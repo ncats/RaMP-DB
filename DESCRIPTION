@@ -1,0 +1,21 @@
+Package: RaMP
+Title: Relational Database of Metabolomic Pathways
+Type: Package
+Version: 0.0.3
+Authors@R: c(
+    person("Elizabeth", "Baskin", email = "Elizabeth.Baskin@osumc.edu", role = "aut"),
+    person("Bofei", "Zhang", email = "zhang.5675@osu.edu", role = "aut"),
+    person("Ewy", "Mathe", email = "Ewy.Mathe@osumc.edu", role = c("aut", "cre")))
+Description: RaMP is a conglomerate of 4 different databases (Kegg, Reactome, 
+    HMDB, and wikipathways) it pulls together the information scattered across 
+    themmainly compounds, genes, and pathways.  
+Depends: R (>= 3.4.0)
+Imports:
+    RMySQL,
+    shiny,
+    shinydashboard,
+    highcharter,
+    DBI,
+    dplyr,
+    DT
+RoxygenNote: 6.0.1.9000
