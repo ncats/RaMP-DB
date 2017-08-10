@@ -1,0 +1,7 @@
+For loop of rampSendQuery
+	time :220s for 540 metabolites, 107 have pathways associated
+	      350s for fisher test 
+
+For loop of Random1000.txt:
+	time: 660s
+	After changing to apply function, it takes 540.6s.....
