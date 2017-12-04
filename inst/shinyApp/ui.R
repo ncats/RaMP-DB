@@ -1,3 +1,4 @@
+
 source(file.path("ui","header.R"),local = T)$value
 
 source(file.path("ui","side.R"),local = T)$value
@@ -14,6 +15,7 @@ source(file.path("ui","uitab4.R"),local = T)$value
 
 source(file.path("ui","uitab5.R"),local = T)$value
 
+source(file.path("ui","uitab6.R"),local = T)$value
 body <- dashboardBody(
   tags$head(
     tags$link(
@@ -26,7 +28,8 @@ body <- dashboardBody(
     tabItem2,
     tabItem3,
     tabItem4,
-    tabItem5
+    tabItem5,
+    tabItem6
   )
 ) 
 

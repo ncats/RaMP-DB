@@ -1,6 +1,0 @@
- rampId     type
-1 RAMP_C_000000001 compound
-2 RAMP_C_000000002 compound
-3 RAMP_C_000000003 compound
-4 RAMP_C_000000004 compound
-5 RAMP_C_000000005 compound

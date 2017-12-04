@@ -9,6 +9,7 @@
 rampFastBiofluid <- function(string,analyteOrBiofluid = NULL){
   biof <- vector()
   analyte <- vector()
+  # check and distribute individual item to either biofluid or analyte
   if(is.character(string)){
     if(grepl("\n",string)[1]){
       list_metabolite <- strsplit(string,"\n")
@@ -87,8 +88,10 @@ rampFastBiofluid <- function(string,analyteOrBiofluid = NULL){
   }
   print(" done for merging ... ")
   if(!is.null(analyteOrBiofluid) && analyteOrBiofluid =="analyteSynonym"){
+    message("Ignore provided biofluid location")
     return(mdf[['analyte']])  
   } else if ( !is.null(analyteOrBiofluid) &&analyteOrBiofluid == "ontology"){
+    message("Ignore provided metabolite or gene synonyms")
     return(mdf[['biofluid']])
   } else if (is.null(analyteOrBiofluid)){
     return(mdf)

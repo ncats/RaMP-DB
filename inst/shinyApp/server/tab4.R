@@ -34,7 +34,7 @@ observe({
   # }
   # 
   # updateSelectInput(session, "KW_cata", label = "Select from the list", choices = x, selected = head(x,1))
-  choices <- kw_analyte[grepl(input$CataInput,kw_analyte)]
+  choices <- kw_analyte[grepl(input$CataInput,kw_analyte,fixed = T)]
   choices <- choices[order(nchar(choices),choices)]
   if(is.null(choices))
     return(NULL)

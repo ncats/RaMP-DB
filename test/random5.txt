@@ -1,7 +1,0 @@
-VitaminA
-VitaminB1
-VitaminC
-VitaminD
-VitaminE
-GTG
-Glucose

@@ -17,16 +17,23 @@ data_stored <- eventReactive(input$subText,{
   progress$set(message = "Querying databases to find metabolites...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
   # rampOut<- rampGenesFromComp(input$kw_search, 90000, input$geneOrComp1)
-  rampOut <- rampFastMetaInPath(input$kw_search)
+  rampOut <- rampFastMetaInPath2(input$kw_search)
+  
   progress$inc(0.7,detail = paste("Down!"))
   return(rampOut)
 })
 
 
 textOut <- eventReactive(input$subText,{
+  if(is.character(data_stored())){
+    return("There is no relevant item in database.")
+  }
   paste0("Search result: ",nrow(data_stored())," items in databases")
 })
 output$numOfitems <- renderText({
+  validate(
+    need(data_stored(),"There is no relevant results in database.")
+  )
   textOut()
 })
 
@@ -49,7 +56,7 @@ output$numOfitems <- renderText({
 # })
 
 observe({
-  choices <- kw_analyte[grepl(input$singleInput,kw_analyte)]
+  choices <- kw_analyte[grepl(input$singleInput,kw_analyte,fixed = T)]
   choices <- choices[order(nchar(choices),choices)]
   if(is.null(choices))
     return(NULL)

@@ -1,4 +1,3 @@
-
 # First tab panel
 dataInput_name <- eventReactive(input$submit_compName,{
   progress <- shiny::Progress$new()
@@ -30,19 +29,8 @@ output$summary_path <- renderText({
 
 
 observe({
-  # x <- rampKWsearch(input$compName, "analytesynonym")
-  # 
-  # isolate({
-  #   if (is.null(x)) {
-  #     x <- character(0)
-  #   } else {
-  #     x <- as.matrix(x)
-  #     x <- matrix(x, ncol = ncol(x), dimnames = NULL)
-  #   }
-  #   
-  #   updateSelectInput(session, "KW_synonym", label = "Select from the list", choices = x, selected = head(x,1))
-  # })
-  choices <- kw_analyte[grepl(input$compName,kw_analyte)]
+
+  choices <- kw_analyte[grepl(input$compName,kw_analyte,fixed = T)]
   choices <- choices[order(nchar(choices),choices)]
   if(is.null(choices))
     return(NULL)

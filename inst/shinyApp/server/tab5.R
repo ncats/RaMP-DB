@@ -23,7 +23,7 @@ summary_onto_out<- eventReactive(input$subText_onto,{
 observe({
   if (input$metaOrOnto == "ontology") {
     # x <- rampKWsearch(input$ontoInput, "ontology")
-    choices <- kw_biofluid[grepl(input$ontoInput,kw_biofluid)]
+    choices <- kw_biofluid[grepl(input$ontoInput,kw_biofluid,fixed = T)]
     choices <- choices[order(nchar(choices),choices)]
   } else {
     # x <- rampKWsearch(input$ontoInput, "analytesynonym")

@@ -5,8 +5,20 @@
 \title{run shiny app}
 \usage{
 runRaMPapp(dbname = "mathelabramp", username = "root",
-  password = "Ehe131224", host = NULL)
+  password = "Ehe131224", host = NULL, update = FALSE)
+}
+\arguments{
+\item{dbname}{a string that is database name including all tables}
+
+\item{username}{a string that is username for database}
+
+\item{password}{a string this is password for database}
+
+\item{host}{a string that stand for host}
+
+\item{update}{a logic value determines if RaMP update local data}
 }
 \description{
-run shiny app
+if has database locally, user must provide database name
+username password
 }

@@ -1,7 +1,7 @@
 Package: RaMP
 Title: Relational Database of Metabolomic Pathways
 Type: Package
-Version: 0.0.3
+Version: 0.0.4
 Authors@R: c(
     person("Elizabeth", "Baskin", email = "Elizabeth.Baskin@osumc.edu", role = "aut"),
     person("Bofei", "Zhang", email = "zhang.5675@osu.edu", role = "aut"),
@@ -17,5 +17,7 @@ Imports:
     highcharter,
     DBI,
     dplyr,
-    DT
+    DT,
+    RSQLServer,
+    xtable
 RoxygenNote: 6.0.1.9000

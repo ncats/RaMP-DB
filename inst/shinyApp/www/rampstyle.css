@@ -109,3 +109,10 @@ table.data:hover {
 .tab3-tooltip-hc{
   overflow-wrap: break-word;
 }
+#kwSearch{
+  background:#3c8dbc;
+  color:#f6f6f6;
+  cursor:pointer;
+  margin:0 3px 3px 0;
+  padding:1px 3px;
+}

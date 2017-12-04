@@ -37,6 +37,11 @@ sideBar <- dashboardSidebar(
       icon = icon("dashboard")
     ),
     menuItem(
+      "Customize Query",
+      tabName = "customizeQuery",
+      icon = icon("dashboard")
+    ),
+    menuItem(
         tags$button(
           id = "buttonstop",
           type = "button",

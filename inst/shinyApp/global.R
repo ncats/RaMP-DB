@@ -1,4 +1,3 @@
-
 # con <- dbPool(
 #   drv = RMySQL::MySQL(),
 #   dbname = "mathelabramp",
