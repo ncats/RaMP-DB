@@ -2,13 +2,13 @@
 % Please edit documentation in R/runRaMP.R
 \name{runRaMPapp}
 \alias{runRaMPapp}
-\title{run shiny app}
+\title{Run Shiny App}
 \usage{
-runRaMPapp(dbname = "mathelabramp", username = "root",
-  password = "Ehe131224", host = NULL, update = FALSE)
+runRaMPapp(dbname = "ramp", username = "root", password = NULL,
+  host = NULL, update = FALSE)
 }
 \arguments{
-\item{dbname}{a string that is database name including all tables}
+\item{dbname}{the name of the dadtabase (by default a string that is database name including all tables}
 
 \item{username}{a string that is username for database}
 
@@ -19,6 +19,5 @@ runRaMPapp(dbname = "mathelabramp", username = "root",
 \item{update}{a logic value determines if RaMP update local data}
 }
 \description{
-if has database locally, user must provide database name
-username password
+This function connects to the RaMP database (provided within the package), and launches the RaMP web application.  The password for the mysql connection must be provided.
 }

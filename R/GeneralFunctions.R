@@ -44,8 +44,9 @@ rampTablize <- function(data,num_row =5){
 #' @param geneOrcompound string defined from radio input that describes type
 #' of returned metablites from query.
 #' @examples
+#' \dontrun{
 #' ramp <- rampGenesFromComp("VitamineE",20,"compound")
-#' @return a dataframe that contain given synonym as column name
+#' @return a dataframe that contain given synonym as column name}
 #' @export
 rampGenesFromComp <- function(names, maxItems, geneOrcompound = NULL) {
     # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
