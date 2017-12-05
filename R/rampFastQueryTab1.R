@@ -99,6 +99,8 @@ rampFastMetaInPath <- function(synonym,options = TRUE){
 
 #' Query: given a synonym, returns other genes or metabolites from the same pathway
 #' @param synonym synonym (character string)
+#' 
+#' @export
 rampFastMetaInPath2 <- function(synonym){
   now <- proc.time()
   if(is.character(synonym)){

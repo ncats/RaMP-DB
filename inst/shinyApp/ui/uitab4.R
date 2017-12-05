@@ -5,10 +5,10 @@
 # 
 tabItem4<-  shinydashboard::tabItem(
   tabName = "geneCataComp",
-  tabBox(width = 12,id = "tabset4",height = "100%",
-         tabPanel(strong("Input metabolite or gene one by one."),
+  shinydashboard::tabBox(width = 12,id = "tabset4",height = "100%",
+         shiny::tabPanel(strong("Input metabolite or gene one by one."),
                   "",
-                  box(width=6,
+                  shinydashboard::box(width=6,
                       title = strong("Input synonym of gene or compound"),
                       solidHeader = T,
                       height = "100%",
@@ -23,7 +23,7 @@ tabItem4<-  shinydashboard::tabItem(
                                )
                       )
                   ),
-                  box(width = 6,title = strong("Search Result:"),solidHeader = T,
+                  shinydashboard::box(width = 6,title = strong("Search Result:"),solidHeader = T,
                       status = "primary",
                       fluidRow(
                         div(style = "margin:25px;",
@@ -40,7 +40,7 @@ tabItem4<-  shinydashboard::tabItem(
                   ),
                   hr(),
                   fluidRow(
-                    box(
+                    shinydashboard::box(
                       width = 12,
                       solidHeader = T,
                       status = "info",
@@ -50,10 +50,10 @@ tabItem4<-  shinydashboard::tabItem(
                       uiOutput("preview_tab4")
                     )
          )),
-         tabPanel(
+         shiny::tabPanel(
            title = strong("Input a list of gene or metabolites"),
            fluidRow(
-             box(width = 6,
+             shinydashboard::box(width = 6,
                  solidHeader = T,
                  status = "primary",
                  title = strong("Input a list of gene or metabolites:"),
@@ -61,7 +61,7 @@ tabItem4<-  shinydashboard::tabItem(
                                placeholder = "Input list of metabolites or gene in lines or separated by \",\""),
                  actionButton("sub_mul_tab4",label = "Submit")
              ),
-             box(
+             shinydashboard::box(
                width = 6,
                title = strong("Upload the file"),
                solidHeader = T,
@@ -76,7 +76,7 @@ tabItem4<-  shinydashboard::tabItem(
            hr(),
            fluidRow(
              HTML("<div id='database-group-output'>"),
-             box(width = 12,
+             shinydashboard::box(width = 12,
                  title = strong("Data preview"),
                  solidHeader = T,
                  status = "primary",

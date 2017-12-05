@@ -1,10 +1,10 @@
 tabItem1<-shinydashboard::tabItem(
   tabName = "genesFromCompounds",
   shinydashboard::tabBox(width = 12,id ="tabset1",
-                         shinydashboard::tabPanel(title = strong("Input analyte one by one"),
+                         shiny::tabPanel(title = strong("Input analyte one by one"),
                   label = "sub_tab_1_TAB1",
                   fluidRow(
-                    box(width=6,
+                    shinydashboard::box(width=6,
                         title = strong("Input synonym that you want to search for"),
                         solidHeader = T,
                         height = "100%",
@@ -19,7 +19,7 @@ tabItem1<-shinydashboard::tabItem(
                                  )
                         )
                     ),
-                    box(width = 6,
+                    shinydashboard::box(width = 6,
                         title = strong("Search Result:"),
                         solidHeader = T,
                         height = "100%",
@@ -40,7 +40,7 @@ tabItem1<-shinydashboard::tabItem(
                   ),
                   fluidRow(
                     HTML("<div id ='databases-group-output'>"),
-                    box(width = 12,
+                    shinydashboard::box(width = 12,
                         solidHeader = T,
                         status = "info",
                         collapsible = T,
@@ -50,9 +50,9 @@ tabItem1<-shinydashboard::tabItem(
                     HTML("</div>")
                   )
             ),
-            shinydashboard::tabPanel(title = "Input a list of analytes",
+            shiny::tabPanel(title = "Input a list of analytes",
                   fluidRow(
-                    box(width = 6,
+                    shinydashboard::box(width = 6,
                         status = "primary",
                         solidHeader = T,
                         title = strong("Input a list of metabolites"),
@@ -60,7 +60,7 @@ tabItem1<-shinydashboard::tabItem(
                                       placeholder = "Input list of metabolites in lines or separated by \",\""),
                         actionButton("sub_mul_tab1",label = "Submit")
                     ),
-                    box(
+                    shinydashboard::box(
                       width = 6,
                       solidHeader = T,
                       status = "primary",
@@ -75,7 +75,7 @@ tabItem1<-shinydashboard::tabItem(
                   hr(),
                   fluidRow(
                     HTML("<div id='database-group-output'>"),
-                    box(width = 12,
+                    shinydashboard::box(width = 12,
                         solidHeader = T,
                         status = "primary",
                         title = strong("Data preview"),

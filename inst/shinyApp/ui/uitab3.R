@@ -1,10 +1,10 @@
 tabItem3 <-  shinydashboard::tabItem(
   tabName = "pathFromMeta",
   shinydashboard::tabBox(width = 12, id = "tabset3",
-         tabPanel(
+         shiny::tabPanel(
            title = strong("Input analyte one by one"),
            label ="sub_tab_1_TAB3",
-           box(
+           shinydashboard::box(
              width = 6,
              title = strong("Input synonym"),
              solidHeader = T,
@@ -19,7 +19,7 @@ tabItem3 <-  shinydashboard::tabItem(
                       )
              )
            ),
-           box(width = 6,
+           shinydashboard::box(width = 6,
                title = strong("Search Result:"),
                solidHeader = T,
                status = "primary",
@@ -38,7 +38,7 @@ tabItem3 <-  shinydashboard::tabItem(
            ),
            hr(),
            fluidRow(
-             box(
+             shinydashboard::box(
                width = 12,
                solidHeader = T,
                status = "info",
@@ -49,11 +49,11 @@ tabItem3 <-  shinydashboard::tabItem(
              )
            )
          ),
-         tabPanel(
+         shiny::tabPanel(
            title = strong("Input list of metabolites"),
            label = "sub_tab_2_TAB3",
            fluidRow(
-             box(width = 6,
+             shinydashboard::box(width = 6,
                  solidHeader = T,
                  status = "primary",
                  title = strong("Input a list of metabolites:"),
@@ -61,7 +61,7 @@ tabItem3 <-  shinydashboard::tabItem(
                                placeholder = "Input list of metabolites in lines or separated by \",\""),
                  actionButton("sub_mul_tab3",label = "Submit")
              ),
-             box(
+             shinydashboard::box(
                width = 6,
                solidHeader = T,
                status = "primary",
@@ -76,14 +76,14 @@ tabItem3 <-  shinydashboard::tabItem(
            hr(),
            fluidRow(
              HTML("<div id='database-group-output'>"),
-             box(width = 12,
+             shinydashboard::box(width = 12,
                  title = strong("Data preview"),
                  solidHeader = T,
                  status = "primary",
                  downloadButton("tab3_mul_report",label = "Download Table"),
                  hr(),
                  dataTableOutput("preview_multi_names"),
-                 highchartOutput("tab3_hc_output"),
+                 highcharter::highchartOutput("tab3_hc_output"),
                  textOutput("hc_click_output"),
                  tableOutput("stats_fisher_tab3"),
                  conditionalPanel(condition = "output.stats_fisher_tab3 != null",
@@ -94,7 +94,7 @@ tabItem3 <-  shinydashboard::tabItem(
                                                "Pathway Enrichment Analysis"),
                                   downloadButton("stats_report","Download Fiser Test Result"),
                                   hr(),
-                                  box(title = strong("Enriched pathways identified by Fisher Test"),
+                                  shinydashboard::box(title = strong("Enriched pathways identified by Fisher Test"),
                                       collapsible = T,
                                       collapsed = T,
                                       solidHeader = T,

@@ -1,7 +1,7 @@
 tabItem2<-  shinydashboard::tabItem(
   tabName = "metaFromPath",
-  tabBox(width = 12,id ="tabset2",
-         tabPanel(title = strong("Input pathway one by one"),
+  shinydashboard::tabBox(width = 12,id ="tabset2",
+         shiny::tabPanel(title = strong("Input pathway one by one"),
                   label = "sub_tab_1_TAB2",
                   fluidRow(
                     box(
@@ -30,7 +30,7 @@ tabItem2<-  shinydashboard::tabItem(
                         )
                       )
                     ),
-                    box(width = 6,
+                    shinydashboard::box(width = 6,
                         title = strong("Search Result:"),
                         solidHeader = T,
                         status = "primary",
@@ -50,7 +50,7 @@ tabItem2<-  shinydashboard::tabItem(
                   ),
                   fluidRow(
                     HTML("<div id='database-group-output'>"),
-                    box(
+                    shinydashboard::box(
                       width = 12,
                       status = "info",
                       solidHeader = T,
@@ -61,15 +61,15 @@ tabItem2<-  shinydashboard::tabItem(
                     HTML("</div>")
                   )
          ),
-         tabPanel(title = "Input a list of pathways",
+         shiny::tabPanel(title = "Input a list of pathways",
                   fluidRow(
-                    box(width = 6,
+                    shinydashboard::box(width = 6,
                         title = strong("Input a list of pathways:"),
                         textAreaInput("input_mul_tab2",label = "",
                                       placeholder = "Input list of metabolites in lines or separated by \",\""),
                         actionButton("sub_mul_tab2",label = "Submit")
                     ),
-                    box(
+                    shinydashboard::box(
                       width = 6,
                       title = strong("Upload the file"),
                       fileInput("inp_file_tab2",label = "",
@@ -82,7 +82,7 @@ tabItem2<-  shinydashboard::tabItem(
                   hr(),
                   fluidRow(
                     HTML("<div id='database-group-output'>"),
-                    box(width = 12,
+                    shinydashboard::box(width = 12,
                         title = strong("Data preview"),
                         downloadButton("tab2_mul_report",label = "Download Table"),
                         hr(),
