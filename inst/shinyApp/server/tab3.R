@@ -241,7 +241,7 @@ fisherHeatMap <- reactive({
 })
 
 
-output$summary_fisher <- renderDataTable({
+output$summary_fisher <- DT::renderDataTable({
   
   data <- fisherHeatMap()
   data <- data[,c('pathway','y')]

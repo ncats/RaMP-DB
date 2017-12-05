@@ -1,8 +1,8 @@
 server <- function(input, output, session) {
   
   session$onSessionEnded(function(){
-    killDbConnections()
-    stopApp()
+    RaMP::killDbConnections()
+    shiny::stopApp()
   }) # close shiny app when close browser.
   
   # Tab 1 for convert synonym to synonyms that have connection to it.

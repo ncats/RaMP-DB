@@ -4,7 +4,7 @@
 #' @export
 rampReadQuery <- function(query){
   out <- tryCatch({
-    dbGetQuery(con,query)
+    DBI::dbGetQuery(con,query)
   },
   error = function(cond){
     message("No searching result in one of the query ...")
@@ -51,12 +51,12 @@ rampFastMetaInPath <- function(synonym,options = TRUE){
     
     query1 <- paste0("select distinct Synonym,rampId from analytesynonym where Synonym in (",
                      list_metabolite,");")
-    df1<- dbGetQuery(con,query1)
+    df1<- DBI::dbGetQuery(con,query1)
     colnames(df1) <- c("Synonym1","rampId1")
     query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where 
                      rampId in (select rampId from analytesynonym where Synonym in (",
                      list_metabolite,"));")
-    df2 <- dbGetQuery(con,query2)
+    df2 <- DBI::dbGetQuery(con,query2)
     df2<- unique(df2)
     colnames(df2) <- c("pathwayRampId1","rampId1")
     pid_list <- df2[,1]
@@ -64,7 +64,7 @@ rampFastMetaInPath <- function(synonym,options = TRUE){
     pid_list <- paste(pid_list,collapse = ",")
     query3 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
                      pid_list,");")
-    df3 <- dbGetQuery(con,query1)
+    df3 <- DBI::dbGetQuery(con,query1)
     df3 <- unique(df3)
     colnames(df3) <- c("rampId2","pathwayRampId1")
     cid_list <- df3[,1]
@@ -72,12 +72,12 @@ rampFastMetaInPath <- function(synonym,options = TRUE){
     cid_list <- paste(cid_list,collapse = ",")
     query4 <- paste0("SELECT Synonym,geneOrCompound,rampId FROM analytesynonym 
                      WHERE rampID IN (",cid_list,");")
-    df4 <- dbGetQuery(con,query4)
+    df4 <- dbGetQuery::dbGetQuery(con,query4)
     df4<- unique(df4)
     colnames(df4) <- c("Synonym2","geneOrCompound","rampId2")
     query5 <- paste0("select rampId,sourceId,IDtype from source where rampId in(",
                      cid_list,");")
-    df5 <- dbGetQuery(con,query5)
+    df5 <- DBI::dbGetQuery(con,query5)
     if(is.null(df5)){
       return("No searching result ...")
     }
@@ -97,6 +97,8 @@ rampFastMetaInPath <- function(synonym,options = TRUE){
     return(mdf4[,1:4])
 }
 
+#' Query: given a synonym, returns other genes or metabolites from the same pathway
+#' @param synonym synonym (character string)
 rampFastMetaInPath2 <- function(synonym){
   now <- proc.time()
   if(is.character(synonym)){
@@ -120,12 +122,12 @@ rampFastMetaInPath2 <- function(synonym){
   
   query1 <- paste0("select distinct Synonym,rampId from analytesynonym where Synonym in (",
                    list_metabolite,");")
-  df1<- dbGetQuery(con,query1)
+  df1<- DBI::dbGetQuery(con,query1)
   colnames(df1) <- c("Synonym1","rampId1")
   query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where 
                    rampId in (select rampId from analytesynonym where Synonym in (",
                    list_metabolite,"));")
-  df2 <- dbGetQuery(con,query2)
+  df2 <- DBI::dbGetQuery(con,query2)
   df2<- unique(df2)
   colnames(df2) <- c("pathwayRampId1","rampId1")
   pid_list <- df2[,1]
@@ -134,7 +136,7 @@ rampFastMetaInPath2 <- function(synonym){
   query3 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
                    pid_list,");")
   
-  df3 <- dbGetQuery(con,query3)
+  df3 <- DBI::dbGetQuery(con,query3)
   df3 <- unique(df3)
   colnames(df3) <- c("rampId2","pathwayRampId1")
   cid_list <- df3[,1]
@@ -142,12 +144,12 @@ rampFastMetaInPath2 <- function(synonym){
   cid_list <- paste(cid_list,collapse = ",")
   query4 <- paste0("SELECT Synonym,geneOrCompound,rampId FROM analytesynonym 
                    WHERE rampID IN (",cid_list,");")
-  df4 <- dbGetQuery(con,query4)
+  df4 <- DBI::dbGetQuery(con,query4)
   df4<- unique(df4)
   colnames(df4) <- c("Synonym2","geneOrCompound","rampId2")
   query5 <- paste0("select rampId,sourceId,IDtype from source where rampId in(",
                    cid_list,");")
-  df5 <- dbGetQuery(con,query5)
+  df5 <- DBI::dbGetQuery(con,query5)
   if(is.null(df5)){
     return("No searching result ...")
   }
