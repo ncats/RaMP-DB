@@ -131,7 +131,7 @@ tb_data_tab2 <- reactive({
   }
   tb
 })
-output$preview_multi_names_tab2 <- renderDataTable({
+output$preview_multi_names_tab2 <- DT::renderDataTable({
   if(is.null(detector_tab2$num))
     return("Waiting for input")
   

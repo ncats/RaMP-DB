@@ -10,7 +10,7 @@ rampOneFisherTest <- function(pathway_list,pathway,num_of_meta){
   contingencyTb <- matrix(0,nrow = 2,ncol = 2)
   colnames(contingencyTb) <- c("In Pathway","Not In Pathway")
   rownames(contingencyTb) <- c("All Metabolites","User's Metabolites")
-  tot_in_pathway <- dbGetQuery(con,paste0("select count(*) from analyte 
+  tot_in_pathway <- DBI::dbGetQuery(con,paste0("select count(*) from analyte 
                                             where rampId in (select rampId from 
                                             analytehaspathway where 
                                             pathwayRampId in (select pathwayRampId 
@@ -18,7 +18,7 @@ rampOneFisherTest <- function(pathway_list,pathway,num_of_meta){
                                           pathway,"\"));"))
   tot_in_pathway <- tot_in_pathway[[1]]
   
-  tot_metabolites <- dbGetQuery(con,"select count(*) from analyte;")
+  tot_metabolites <- DBI::dbGetQuery(con,"select count(*) from analyte;")
   tot_metabolites <- tot_metabolites[[1]]
   tot_out_pathway <- tot_metabolites - tot_in_pathway
   user_in_pathway <- nrow(pathway_list[[pathway]])
@@ -67,7 +67,7 @@ rampFisherTest <- function(pathway_meta_list,num_user_metabolites,FisherPathwayT
   # progress<- shiny::Progress$new()
   # progress$set(message = "Fisher testing ...",value = 0)
   # on.exit(progress$close())
-  tot_metabolites <- dbGetQuery(con,"select count(*) from analyte;")
+  tot_metabolites <- DBI::dbGetQuery(con,"select count(*) from analyte;")
   tot_metabolites <- tot_metabolites[[1]]
   cumulative_fisher_results <- list()
   
@@ -120,17 +120,17 @@ rampFastPathFromMeta<- function(synonym,find_synonym = FALSE){
   list_metabolite <- paste(list_metabolite,collapse = ",")
   query1 <- paste0("select distinct Synonym,rampId from analytesynonym where Synonym in (",
                     list_metabolite,");")
-  df1<- dbGetQuery(con,query1)
+  df1<- DBI::dbGetQuery(con,query1)
   query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where 
                     rampId in (select rampId from analytesynonym where Synonym in (",
                     list_metabolite,"));")
-  df2 <- dbGetQuery(con,query2)
+  df2 <- DBI::dbGetQuery(con,query2)
   id_list <- df2[,1]
   id_list <- sapply(id_list,shQuote)
   id_list <- paste(id_list,collapse = ",")
   query3 <- paste0("select pathwayName,sourceId,type,pathwayRampId from pathway where pathwayRampId in (",
                     id_list,");")
-  df3 <- dbGetQuery(con,query3)
+  df3 <- DBI::dbGetQuery(con,query3)
   mdf <- merge(df1,df2,all.x=T)
   mdf <- mdf[!is.na(mdf[,3]),]
   mdf <- merge(mdf,df3,all.x = T)

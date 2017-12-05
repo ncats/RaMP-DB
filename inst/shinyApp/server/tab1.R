@@ -17,7 +17,7 @@ data_stored <- eventReactive(input$subText,{
   progress$set(message = "Querying databases to find metabolites...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
   # rampOut<- rampGenesFromComp(input$kw_search, 90000, input$geneOrComp1)
-  rampOut <- rampFastMetaInPath2(input$kw_search)
+  rampOut <- RaMP:::rampFastMetaInPath2(input$kw_search)
   
   progress$inc(0.7,detail = paste("Down!"))
   return(rampOut)

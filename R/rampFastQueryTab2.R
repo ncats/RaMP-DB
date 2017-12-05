@@ -30,21 +30,21 @@ rampFastMetaFromPath <- function(pathway){
   list_pathway <- paste(list_pathway,collapse = ",")
   query1 <- paste0("select pathwayName,pathwayRampId from pathway where pathwayName
                    in (",list_pathway,");")
-  df1 <- dbGetQuery(con,query1)
+  df1 <- DBI::dbGetQuery(con,query1)
   query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where 
                    pathwayRampId in (select pathwayRampId from pathway where 
                    pathwayName in (",list_pathway,"));")
  
-  df2 <- dbGetQuery(con,query2)
+  df2 <- DBI::dbGetQuery(con,query2)
   cid_list <- unlist(df2[,2])
   cid_list <- sapply(cid_list,shQuote)
   cid_list <- paste(cid_list,collapse = ",")
   query3 <- paste0("select synonym,geneOrCompound,rampId from analytesynonym where rampId in (",
                    cid_list,");")
-  df3 <- dbGetQuery(con,query3)
+  df3 <- DBI::dbGetQuery(con,query3)
   query4 <- paste0("select rampId,sourceId,IDtype from source where rampId in (",
                    cid_list,");")
-  df4 <- dbGetQuery(con,query4)
+  df4 <- DBI::dbGetQuery(con,query4)
   mdf1 <- merge(df3,df4,all.x = T)
   mdf1 <- merge(mdf1,df2,all.x = T)
   mdf1 <- merge(mdf1,df1,all.x = T)

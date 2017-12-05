@@ -28,7 +28,7 @@ rampFindSynonymFromSynonym <- function(synonym,full = F,find_synonym = F){
     query <- paste0("select synonym as origins,rampId from analyteSynonym where Synonym in(",
                     list_metabolite,
                     ");")
-    df1 <- dbGetQuery(con,query)
+    df1 <- DBI::dbGetQuery(con,query)
     return(df1)
   }
   list_metabolite <- unique(list_metabolite)
@@ -37,13 +37,13 @@ rampFindSynonymFromSynonym <- function(synonym,full = F,find_synonym = F){
   query <- paste0("select synonym as origins,rampId from analyteSynonym where Synonym in(",
                   list_metabolite,
                   ");")
-  df1 <- dbGetQuery(con,query)
+  df1 <- DBI::dbGetQuery(con,query)
   
   rampid <- df1$rampId
   rampid <- sapply(rampid,shQuote)
   rampid <- paste(rampid,collapse = ",")
   query <- paste0("select * from analyteSynonym where rampId in(",rampid,");")
-  df2 <- dbGetQuery(con,query)
+  df2 <- DBI::dbGetQuery(con,query)
   df2 <- merge(df1,df2)
   if(full){
     return(df2)
@@ -79,7 +79,7 @@ rampFindSourceFromId <- function(rampId=NULL,full = T){
   list_id <- sapply(list_id,shQuote)
   list_id <- paste(list_id,collapse = ",")
   query <- paste0("select * from source where rampId in (",list_id,");")
-  df <- dbGetQuery(con,query)
+  df <- DBI::dbGetQuery(con,query)
   if(full){
     return(df)
   } else{
@@ -110,7 +110,7 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE){
   list_metabolite <- paste(list_metabolite,collapse = ",")
   query1 <- paste0("select * from source where sourceid in (",
                    list_metabolite,");")
-  df1<- dbGetQuery(con,query1)
+  df1<- DBI::dbGetQuery(con,query1)
   colnames(df1)[1] <-"sourceId2"
   #return(df1)
   rampid <- df1$rampId
@@ -118,7 +118,7 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE){
   rampid <- paste(rampid,collapse = ",")
   query2 <- paste0("select * from analytehaspathway where 
                    rampId in (",rampid,");")
-  df2 <- dbGetQuery(con,query2)
+  df2 <- DBI::dbGetQuery(con,query2)
   #return(df2)
   id_list <- unique(df2$pathwayRampId)
   id_list <- sapply(id_list,shQuote)
@@ -126,7 +126,7 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE){
   print(id_list)
   query3 <- paste0("select * from pathway where pathwayRampId in (",
                    id_list,");")
-  df3 <- dbGetQuery(con,query3)
+  df3 <- DBI::dbGetQuery(con,query3)
   #return(df3)
   mdf <- merge(df3,df2,all.x=T)
   mdf <- merge(mdf,df1,all.x = T)

@@ -27,7 +27,7 @@ rampFastOneCata <- function(synonym,options = F) {
   print(list_metabolite)
   query1 <- paste0("select Synonym as analyte1,rampId,geneOrCompound as type1 from analytesynonym where Synonym in (",
                    list_metabolite,");")
-  df1<- dbGetQuery(con,query1)
+  df1<- DBI::dbGetQuery(con,query1)
   print(df1$rampId)
   df_c <- df_g <- NULL
   mdf_c <- mdf_g <- NULL
@@ -45,7 +45,7 @@ rampFastOneCata <- function(synonym,options = F) {
     query_c <- paste0("select rampCompoundId as rampId,rampGeneId as rampId2 from catalyzed where rampCompoundId in (",
                       c_id,");")
     print("Geting gene Id from Compound Id ...")
-    df_c2 <- dbGetQuery(con,query_c)
+    df_c2 <- DBI::dbGetQuery(con,query_c)
     if(nrow(df_c2) == 0){
       message("No searching result")
       return(NULL)
@@ -56,11 +56,11 @@ rampFastOneCata <- function(synonym,options = F) {
     analyte2_list <- paste(analyte2_list,collapse = ",")
     query2 <- paste0("select Synonym as analyte2,rampId as rampId2,geneOrCompound as type2 from analyteSynonym 
                      where rampId in (",analyte2_list,");")
-    df_c3 <- dbGetQuery(con,query2)
+    df_c3 <- DBI::dbGetQuery(con,query2)
     query3 <- paste0("select sourceId,rampId as rampId2,IDtype from source where rampId in (",
                      analyte2_list,");")
     print("Get source ...")
-    df_c4 <- dbGetQuery(con,query3)
+    df_c4 <- DBI::dbGetQuery(con,query3)
     df_c4 <- unique(df_c4)
     
     print("merge 1")
@@ -84,7 +84,7 @@ rampFastOneCata <- function(synonym,options = F) {
     g_id <- paste(g_id,collapse = ",")
     query_g <- paste0("select rampGeneId as rampId,rampCompoundId as rampId2 from catalyzed where rampGeneId in (",
                       g_id,");")
-    df_g2 <- dbGetQuery(con,query_g)
+    df_g2 <- DBI::dbGetQuery(con,query_g)
     if(nrow(df_g2) == 0){
       message("No searching result for gene")
       return(NULL)
@@ -99,7 +99,7 @@ rampFastOneCata <- function(synonym,options = F) {
     if(nrow(df_g3))
     query3 <- paste0("select sourceId,rampId as rampId2,IDtype from source where rampId in (",
                      analyte2_list,");")
-    df_g4 <- dbGetQuery(con,query3)
+    df_g4 <- DBI::dbGetQuery(con,query3)
     
     # mdf_g <- merge(df_g3,df_g4,all = T)
     mdf_g <- dplyr::left_join(df_g3,df_g4)
@@ -145,7 +145,7 @@ rampFastMulCata <- function(synonym) {
   print(list_metabolite)
   query1 <- paste0("select Synonym as analyte1,rampId,geneOrCompound as type1 from analytesynonym where Synonym in (",
                    list_metabolite,");")
-  df1<- dbGetQuery(con,query1)
+  df1<- DBI::dbGetQuery(con,query1)
   print(df1$rampId)
   df_c <- df_g <- NULL
   mdf_c <- mdf_g <- NULL
@@ -163,7 +163,7 @@ rampFastMulCata <- function(synonym) {
     query_c <- paste0("select rampCompoundId as rampId,rampGeneId as rampId2 from catalyzed where rampCompoundId in (",
                       c_id,");")
     print("Geting gene Id from Compound Id ...")
-    df_c2 <- dbGetQuery(con,query_c)
+    df_c2 <- DBI::dbGetQuery(con,query_c)
     if(nrow(df_c2) == 0){
       message("No searching result")
       df_c2 <- data.frame(rampId2 = "Not Found")
@@ -174,11 +174,11 @@ rampFastMulCata <- function(synonym) {
     analyte2_list <- paste(analyte2_list,collapse = ",")
     query2 <- paste0("select Synonym as analyte2,rampId as rampId2,geneOrCompound as type2 from analyteSynonym 
                      where rampId in (",analyte2_list,");")
-    df_c3 <- dbGetQuery(con,query2)
+    df_c3 <- DBI::dbGetQuery(con,query2)
     query3 <- paste0("select sourceId,rampId as rampId2,IDtype from source where rampId in (",
                      analyte2_list,");")
     print("Get source ...")
-    df_c4 <- dbGetQuery(con,query3)
+    df_c4 <- DBI::dbGetQuery(con,query3)
     df_c4 <- unique(df_c4)
     
     print("merge 1")
@@ -202,7 +202,7 @@ rampFastMulCata <- function(synonym) {
     g_id <- paste(g_id,collapse = ",")
     query_g <- paste0("select rampGeneId as rampId,rampCompoundId as rampId2 from catalyzed where rampGeneId in (",
                       g_id,");")
-    df_g2 <- dbGetQuery(con,query_g)
+    df_g2 <- DBI::dbGetQuery(con,query_g)
     if(nrow(df_g2) == 0){
       message("No searching result for gene")
       
@@ -216,7 +216,7 @@ rampFastMulCata <- function(synonym) {
     df_g3 <-dbGetQuery(con,query2)
     query3 <- paste0("select sourceId,rampId as rampId2,IDtype from source where rampId in (",
                      analyte2_list,");")
-    df_g4 <- dbGetQuery(con,query3)
+    df_g4 <- DBI::dbGetQuery(con,query3)
     
     # mdf_g <- merge(df_g3,df_g4,all = T)
     mdf_g <- dplyr::left_join(df_g3,df_g4)
