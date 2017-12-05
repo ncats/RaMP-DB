@@ -106,7 +106,7 @@ tabItem3 <-  shinydashboard::tabItem(
                                         DT::dataTableOutput("summary_fisher")
                                       ),
                                       column(width = 6,
-                                             highchartOutput("heatmap_pvalue")
+                                             highcharter::highchartOutput("heatmap_pvalue")
                                              )
                                   )
                  )
