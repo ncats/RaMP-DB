@@ -3,7 +3,7 @@
 # Tab 4
 # 
 # 
-tabItem4<-  tabItem(
+tabItem4<-  shinydashboard::tabItem(
   tabName = "geneCataComp",
   tabBox(width = 12,id = "tabset4",height = "100%",
          tabPanel(strong("Input metabolite or gene one by one."),

@@ -1,4 +1,4 @@
-tabItem2<-  tabItem(
+tabItem2<-  shinydashboard::tabItem(
   tabName = "metaFromPath",
   tabBox(width = 12,id ="tabset2",
          tabPanel(title = strong("Input pathway one by one"),

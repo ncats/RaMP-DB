@@ -1,7 +1,7 @@
-tabItem1<-  tabItem(
+tabItem1<-shinydashboard::tabItem(
   tabName = "genesFromCompounds",
-  tabBox(width = 12,id ="tabset1",
-         tabPanel(title = strong("Input analyte one by one"),
+  shinydashboard::tabBox(width = 12,id ="tabset1",
+                         shinydashboard::tabPanel(title = strong("Input analyte one by one"),
                   label = "sub_tab_1_TAB1",
                   fluidRow(
                     box(width=6,
@@ -50,7 +50,7 @@ tabItem1<-  tabItem(
                     HTML("</div>")
                   )
             ),
-         tabPanel(title = "Input a list of analytes",
+            shinydashboard::tabPanel(title = "Input a list of analytes",
                   fluidRow(
                     box(width = 6,
                         status = "primary",

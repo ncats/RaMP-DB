@@ -1,6 +1,6 @@
-tabItem_about <- tabItem(
+tabItem_about <- shinydashboard::tabItem(
   tabName = "About",
-  box(width = 12,
+  shinydashboard::box(width = 12,
       title = tags$h1(strong("RaMP: Relational Database of Metabolic Pathways")),
       footer = p(strong("Contact: Bofei Zhang zhang.5675@osu.edu")),
       solidHeader = T,

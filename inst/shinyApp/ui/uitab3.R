@@ -1,6 +1,6 @@
-tabItem3 <-  tabItem(
+tabItem3 <-  shinydashboard::tabItem(
   tabName = "pathFromMeta",
-  tabBox(width = 12, id = "tabset3",
+  shinydashboard::tabBox(width = 12, id = "tabset3",
          tabPanel(
            title = strong("Input analyte one by one"),
            label ="sub_tab_1_TAB3",

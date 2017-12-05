@@ -2,7 +2,7 @@
 # 
 # 
 # 
-tabItem5<-  tabItem(
+tabItem5<-  shinydashboard::tabItem(
   tabName = "geneCompOnto",
   tabBox(width = 12,
          id = "tabset5",
