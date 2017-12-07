@@ -50,7 +50,7 @@ rampTablize <- function(data,num_row =5){
 #' @export
 rampGenesFromComp <- function(names, maxItems, geneOrcompound = NULL) {
     # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
-    result <- dbGetQuery(con, paste0("SELECT analytesynonym.Synonym,analytesynonym.geneOrCompound,source.sourceId,source.IDtype
+    result <- DBI::dbGetQuery(con, paste0("SELECT analytesynonym.Synonym,analytesynonym.geneOrCompound,source.sourceId,source.IDtype
                             FROM analytesynonym,source WHERE analytesynonym.rampID IN
                                      (SELECT rampId FROM analytehaspathway WHERE pathwayRampId IN
                                      (SELECT pathwayRampId FROM analytehaspathway WHERE rampId IN
@@ -78,14 +78,14 @@ rampGenesFromComp <- function(names, maxItems, geneOrcompound = NULL) {
 rampNameFromPath <- function(names, maxItems, geneOrCompound) {
   # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
   if (geneOrCompound != "both"){
-      result <- dbGetQuery(con, paste0("select analytesynonym.Synonym,analytesynonym.geneOrCompound,source.sourceId,source.IDtype 
+      result <- DBI::dbGetQuery(con, paste0("select analytesynonym.Synonym,analytesynonym.geneOrCompound,source.sourceId,source.IDtype 
                                         from analytesynonym,source where analytesynonym.rampId in 
                                        (select rampId from analytehaspathway where pathwayRampId in 
                                        (select pathwayRampId from pathway where pathwayName = \"",
                                         names,"\")) and source.rampId = analytesynonym.rampId and analytesynonym.geneOrCompound = \"",
                                         geneOrCompound,"\" limit ", maxItems,";"))
   } else {
-      result <- dbGetQuery(con, paste0("select analytesynonym.Synonym,analytesynonym.geneOrCompound,source.sourceId,source.IDtype 
+      result <- DBI::dbGetQuery(con, paste0("select analytesynonym.Synonym,analytesynonym.geneOrCompound,source.sourceId,source.IDtype 
                                         from analytesynonym,source where analytesynonym.rampId in 
                                        (select rampId from analytehaspathway where pathwayRampId in 
                                        (select pathwayRampId from pathway where pathwayName = \"",
@@ -115,12 +115,12 @@ rampPathFromMeta <- function(synonym, maxItems) {
     sql <- paste0("select pathwayRampId from analytehaspathway where rampId in
                   (select rampID from analytesynonym where Synonym = \"",synonym, "\");")
     cat(sql)
-    query <- dbGetQuery(con,sql)
+    query <- DBI::dbGetQuery(con,sql)
     container <- data.frame(matrix(nrow = 0,ncol = 3))
     colnames(container) <- c(paste0("Search result for ", synonym), "source_id", "source_type")
     for(id in unlist(query)){
       sql <- paste0("select pathwayName,sourceId,type from pathway where pathwayRampId =\"",id,"\";")
-      query2 <- dbGetQuery(con,sql)
+      query2 <- DBI::dbGetQuery(con,sql)
       colnames(query2) <- c(paste0("Search result for ", synonym), "source_id", "source_type")
       container <- rbind(container,query2)
     }
@@ -159,7 +159,7 @@ rampKWsearch <- function(word, database) {
                     item,"), ",
                     item," ASC limit 20;")
 
-    rampOut <- dbGetQuery(con, query)
+    rampOut <- DBI::dbGetQuery(con, query)
     # dbDisconnect(con)
     if (length(unlist(rampOut)) == 0)
         rampOut <- "Not Found"
@@ -182,7 +182,7 @@ rampKWsearch <- function(word, database) {
 #' @export
 rampCataOut <- function(synonym, maxItems = 1000) {
     # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
-    rampOut <- dbGetQuery(con, paste0("select synonym from analytesynonym where rampId in
+    rampOut <- DBI::dbGetQuery(con, paste0("select synonym from analytesynonym where rampId in
                         (select if((select geneOrCompound from analyteSynonym where synonym = \"",
         synonym, "\" limit 1) =\"compound\",rampGeneId,rampCompoundId) from catalyzed where
                         if((select geneOrCompound from analyteSynonym where synonym = \"",
@@ -206,15 +206,15 @@ rampCataOut <- function(synonym, maxItems = 1000) {
 #' @export
 rampOntoOut <- function(synonym, maxItems) {
     con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
-    out <- dbGetQuery(con, paste0("select * from analyteSynonym where Synonym = \"", synonym, "\";"))
+    out <- DBI::dbGetQuery(con, paste0("select * from analyteSynonym where Synonym = \"", synonym, "\";"))
     if (nrow(out) > 0) {
-        rampOut <- dbGetQuery(con, paste0("select commonName,biofluidORcellular from ontology where rampOntologyIdLocation in
+        rampOut <- DBI::dbGetQuery(con, paste0("select commonName,biofluidORcellular from ontology where rampOntologyIdLocation in
       (select rampOntologyidlocation from analyteHasOntology where rampCompoundId in
        (select rampID from analyteSynonym where synonym = \"",
             synonym, "\")) limit ", maxItems, ";"))
 
     } else {
-        rampOut <- dbGetQuery(con, paste0("select synonym,geneOrCompound from analyteSynonym where rampId in
+        rampOut <- DBI::dbGetQuery(con, paste0("select synonym,geneOrCompound from analyteSynonym where rampId in
       (select rampCompoundId from analyteHasOntology where rampOntologyIdLocation in
        (select rampOntologyIdLocation from ontology where commonName=\"",
             synonym, "\")) limit ", maxItems, ";"))

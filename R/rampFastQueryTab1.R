@@ -72,7 +72,7 @@ rampFastMetaInPath <- function(synonym,options = TRUE){
     cid_list <- paste(cid_list,collapse = ",")
     query4 <- paste0("SELECT Synonym,geneOrCompound,rampId FROM analytesynonym 
                      WHERE rampID IN (",cid_list,");")
-    df4 <- dbGetQuery::dbGetQuery(con,query4)
+    df4 <- DBI::dbGetQuery(con,query4)
     df4<- unique(df4)
     colnames(df4) <- c("Synonym2","geneOrCompound","rampId2")
     query5 <- paste0("select rampId,sourceId,IDtype from source where rampId in(",

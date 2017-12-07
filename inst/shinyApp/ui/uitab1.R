@@ -82,7 +82,7 @@ tabItem1<-shinydashboard::tabItem(
                         downloadButton("tab1_mul_report",label = "Download Table"),
                         hr(),
                         dataTableOutput("preview_multi_names_tab1"),
-                        highchartOutput("tab1_hc_output"),
+                        highcharter::highchartOutput("tab1_hc_output"),
                         conditionalPanel(
                           condition = "output.tab1_hc_output != null",
                           selectizeInput(inputId = "pathway_from_hc","",

@@ -1,7 +1,7 @@
 
 tabItem6 <- tabItem(
   tabName = "customizeQuery",
-  box(width= 12,
+  shinydashboard::box(width= 12,
       title = strong("Provide Search Condition:"),
       selectInput("givenDataType","Define Type of Searching Condition"
                   ,choices = c("metabolites",

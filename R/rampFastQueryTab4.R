@@ -95,7 +95,7 @@ rampFastOneCata <- function(synonym,options = F) {
     query2 <- paste0("select Synonym as analyte2,rampId as rampId2,geneOrCompound as type2 from analyteSynonym 
                      where rampId in (",analyte2_list,");")
     print(query2)
-    df_g3 <-dbGetQuery(con,query2)
+    df_g3 <-DBI::dbGetQuery(con,query2)
     if(nrow(df_g3))
     query3 <- paste0("select sourceId,rampId as rampId2,IDtype from source where rampId in (",
                      analyte2_list,");")
@@ -213,7 +213,7 @@ rampFastMulCata <- function(synonym) {
     query2 <- paste0("select Synonym as analyte2,rampId as rampId2,geneOrCompound as type2 from analyteSynonym 
                      where rampId in (",analyte2_list,");")
     print(query2)
-    df_g3 <-dbGetQuery(con,query2)
+    df_g3 <-DBI::dbGetQuery(con,query2)
     query3 <- paste0("select sourceId,rampId as rampId2,IDtype from source where rampId in (",
                      analyte2_list,");")
     df_g4 <- DBI::dbGetQuery(con,query3)
