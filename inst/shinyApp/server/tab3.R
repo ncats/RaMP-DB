@@ -137,7 +137,7 @@ meta_path_list <- reactive({
 # bar plot
 # highchart
 # order data in decreasing...
-output$tab3_hc_output <- renderHighchart({
+output$tab3_hc_output <- highcharter::renderHighchart({
   if (is.null(rea_detector$num) && is.null(input$inp_file_tab3))
     return()
   
@@ -250,7 +250,7 @@ output$summary_fisher <- DT::renderDataTable({
   data
 },rownames = FALSE,filter = "top")
 
-output$heatmap_pvalue <- renderHighchart({
+output$heatmap_pvalue <- highcharter::renderHighchart({
   data <- fisherHeatMap()
   data <- data[order(data$y),]
   pathway <- as.vector(data$pathway)
@@ -263,8 +263,8 @@ output$heatmap_pvalue <- renderHighchart({
     "function(){
     return this.series.yAxis.categories[this.point.y] + ' p='+this.point.value;
   }")
-  hc <- highchart() %>%
-    hc_chart(type = "heatmap",
+  hc <- highcharter::highchart() %>%
+    highcharter::hc_chart(type = "heatmap",
              borderColor = '#ceddff',
              borderRadius = 10,
              borderWidth = 2,

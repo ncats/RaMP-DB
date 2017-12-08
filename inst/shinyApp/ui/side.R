@@ -7,11 +7,11 @@ sideBar <-shinydashboard::dashboardSidebar(
     ),
     # Given synonym, it returns compound or genes based on choices of user which have 
     # same pahtway involved.
-    shinydashboard::menuItem(
-      HTML("<p>Return analytes in pathways containing a given<br> analyte</p>"),
-      tabName = "genesFromCompounds",
-      icon = icon("dashboard")
-    ),
+    # shinydashboard::menuItem(
+    #   HTML("<p>Return analytes in pathways containing a given<br> analyte</p>"),
+    #   tabName = "genesFromCompounds",
+    #   icon = icon("dashboard")
+    # ),
     # Given pathway name, it returns genes or compound based on user choice which are involved
     # in that pathway.
     shinydashboard::menuItem(
@@ -31,16 +31,16 @@ sideBar <-shinydashboard::dashboardSidebar(
       tabName = "geneCataComp",
       icon = icon("dashboard")
     ),
-    shinydashboard::menuItem(
-      "Return metabolites or biofluid location",
-      tabName = "geneCompOnto",
-      icon = icon("dashboard")
-    ),
-    shinydashboard::menuItem(
-      "Customize Query",
-      tabName = "customizeQuery",
-      icon = icon("dashboard")
-    ),
+    # shinydashboard::menuItem(
+    #   "Return metabolites or biofluid location",
+    #   tabName = "geneCompOnto",
+    #   icon = icon("dashboard")
+    # ),
+    # shinydashboard::menuItem(
+    #   "Customize Query",
+    #   tabName = "customizeQuery",
+    #   icon = icon("dashboard")
+    # ),
     shinydashboard::menuItem(
         tags$button(
           id = "buttonstop",

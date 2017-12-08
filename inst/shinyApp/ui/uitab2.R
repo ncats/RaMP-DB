@@ -89,7 +89,7 @@ tabItem2<-  shinydashboard::tabItem(
                         DT::dataTableOutput("preview_multi_names_tab2",
                                             width = "100%",
                                             height = "100%"),
-                        highchartOutput("tab2_hc_output"),
+                        highcharter::highchartOutput("tab2_hc_output"),
                         textOutput("hc_click_output_tab2"),
                         tableOutput("stats_fisher_tab2")
                     ),
