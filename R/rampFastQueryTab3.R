@@ -3,7 +3,6 @@
 #' @param pathway_list a vector of all pathways searched from given metabolites
 #' @param pathway single pathway name that is applied by Fisher test
 #' @param num_of_meta integer that describe how many initial metabolites
-#' @export
 rampOneFisherTest <- function(pathway_list,pathway,num_of_meta){
   # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
   # on.exit(dbDisconnect(con))
@@ -36,7 +35,6 @@ rampOneFisherTest <- function(pathway_list,pathway,num_of_meta){
 #' 
 #' each pathway contains all metabolites inside that pathway
 #' @param df A dataframe that has information for bar plot
-#' @export
 rampGenerateBarPlot <- function(df){
   path_meta_list <- list()
   for (i in 1:nrow(df)){
@@ -60,7 +58,6 @@ rampGenerateBarPlot <- function(df){
 #' search for pathways.
 #' @return a data.frame contains all fisher test result with pathway name
 #' as column name
-#' @export
 rampFisherTest <- function(pathway_meta_list,num_user_metabolites,FisherPathwayTable){
   # con <- dbConnect(MySQL(), user = "root", password = "Ehe131224", dbname = "mathelabramp")
   # on.exit(dbDisconnect(con))
@@ -103,8 +100,6 @@ rampFisherTest <- function(pathway_meta_list,num_user_metabolites,FisherPathwayT
 #' @return a list contains all metabolits as name and pathway inside.
 #' 
 #' Apply famil function...
-#' 
-#' @export
 rampFastPathFromMeta<- function(synonym,find_synonym = FALSE){
   # progress<- shiny::Progress$new()
   # progress$set(message = "Querying databases ...",value = 0)
@@ -152,7 +147,6 @@ rampFastPathFromMeta<- function(synonym,find_synonym = FALSE){
 #' 
 #' @return a data.frame either from multiple csv file
 #' or search through by a txt file.
-#' @export
 rampFileOfPathways <- function(infile){
   name <- infile[[1,'name']]
     summary <- data.frame(pathway  = character(0),id = character(0),
@@ -184,15 +178,14 @@ rampFileOfPathways <- function(infile){
 #' @param type plot's type of this highcharter object
 #' @param event_func Javascript code that define the click event
 #' @return highcharter object
-#' @export
 rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
-  fomatterFunc <- JS("function(){
+  fomatterFunc <- highcharter::JS("function(){
                         html = '<strong> Pathway ' + this.x +' has frequency: ' + this.y +'. metabolites are :'
                         '+this.y.detail+'</strong>;'
                         return html;
                      }")
-  hc<-highchart() %>%
-    hc_chart(type = type,
+  hc<-highcharter::highchart() %>%
+    highcharter::hc_chart(type = type,
              # options3d = list(enabled = TRUE, beta = 15, alpha = 15),
              borderColor = '#ceddff',
              borderRadius = 10,
@@ -204,29 +197,29 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
                  list(0, 'rgb(255, 255, 255)'),
                  list(1, 'rgb(219, 228, 252)')
                ))) %>%
-    hc_title(text = "<strong>Search result from given metabolites</strong>",
+    highcharter::hc_title(text = "<strong>Search result from given metabolites</strong>",
              margin = 20,align = "left",
              style = list(color = "black",useHTML = TRUE)) %>%
-    hc_xAxis(categories = x_data) %>%
-    hc_yAxis(allowDecimals = FALSE,
+    highcharter::hc_xAxis(categories = x_data) %>%
+    highcharter::hc_yAxis(allowDecimals = FALSE,
              title = list(
                text = "Frequency"
              )) %>%
-    hc_add_series(data = y_data,
+    highcharter::hc_add_series(data = y_data,
                   name = "pathway"
                   ) %>%
-    hc_plotOptions(
+    highcharter::hc_plotOptions(
       series = list(stacking = FALSE,
                     events = list(
                       click = event_func
                     ))) %>%
-    hc_tooltip(headerFormat = "<span>{point.key} has frequency {point.y}</span>
+    highcharter::hc_tooltip(headerFormat = "<span>{point.key} has frequency {point.y}</span>
                <div style ='margin:0px;ma-xwidth:300px;overflow-y:hidden;'>",
                pointFormat = "<p class = 'tab3-tooltip-hc'>Metabolites: {point.detail}</p>",
                footerFormat = "</div>",
               # formatter = fomatterFunc,
                shared = TRUE,
                useHTML = TRUE) %>%
-    hc_exporting(enabled = TRUE)
+    highcharter::hc_exporting(enabled = TRUE)
   return(hc)
 }

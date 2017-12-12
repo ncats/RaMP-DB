@@ -15,7 +15,15 @@ returned by query}
 \item{geneOrcompound}{string defined from radio input that describes type
 of returned metablites from query.}
 }
+\value{
+a dataframe that contain given synonym as column name
+}
 \description{
 From user supplied synonym metabolites, it search through whole databases 
 , and returns all metabolites which are in the same pathways.
+}
+\examples{
+\dontrun{
+ramp <- rampGenesFromComp("VitamineE",20,"compound")
+}
 }

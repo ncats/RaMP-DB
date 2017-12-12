@@ -2,7 +2,6 @@
 #' @param full bool if return whole data.frame
 #' @param find_synonym bool if find all synonyms or just return same synonym
 #' as input (there are some common synonyms that will mess up whole searching)
-#' @export
 rampFindSynonymFromSynonym <- function(synonym,full = F,find_synonym = F){
   if(is.character(synonym)){
     if(grepl("\n",synonym)[1]){
@@ -57,7 +56,6 @@ rampFindSynonymFromSynonym <- function(synonym,full = F,find_synonym = F){
 #'  containing all information related to synonym. Or can be a list of 
 #'  rampId
 #'  @param full return whole searching result or not.
-#' @export
 rampFindSourceFromId <- function(rampId=NULL,full = T){
   if(is.data.frame(rampId)){
     list_id <- rampId$rampId
@@ -93,8 +91,6 @@ rampFindSourceFromId <- function(rampId=NULL,full = T){
 #' @return a list contains all metabolits as name and pathway inside.
 #' 
 #' Apply famil function...
-#' 
-#' @export
 rampFastPathFromSource<- function(sourceid,find_synonym = FALSE){
   # progress<- shiny::Progress$new()
   # progress$set(message = "Querying databases ...",value = 0)

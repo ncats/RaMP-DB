@@ -2,7 +2,6 @@
 #' 
 #' @param pathway a string or a data.fram that contains all pathways
 #' @return a data.frame that contains all search results
-#' @export
 rampFastMetaFromPath <- function(pathway){
   now <- proc.time()
   print("fired")
@@ -64,7 +63,6 @@ rampFastMetaFromPath <- function(pathway){
 #' 
 #' @return a data.frame either from multiple csv file
 #' or search through by a txt file.
-#' @export
 rampFileOfPathways_tab2 <- function(infile){
   name <- infile[[1,'name']]
   summary <- data.frame(pathway  = character(0),id = character(0),

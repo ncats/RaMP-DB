@@ -7,6 +7,10 @@ Return the customized error messages}
 \usage{
 rampReadQuery(query)
 }
+\arguments{
+\item{query}{a string that follows syntax of MySQL and is used
+to query database.}
+}
 \description{
 Function that sends query with tryCatch
 Return the customized error messages

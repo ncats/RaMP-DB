@@ -6,7 +6,7 @@ dataInput_path <- eventReactive(input$subText2,{
   progress$set(message = "Querying databases to find metabolites ...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
   
-  rampOut <- rampFastMetaFromPath(input$KW_path)
+  rampOut <- RaMP:::rampFastMetaFromPath(input$KW_path)
   rampOut <- rampOut[,1:(ncol(rampOut) - 1)]
   if(input$geneOrComp2 != "both"){
     rampOut <- rampOut[rampOut[,2] == input$geneOrComp2,]
@@ -67,7 +67,7 @@ output$path_report <- downloadHandler(filename = function() {
 output$preview_tab2 <- renderUI({
   input$subText2
   isolate({
-    tables <- rampTablize(dataInput_path())
+    tables <- RaMP:::rampTablize(dataInput_path())
     return(div(HTML(unlist(tables)),class = "shiny-html-output"))
   })
 })
@@ -87,14 +87,14 @@ observe({
 data_mul_name_tab2 <- eventReactive(input$sub_mul_tab2,{
   if(is.null(input$sub_mul_tab2))
     return(NULL)
-  rampFastMetaFromPath(input$input_mul_tab2)
+  RaMP:::rampFastMetaFromPath(input$input_mul_tab2)
 })
 data_mul_file_tab2 <- eventReactive(input$sub_file_tab2,{
   infile <- input$inp_file_tab2
   if (is.null(infile))
     return(NULL)
   
-  rampFileOfPathways_tab2(infile)
+  RaMP:::rampFileOfPathways_tab2(infile)
 })
 
 

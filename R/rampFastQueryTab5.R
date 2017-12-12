@@ -102,7 +102,6 @@ rampFastBiofluid <- function(string,analyteOrBiofluid = NULL){
 #' 
 #' @param infile a file object given by shiny
 #' @return search results of biofluid or analytes
-#' @export
 rampFileOfBiofluid <- function(infile) {
   name <- infile[[1,'name']]
   

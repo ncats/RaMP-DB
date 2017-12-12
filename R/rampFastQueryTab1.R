@@ -1,7 +1,7 @@
 #' Function that sends query with tryCatch
 #' Return the customized error messages
-#' @param query
-#' @export
+#' @param query a string that follows syntax of MySQL and is used
+#' to query database.
 rampReadQuery <- function(query){
   out <- tryCatch({
     DBI::dbGetQuery(con,query)
@@ -25,7 +25,6 @@ rampReadQuery <- function(query){
 #' want to search for
 #' @param options a logic value used to define output (deprecate)
 #' @return a data.frame that contains all search results
-#' @export
 rampFastMetaInPath <- function(synonym,options = TRUE){
   now <- proc.time()
   # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")

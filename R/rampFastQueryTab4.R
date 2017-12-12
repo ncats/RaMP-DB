@@ -3,7 +3,6 @@
 #' @param synonym string or data.frame contains given analyte
 #' @param options logic value defines output
 #' @return a data.frame that contains search results
-#' @export
 rampFastOneCata <- function(synonym,options = F) {
   now <- proc.time()
   # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
@@ -121,7 +120,6 @@ rampFastOneCata <- function(synonym,options = F) {
 #' @param synonym string or data.frame contains given analyte
 #' @param options logic value defines output
 #' @return a data.frame that contains search results
-#' @export
 rampFastMulCata <- function(synonym) {
   now <- proc.time()
   # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
@@ -243,7 +241,6 @@ rampFastMulCata <- function(synonym) {
 #' 
 #' @return a data.frame either from multiple csv file
 #' or search through by a txt file.
-#' @export
 rampFileOfAnalytes_tab4 <- function(infile){
   name <- infile[[1,'name']]
   summary <- data.frame(pathway  = character(0),id = character(0),

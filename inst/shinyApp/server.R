@@ -1,7 +1,7 @@
 server <- function(input, output, session) {
   
   session$onSessionEnded(function(){
-    RaMP::killDbConnections()
+    RaMP:::killDbConnections()
     shiny::stopApp()
   }) # close shiny app when close browser.
   
