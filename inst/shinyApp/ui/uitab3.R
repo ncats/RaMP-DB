@@ -82,37 +82,54 @@ tabItem3 <-  shinydashboard::tabItem(
                  status = "primary",
                  downloadButton("tab3_mul_report",label = "Download Table"),
                  hr(),
-                 dataTableOutput("preview_multi_names"),
-                 highcharter::highchartOutput("tab3_hc_output"),
-                 textOutput("hc_click_output"),
-                 tableOutput("stats_fisher_tab3"),
-                 conditionalPanel(condition = "output.stats_fisher_tab3 != null",
-                                  selectInput("pvalue_fisher",
-                                              "Select significant level for Fisher Exact Test",
-                                              choices = c(0.01,0.05,0.1)),
-                                  actionButton("generateFisherTest",
-                                               "Pathway Enrichment Analysis"),
-                                  downloadButton("stats_report","Download Fiser Test Result"),
-                                  hr(),
-                                  shinydashboard::box(title = strong("Enriched pathways identified by Fisher Test"),
-                                      collapsible = T,
-                                      collapsed = T,
-                                      solidHeader = T,
-                                      width = 12,
-                                      status = "info",
-                                      column(width = 6,
-                                        # htmlOutput("summary_fisher")
-                                        textOutput("text_fisher"),
-                                        DT::dataTableOutput("summary_fisher")
-                                      ),
-                                      column(width = 6,
-                                             highcharter::highchartOutput("heatmap_pvalue")
-                                             )
-                                  )
+                 DT::dataTableOutput("preview_multi_names"),
+                 fluidRow(
+                   shinydashboard::box(
+                     width = 6,
+                     shiny::fileInput(
+                       "fisher_test_background_tab3_2",
+                       label = "Input Background for Fisher Test",
+                       placeholder = "Specific format required",
+                       buttonLabel = "Upload"
+                     )
+                   ),
+                   shinydashboard::box(
+                     width = 6,
+                     actionButton("generateFisherTest",
+                                  "Pathway Enrichment Analysis"),
+                     selectInput("pvalue_fisher",
+                                 "Select significant level for Fisher Exact Test",
+                                 choices = c(0.01,0.05,0.1),
+                                 width = "80%"
+                     )
+                   )
                  )
              ),
-             HTML("</div>")
-           )
-         )
+             conditionalPanel(condition = "output.preview_multi_names != null",
+                              highcharter::highchartOutput("tab3_hc_output"),
+                              textOutput("hc_click_output"),
+                              tableOutput("stats_fisher_tab3"),
+                              downloadButton("stats_report","Download Fiser Test Result"),
+                              hr(),
+                              shinydashboard::box(title = strong("Enriched pathways identified by Fisher Test"),
+                                                  collapsible = T,
+                                                  collapsed = T,
+                                                  solidHeader = T,
+                                                  width = 12,
+                                                  status = "info",
+                                                  column(width = 6,
+                                                         # htmlOutput("summary_fisher")
+                                                         textOutput("text_fisher"),
+                                                         DT::dataTableOutput("summary_fisher")
+                                                  ),
+                                                  column(width = 6,
+                                                         highcharter::highchartOutput("heatmap_pvalue")
+                                                  )
+                              )
+             )
+           ),
+           HTML("</div>")
          )
   )
+)
+

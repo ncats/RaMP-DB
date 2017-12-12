@@ -1,4 +1,7 @@
 #' Find all synonym from a given metabolite's name
+#' This function is used to filter out some super common synonyms like glyceride
+#' Now, this function only format the user input, so the user vector, dataframe,
+#' and entire string separated by comma are working.
 #' @param full bool if return whole data.frame
 #' @param find_synonym bool if find all synonyms or just return same synonym
 #' as input (there are some common synonyms that will mess up whole searching)
@@ -86,7 +89,7 @@ rampFindSourceFromId <- function(rampId=NULL,full = T){
 }
 
 
-#' Fast search given a list of metabolites
+#' Fast search given a list of metabolites source Id
 #' @param sourceid a vector of synonym that need to be searched
 #' @return a list contains all metabolits as name and pathway inside.
 #' 
