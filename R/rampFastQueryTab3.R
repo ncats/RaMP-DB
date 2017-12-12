@@ -107,9 +107,9 @@ rampFastPathFromMeta<- function(synonym,find_synonym = FALSE){
   # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
   # on.exit(dbDisconnect(con))
   # find synonym
-  
+
   synonym <- rampFindSynonymFromSynonym(synonym,find_synonym=find_synonym)
-  
+    
   list_metabolite <- unique(synonym)
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
@@ -125,16 +125,19 @@ rampFastPathFromMeta<- function(synonym,find_synonym = FALSE){
   id_list <- paste(id_list,collapse = ",")
   query3 <- paste0("select pathwayName,sourceId,type,pathwayRampId from pathway where pathwayRampId in (",
                     id_list,");")
+
   df3 <- DBI::dbGetQuery(con,query3)
   mdf <- merge(df1,df2,all.x=T)
   mdf <- mdf[!is.na(mdf[,3]),]
   mdf <- merge(mdf,df3,all.x = T)
   # mdf <- mdf[!is.na(mdf[,3]),]
   colnames(mdf)[3] <- "metabolite"
-  mdf <- mdf[,c(4,5,6,3)]
-  mdf <- unique(mdf)
   print("timing ...")
   print(proc.time()- now)
+  return(mdf)
+  mdf <- mdf[,c(4,5,6,3)]
+  mdf <- unique(mdf)
+  
   return(mdf)
 }
 
@@ -223,3 +226,6 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
     highcharter::hc_exporting(enabled = TRUE)
   return(hc)
 }
+#' Generate raw data for fisher test based on the given output
+#' Out put is from rampFastMetaFromPathway
+#' Required format 

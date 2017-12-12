@@ -107,9 +107,9 @@ output$tab3_mul_report <- downloadHandler(filename = function(){
 },
 content = function(file) {
   if (rea_detector$num == 1){
-    rampOut <- data_mul_name()
+    rampOut <- data_mul_name()[,c(4,5,6,3)]
   } else if (rea_detector$num == 2){
-    rampOut <- data_mul_file()
+    rampOut <- data_mul_file()[,c(4,5,6,3)]
   }
   write.csv(rampOut,file,row.names = FALSE)
 }
@@ -119,24 +119,27 @@ output$preview_multi_names <- DT::renderDataTable({
     return("Waiting for input")
   
   if(rea_detector$num == 1){
-      tb <- data_mul_name()
+      tb <- data_mul_name()[,c(4,5,6,3)]
   } else if (rea_detector$num == 2) {
-      tb <- data_mul_file()
+      tb <- data_mul_file()[,c(4,5,6,3)]
   }
   tb
 }
 ,rownames = FALSE)
+# Format data from querying database and provide appropriate layout to genrate
+# bar plot for highcharter.
 meta_path_list <- reactive({
   if(rea_detector$num == 1){
-      bar_plot_info <- RaMP:::rampGenerateBarPlot(data_mul_name())
+      bar_plot_info <- RaMP:::rampGenerateBarPlot(data_mul_name()[,c(4,5,6,3)])
   } else if (rea_detector$num == 2){
-      bar_plot_info <- RaMP:::rampGenerateBarPlot(data_mul_file())
+      bar_plot_info <- RaMP:::rampGenerateBarPlot(data_mul_file()[,c(4,5,6,3)])
   }
   bar_plot_info <- bar_plot_info[order(sapply(bar_plot_info,nrow),decreasing =TRUE)]
 })
 # bar plot
 # highchart
 # order data in decreasing...
+# 12/12 change it to display the log(p) value of each pathways.
 output$tab3_hc_output <- highcharter::renderHighchart({
   if (is.null(rea_detector$num) && is.null(input$inp_file_tab3))
     return()
