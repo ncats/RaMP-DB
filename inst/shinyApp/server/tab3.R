@@ -7,7 +7,7 @@ dataInput_name <- eventReactive(input$submit_compName,{
   progress$set(message = "Querying databases to find pathways ...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
   
-  rampOut <- rampPathFromMeta(input$KW_synonym, 99999)
+  rampOut <- RaMP:::rampPathFromMeta(input$KW_synonym, 99999)
   progress$inc(0.7,detail = paste("Done!"))
   return (rampOut)
 })
@@ -64,7 +64,7 @@ output$preview_tab3 <- renderUI({
   input$submit_compName
   
   isolate({
-    tables <- rampTablize(dataInput_name())
+    tables <- RaMP:::rampTablize(dataInput_name())
     return(div(HTML(unlist(tables)),class = "shiny-html-output"))
   })
 })
@@ -81,14 +81,14 @@ observe({
   rea_detector$num <- 1
 })
 data_mul_name <- eventReactive(input$sub_mul_tab3,{
-  rampFastPathFromMeta(input$input_mul_tab3)
+  RaMP:::rampFastPathFromMeta(input$input_mul_tab3)
 })
 data_mul_file <- eventReactive(input$sub_file_tab3,{
   infile <- input$inp_file_tab3
   if (is.null(infile))
     return(NULL)
   
-  rampFileOfPathways(infile)
+  RaMP:::rampFileOfPathways(infile)
 })
 observe({
   input$sub_file_tab3
@@ -128,22 +128,22 @@ output$preview_multi_names <- DT::renderDataTable({
 ,rownames = FALSE)
 meta_path_list <- reactive({
   if(rea_detector$num == 1){
-      bar_plot_info <- rampGenerateBarPlot(data_mul_name())
+      bar_plot_info <- RaMP:::rampGenerateBarPlot(data_mul_name())
   } else if (rea_detector$num == 2){
-      bar_plot_info <- rampGenerateBarPlot(data_mul_file())
+      bar_plot_info <- RaMP:::rampGenerateBarPlot(data_mul_file())
   }
   bar_plot_info <- bar_plot_info[order(sapply(bar_plot_info,nrow),decreasing =TRUE)]
 })
 # bar plot
 # highchart
 # order data in decreasing...
-output$tab3_hc_output <- renderHighchart({
+output$tab3_hc_output <- highcharter::renderHighchart({
   if (is.null(rea_detector$num) && is.null(input$inp_file_tab3))
     return()
   
   hc_data <- meta_path_list()
   
-  myClickFunc <- JS("function(event) {Shiny.onInputChange('hcClicked',event.point.category);}")
+  myClickFunc <- highcharter::JS("function(event) {Shiny.onInputChange('hcClicked',event.point.category);}")
   freq <- lapply(hc_data,nrow)
   x_data <- names(freq)
   detail <- sapply(hc_data,as.vector)
@@ -152,7 +152,7 @@ output$tab3_hc_output <- renderHighchart({
   
   names(freq) <- NULL
   y_data <- data.frame(y = unlist(freq),detail = unlist(detail))
-  hc <- rampHcOutput(x_data,y_data,"column",myClickFunc)          
+  hc <- RaMP:::rampHcOutput(x_data,y_data,"column",myClickFunc)          
   return(hc)
 })
 
@@ -175,9 +175,9 @@ output$hc_click_output <- renderText({
 
 fisher_result_bar <- eventReactive(input$hcClicked,{
   if(rea_detector$num == 1){
-    rampOneFisherTest(meta_path_list(),input$hcClicked$name,length(unique(data_mul_name()$metabolite)))
+    RaMP:::rampOneFisherTest(meta_path_list(),input$hcClicked$name,length(unique(data_mul_name()$metabolite)))
   } else if (rea_detector$num == 2){
-    rampOneFisherTest(meta_path_list(),input$hcClicked$name,length(unique(data_mul_file()$metabolite)))
+    RaMP:::rampOneFisherTest(meta_path_list(),input$hcClicked$name,length(unique(data_mul_file()$metabolite)))
   } else {
     return("No Input")
   }
@@ -187,9 +187,9 @@ fisher_result_tab3 <- reactive({
     return()
   }
   if (rea_detector$num == 1){
-    rampFisherTest(meta_path_list(),length(unique(data_mul_name()$metabolite)))
+    RaMP:::rampFisherTest(meta_path_list(),length(unique(data_mul_name()$metabolite)))
   } else if (rea_detector$num == 2){
-    rampFisherTest(meta_path_list(),length(unique(data_mul_file()$metabolite)))
+    RaMP:::rampFisherTest(meta_path_list(),length(unique(data_mul_file()$metabolite)))
   }
 })
 output$stats_fisher_tab3 <- renderTable({
@@ -214,10 +214,10 @@ fisherTestResult <- eventReactive(input$generateFisherTest,{
   hc_data <- meta_path_list()
  
   if (rea_detector$num == 1){
-    rampFisherTest(hc_data,length(unique(data_mul_name()$metabolite)),
+    RaMP:::rampFisherTest(hc_data,length(unique(data_mul_name()$metabolite)),
                    FisherPathwayTable = FisherPathwayTable)
   } else if (rea_detector$num == 2){
-    rampFisherTest(hc_data,length(unique(data_mul_file()$metabolite)),
+    RaMP:::rampFisherTest(hc_data,length(unique(data_mul_file()$metabolite)),
                    FisherPathwayTable = FisherPathwayTable)
   }
 })
@@ -250,7 +250,7 @@ output$summary_fisher <- DT::renderDataTable({
   data
 },rownames = FALSE,filter = "top")
 
-output$heatmap_pvalue <- renderHighchart({
+output$heatmap_pvalue <- highcharter::renderHighchart({
   data <- fisherHeatMap()
   data <- data[order(data$y),]
   pathway <- as.vector(data$pathway)
@@ -259,12 +259,12 @@ output$heatmap_pvalue <- renderHighchart({
   heatmap_data$value <- pvalue
   heatmap_data <- list_parse2(heatmap_data)
   
-  fntltp <- JS(
+  fntltp <- highcharter::JS(
     "function(){
     return this.series.yAxis.categories[this.point.y] + ' p='+this.point.value;
   }")
-  hc <- highchart() %>%
-    hc_chart(type = "heatmap",
+  hc <- highcharter::highchart() %>%
+    highcharter::hc_chart(type = "heatmap",
              borderColor = '#ceddff',
              borderRadius = 10,
              borderWidth = 2,
@@ -286,7 +286,7 @@ output$heatmap_pvalue <- renderHighchart({
     hc_exporting(enabled = TRUE)
   
   hc_colorAxis(hc,minColor ="#FFFFFF", maxColor = "#F44242")
-
+  
 })
 
 output$stats_report <- downloadHandler(filename = function(){

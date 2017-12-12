@@ -1,7 +1,7 @@
 #' Function that sends query with tryCatch
 #' Return the customized error messages
-#' @param query
-#' @export
+#' @param query a string that follows syntax of MySQL and is used
+#' to query database.
 rampReadQuery <- function(query){
   out <- tryCatch({
     DBI::dbGetQuery(con,query)
@@ -25,7 +25,6 @@ rampReadQuery <- function(query){
 #' want to search for
 #' @param options a logic value used to define output (deprecate)
 #' @return a data.frame that contains all search results
-#' @export
 rampFastMetaInPath <- function(synonym,options = TRUE){
   now <- proc.time()
   # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
@@ -72,7 +71,7 @@ rampFastMetaInPath <- function(synonym,options = TRUE){
     cid_list <- paste(cid_list,collapse = ",")
     query4 <- paste0("SELECT Synonym,geneOrCompound,rampId FROM analytesynonym 
                      WHERE rampID IN (",cid_list,");")
-    df4 <- dbGetQuery::dbGetQuery(con,query4)
+    df4 <- DBI::dbGetQuery(con,query4)
     df4<- unique(df4)
     colnames(df4) <- c("Synonym2","geneOrCompound","rampId2")
     query5 <- paste0("select rampId,sourceId,IDtype from source where rampId in(",

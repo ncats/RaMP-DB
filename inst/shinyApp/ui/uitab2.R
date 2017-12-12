@@ -4,7 +4,7 @@ tabItem2<-  shinydashboard::tabItem(
          shiny::tabPanel(title = strong("Input pathway one by one"),
                   label = "sub_tab_1_TAB2",
                   fluidRow(
-                    box(
+                    shinydashboard::box(
                       width = 6,
                       title = strong("Input pathway you want to search for"),
                       solidHeader = T,
@@ -19,7 +19,7 @@ tabItem2<-  shinydashboard::tabItem(
                                hr())
                         ),
                       fluidRow(
-                        box(width = 12,
+                        shinydashboard::box(width = 12,
                             title = "Select type of metabolites returned by databases",
                             radioButtons("geneOrComp2","Return compound or gene", choices = c(
                               "Compound" = "compound", "Gene" = "gene","Both" = "both"
@@ -89,7 +89,7 @@ tabItem2<-  shinydashboard::tabItem(
                         DT::dataTableOutput("preview_multi_names_tab2",
                                             width = "100%",
                                             height = "100%"),
-                        highchartOutput("tab2_hc_output"),
+                        highcharter::highchartOutput("tab2_hc_output"),
                         textOutput("hc_click_output_tab2"),
                         tableOutput("stats_fisher_tab2")
                     ),

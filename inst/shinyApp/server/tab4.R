@@ -7,7 +7,7 @@ dataInput_cata <- eventReactive(input$subText_cata,{
   progress$inc(0.3,detail = paste("Send Query ..."))
   
   # rampOut <- rampCataOut(input$KW_cata, 99999)
-  rampOut <- rampFastOneCata(input$KW_cata)
+  rampOut <- RaMP:::rampFastOneCata(input$KW_cata)
   progress$inc(0.7,detail = paste("Done!"))
   return (rampOut[,1:4])
 })
@@ -69,7 +69,7 @@ output$preview_tab4 <- renderUI({
     if(length(rampout) == 0){
       return(HTML("<strong> No Summary due to small dataset</strong>"))
     }
-    tables <- rampTablize(rampout)
+    tables <- RaMP:::rampTablize(rampout)
     return(div(HTML(unlist(tables)),class = "shiny-html-output"))
   })
 })
@@ -85,14 +85,14 @@ observe({
   detector_tab4$num <- 1
 })
 data_mul_name_tab4 <- eventReactive(input$sub_mul_tab4,{
-  rampFastMulCata(input$input_mul_tab4)
+  RaMP:::rampFastMulCata(input$input_mul_tab4)
 })
 data_mul_file_tab4 <- eventReactive(input$sub_file_tab4,{
   infile <- input$inp_file_tab4
   if (is.null(infile))
     return(NULL)
   
-  rampOut <- rampFileOfAnalytes_tab4(infile)
+  rampOut <- RaMP:::rampFileOfAnalytes_tab4(infile)
   
 })
 observe({

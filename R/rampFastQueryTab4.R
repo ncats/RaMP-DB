@@ -3,7 +3,6 @@
 #' @param synonym string or data.frame contains given analyte
 #' @param options logic value defines output
 #' @return a data.frame that contains search results
-#' @export
 rampFastOneCata <- function(synonym,options = F) {
   now <- proc.time()
   # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
@@ -95,7 +94,7 @@ rampFastOneCata <- function(synonym,options = F) {
     query2 <- paste0("select Synonym as analyte2,rampId as rampId2,geneOrCompound as type2 from analyteSynonym 
                      where rampId in (",analyte2_list,");")
     print(query2)
-    df_g3 <-dbGetQuery(con,query2)
+    df_g3 <-DBI::dbGetQuery(con,query2)
     if(nrow(df_g3))
     query3 <- paste0("select sourceId,rampId as rampId2,IDtype from source where rampId in (",
                      analyte2_list,");")
@@ -121,7 +120,6 @@ rampFastOneCata <- function(synonym,options = F) {
 #' @param synonym string or data.frame contains given analyte
 #' @param options logic value defines output
 #' @return a data.frame that contains search results
-#' @export
 rampFastMulCata <- function(synonym) {
   now <- proc.time()
   # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
@@ -213,7 +211,7 @@ rampFastMulCata <- function(synonym) {
     query2 <- paste0("select Synonym as analyte2,rampId as rampId2,geneOrCompound as type2 from analyteSynonym 
                      where rampId in (",analyte2_list,");")
     print(query2)
-    df_g3 <-dbGetQuery(con,query2)
+    df_g3 <-DBI::dbGetQuery(con,query2)
     query3 <- paste0("select sourceId,rampId as rampId2,IDtype from source where rampId in (",
                      analyte2_list,");")
     df_g4 <- DBI::dbGetQuery(con,query3)
@@ -243,7 +241,6 @@ rampFastMulCata <- function(synonym) {
 #' 
 #' @return a data.frame either from multiple csv file
 #' or search through by a txt file.
-#' @export
 rampFileOfAnalytes_tab4 <- function(infile){
   name <- infile[[1,'name']]
   summary <- data.frame(pathway  = character(0),id = character(0),
