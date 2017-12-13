@@ -6,13 +6,17 @@ dataInput_path <- eventReactive(input$subText2,{
   progress$set(message = "Querying databases to find metabolites ...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
   
-  rampOut <- RaMP:::rampFastMetaFromPath(input$KW_path)
+  rampOut <- RaMP::rampFastMetaFromPath(input$KW_path,conpass=.conpass)
+  print(dim(rampOut))
+  print(input$KW_path)
   rampOut <- rampOut[,1:(ncol(rampOut) - 1)]
+  print(input$geneOrComp2)
   if(input$geneOrComp2 != "both"){
-    rampOut <- rampOut[rampOut[,2] == input$geneOrComp2,]
+    rampOut <- rampOut[rampOut$geneOrCompound == input$geneOrComp2,]
   }
   progress$inc(0.7,detail = paste("Down!"))
-  
+ 
+  print(dim(rampOut)) 
   return(rampOut)
 })
 
@@ -41,7 +45,7 @@ output$result2 <- DT::renderDataTable({
 
 observe({
   
-  choices <- kw_pathway[grepl(input$singleInput2,kw_pathway,fixed = T)]
+  choices <- kw_pathway[grepl(input$singleInput2,kw_pathway,ignore.case=TRUE)]
   choices <- choices[order(nchar(choices),choices)]
   if(is.null(choices))
     return(NULL)
@@ -87,7 +91,7 @@ observe({
 data_mul_name_tab2 <- eventReactive(input$sub_mul_tab2,{
   if(is.null(input$sub_mul_tab2))
     return(NULL)
-  RaMP:::rampFastMetaFromPath(input$input_mul_tab2)
+  RaMP::rampFastMetaFromPath(input$input_mul_tab2,conpass=.conpass)
 })
 data_mul_file_tab2 <- eventReactive(input$sub_file_tab2,{
   infile <- input$inp_file_tab2

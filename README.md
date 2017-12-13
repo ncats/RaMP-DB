@@ -1,44 +1,58 @@
-# RaMP Relational Database of Metabolomic Pathways
-Metabolomics involves the systematic study of all metabolites (metabolome) measured in biospecimens such as cells, tissues, and biofluids. Metabolomics plays a critical role in translational research, and interpretation of metabolomics data contributes to better understanding of cellular biology and genomics.
+# RaMP - Relational Database of Metabolomic Pathways
 
-However, functional interpretation of disease-associated metabolites is challenging, and the connection between biological mechanisms and disease-specific metabolomics profiles are usually unknown. Further ,publicly available metabolomics data are generally sparse, and either alone cannot provide comprehensive analysis. 
+The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene biological pathways from multiple sources. So far, we have integrated information from HMDB, KEGG Reactome, and WikiPathways. The relational structure of RaMP enables complex and batch queries.  To facilitate its usage, we have created an R package that includes a user-friendly R Shiny web application.  Please note that this project is in continuous development and we certainly appreciate your feedback.  
 
-Because an integrated database is not readily available for download and integration with other web tools,we developed RaMP (Relational databases of Metabolomics Pathway) by integrating metabolite/protein/gene biological pathways from publicly available databases. To use and query RaMP, we have developed an R package with associated Rshiny app. The user-friendly web app enables complex queries, statistical analyses, and interactive plots of results to aid intepretation of metabolomics data.<br />
+Also note that we are working on a server version of RaMP so that users do not have to install anything on their local machines.  Stay tuned!
 
-Front Page:<br/>
+## Basic Features:
+The app performs some complex queries (e.g. retrieve allmetabolites and/or genes that belong to a user input pathway or list of pathways).  It also performs pathway enrichment analysis given a list of metabolites and/or genes.
+
+Here are some screenshots to give you an idea.
+
+Front page:
+
 <img src="img/Picture1.png" alt = "FrontPage" width="400"/>
 
 Search WorkFlow:<br/>
+
 <img src="img/Picture2.png" alt = "FrontPage" width="400"/>
 <img src="img/Picture3.png" alt = "FrontPage" width="400"/>
 <img src="img/Picture4.png" alt = "FrontPage" width="400"/>
 
-
-
-## Getting Started
-This repo is the user interface that is integrated to a R package format.
-If you have go through the process through importing RaMP database instead of having mysql dump file, skip this part.
-In order to use the web application, you need 
+## Installation Instructions
+In order to use the web application, you will need the following:
 * The R code under this repo
-* The mysql dump file that has all content of RaMP database
-### Manually importing mysql database from dump file
-You firstly need a mysql service running locally with account and password.
-If you have not dealed with mysql at all, here is the link to download MySQL cloud service [MySQL Downloads](https://www.mysql.com/downloads/). Please download MySQL WorkBench at this link. During the process of installation, it will ask you create password for root user.
-If you aleady had a MySQL server setup on your computer, below is the procedure how to import RaMP database from dump file to MySQL server.
-Here is another link for resetting password for MySQL server just in case you forgot that [MySQL References 5.7 - How to reset root password ] (https://dev.mysql.com/doc/refman/5.7/en/resetting-permissions.html)
-Firstly, open command prompt 
+* The mysql dump file that contains the RaMP database (in the folder inst/extdata/)
+
+### MySQL set-up
+RaMP requires that MySQL and the RaMP database be set up on the machine that you will be running the app from.
+To download MySQL, you can go to the [MySQL Downloads page](https://www.mysql.com/downloads/)
+
+When installing, you will be prompted to create a password for the user "root", or it will create one automatically for you.  **Importantly, remember your MySQL password!**  You will need to get into mysql and to pass it as an argument to the RaMP R shiny web application.
+
+If you want to reset your password , you can go to [MySQL References 5.7 - How to reset root password ] (https://dev.mysql.com/doc/refman/5.7/en/resetting-permissions.html)
+
+Please note that you will need administrator priviledges for this step..
+
+### Creating the database locally
+Once your MySQL environment is in place, creating the RaMP database locally is trivial.
+First, launch MySQL and create the database:
 ```
-mysql -u root -p
-create database mathelabramp
+> mysql -u root -p
+mysql> create database ramp;
+mysql> exit;
 ```
-Now you have an empty database for importing your dump file.
-Open command prompt
+
+Here, we're calling the database ramp but you can use any name you'd like.  Realize though that R package assumes that the name of the database is RaMP by default.  So if you change the name, remember to pass that name as arguments in the R package functions.
+
+Second, populate the named database with the mysql dump file (which you can get from  inst/extdata/ramp.sql):
 ```
-cd directory-of-mysqldump-file
-mysql -u root -p mathelabramp < mysqldump.sql
+> mysql -u root -p ramp < ramp.sql
 ```
-It's okay if you do not want to use `mathelabramp` as the name of database. Please do remember the name of database. It will be needed in the future usage. 
-After you import mysql, you will find 8 tables in the `mathelabramp`
+
+You're done!
+
+Note that your "ramp" database should contain the following 8 tables:
 1. analyte
 1. analyehasontology
 1. analytehaspathway
@@ -47,40 +61,36 @@ After you import mysql, you will find 8 tables in the `mathelabramp`
 1. ontology
 1. pathway
 1. source
-At this step, you can directly use RaMP database by MySQL.
-You can try:
+
+If you want to explore this in MySQL, you can try:
 ```
 mysql -u root -p
-use mathelabramp;
+use ramp;
+view tables;
 select * from analytesynonym where synonym = "glucose";
 ```
-### Install and load this package 
-You can install this package directly from GitHub.
-```R
-install_github("RaMP2",username = "Bofei5675")
-```
-Then, you can load the package by:
-```R
-RaMP::runRaMPapp(
-  dbname = "Database name that you input previously",
-  username = "root",
-  password = "Your password for the MySQL server",
-  host = "localhost"
-  )
-```
-The username not has to be `root`. It depends on how you have access to mysql service by command prompt. The host is usually `localhost`, but could also be something different. Basically, it matches the pattern that how you login to MySQL by command prompt
-```MySQL
-mysql -u [username] -h [host] -p [password]
-```
-Then, the app is ready to use.
 
-### Prerequisites
+
+### Install and load the RaMP package 
+You can install this package directly from GitHub. In the R Console, type the following:
+```R
+install_github("Bofei5675/RaMP2")
+# Load the package
+library(RaMP)
 ```
-Have RaMP database locally
+
+Now, you're set to use the web application locally.  Just type:
+```R
+RaMP::runRaMPapp(conpass="mysql_password")
 ```
+
+If the username is different then root, then specify the username in the "username" parater.  Similarly, if the name of the database is different than "ramp", then specify the "dbname" parameter.
+
+## Reporting Issues
+If you encounter any problems, or find installation problems or bugs, please start an issue on the Issues tab or email Ewy.Mathe@osumc.edu directly. Thanks!
+
 ## Authors
-* **Bofei Zhang** - *Web Interface* - [Bofei5675](https://github.com/Bofei5675)
-## License
+* **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
+* **Ewy Mathé** - [Mathelab](https://github.com/MatheLab)
 
-## Acknowledgements
 

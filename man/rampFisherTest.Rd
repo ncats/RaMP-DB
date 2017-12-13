@@ -4,14 +4,18 @@
 \alias{rampFisherTest}
 \title{Fisher test for given list of pathways}
 \usage{
-rampFisherTest(pathway_meta_list, num_user_metabolites, FisherPathwayTable)
+rampFisherTest(pathway_meta_list, num_user_metabolites, FisherPathwayTable, con)
 }
 \arguments{
+\item{pathway_meta_list}{The list contains pathway as names and metabolites in that pathway 
+under each names (list)}
+
 \item{num_user_metabolites}{number of metabolites given by user when they want to 
 search for pathways.}
 
-\item{pathway_list}{The list contains pathway as names and metabolites in that pathway 
-under each names (list)}
+\item{FisherPathwayTable}{Fisher Pathway Table}
+
+\item{con}{a connection object returned from the function connectToRaMP()}
 }
 \value{
 a data.frame contains all fisher test result with pathway name

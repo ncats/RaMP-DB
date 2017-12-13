@@ -1,35 +1,28 @@
 #' Run Shiny App
 #' 
-#' This function connects to the RaMP database (provided within the package), and launches the RaMP web application.  The password for the mysql connection must be provided.
+#' This function launches the RShiny app.  It requires a connection to the RaMP database as input, which requires running the function connectoToRaMP() and providing the MySQL password.  
 #' 
-#' @param dbname the name of the dadtabase (by default a string that is database name including all tables
-#' @param username a string that is username for database
-#' @param password a string this is password for database
-#' @param host a string that stand for host 
-#' @param update a logic value determines if RaMP update local data
+#' @param conpass password for database access (string)
+#' @examples
+#' \dontrun{
+#' con <- connectToRaMP(dbname="ramp",username="root",password="mypassword")
+#' runRaMPapp(con=con)
+#' }
 #' @export
-runRaMPapp <- function(dbname = "ramp",
-                       username = "root",
-                       password = NULL,
-                       host = NULL,
-                       update = FALSE){
-  
-  if(is.null(password)) {
-	stop("Please define the password for the mysql connection")
+runRaMPapp <- function(conpass = NULL) {
+ 
+  if(is.null(conpass)) {
+        stop("Please define the password for the mysql connection")
   }
 
-  con <<- DBI::dbConnect(
-    drv = RMySQL::MySQL(),
-    dbname = dbname,
-    username = username,
-    password = password
-  )
   appDir <- system.file("shinyApp",package = "RaMP")
   if (appDir == ""){
-    dbDisconnect(con)
+    DBI::dbDisconnect(con)
     stop("Could not find example directory. Try re-installing 'ramp'.")
   }
- 
+  # Make conpass a global variable so that it can be accessed by the shinyApp:
+  .GlobalEnv$.conpass <- conpass
+   on.exit(rm(.conpass, envir=.GlobalEnv))
   shiny::runApp(appDir,display.mode = "normal")
   
 }

@@ -4,20 +4,17 @@
 \alias{runRaMPapp}
 \title{Run Shiny App}
 \usage{
-runRaMPapp(dbname = "ramp", username = "root", password = NULL,
-  host = NULL, update = FALSE)
+runRaMPapp(conpass = NULL)
 }
 \arguments{
-\item{dbname}{the name of the dadtabase (by default a string that is database name including all tables}
-
-\item{username}{a string that is username for database}
-
-\item{password}{a string this is password for database}
-
-\item{host}{a string that stand for host}
-
-\item{update}{a logic value determines if RaMP update local data}
+\item{conpass}{password for database access (string)}
 }
 \description{
-This function connects to the RaMP database (provided within the package), and launches the RaMP web application.  The password for the mysql connection must be provided.
+This function launches the RShiny app.  It requires a connection to the RaMP database as input, which requires running the function connectoToRaMP() and providing the MySQL password.
+}
+\examples{
+\dontrun{
+con <- connectToRaMP(dbname="ramp",username="root",password="mypassword")
+runRaMPapp(con=con)
+}
 }

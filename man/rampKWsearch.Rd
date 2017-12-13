@@ -4,13 +4,15 @@
 \alias{rampKWsearch}
 \title{The function does key word search from given synonym on within databases}
 \usage{
-rampKWsearch(word, database)
+rampKWsearch(word, database, con)
 }
 \arguments{
 \item{word}{string value that describe the keyword user want to search}
 
 \item{database}{string value that describe where the user want to search
 for key word}
+
+\item{con}{a connection object returned from the function connectToRaMP()}
 }
 \value{
 If there is at least one itmes in database vaguely matching key

@@ -29,6 +29,7 @@ output$summary_path <- renderText({
 
 
 
+<<<<<<< HEAD
 observe({
   if(input$synonymOrSource == "synonyms"){
     choices <- kw_analyte[grepl(input$compName,kw_analyte,fixed = T)]
@@ -43,6 +44,20 @@ observe({
                         label = "Select from the list",
                         choices = choices, selected = head(choices,1)
       )
+=======
+  choices <- kw_analyte[grepl(input$compName,kw_analyte,ignore.case=TRUE)]
+  choices <- choices[order(nchar(choices),choices)]
+  if(is.null(choices))
+    return(NULL)
+  if(length(choices) >10 ){
+    choices <- choices[1:10]
+  }
+  isolate({
+    updateSelectInput(session, "KW_synonym",
+                      label = "Select from the list",
+                      choices = choices, selected = head(choices,1)
+    )
+>>>>>>> 3a5564b02de570058f5719dca0fede3fb525f7be
     })
   } else if (input$synonymOrSource == "ids"){
     choices <- kw_source[grepl(input$compName,kw_source,fixed = T)]
