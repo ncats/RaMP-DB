@@ -6,8 +6,11 @@ dataInput_name <- eventReactive(input$submit_compName,{
   
   progress$set(message = "Querying databases to find pathways ...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
-  
-  rampOut <- RaMP:::rampPathFromMeta(input$KW_synonym, 99999)
+  if(input$synonymOrSource == "synonyms"){
+    rampOut <- RaMP:::rampPathFromMeta(input$KW_synonym,99999)
+  } else {
+    rampOut <- RaMP:::rampFastMetaFromPath(input$KW_synonym,input$synonymOrSource)
+  }
   progress$inc(0.7,detail = paste("Done!"))
   return (rampOut)
 })
@@ -23,26 +26,39 @@ summary_path_out<- eventReactive(input$submit_compName,{
 output$summary_path <- renderText({
   summary_path_out()
 })
-# output$KWsearchComp <- renderUI({
-#   selectInput("KW_synonym", "", choices = NULL)
-# })
+
 
 
 observe({
-
-  choices <- kw_analyte[grepl(input$compName,kw_analyte,fixed = T)]
-  choices <- choices[order(nchar(choices),choices)]
-  if(is.null(choices))
-    return(NULL)
-  if(length(choices) >10 ){
-    choices <- choices[1:10]
-  }
-  isolate({
-    updateSelectInput(session, "KW_synonym",
-                      label = "Select from the list",
-                      choices = choices, selected = head(choices,1)
-    )
+  if(input$synonymOrSource == "synonyms"){
+    choices <- kw_analyte[grepl(input$compName,kw_analyte,fixed = T)]
+    choices <- choices[order(nchar(choices),choices)]
+    if(is.null(choices))
+      return(NULL)
+    if(length(choices) >10 ){
+      choices <- choices[1:10]
+    }
+    isolate({
+      updateSelectInput(session, "KW_synonym",
+                        label = "Select from the list",
+                        choices = choices, selected = head(choices,1)
+      )
     })
+  } else if (input$synonymOrSource == "ids"){
+    choices <- kw_source[grepl(input$compName,kw_source,fixed = T)]
+    choices <- choices[order(nchar(choices),choices)]
+    if(is.null(choices))
+      return(NULL)
+    if(length(choices) >10 ){
+      choices <- choices[1:10]
+    }
+    isolate({
+      updateSelectInput(session, "KW_synonym",
+                        label = "Select from the list",
+                        choices = choices, selected = head(choices,1)
+      )
+    })  
+  }
 })
 
 
@@ -64,8 +80,12 @@ output$preview_tab3 <- renderUI({
   input$submit_compName
   
   isolate({
-    tables <- RaMP:::rampTablize(dataInput_name())
-    return(div(HTML(unlist(tables)),class = "shiny-html-output"))
+    if(input$synonymOrSource == "synonyms"){
+      tables <- RaMP:::rampTablize(dataInput_name())
+      return(div(HTML(unlist(tables)),class = "shiny-html-output"))
+    } else {
+      return(NULL)
+    }
   })
 })
 
@@ -81,6 +101,7 @@ observe({
   rea_detector$num <- 1
 })
 data_mul_name <- eventReactive(input$sub_mul_tab3,{
+  print(input$input_mul_tab3)
   RaMP:::rampFastPathFromMeta(input$input_mul_tab3)
 })
 data_mul_file <- eventReactive(input$sub_file_tab3,{

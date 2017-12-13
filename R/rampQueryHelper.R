@@ -134,3 +134,30 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE){
   print(proc.time()- now)
   return(unique(mdf[,c(6,4,3,7)]))
 }
+#' Find rampId from given source ID
+#' The rampId can be plugged in other functions to continue query
+#' @param sourceId a data frame or string separated by comma or string 
+#' separated by new line
+#' @return data.frame that has sourceId and rampId and source as columns
+rampFindSourceRampId <- function(sourceId){
+  if(is.character(sourceId)){
+    if(grepl("\n",sourceId)[1]){
+      list_metabolite <- strsplit(sourceId,"\n")
+      list_metabolite <- unlist(list_metabolite)
+    } else if(grepl(",",sourceId)[1]){
+      list_metabolite <- strsplit(sourceId,",")
+      list_metabolite <- unlist(list_metabolite)
+    } else {
+      list_metabolite <- sourceId
+    }
+  } else if(is.data.frame(sourceId)){
+    list_metabolite <-as.character(unlist(sourceId$sourceId))
+  } else{
+    message("Wrong Format of argument")
+    return(NULL)
+  }
+  list_metabolite <- sapply(list_metabolite,shQuote)
+  list_metabolite <- paste(list_metabolite,collapse = ",")
+  query <- paste0("select sourceId,IDtype as analytesource, rampId from source where sourceId in (",list_metabolite,");")
+  df <- DBI::dbGetQuery(con,query)
+}

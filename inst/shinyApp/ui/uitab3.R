@@ -13,7 +13,10 @@ tabItem3 <-  shinydashboard::tabItem(
                column(12,
                       helpText("Given compound's name, 
                                it returns pathways in which the compound get involved in."),
-                      textInput("compName","",placeholder = "Input compound synonym"),
+                      textInput("compName","",placeholder = "Input compound synonym or source"),
+                      radioButtons("synonymOrSource","Search by synonyms or source IDs?", choices = c(
+                        "Synonym" = "synonyms", "Source ID" = "ids"
+                      ),selected = "ids"),
                       selectInput("KW_synonym", "Select from list", choices = NULL),
                       actionButton("submit_compName","Submit")
                       )
