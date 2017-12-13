@@ -5,7 +5,7 @@
 \title{Fast search given a list of metabolites}
 \usage{
 rampFastPathFromMeta(synonym, find_synonym = FALSE, conpass = NULL,
-  dbname = "ramp", username = "root")
+  dbname = "ramp", username = "root", synonymOrIdS = "ids")
 }
 \arguments{
 \item{synonym}{a vector of synonym that need to be searched}
@@ -17,6 +17,8 @@ rampFastPathFromMeta(synonym, find_synonym = FALSE, conpass = NULL,
 \item{dbname}{name of the mysql database (default is "ramp")}
 
 \item{username}{username for database access (default is "root")}
+
+\item{synonymOrIdS}{whether to return "synonyms" or "ids" (default is "ids")}
 }
 \value{
 a list contains all metabolits as name and pathway inside.
