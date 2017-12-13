@@ -90,8 +90,7 @@ If the username is different then root, then specify the username in the "userna
 If you encounter any problems, or find installation problems or bugs, please start an issue on the Issues tab or email Ewy.Mathe@osumc.edu directly. Thanks!
 
 ## Authors
-* **Bofei Zhang** - *Web Interface* - [Bofei5675](https://github.com/Bofei5675)
+* **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
 * **Ewy Mathé** - [Mathelab](https://github.com/MatheLab)
-## License
 
 
