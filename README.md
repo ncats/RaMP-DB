@@ -8,7 +8,8 @@ Also note that we are working on a server version of RaMP so that users do not h
 The app performs some complex queries (e.g. retrieve allmetabolites and/or genes that belong to a user input pathway or list of pathways).  It also performs pathway enrichment analysis given a list of metabolites and/or genes.
 
 Here are some screenshots to give you an idea.
-Fonr page:
+
+Front page:
 
 <img src="img/Picture1.png" alt = "FrontPage" width="400"/>
 
