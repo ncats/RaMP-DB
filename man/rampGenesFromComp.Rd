@@ -4,7 +4,7 @@
 \alias{rampGenesFromComp}
 \title{Send query to databases to get metabolites}
 \usage{
-rampGenesFromComp(names, maxItems, geneOrcompound = NULL)
+rampGenesFromComp(names, maxItems, geneOrcompound = NULL, con = NULL)
 }
 \arguments{
 \item{names}{the string that user defined for given synonym of metablite}
@@ -14,6 +14,8 @@ returned by query}
 
 \item{geneOrcompound}{string defined from radio input that describes type
 of returned metablites from query.}
+
+\item{con}{a connection object returned from the function connectToRaMP()}
 }
 \value{
 a dataframe that contain given synonym as column name

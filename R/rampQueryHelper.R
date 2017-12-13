@@ -2,10 +2,13 @@
 #' This function is used to filter out some super common synonyms like glyceride
 #' Now, this function only format the user input, so the user vector, dataframe,
 #' and entire string separated by comma are working.
+#' @param synonym name to search for
 #' @param full bool if return whole data.frame
 #' @param find_synonym bool if find all synonyms or just return same synonym
+#' @param con a connection object returned from the function connectToRaMP()
 #' as input (there are some common synonyms that will mess up whole searching)
-rampFindSynonymFromSynonym <- function(synonym,full = F,find_synonym = F){
+rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
+	find_synonym = FALSE,con=NULL){
   if(is.character(synonym)){
     if(grepl("\n",synonym)[1]){
       list_metabolite <- strsplit(synonym,"\n")
@@ -56,10 +59,11 @@ rampFindSynonymFromSynonym <- function(synonym,full = F,find_synonym = F){
 }
 #' Find all source from given list of RaMP Ids
 #' @param rampId could be a data frame return by rampFindSynonymFromSynonym
-#'  containing all information related to synonym. Or can be a list of 
-#'  rampId
-#'  @param full return whole searching result or not.
-rampFindSourceFromId <- function(rampId=NULL,full = T){
+#' @param con a connection object returned from the function connectToRaMP()
+#' containing all information related to synonym. Or can be a list of 
+#' rampId
+#' @param full return whole searching result or not (TRUE/FALSE)
+rampFindSourceFromId <- function(rampId=NULL,full = TRUE,con){
   if(is.data.frame(rampId)){
     list_id <- rampId$rampId
   } else if(is.character(rampId)){
@@ -91,10 +95,12 @@ rampFindSourceFromId <- function(rampId=NULL,full = T){
 
 #' Fast search given a list of metabolites source Id
 #' @param sourceid a vector of synonym that need to be searched
+#' @param find_synonym bool if find all synonyms or just return same synonym
+#' @param con a connection object returned from the function connectToRaMP()
 #' @return a list contains all metabolits as name and pathway inside.
 #' 
 #' Apply famil function...
-rampFastPathFromSource<- function(sourceid,find_synonym = FALSE){
+rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,con=con){
   # progress<- shiny::Progress$new()
   # progress$set(message = "Querying databases ...",value = 0)
   now <- proc.time()

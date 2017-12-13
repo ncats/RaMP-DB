@@ -30,7 +30,7 @@ output$summary_path <- renderText({
 
 observe({
 
-  choices <- kw_analyte[grepl(input$compName,kw_analyte,fixed = T)]
+  choices <- kw_analyte[grepl(input$compName,kw_analyte,ignore.case=TRUE)]
   choices <- choices[order(nchar(choices),choices)]
   if(is.null(choices))
     return(NULL)

@@ -4,10 +4,12 @@
 \alias{rampFastMetaFromPath}
 \title{Use fast search algorithm to find all pathways from given analytes}
 \usage{
-rampFastMetaFromPath(pathway)
+rampFastMetaFromPath(pathway, con = con)
 }
 \arguments{
 \item{pathway}{a string or a data.fram that contains all pathways}
+
+\item{con}{a connection object returned from the function connectToRaMP()}
 }
 \value{
 a data.frame that contains all search results

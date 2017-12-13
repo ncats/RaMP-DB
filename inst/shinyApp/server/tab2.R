@@ -41,7 +41,7 @@ output$result2 <- DT::renderDataTable({
 
 observe({
   
-  choices <- kw_pathway[grepl(input$singleInput2,kw_pathway,fixed = T)]
+  choices <- kw_pathway[grepl(input$singleInput2,kw_pathway,ignore.case=TRUE)]
   choices <- choices[order(nchar(choices),choices)]
   if(is.null(choices))
     return(NULL)

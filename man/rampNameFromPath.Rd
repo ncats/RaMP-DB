@@ -4,7 +4,7 @@
 \alias{rampNameFromPath}
 \title{Send query to databases to get metabolites}
 \usage{
-rampNameFromPath(names, maxItems, geneOrCompound)
+rampNameFromPath(names, maxItems, geneOrCompound, con)
 }
 \arguments{
 \item{names}{the string value that describes pathway name.}
@@ -14,6 +14,8 @@ return by this query.}
 
 \item{geneOrCompound}{the string value that define types (gene or
 compound) of returned metabolites.}
+
+\item{con}{a connection object returned from the function connectToRaMP()}
 }
 \value{
 a dataframe that has given pathwayname as column names

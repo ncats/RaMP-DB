@@ -3,7 +3,8 @@
 #' @param pathway_list a vector of all pathways searched from given metabolites
 #' @param pathway single pathway name that is applied by Fisher test
 #' @param num_of_meta integer that describe how many initial metabolites
-rampOneFisherTest <- function(pathway_list,pathway,num_of_meta){
+#' @param con a connection object returned from the function connectToRaMP()
+rampOneFisherTest <- function(pathway_list,pathway,num_of_meta,con){
   # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
   # on.exit(dbDisconnect(con))
   contingencyTb <- matrix(0,nrow = 2,ncol = 2)
@@ -27,7 +28,7 @@ rampOneFisherTest <- function(pathway_list,pathway,num_of_meta){
   contingencyTb[2,1] <- user_in_pathway
   contingencyTb[2,2] <- user_out_pathway
   
-  result <- fisher.test(contingencyTb)
+  result <- stats::fisher.test(contingencyTb)
   result$p.value <- round(result$p.value,4)
   return(result)
 
@@ -53,18 +54,18 @@ rampGenerateBarPlot <- function(df){
 #' From user input, the function accept a list of pathways, and number of metabolites 
 #' from which the pathways are
 #' 
-#' @param pathway_list The list contains pathway as names and metabolites in that pathway 
+#' @param pathway_meta_list The list contains pathway as names and metabolites in that pathway 
 #' under each names (list)
 #' @param num_user_metabolites number of metabolites given by user when they want to 
 #' search for pathways.
+#' @param FisherPathwayTable Fisher Pathway Table
+#' @param con a connection object returned from the function connectToRaMP()
+#' con <- connectToRaMP(dbname="ramp",username="root",password="mypassword")
 #' @return a data.frame contains all fisher test result with pathway name
 #' as column name
-rampFisherTest <- function(pathway_meta_list,num_user_metabolites,FisherPathwayTable){
-  # con <- dbConnect(MySQL(), user = "root", password = "Ehe131224", dbname = "mathelabramp")
-  # on.exit(dbDisconnect(con))
-  # progress<- shiny::Progress$new()
-  # progress$set(message = "Fisher testing ...",value = 0)
-  # on.exit(progress$close())
+rampFisherTest <- function(pathway_meta_list,
+			   num_user_metabolites,
+			   FisherPathwayTable,con){
   tot_metabolites <- DBI::dbGetQuery(con,"select count(*) from analyte;")
   tot_metabolites <- tot_metabolites[[1]]
   cumulative_fisher_results <- list()
@@ -92,16 +93,18 @@ rampFisherTest <- function(pathway_meta_list,num_user_metabolites,FisherPathwayT
   
   }
   
-  cumulative_fisher_results <- lapply(cumulative_fisher_results,fisher.test)
+  cumulative_fisher_results <- lapply(cumulative_fisher_results,stats::fisher.test)
   
   return(cumulative_fisher_results)
 }
 #' Fast search given a list of metabolites
-#' @param sysnonym a vector of synonym that need to be searched
+#' @param synonym a vector of synonym that need to be searched
+#' @param find_synonym bool if find all synonyms or just return same synonym
+#' @param con a connection object returned from the function connectToRaMP()
 #' @return a list contains all metabolits as name and pathway inside.
 #' 
 #' Apply famil function...
-rampFastPathFromMeta<- function(synonym,find_synonym = FALSE){
+rampFastPathFromMeta<- function(synonym,find_synonym = FALSE,con){
   # progress<- shiny::Progress$new()
   # progress$set(message = "Querying databases ...",value = 0)
   now <- proc.time()
@@ -109,7 +112,7 @@ rampFastPathFromMeta<- function(synonym,find_synonym = FALSE){
   # on.exit(dbDisconnect(con))
   # find synonym
 
-  synonym <- rampFindSynonymFromSynonym(synonym,find_synonym=find_synonym)
+  synonym <- rampFindSynonymFromSynonym(synonym,find_synonym=find_synonym,con=con)
     
   list_metabolite <- unique(synonym)
   list_metabolite <- sapply(list_metabolite,shQuote)
@@ -158,7 +161,7 @@ rampFileOfPathways <- function(infile){
     rampOut <- list()
     for (i in 1:length(infile[,1])){
       if(infile[[i,'type']]!="text/plain"){
-        rampOut[[i]] <- read.csv(infile[[i,'datapath']])
+        rampOut[[i]] <- utils::read.csv(infile[[i,'datapath']])
         name <- infile[[i,'name']]
         print(infile[[i,'type']])
         rampOut[[i]]$new.col <- substr(name,1,nchar(name) - 4)

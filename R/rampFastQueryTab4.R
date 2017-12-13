@@ -1,9 +1,9 @@
 #' Return analytes that has catalyzation relation with given analyte
 #' 
 #' @param synonym string or data.frame contains given analyte
-#' @param options logic value defines output
+#' @param con a connection object returned from the function connectToRaMP()
 #' @return a data.frame that contains search results
-rampFastOneCata <- function(synonym,options = F) {
+rampFastOneCata <- function(synonym,con) {
   now <- proc.time()
   # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
   # on.exit(dbDisconnect(con))
@@ -118,9 +118,9 @@ rampFastOneCata <- function(synonym,options = F) {
 #' Return analytes that has catalyzation relation with given list of analytes
 #' 
 #' @param synonym string or data.frame contains given analyte
-#' @param options logic value defines output
+#' @param con a connection object returned from the function connectToRaMP()
 #' @return a data.frame that contains search results
-rampFastMulCata <- function(synonym) {
+rampFastMulCata <- function(synonym,con) {
   now <- proc.time()
   # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
   # on.exit(dbDisconnect(con))
@@ -248,7 +248,7 @@ rampFileOfAnalytes_tab4 <- function(infile){
   rampOut <- list()
   for (i in 1:length(infile[,1])){
     rampOut <- readLines(infile[[i,'datapath']])
-    summary <- rampFastCata(rampOut,T)
+    summary <- rampFastOneCata(rampOut,T)
   }
   return(summary)
 }

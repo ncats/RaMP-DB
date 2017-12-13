@@ -4,10 +4,14 @@
 \alias{rampFastPathFromSource}
 \title{Fast search given a list of metabolites source Id}
 \usage{
-rampFastPathFromSource(sourceid, find_synonym = FALSE)
+rampFastPathFromSource(sourceid, find_synonym = FALSE, con = con)
 }
 \arguments{
 \item{sourceid}{a vector of synonym that need to be searched}
+
+\item{find_synonym}{bool if find all synonyms or just return same synonym}
+
+\item{con}{a connection object returned from the function connectToRaMP()}
 }
 \value{
 a list contains all metabolits as name and pathway inside.

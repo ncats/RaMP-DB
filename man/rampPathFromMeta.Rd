@@ -4,12 +4,14 @@
 \alias{rampPathFromMeta}
 \title{Send query to database that find pathway}
 \usage{
-rampPathFromMeta(synonym, maxItems)
+rampPathFromMeta(synonym, maxItems, con)
 }
 \arguments{
 \item{synonym}{the string that describe given synonym name.}
 
-\item{maxItems}{the integer that limit maximum returned by
+\item{maxItems}{the integer that limit maximum returned by}
+
+\item{con}{a connection object returned from the function connectToRaMP()
 query}
 }
 \value{

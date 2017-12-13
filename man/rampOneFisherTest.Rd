@@ -5,7 +5,7 @@
 \title{Do fisher test for only one pathway from search result
 clicked on highchart}
 \usage{
-rampOneFisherTest(pathway_list, pathway, num_of_meta)
+rampOneFisherTest(pathway_list, pathway, num_of_meta, con)
 }
 \arguments{
 \item{pathway_list}{a vector of all pathways searched from given metabolites}
@@ -13,6 +13,8 @@ rampOneFisherTest(pathway_list, pathway, num_of_meta)
 \item{pathway}{single pathway name that is applied by Fisher test}
 
 \item{num_of_meta}{integer that describe how many initial metabolites}
+
+\item{con}{a connection object returned from the function connectToRaMP()}
 }
 \description{
 Do fisher test for only one pathway from search result

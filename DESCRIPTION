@@ -12,6 +12,7 @@ Description: RaMP is integrates 4 different databases (Kegg, Reactome,
     HMDB, and wikipathways) and provides comprehensive pathway annotations for compounds (metabolites), genes, and pathways.
 Imports:
     RMySQL,
+    magrittr,
     shiny,
     shinydashboard,
     highcharter,
@@ -19,5 +20,4 @@ Imports:
     dplyr,
     DT,
     xtable,
-    magrittr
 RoxygenNote: 6.0.1.9000

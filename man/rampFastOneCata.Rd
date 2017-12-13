@@ -4,12 +4,12 @@
 \alias{rampFastOneCata}
 \title{Return analytes that has catalyzation relation with given analyte}
 \usage{
-rampFastOneCata(synonym, options = F)
+rampFastOneCata(synonym, con)
 }
 \arguments{
 \item{synonym}{string or data.frame contains given analyte}
 
-\item{options}{logic value defines output}
+\item{con}{a connection object returned from the function connectToRaMP()}
 }
 \value{
 a data.frame that contains search results

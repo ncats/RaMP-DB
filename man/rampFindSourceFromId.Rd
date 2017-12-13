@@ -4,13 +4,16 @@
 \alias{rampFindSourceFromId}
 \title{Find all source from given list of RaMP Ids}
 \usage{
-rampFindSourceFromId(rampId = NULL, full = T)
+rampFindSourceFromId(rampId = NULL, full = TRUE, con)
 }
 \arguments{
-\item{rampId}{could be a data frame return by rampFindSynonymFromSynonym
+\item{rampId}{could be a data frame return by rampFindSynonymFromSynonym}
+
+\item{full}{return whole searching result or not (TRUE/FALSE)}
+
+\item{con}{a connection object returned from the function connectToRaMP()
 containing all information related to synonym. Or can be a list of 
-rampId
-@param full return whole searching result or not.}
+rampId}
 }
 \description{
 Find all source from given list of RaMP Ids
