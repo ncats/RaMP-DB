@@ -4,7 +4,7 @@
 \alias{connectToRaMP}
 \title{Connect to RaMP database (requires mysql password when running locally)}
 \usage{
-connectToRaMP(dbname = "ramp", username = "root", password = NULL,
+connectToRaMP(dbname = "ramp", username = "root", conpass = NULL,
   host = NULL)
 }
 \arguments{
@@ -12,7 +12,7 @@ connectToRaMP(dbname = "ramp", username = "root", password = NULL,
 
 \item{username}{a string that is username for database (default: root)}
 
-\item{password}{a string this is password for database}
+\item{conpass}{password for database (string)}
 
 \item{host}{a string that stand for host}
 }
@@ -21,6 +21,6 @@ Connect to RaMP database (requires mysql password when running locally)
 }
 \examples{
 \dontrun{
-con <- connectToRaMP(dbname="ramp",username="root",password="mypassword")
+con <- connectToRaMP(dbname="ramp",username="root",conpass="mypassword")
 }
 }

@@ -5,7 +5,8 @@
 \title{Do fisher test for only one pathway from search result
 clicked on highchart}
 \usage{
-rampOneFisherTest(pathway_list, pathway, num_of_meta, con)
+rampOneFisherTest(pathway_list, pathway, num_of_meta, conpass = NULL,
+  dbname = "ramp", username = "root")
 }
 \arguments{
 \item{pathway_list}{a vector of all pathways searched from given metabolites}
@@ -14,7 +15,11 @@ rampOneFisherTest(pathway_list, pathway, num_of_meta, con)
 
 \item{num_of_meta}{integer that describe how many initial metabolites}
 
-\item{con}{a connection object returned from the function connectToRaMP()}
+\item{conpass}{password for database access (string)}
+
+\item{dbname}{name of the mysql database (default is "ramp")}
+
+\item{username}{username for database access (default is "root")}
 }
 \description{
 Do fisher test for only one pathway from search result

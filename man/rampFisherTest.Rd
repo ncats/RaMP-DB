@@ -15,8 +15,7 @@ search for pathways.}
 
 \item{FisherPathwayTable}{Fisher Pathway Table}
 
-\item{con}{a connection object returned from the function connectToRaMP()
-con <- connectToRaMP(dbname="ramp",username="root",password="mypassword")}
+\item{con}{a connection object returned from the function connectToRaMP()}
 }
 \value{
 a data.frame contains all fisher test result with pathway name

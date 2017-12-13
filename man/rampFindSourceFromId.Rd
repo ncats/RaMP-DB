@@ -4,16 +4,21 @@
 \alias{rampFindSourceFromId}
 \title{Find all source from given list of RaMP Ids}
 \usage{
-rampFindSourceFromId(rampId = NULL, full = TRUE, con)
+rampFindSourceFromId(rampId = NULL, full = TRUE, conpass = NULL,
+  dbname = "ramp", username = "root")
 }
 \arguments{
-\item{rampId}{could be a data frame return by rampFindSynonymFromSynonym}
+\item{rampId}{could be a data frame return by rampFindSynonymFromSynonym
+containing all information related to synonym. Or can be a list of 
+rampId}
 
 \item{full}{return whole searching result or not (TRUE/FALSE)}
 
-\item{con}{a connection object returned from the function connectToRaMP()
-containing all information related to synonym. Or can be a list of 
-rampId}
+\item{conpass}{password for database access (string)}
+
+\item{dbname}{name of the mysql database (default is "ramp")}
+
+\item{username}{username for database access (default is "root")}
 }
 \description{
 Find all source from given list of RaMP Ids

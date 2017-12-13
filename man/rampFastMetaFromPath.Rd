@@ -4,16 +4,27 @@
 \alias{rampFastMetaFromPath}
 \title{Use fast search algorithm to find all pathways from given analytes}
 \usage{
-rampFastMetaFromPath(pathway, con = con)
+rampFastMetaFromPath(pathway, conpass = NULL, dbname = "ramp",
+  username = "root")
 }
 \arguments{
 \item{pathway}{a string or a data.fram that contains all pathways}
 
-\item{con}{a connection object returned from the function connectToRaMP()}
+\item{conpass}{password for database access (string)}
+
+\item{dbname}{name of the mysql database (default is "ramp")}
+
+\item{username}{username for database access (default is "root")}
 }
 \value{
 a data.frame that contains all search results
 }
 \description{
 Use fast search algorithm to find all pathways from given analytes
+}
+\examples{
+\dontrun{
+con <- connectToRaMP(dbname="ramp",username="root",conpass="mypassword")
+rampFastMetaFromPath <- pathway="sphingolipid metabolism",conpass="mypassword")
+}
 }

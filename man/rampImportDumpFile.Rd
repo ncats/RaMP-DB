@@ -5,12 +5,12 @@
 \title{Import RaMP database automatically from dump file that is coming with 
 the Package}
 \usage{
-rampImportDumpFile(dbname, password)
+rampImportDumpFile(dbname, conpass)
 }
 \arguments{
 \item{dbname}{The database name user defined}
 
-\item{password}{The password for MySQL server}
+\item{conpass}{The password for MySQL server}
 }
 \description{
 Import RaMP database automatically from dump file that is coming with 

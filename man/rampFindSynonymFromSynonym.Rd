@@ -8,7 +8,7 @@ Now, this function only format the user input, so the user vector, dataframe,
 and entire string separated by comma are working.}
 \usage{
 rampFindSynonymFromSynonym(synonym, full = FALSE, find_synonym = FALSE,
-  con = NULL)
+  conpass = NULL, dbname = "ramp", username = "root")
 }
 \arguments{
 \item{synonym}{name to search for}
@@ -17,7 +17,11 @@ rampFindSynonymFromSynonym(synonym, full = FALSE, find_synonym = FALSE,
 
 \item{find_synonym}{bool if find all synonyms or just return same synonym}
 
-\item{con}{a connection object returned from the function connectToRaMP()
+\item{conpass}{password for database access (string)}
+
+\item{dbname}{name of the mysql database (default is "ramp")}
+
+\item{username}{username for database access (default is "root")
 as input (there are some common synonyms that will mess up whole searching)}
 }
 \description{

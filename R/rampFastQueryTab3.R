@@ -3,10 +3,16 @@
 #' @param pathway_list a vector of all pathways searched from given metabolites
 #' @param pathway single pathway name that is applied by Fisher test
 #' @param num_of_meta integer that describe how many initial metabolites
-#' @param con a connection object returned from the function connectToRaMP()
-rampOneFisherTest <- function(pathway_list,pathway,num_of_meta,con){
-  # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
-  # on.exit(dbDisconnect(con))
+#' @param conpass password for database access (string)
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
+rampOneFisherTest <- function(pathway_list,pathway,num_of_meta,conpass=NULL,
+	dbname="ramp",username="root"){
+
+  if(is.null(conpass)) {
+        stop("Please define the password for the mysql connection")
+  }
+
   contingencyTb <- matrix(0,nrow = 2,ncol = 2)
   colnames(contingencyTb) <- c("In Pathway","Not In Pathway")
   rownames(contingencyTb) <- c("All Metabolites","User's Metabolites")
@@ -17,8 +23,13 @@ rampOneFisherTest <- function(pathway_list,pathway,num_of_meta,con){
                                             from pathway where pathwayName = \"",
                                           pathway,"\"));"))
   tot_in_pathway <- tot_in_pathway[[1]]
+
+  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+	password = conpass, 
+	dbname = dbname)
   
   tot_metabolites <- DBI::dbGetQuery(con,"select count(*) from analyte;")
+  DBI::dbDisconnect(con)
   tot_metabolites <- tot_metabolites[[1]]
   tot_out_pathway <- tot_metabolites - tot_in_pathway
   user_in_pathway <- nrow(pathway_list[[pathway]])
@@ -60,7 +71,6 @@ rampGenerateBarPlot <- function(df){
 #' search for pathways.
 #' @param FisherPathwayTable Fisher Pathway Table
 #' @param con a connection object returned from the function connectToRaMP()
-#' con <- connectToRaMP(dbname="ramp",username="root",password="mypassword")
 #' @return a data.frame contains all fisher test result with pathway name
 #' as column name
 rampFisherTest <- function(pathway_meta_list,
@@ -100,11 +110,20 @@ rampFisherTest <- function(pathway_meta_list,
 #' Fast search given a list of metabolites
 #' @param synonym a vector of synonym that need to be searched
 #' @param find_synonym bool if find all synonyms or just return same synonym
-#' @param con a connection object returned from the function connectToRaMP()
+#' @param conpass password for database access (string)
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
 #' @return a list contains all metabolits as name and pathway inside.
 #' 
 #' Apply famil function...
-rampFastPathFromMeta<- function(synonym,find_synonym = FALSE,con){
+rampFastPathFromMeta<- function(synonym,find_synonym = FALSE,
+	conpass=NULL,dbname="ramp",username="root"){
+
+  if(is.null(conpass)) {
+        stop("Please define the password for the mysql connection")
+  }
+
+
   # progress<- shiny::Progress$new()
   # progress$set(message = "Querying databases ...",value = 0)
   now <- proc.time()
@@ -112,25 +131,44 @@ rampFastPathFromMeta<- function(synonym,find_synonym = FALSE,con){
   # on.exit(dbDisconnect(con))
   # find synonym
 
-  synonym <- rampFindSynonymFromSynonym(synonym,find_synonym=find_synonym,con=con)
+  synonym <- rampFindSynonymFromSynonym(synonym,find_synonym=find_synonym,
+	conpass=conpass)
     
   list_metabolite <- unique(synonym)
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
   query1 <- paste0("select distinct Synonym,rampId from analytesynonym where Synonym in (",
                     list_metabolite,");")
+
+
+  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+        password = conpass,
+        dbname = dbname)
+
+  tot_metabolites <- DBI::dbGetQuery(con,"select count(*) from analyte;")
   df1<- DBI::dbGetQuery(con,query1)
+  DBI::dbDisconnect(con)
+
   query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where 
                     rampId in (select rampId from analytesynonym where Synonym in (",
                     list_metabolite,"));")
+  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+        password = conpass,
+        dbname = dbname)
   df2 <- DBI::dbGetQuery(con,query2)
+  DBI::dbDisconnect(con)
+
   id_list <- df2[,1]
   id_list <- sapply(id_list,shQuote)
   id_list <- paste(id_list,collapse = ",")
   query3 <- paste0("select pathwayName,sourceId,type,pathwayRampId from pathway where pathwayRampId in (",
                     id_list,");")
-
+  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+        password = conpass,
+        dbname = dbname)
   df3 <- DBI::dbGetQuery(con,query3)
+  DBI::dbDisconnect(con)
+
   mdf <- merge(df1,df2,all.x=T)
   mdf <- mdf[!is.na(mdf[,3]),]
   mdf <- merge(mdf,df3,all.x = T)

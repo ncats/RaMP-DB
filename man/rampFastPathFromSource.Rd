@@ -4,14 +4,19 @@
 \alias{rampFastPathFromSource}
 \title{Fast search given a list of metabolites source Id}
 \usage{
-rampFastPathFromSource(sourceid, find_synonym = FALSE, con = con)
+rampFastPathFromSource(sourceid, find_synonym = FALSE, conpass = NULL,
+  dbname = "ramp", username = "root")
 }
 \arguments{
 \item{sourceid}{a vector of synonym that need to be searched}
 
 \item{find_synonym}{bool if find all synonyms or just return same synonym}
 
-\item{con}{a connection object returned from the function connectToRaMP()}
+\item{conpass}{password for database access (string)}
+
+\item{dbname}{name of the mysql database (default is "ramp")}
+
+\item{username}{username for database access (default is "root")}
 }
 \value{
 a list contains all metabolits as name and pathway inside.
