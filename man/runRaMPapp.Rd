@@ -4,10 +4,10 @@
 \alias{runRaMPapp}
 \title{Run Shiny App}
 \usage{
-runRaMPapp(con = NULL)
+runRaMPapp(conpass = NULL)
 }
 \arguments{
-\item{con}{a connection object returned from the function connectToRaMP()}
+\item{conpass}{password for database access (string)}
 }
 \description{
 This function launches the RShiny app.  It requires a connection to the RaMP database as input, which requires running the function connectoToRaMP() and providing the MySQL password.
