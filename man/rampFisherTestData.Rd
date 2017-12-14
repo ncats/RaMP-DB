@@ -6,7 +6,7 @@
 or metabolites (output of rampFastPathFromMeta)}
 \usage{
 rampFisherTestData(rampOut, analyte_type = "metabolites",
-  totalanalytes = 500, conpass = NULL, dbname = "ramp",
+  total_analytes = 500, conpass = NULL, dbname = "ramp",
   username = "root")
 }
 \arguments{
@@ -14,13 +14,13 @@ rampFisherTestData(rampOut, analyte_type = "metabolites",
 
 \item{analyte_type}{specify whether to do test on 'metabolites' or 'genes'}
 
+\item{total_analytes}{number of total genes or metabolites analyzed in the experiment (e.g. background) (default is 500, with assumption that analyte_type is "metabolite")}
+
 \item{conpass}{password for database access (string)}
 
 \item{dbname}{name of the mysql database (default is "ramp")}
 
 \item{username}{username for database access (default is "root")}
-
-\item{total_analytes}{number of total genes or metabolites analyzed in the experiment (e.g. background) (default is 500, with assumption that analyte_type is "metabolite")}
 }
 \value{
 a data frame with three columns pathwayID, Number in pathway,

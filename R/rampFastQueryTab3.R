@@ -292,7 +292,7 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
 #' @param username username for database access (default is "root")
 #' @return a data frame with three columns pathwayID, Number in pathway,
 #' number out of pathway
-rampFisherTestData <- function(rampOut,analyte_type="metabolites",totalanalytes=500,
+rampFisherTestData <- function(rampOut,analyte_type="metabolites",total_analytes=500,
 	conpass=NULL,dbname="ramp",username="root"){
   if(analyte_type == "metabolites"){
     rampOut2 <- rampOut[grepl("RAMP_C_",rampOut$rampId),]
