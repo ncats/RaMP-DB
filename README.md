@@ -1,6 +1,6 @@
 # RaMP - Relational Database of Metabolomic Pathways
 
-The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene biological pathways from multiple sources. So far, we have integrated information from HMDB, KEGG Reactome, and WikiPathways. The relational structure of RaMP enables complex and batch queries.  To facilitate its usage, we have created an R package that includes a user-friendly R Shiny web application.  Please note that this project is in continuous development and we certainly appreciate your feedback.  
+The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene biological pathways from multiple sources. Currently, we have integrated information from HMDB, KEGG Reactome, and WikiPathways. The relational structure of RaMP enables complex and batch queries.  To facilitate its usage, we have created an R package that includes a user-friendly R Shiny web application.  Please note that this project is in continuous development and we certainly appreciate your feedback.  
 
 Also note that we are working on a server version of RaMP so that users do not have to install anything on their local machines.  Stay tuned!
 
@@ -32,7 +32,7 @@ When installing, you will be prompted to create a password for the user "root", 
 
 If you want to reset your password , you can go to [MySQL References 5.7 - How to reset root password ] (https://dev.mysql.com/doc/refman/5.7/en/resetting-permissions.html)
 
-Please note that you will need administrator priviledges for this step..
+Please note that you will need administrator privileges for this step..
 
 ### Creating the database locally
 Once your MySQL environment is in place, creating the RaMP database locally is trivial.
@@ -72,8 +72,10 @@ select * from analytesynonym where synonym = "glucose";
 
 
 ### Install and load the RaMP package 
-You can install this package directly from GitHub. In the R Console, type the following:
+You can install this package directly from GitHub using the install_github() function available through the devtools package. In the R Console, type the following:
 ```R
+install.packages(“devtools”)
+library(devtools)
 install_github("Bofei5675/RaMP2")
 # Load the package
 library(RaMP)
@@ -84,7 +86,7 @@ Now, you're set to use the web application locally.  Just type:
 RaMP::runRaMPapp(conpass="mysql_password")
 ```
 
-If the username is different then root, then specify the username in the "username" parater.  Similarly, if the name of the database is different than "ramp", then specify the "dbname" parameter.
+If the username is different then root, then specify the username in the "username" parameter.  Similarly, if the name of the database is different than "ramp", then specify the "dbname" parameter.
 
 ## Reporting Issues
 If you encounter any problems, or find installation problems or bugs, please start an issue on the Issues tab or email Ewy.Mathe@osumc.edu directly. Thanks!
