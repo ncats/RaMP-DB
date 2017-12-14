@@ -70,13 +70,27 @@ rampGenerateBarPlot <- function(df){
 #' @param num_user_metabolites number of metabolites given by user when they want to 
 #' search for pathways.
 #' @param FisherPathwayTable Fisher Pathway Table
-#' @param con a connection object returned from the function connectToRaMP()
+#' @param conpass password for database access (string)
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
 #' @return a data.frame contains all fisher test result with pathway name
 #' as column name
 rampFisherTest <- function(pathway_meta_list,
 			   num_user_metabolites,
-			   FisherPathwayTable,con){
+			   FisherPathwayTable,
+			   conpass=NULL,
+			   dbname="ramp",
+			   username="root"){
+  if(is.null(conpass)) {
+        stop("Please define the password for the mysql connection")
+  }
+
+  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+        password = conpass,
+        dbname = dbname)
+
   tot_metabolites <- DBI::dbGetQuery(con,"select count(*) from analyte;")
+  DBI::dbDisconnect(con)
   tot_metabolites <- tot_metabolites[[1]]
   cumulative_fisher_results <- list()
   
@@ -107,18 +121,25 @@ rampFisherTest <- function(pathway_meta_list,
   
   return(cumulative_fisher_results)
 }
+
+
 #' Fast search given a list of metabolites
 #' @param synonym a vector of synonym that need to be searched
-#' @param find_synonym bool if find all synonyms or just return same synonym
+#' @param find_synonym find all synonyms or just return same synonym (T/F)
 #' @param conpass password for database access (string)
 #' @param synonymOrIdS whether to return "synonyms" or "ids" (default is "ids")
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @return a list contains all metabolits as name and pathway inside.
 #' 
-#' Apply famil function...
-rampFastPathFromMeta<- function(synonym,find_synonym = FALSE,
-	conpass=NULL,dbname="ramp",username="root",synonymOrIdS = "ids"){
+##' Apply famil function...
+#' @export
+rampFastPathFromMeta<- function(synonym,
+	find_synonym = FALSE,
+	conpass=NULL,
+	dbname="ramp",
+	username="root",
+	synonymOrIdS = "ids"){
 
   if(is.null(conpass)) {
         stop("Please define the password for the mysql connection")
@@ -127,25 +148,34 @@ rampFastPathFromMeta<- function(synonym,find_synonym = FALSE,
   now <- proc.time()
 
   if(synonymOrIdS == "synonyms"){
-    synonym <- rampFindSynonymFromSynonym(input,find_synonym=find_synonym,
+    synonym <- RaMP:::rampFindSynonymFromSynonym(synonym=synonym,
+	find_synonym=find_synonym,
 	conpass=conpass)
     list_metabolite <- unique(synonym)
-    
     list_metabolite <- sapply(list_metabolite,shQuote)
     list_metabolite <- paste(list_metabolite,collapse = ",")
   } else if (synonymOrIdS == "ids"){
-    source <- rampFindSourceRampId(input, conpass=conpass)
+    source <- RaMP:::rampFindSourceRampId(sourceId=synonym, conpass=conpass)
+    if (nrow(source)==0) {
+	stop("Make sure you are actually inputting ids and not names (you have synonymOrIdS set to 'ids'")
+	}
     list_metabolite <- unique(source)
     sourceIDTable <- list_metabolite
     list_metabolite <- list_metabolite$rampId
     list_metabolite <- sapply(list_metabolite,shQuote)
     list_metabolite <- paste(list_metabolite,collapse = ",")
-    
+  } else {
+	stop("Make sure synonymOrIdS is set to 'synonyms' or 'ids'")
   }
   # Parse data to fit mysql
   # Can be simplified here
-  
+  if(list_metabolite=="") {
+	stop("Unable to retrieve metabolites")
+  }
+ 
+ 
   if(synonymOrIdS == "synonyms"){
+    # Retrieve IDs for current name and all associated synonyms
     query1 <- paste0("select distinct Synonym,rampId from analytesynonym where Synonym in (",
                       list_metabolite,");")
     con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
@@ -165,19 +195,18 @@ rampFastPathFromMeta<- function(synonym,find_synonym = FALSE,
     df2 <- DBI::dbGetQuery(con,query2)
     DBI::dbDisconnect(con)
   }
-  id_list <- df2[,1]
-  id_list <- sapply(id_list,shQuote)
-  id_list <- paste(id_list,collapse = ",")
+  pathid_list <- df2$pathwayRampId
+  pathid_list <- sapply(pathid_list,shQuote)
+  pathid_list <- paste(pathid_list,collapse = ",")
   query3 <- paste0("select pathwayName,sourceId as pathwaysourceId,type as pathwaysource,pathwayRampId from pathway where pathwayRampId in (",
-                    id_list,");")
+                    pathid_list,");")
   con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
   df3 <- DBI::dbGetQuery(con,query3)
   DBI::dbDisconnect(con)
   if(synonymOrIdS == "synonyms"){
     mdf <- merge(df1,df2,all.x=T)
-    mdf <- mdf[!is.na(mdf[,3]),]
+    mdf <- mdf[!is.na(mdf[,"pathwayRampId"]),]
     mdf <- merge(mdf,df3,all.x = T)
-    # mdf <- mdf[!is.na(mdf[,3]),]
     colnames(mdf)[3] <- "metabolite"
     print("timing ...")
     print(proc.time()- now)
@@ -274,12 +303,10 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
   return(hc)
 }
 #' Generate raw data for fisher test based on the given output
-#' Out put is from rampFastMetaFromPathway
+#' Output is from rampFastMetaFromPathway
 #' Required format 
 #' @param rampOut The data frame generated by rampFastPathFromMeta
 #' @param metaboliteOrGene specify whether to do test on 'metabolite' or 'gene'
-#' @metaboliteOrGene A bool value that specifiy if the fisher test data for
-#' metabolites or genes is the output
 #' @return a data frame with three columns pathwayID, Number in pathway,
 #' number out of pathway
 rampFisherTestData <- function(rampOut,metaboliteOrGene){

@@ -29,13 +29,9 @@ tabItem3 <-  shinydashboard::tabItem(
                fluidRow(
                  div(
                    style = "margin:25px",
-                   downloadButton("comp_report","Generate Report"),
+                   downloadButton("comp_report","Download Results"),
                    hr(),
-                   textOutput("summary_path"),
-                   div(style = "height:300px;overflow-x:auto;overflow-y:scroll",
-                       helpText("Preview of output only display first 20 items."),
-                       DT::dataTableOutput("result3")
-                   )
+                   textOutput("summary_path")
                  )
                )
            ),
@@ -48,7 +44,11 @@ tabItem3 <-  shinydashboard::tabItem(
                collapsible = T,
                collapsed = F,
                title = strong("Summary"),
-               uiOutput("preview_tab3")
+#               uiOutput("preview_tab3")
+                   div(style = "height:900px;overflow-x:auto;overflow-y:scroll",
+                       helpText("Preview of output only display first 20 items."),
+                       DT::dataTableOutput("result3")
+                   )
              )
            )
          ),

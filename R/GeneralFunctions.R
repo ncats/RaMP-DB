@@ -29,9 +29,9 @@ rampTablize <- function(data,num_row =5){
                               include.rownames = F)
     }
   }
-  return(lapply(tables,paste))
-  
+  return(lapply(tables,paste))  
 }
+
 #' Send query to databases to get metabolites 
 #'
 #' From user supplied synonym metabolites, it search through whole databases 
@@ -42,16 +42,24 @@ rampTablize <- function(data,num_row =5){
 #' returned by query
 #' @param geneOrcompound string defined from radio input that describes type
 #' of returned metablites from query.
-#' @param con a connection object returned from the function connectToRaMP()
+#' @param conpass password for database access (string)
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
 #' @examples
 #' \dontrun{
-#' ramp <- rampGenesFromComp("VitamineE",20,"compound")
+#' ramp <- rampGenesFromComp("VitamineE",20,"compound",conpass="mysqlpassword")
 #' }
 #' @return a dataframe that contain given synonym as column name
-rampGenesFromComp <- function(names, maxItems, geneOrcompound = NULL,con=NULL) {
-    if (is.null(con)) {
-	stop("Make sure you are connected to the database, use connectToRamp()")
-    }
+rampGenesFromComp <- function(names, maxItems, geneOrcompound = NULL,conpass=NULL,
+	dbname="ramp",username="root") {
+  if(is.null(conpass)) {
+        stop("Please define the password for the mysql connection")
+  }
+
+  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+        password = conpass,
+        dbname = dbname)
+
     result <- DBI::dbGetQuery(con, paste0("SELECT analytesynonym.Synonym,analytesynonym.geneOrCompound,source.sourceId,source.IDtype
                             FROM analytesynonym,source WHERE analytesynonym.rampID IN
                                      (SELECT rampId FROM analytehaspathway WHERE pathwayRampId IN
@@ -59,7 +67,10 @@ rampGenesFromComp <- function(names, maxItems, geneOrcompound = NULL,con=NULL) {
                                      (SELECT rampID FROM analytesynonym WHERE synonym = \"",
                                      names, "\"))) AND source.rampId = analytesynonym.rampId LIMIT ", maxItems, ";"))
 
+   DBI::dbDisconnect(con)
+
     colnames(result) <- c(paste0("Search result for ", names),"metabolites_type","sourceID","source_type")
+
     return(result)
 }
 
@@ -73,30 +84,49 @@ rampGenesFromComp <- function(names, maxItems, geneOrcompound = NULL,con=NULL) {
 #' return by this query.
 #' @param geneOrCompound the string value that define types (gene or
 #' compound) of returned metabolites.
-#' @param con a connection object returned from the function connectToRaMP()
+#' @param conpass password for database access (string)
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
 #' @return a dataframe that has given pathwayname as column names
-#' ramp <- rampNameFromPath("Glucose-Alanine Cycle",20,compound)
-rampNameFromPath <- function(names, maxItems, geneOrCompound,con) {
+#' @examples
+#' \dontrun{
+#' ramp <- rampNameFromPath("Glucose-Alanine Cycle",20,compound,conpass="mysqlpassword")
+#' }
+rampNameFromPath <- function(names, maxItems, geneOrCompound,conpass,
+	dbname="ramp",username="root") {
+  if(is.null(conpass)) {
+        stop("Please define the password for the mysql connection")
+  }
+
   if (geneOrCompound != "both"){
+  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+        password = conpass,
+        dbname = dbname)
+
       result <- DBI::dbGetQuery(con, paste0("select analytesynonym.Synonym,analytesynonym.geneOrCompound,source.sourceId,source.IDtype 
                                         from analytesynonym,source where analytesynonym.rampId in 
                                        (select rampId from analytehaspathway where pathwayRampId in 
                                        (select pathwayRampId from pathway where pathwayName = \"",
                                         names,"\")) and source.rampId = analytesynonym.rampId and analytesynonym.geneOrCompound = \"",
                                         geneOrCompound,"\" limit ", maxItems,";"))
+    DBI::dbDisconnect(con)
   } else {
+  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+        password = conpass,
+        dbname = dbname)
+
       result <- DBI::dbGetQuery(con, paste0("select analytesynonym.Synonym,analytesynonym.geneOrCompound,source.sourceId,source.IDtype 
                                         from analytesynonym,source where analytesynonym.rampId in 
                                        (select rampId from analytehaspathway where pathwayRampId in 
                                        (select pathwayRampId from pathway where pathwayName = \"",
                                        names,"\")) and source.rampId = analytesynonym.rampId limit ", maxItems,";"))
+   DBI::dbDisconnect(con)
   }
   if (nrow(result)>0){
     colnames(result) <- c(paste0("Result_for_", names),"metabolites_type","source_ID", "source_type")
   } else {
     return ("Not Found")
   }
-  # dbDisconnect(con)
   return(result)
 }
 
@@ -107,25 +137,38 @@ rampNameFromPath <- function(names, maxItems, geneOrCompound,con) {
 #'
 #' @param synonym the string that describe given synonym name.
 #' @param maxItems the integer that limit maximum returned by
-#' @param con a connection object returned from the function connectToRaMP()
+#' @param conpass password for database access (string)
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
 #' query
 #' @return a dataframe that has given synonym as column name
-rampPathFromMeta <- function(synonym, maxItems,con) {
+rampPathFromMeta <- function(synonym, maxItems,conpass,
+	dbname="ramp",username="root") {
+  if(is.null(conpass)) {
+        stop("Please define the password for the mysql connection")
+  }
     sql <- paste0("select pathwayRampId from analytehaspathway where rampId in
                   (select rampID from analytesynonym where Synonym = \"",synonym, "\");")
     cat(sql)
+    con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+        password = conpass,
+        dbname = dbname)
     query <- DBI::dbGetQuery(con,sql)
+    DBI::dbDisconnect(con)
     container <- data.frame(matrix(nrow = 0,ncol = 3))
     colnames(container) <- c(paste0("Search result for ", synonym), "source_id", "source_type")
     for(id in unlist(query)){
       sql <- paste0("select pathwayName,sourceId,type from pathway where pathwayRampId =\"",id,"\";")
+
+ con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+        password = conpass,
+        dbname = dbname)
       query2 <- DBI::dbGetQuery(con,sql)
+      DBI::dbDisconnect(con)
       colnames(query2) <- c(paste0("Search result for ", synonym), "source_id", "source_type")
       container <- rbind(container,query2)
     }
     
-    # dbDisconnect(con)
-
     return(container)
 }
 
@@ -134,11 +177,19 @@ rampPathFromMeta <- function(synonym, maxItems,con) {
 #' @param word string value that describe the keyword user want to search
 #' @param database string value that describe where the user want to search
 #' for key word
-#' @param con a connection object returned from the function connectToRaMP()
+#' @param conpass password for database access (string)
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
 #' @return If there is at least one itmes in database vaguely matching key
 #' word, it will return a data frame that contains all search result. Otherwise
 #' it will return a string value to inform user.
-rampKWsearch <- function(word, database,con) {
+rampKWsearch <- function(word, database,conpass,
+	dbname="ramp",username="root") {
+
+  if(is.null(conpass)) {
+        stop("Please define the password for the mysql connection")
+  }
+
     item <- "*"
     if (database == "analytesynonym") {
         item <- "Synonym"
@@ -149,7 +200,10 @@ rampKWsearch <- function(word, database,con) {
     } else {
         return("Not Found")
     }
-  
+  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+        password = conpass,
+        dbname = dbname)
+
     query <- paste0("select distinct ", item, " from ", database,
                     " where (", item, " like \"%", 
                     word, "%\") order by ",
@@ -158,7 +212,7 @@ rampKWsearch <- function(word, database,con) {
                     item," ASC limit 20;")
 
     rampOut <- DBI::dbGetQuery(con, query)
-    # dbDisconnect(con)
+    DBI::dbDisconnect(con)
     if (length(unlist(rampOut)) == 0)
         rampOut <- "Not Found"
     return(rampOut)
@@ -173,12 +227,24 @@ rampKWsearch <- function(word, database,con) {
 #' @param synonym string value that describe synonym of metabolites
 #' @param maxItems Integer value that describe maximum returned by
 #' query
-#' @param con a connection object returned from the function connectToRaMP()
+#' @param conpass password for database access (string)
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
 #' @return a dataframe that has all searching result with given synonym
 #' as column name. If \code{synonym} is compound, it returns all gene that
 #' catalyze that compound. If \code{synonym} is gene, it returns all compound
 #' catalyzed by this gene.
-rampCataOut <- function(synonym, maxItems = 1000,con) {
+rampCataOut <- function(synonym, maxItems = 1000,conpass,
+	dbname="ramp",username="root") {
+
+  if(is.null(conpass)) {
+        stop("Please define the password for the mysql connection")
+  }
+
+  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+        password = conpass,
+        dbname = dbname)
+
     rampOut <- DBI::dbGetQuery(con, paste0("select synonym from analytesynonym where rampId in
                         (select if((select geneOrCompound from analyteSynonym where synonym = \"",
         synonym, "\" limit 1) =\"compound\",rampGeneId,rampCompoundId) from catalyzed where
@@ -187,7 +253,7 @@ rampCataOut <- function(synonym, maxItems = 1000,con) {
                         \"compound\",rampCompoundId,rampGeneId) in
                         (select rampID from analytesynonym where synonym = \"",
         synonym, "\")) limit ", maxItems, ";"))
-    # dbDisconnect(con)
+    DBI::dbDisconnect(con)
     return(rampOut)
 }
 

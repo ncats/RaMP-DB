@@ -2,5 +2,6 @@
 
 export(connectToRaMP)
 export(rampFastMetaFromPath)
+export(rampFastPathFromMeta)
 export(rampImportDumpFile)
 export(runRaMPapp)

@@ -4,7 +4,8 @@
 \alias{rampFisherTest}
 \title{Fisher test for given list of pathways}
 \usage{
-rampFisherTest(pathway_meta_list, num_user_metabolites, FisherPathwayTable, con)
+rampFisherTest(pathway_meta_list, num_user_metabolites, FisherPathwayTable,
+  conpass = NULL, dbname = "ramp", username = "root")
 }
 \arguments{
 \item{pathway_meta_list}{The list contains pathway as names and metabolites in that pathway 
@@ -15,7 +16,11 @@ search for pathways.}
 
 \item{FisherPathwayTable}{Fisher Pathway Table}
 
-\item{con}{a connection object returned from the function connectToRaMP()}
+\item{conpass}{password for database access (string)}
+
+\item{dbname}{name of the mysql database (default is "ramp")}
+
+\item{username}{username for database access (default is "root")}
 }
 \value{
 a data.frame contains all fisher test result with pathway name

@@ -10,7 +10,7 @@ rampFastPathFromMeta(synonym, find_synonym = FALSE, conpass = NULL,
 \arguments{
 \item{synonym}{a vector of synonym that need to be searched}
 
-\item{find_synonym}{bool if find all synonyms or just return same synonym}
+\item{find_synonym}{find all synonyms or just return same synonym (T/F)}
 
 \item{conpass}{password for database access (string)}
 

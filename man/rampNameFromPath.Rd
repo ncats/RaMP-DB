@@ -4,7 +4,8 @@
 \alias{rampNameFromPath}
 \title{Send query to databases to get metabolites}
 \usage{
-rampNameFromPath(names, maxItems, geneOrCompound, con)
+rampNameFromPath(names, maxItems, geneOrCompound, conpass, dbname = "ramp",
+  username = "root")
 }
 \arguments{
 \item{names}{the string value that describes pathway name.}
@@ -15,13 +16,21 @@ return by this query.}
 \item{geneOrCompound}{the string value that define types (gene or
 compound) of returned metabolites.}
 
-\item{con}{a connection object returned from the function connectToRaMP()}
+\item{conpass}{password for database access (string)}
+
+\item{dbname}{name of the mysql database (default is "ramp")}
+
+\item{username}{username for database access (default is "root")}
 }
 \value{
 a dataframe that has given pathwayname as column names
-ramp <- rampNameFromPath("Glucose-Alanine Cycle",20,compound)
 }
 \description{
 From given pathway name, it searches through whole databases to find
 all metabolites in that pathway.
+}
+\examples{
+\dontrun{
+ramp <- rampNameFromPath("Glucose-Alanine Cycle",20,compound,conpass="mysqlpassword")
+}
 }

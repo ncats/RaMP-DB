@@ -4,14 +4,19 @@
 \alias{rampPathFromMeta}
 \title{Send query to database that find pathway}
 \usage{
-rampPathFromMeta(synonym, maxItems, con)
+rampPathFromMeta(synonym, maxItems, conpass, dbname = "ramp",
+  username = "root")
 }
 \arguments{
 \item{synonym}{the string that describe given synonym name.}
 
 \item{maxItems}{the integer that limit maximum returned by}
 
-\item{con}{a connection object returned from the function connectToRaMP()
+\item{conpass}{password for database access (string)}
+
+\item{dbname}{name of the mysql database (default is "ramp")}
+
+\item{username}{username for database access (default is "root")
 query}
 }
 \value{

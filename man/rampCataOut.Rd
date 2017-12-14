@@ -4,7 +4,8 @@
 \alias{rampCataOut}
 \title{The function send query to databases to find synonym}
 \usage{
-rampCataOut(synonym, maxItems = 1000, con)
+rampCataOut(synonym, maxItems = 1000, conpass, dbname = "ramp",
+  username = "root")
 }
 \arguments{
 \item{synonym}{string value that describe synonym of metabolites}
@@ -12,7 +13,11 @@ rampCataOut(synonym, maxItems = 1000, con)
 \item{maxItems}{Integer value that describe maximum returned by
 query}
 
-\item{con}{a connection object returned from the function connectToRaMP()}
+\item{conpass}{password for database access (string)}
+
+\item{dbname}{name of the mysql database (default is "ramp")}
+
+\item{username}{username for database access (default is "root")}
 }
 \value{
 a dataframe that has all searching result with given synonym

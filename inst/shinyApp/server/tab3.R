@@ -6,18 +6,18 @@ dataInput_name <- eventReactive(input$submit_compName,{
   
   progress$set(message = "Querying databases to find pathways ...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
-  if(input$synonymOrSource == "synonyms"){
-    rampOut <- RaMP:::rampPathFromMeta(input$KW_synonym,99999)
-  } else {
-    rampOut <- RaMP:::rampFastMetaFromPath(input$KW_synonym,input$synonymOrSource)
-  }
+
+      rampOut <- RaMP::rampFastPathFromMeta(synonym=input$KW_synonym,
+                synonymOrIdS=input$synonymOrSource,
+                conpass=.conpass)
   progress$inc(0.7,detail = paste("Done!"))
   return (rampOut)
 })
 
 summary_path_out<- eventReactive(input$submit_compName,{
   if (!is.null(nrow(dataInput_name()))){
-    return (paste0("There are(is) ",nrow(dataInput_name())," relevent items in databases."))
+    return (paste0("There are ",nrow(dataInput_name())," pathways returned for ",
+	input$KW_synonym))
   } else{
     return ("Given metabolites have no search result.")
   }
@@ -27,24 +27,8 @@ output$summary_path <- renderText({
   summary_path_out()
 })
 
-
-
-<<<<<<< HEAD
 observe({
-  if(input$synonymOrSource == "synonyms"){
-    choices <- kw_analyte[grepl(input$compName,kw_analyte,fixed = T)]
-    choices <- choices[order(nchar(choices),choices)]
-    if(is.null(choices))
-      return(NULL)
-    if(length(choices) >10 ){
-      choices <- choices[1:10]
-    }
-    isolate({
-      updateSelectInput(session, "KW_synonym",
-                        label = "Select from the list",
-                        choices = choices, selected = head(choices,1)
-      )
-=======
+   if(input$synonymOrSource == "synonyms"){
   choices <- kw_analyte[grepl(input$compName,kw_analyte,ignore.case=TRUE)]
   choices <- choices[order(nchar(choices),choices)]
   if(is.null(choices))
@@ -57,9 +41,8 @@ observe({
                       label = "Select from the list",
                       choices = choices, selected = head(choices,1)
     )
->>>>>>> 3a5564b02de570058f5719dca0fede3fb525f7be
     })
-  } else if (input$synonymOrSource == "ids"){
+   } else if (input$synonymOrSource == "ids"){
     choices <- kw_source[grepl(input$compName,kw_source,fixed = T)]
     choices <- choices[order(nchar(choices),choices)]
     if(is.null(choices))
@@ -80,6 +63,7 @@ observe({
 
 output$result3 <- DT::renderDataTable({
   out_stc <- dataInput_name()
+  out_stc[,c("pathwayName","pathwaysourceId","pathwaysource")]
 })
 
 output$comp_report <- downloadHandler(filename = function() {
@@ -91,18 +75,18 @@ content = function(file) {
   write.csv(rampOut, file, row.names = FALSE, sep = ",")
 })
 
-output$preview_tab3 <- renderUI({
-  input$submit_compName
+#output$preview_tab3 <- renderUI({
+#  input$submit_compName
   
-  isolate({
-    if(input$synonymOrSource == "synonyms"){
-      tables <- RaMP:::rampTablize(dataInput_name())
-      return(div(HTML(unlist(tables)),class = "shiny-html-output"))
-    } else {
-      return(NULL)
-    }
-  })
-})
+#  isolate({
+#    if(input$synonymOrSource == "synonyms"){
+#      tables <- RaMP:::rampTablize(dataInput_name())
+#      return(div(HTML(unlist(tables)),class = "shiny-html-output"))
+#    } else {
+#      return(NULL)
+#    }
+#  })
+#})
 
 
 # Second Tab
@@ -117,7 +101,7 @@ observe({
 })
 data_mul_name <- eventReactive(input$sub_mul_tab3,{
   print(input$input_mul_tab3)
-  RaMP:::rampFastPathFromMeta(input$input_mul_tab3)
+  RaMP:::rampFastPathFromMeta(input$input_mul_tab3,conpass=.conpass)
 })
 data_mul_file <- eventReactive(input$sub_file_tab3,{
   infile <- input$inp_file_tab3
@@ -214,9 +198,11 @@ output$hc_click_output <- renderText({
 
 fisher_result_bar <- eventReactive(input$hcClicked,{
   if(rea_detector$num == 1){
-    RaMP:::rampOneFisherTest(meta_path_list(),input$hcClicked$name,length(unique(data_mul_name()$metabolite)))
+    RaMP:::rampOneFisherTest(meta_path_list(),input$hcClicked$name,
+	length(unique(data_mul_name()$metabolite)),conpass=.conpass)
   } else if (rea_detector$num == 2){
-    RaMP:::rampOneFisherTest(meta_path_list(),input$hcClicked$name,length(unique(data_mul_file()$metabolite)))
+    RaMP:::rampOneFisherTest(meta_path_list(),input$hcClicked$name,
+	length(unique(data_mul_file()$metabolite)),conpass=.conpass)
   } else {
     return("No Input")
   }
@@ -226,9 +212,11 @@ fisher_result_tab3 <- reactive({
     return()
   }
   if (rea_detector$num == 1){
-    RaMP:::rampFisherTest(meta_path_list(),length(unique(data_mul_name()$metabolite)))
+    RaMP:::rampFisherTest(meta_path_list(),length(unique(data_mul_name()$metabolite)),
+	conpass=.conpass)
   } else if (rea_detector$num == 2){
-    RaMP:::rampFisherTest(meta_path_list(),length(unique(data_mul_file()$metabolite)))
+    RaMP:::rampFisherTest(meta_path_list(),length(unique(data_mul_file()$metabolite)),
+	conpass=.conpass)
   }
 })
 output$stats_fisher_tab3 <- renderTable({
@@ -254,10 +242,10 @@ fisherTestResult <- eventReactive(input$generateFisherTest,{
  
   if (rea_detector$num == 1){
     RaMP:::rampFisherTest(hc_data,length(unique(data_mul_name()$metabolite)),
-                   FisherPathwayTable = FisherPathwayTable)
+                   FisherPathwayTable = FisherPathwayTable,conpass=.conpass)
   } else if (rea_detector$num == 2){
     RaMP:::rampFisherTest(hc_data,length(unique(data_mul_file()$metabolite)),
-                   FisherPathwayTable = FisherPathwayTable)
+                   FisherPathwayTable = FisherPathwayTable,conpass=.conpass)
   }
 })
 fisherHeatMap <- reactive({

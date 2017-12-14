@@ -3,7 +3,7 @@
 \name{rampFisherTestData}
 \alias{rampFisherTestData}
 \title{Generate raw data for fisher test based on the given output
-Out put is from rampFastMetaFromPathway
+Output is from rampFastMetaFromPathway
 Required format}
 \usage{
 rampFisherTestData(rampOut, metaboliteOrGene)
@@ -19,6 +19,6 @@ number out of pathway
 }
 \description{
 Generate raw data for fisher test based on the given output
-Out put is from rampFastMetaFromPathway
+Output is from rampFastMetaFromPathway
 Required format
 }

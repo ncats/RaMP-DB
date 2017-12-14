@@ -195,8 +195,13 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
 #' The rampId can be plugged in other functions to continue query
 #' @param sourceId a data frame or string separated by comma or string 
 #' separated by new line
+#' @param conpass password for database access (string)
 #' @return data.frame that has sourceId and rampId and source as columns
-rampFindSourceRampId <- function(sourceId){
+rampFindSourceRampId <- function(sourceId, conpass=NULL){
+  if(is.null(conpass)) {
+        stop("Please define the password for the mysql connection")
+  }
+
   if(is.character(sourceId)){
     if(grepl("\n",sourceId)[1]){
       list_metabolite <- strsplit(sourceId,"\n")
@@ -215,6 +220,11 @@ rampFindSourceRampId <- function(sourceId){
   }
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
+  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+        password = conpass,
+        dbname = dbname)
   query <- paste0("select sourceId,IDtype as analytesource, rampId from source where sourceId in (",list_metabolite,");")
   df <- DBI::dbGetQuery(con,query)
+  DBI::dbDisconnect(con)
+  return(df)
 }

@@ -4,7 +4,8 @@
 \alias{rampGenesFromComp}
 \title{Send query to databases to get metabolites}
 \usage{
-rampGenesFromComp(names, maxItems, geneOrcompound = NULL, con = NULL)
+rampGenesFromComp(names, maxItems, geneOrcompound = NULL, conpass = NULL,
+  dbname = "ramp", username = "root")
 }
 \arguments{
 \item{names}{the string that user defined for given synonym of metablite}
@@ -15,7 +16,11 @@ returned by query}
 \item{geneOrcompound}{string defined from radio input that describes type
 of returned metablites from query.}
 
-\item{con}{a connection object returned from the function connectToRaMP()}
+\item{conpass}{password for database access (string)}
+
+\item{dbname}{name of the mysql database (default is "ramp")}
+
+\item{username}{username for database access (default is "root")}
 }
 \value{
 a dataframe that contain given synonym as column name
@@ -26,6 +31,6 @@ From user supplied synonym metabolites, it search through whole databases
 }
 \examples{
 \dontrun{
-ramp <- rampGenesFromComp("VitamineE",20,"compound")
+ramp <- rampGenesFromComp("VitamineE",20,"compound",conpass="mysqlpassword")
 }
 }
