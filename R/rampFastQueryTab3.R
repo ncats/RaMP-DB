@@ -1,12 +1,13 @@
 #' Do fisher test for only one pathway from search result
 #' clicked on highchart
-#' @param pathway_list a vector of all pathways searched from given metabolites
-#' @param pathway single pathway name that is applied by Fisher test
-#' @param num_of_meta integer that describe how many initial metabolites
+#' @param pathwaydf a data frame resulting from rampFastPathFromMeta
+#' @param total_analytes number of total genes or metabolites analyzed in the experiment (e.g. background) (default is 500, with assumption that analyte_type is "metabolite")
+#' @param analyte_type "metabolites" or "genes" (default is "metabolites")
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
-rampOneFisherTest <- function(pathway_list,pathway,num_of_meta,conpass=NULL,
+rampOneFisherTest <- function(pathwaydf,total_analytes=500,
+	analyte_type="metabolites",conpass=NULL,
 	dbname="ramp",username="root"){
 
   if(is.null(conpass)) {
@@ -16,112 +17,81 @@ rampOneFisherTest <- function(pathway_list,pathway,num_of_meta,conpass=NULL,
   contingencyTb <- matrix(0,nrow = 2,ncol = 2)
   colnames(contingencyTb) <- c("In Pathway","Not In Pathway")
   rownames(contingencyTb) <- c("All Metabolites","User's Metabolites")
-  tot_in_pathway <- DBI::dbGetQuery(con,paste0("select count(*) from analyte 
-                                            where rampId in (select rampId from 
-                                            analytehaspathway where 
-                                            pathwayRampId in (select pathwayRampId 
-                                            from pathway where pathwayName = \"",
-                                          pathway,"\"));"))
-  tot_in_pathway <- tot_in_pathway[[1]]
 
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
-	password = conpass, 
-	dbname = dbname)
-  
-  tot_metabolites <- DBI::dbGetQuery(con,"select count(*) from analyte;")
-  DBI::dbDisconnect(con)
-  tot_metabolites <- tot_metabolites[[1]]
-  tot_out_pathway <- tot_metabolites - tot_in_pathway
-  user_in_pathway <- nrow(pathway_list[[pathway]])
-  user_out_pathway <- num_of_meta - user_in_pathway
-  contingencyTb[1,1] <- tot_in_pathway[[1]]
-  contingencyTb[1,2] <- tot_out_pathway[[1]]
-  contingencyTb[2,1] <- user_in_pathway
-  contingencyTb[2,2] <- user_out_pathway
-  
-  result <- stats::fisher.test(contingencyTb)
-  result$p.value <- round(result$p.value,4)
-  return(result)
-
-}
-#' Return a list named by pathway
-#' 
-#' each pathway contains all metabolites inside that pathway
-#' @param df A dataframe that has information for bar plot
-rampGenerateBarPlot <- function(df){
-  path_meta_list <- list()
-  for (i in 1:nrow(df)){
-    if (!is.element(df[i,]$pathway,names(path_meta_list))){
-      path_meta_list[[df[i,]$pathway]] <- data.frame(metabolite = df[i,]$metabolite,stringsAsFactors = F)
-    } else {
-      path_meta_list[[df[i,]$pathway]] <- rbind(path_meta_list[[df[i,]$pathway]],df[i,]$metabolite)
-      path_meta_list[[df[i,]$pathway]] <- unique(path_meta_list[[df[i,]$pathway]])
-    }
+  # Get the total number of analytes in the input pathway:
+  pid <- unique(pathwaydf$pathwayRampId);
+  if(length(pid)>1) {
+	stop("This function is meant to do a Fisher's test on one pathway only (only input one info on one pathway")
   }
-  return(path_meta_list)
-}
-#' Fisher test for given list of pathways
-#' 
-#' From user input, the function accept a list of pathways, and number of metabolites 
-#' from which the pathways are
-#' 
-#' @param pathway_meta_list The list contains pathway as names and metabolites in that pathway 
-#' under each names (list)
-#' @param num_user_metabolites number of metabolites given by user when they want to 
-#' search for pathways.
-#' @param FisherPathwayTable Fisher Pathway Table
-#' @param conpass password for database access (string)
-#' @param dbname name of the mysql database (default is "ramp")
-#' @param username username for database access (default is "root")
-#' @return a data.frame contains all fisher test result with pathway name
-#' as column name
-rampFisherTest <- function(pathway_meta_list,
-			   num_user_metabolites,
-			   FisherPathwayTable,
-			   conpass=NULL,
-			   dbname="ramp",
-			   username="root"){
-  if(is.null(conpass)) {
-        stop("Please define the password for the mysql connection")
-  }
+  # Retrieve the Ramp compound ids associated with the ramp pathway id and count them:
+  query1 <- paste0("select rampId from analytehaspathway where pathwayRampId in (\"",
+	pid,"\")")  
 
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
         dbname = dbname)
-
-  tot_metabolites <- DBI::dbGetQuery(con,"select count(*) from analyte;")
+  cids <- DBI::dbGetQuery(con,query1)[[1]]
   DBI::dbDisconnect(con)
-  tot_metabolites <- tot_metabolites[[1]]
-  cumulative_fisher_results <- list()
-  
-  inc <- length(pathway_meta_list)
-  for (pathway in names(pathway_meta_list)){
-    # progress$inc(1/inc,"computing ...")
-    contingencyTb <- matrix(0,nrow = 2,ncol = 2)
-    colnames(contingencyTb) <- c("In Pathway","Not In Pathway")
-    rownames(contingencyTb) <- c("All Metabolites","User's Metabolites")
-    print(pathway)
-    df <- FisherPathwayTable[FisherPathwayTable[,1] == pathway,]
-    tot_in_pathway <- df[,2]
-    print(tot_in_pathway)
-    tot_out_pathway <- df[,3]
-    print(tot_out_pathway)
-    user_in_pathway <- nrow(pathway_meta_list[[pathway]])
-    user_out_pathway <- num_user_metabolites - user_in_pathway
-    contingencyTb[1,1] <- tot_in_pathway
-    contingencyTb[1,2] <- tot_out_pathway
-    contingencyTb[2,1] <- user_in_pathway
-    
-    contingencyTb[2,2] <- user_out_pathway
-    cumulative_fisher_results[[pathway]] <- contingencyTb
-  
+
+  if(analyte_type=="metabolites") {
+	tot_in_pathway <- length(grep("RAMP_C",cids))
+  } else if (analyte_type=="genes") {
+	tot_in_pathway <- length(grep("RAMP_G",cids))
   }
+  else {stop("Please define analyte_type as 'metabolites' or 'genes'")}
+
+  # Get the number of analytes
+#  tot_in_pathway <- DBI::dbGetQuery(con,paste0("select count(*) from analyte 
+#                                            where rampId in (select rampId from 
+#                                            analytehaspathway where 
+#                                            pathwayRampId in (select pathwayRampId 
+#                                            from pathway where sourceId = \"",
+#                                            unique(pathwaydf$pathwaysourceId),"\"));"))
+#  DBI::dbDisconnect(con)
+#  tot_in_pathway <- tot_in_pathway[[1]]
+
+ # Now get the total number of metabolites
+ con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+	password = conpass, 
+	dbname = dbname)
   
-  cumulative_fisher_results <- lapply(cumulative_fisher_results,stats::fisher.test)
+  tot_analytes <- DBI::dbGetQuery(con,"select count(*) from analyte;")[[1]]
+  DBI::dbDisconnect(con)
+  tot_out_pathway <- tot_analytes - tot_in_pathway
+
+  # fill the rest of the table out 
+  user_in_pathway <- nrow(pathwaydf)
+  user_out_pathway <- total_analytes - user_in_pathway
+  contingencyTb[1,1] <- tot_in_pathway
+  contingencyTb[1,2] <- tot_out_pathway
+  contingencyTb[2,1] <- user_in_pathway
+  contingencyTb[2,2] <- user_out_pathway
   
-  return(cumulative_fisher_results)
+  result <- stats::fisher.test(contingencyTb)
+  pval <- round(result$p.value,4)
+  return(pval)
 }
 
+#' Reformat the result of query (get pathways from analyte(s)) for input into barplot
+#' function
+#' 
+#' each pathway contains all metabolites inside that pathway
+#' @param df A dataframe that has information for bar plot
+#' @return a list with the analyte names for each pathway that is represented in the list
+rampGenerateBarPlot <- function(df){
+  path_meta_list <- list()
+  for (i in 1:nrow(df)){
+    if (length(path_meta_list)==0){
+      path_meta_list[[df[i,]$pathwaysourceId]] <- data.frame(metabolite = df[i,]$metabolite,stringsAsFactors = F)
+    } else {
+      path_meta_list[[df[i,]$pathwaysourceId]] <- 
+		rbind(path_meta_list[[df[i,]$pathwaysourceId]],df[i,]$metabolite)
+      path_meta_list[[df[i,]$pathwaysourceId]] <- 
+	unique(path_meta_list[[df[i,]$pathwaysourceId]])
+    }
+  }
+  return(path_meta_list)
+}
 
 #' Fast search given a list of metabolites
 #' @param synonym a vector of synonym that need to be searched
@@ -311,36 +281,47 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
     highcharter::hc_exporting(enabled = TRUE)
   return(hc)
 }
-#' Generate raw data for fisher test based on the given output
-#' Output is from rampFastMetaFromPathway
-#' Required format 
+
+#' Calculate fisher test p-values from pathways returned when querying a list of genes
+#' or metabolites (output of rampFastPathFromMeta)
 #' @param rampOut The data frame generated by rampFastPathFromMeta
-#' @param metaboliteOrGene specify whether to do test on 'metabolite' or 'gene'
+#' @param analyte_type specify whether to do test on 'metabolites' or 'genes'
+#' @param total_analytes number of total genes or metabolites analyzed in the experiment (e.g. background) (default is 500, with assumption that analyte_type is "metabolite")
+#' @param conpass password for database access (string)
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
 #' @return a data frame with three columns pathwayID, Number in pathway,
 #' number out of pathway
-rampFisherTestData <- function(rampOut,metaboliteOrGene){
-  if(metaboliteOrGene == "metabolites"){
+rampFisherTestData <- function(rampOut,analyte_type="metabolites",totalanalytes=500,
+	conpass=NULL,dbname="ramp",username="root"){
+  if(analyte_type == "metabolites"){
     rampOut2 <- rampOut[grepl("RAMP_C_",rampOut$rampId),]
-  } else if (metaboliteOrGene == "genes") {
+    total_analytes <- length(unique(rampOut$rampId[grepl("RAMP_C",rampOut$rampId)]))
+  } else if (analyte_type == "genes") {
     rampOut2 <- rampOut[grepl("RAMP_G_",rampOut$rampId),]
+    total_analytes <- length(unique(rampOut$rampId[grepl("RAMP_G",rampOut$rampId)]))
   } else {
-    warning("Please input either 'metabolites' or 'genes' for metaboliteOrGene")
+    warning("Please input either 'metabolites' or 'genes' for analyte_type")
     return(NULL)
   }
-  df <- aggregate(rampOut2$rampId,
-                  list(rampOut2$pathwayRampId),FUN = function(x){
-                    x <- unique(x)
-                    length(x)
-                  }
-                  )
-  total_metabolites <- length(unique(rampOut$rampId[grepl("RAMP_C",rampOut$rampId)]))
-  total_genes <- length(unique(rampOut$rampId[grepl("RAMP_G",rampOut$rampId)]))
-  if(metaboliteOrGene == "metabolite"){
-    df$newCol <- total_metabolites - df$x
-  } else if(metaboliteOrGene == "genes"){
-    df$newCol <- total_genes - df$x
-  }
-  print("Hello")
-  colnames(df) <- c("pathwayRampId","inPathway","outPathway")
-  df
+
+  if(nrow(rampOut2)==0) {
+	stop(paste0("You have selected ",analyte_type," yet no ",
+		analyte_type," were found in the results table"))
+	}
+  fisher.pval <- c()
+  for (i in unique(rampOut2$pathwaysourceId)) {
+	tempOut <- rampOut2[which(rampOut2$pathwaysourceId==i),]
+	fisher.pval <- c(fisher.pval,RaMP:::rampOneFisherTest(pathwaydf = tempOut,
+		total_analytes=500,analyte_type=analyte_type,
+		conpass=conpass,dbname=dbname,username=username))
+	}
+  fisher.adj.pval <- p.adjust(fisher.pval,method='fdr')
+  # format output (retrieve pathway name for each unique source id first
+  pathnames <- as.character(lapply(unique(rampOut2$pathwaysourceId), function(x)
+	rampOut2$pathwayName[which(rampOut2$pathwaysourceId==x)[1]]))
+  out=cbind(unique(rampOut2$pathwaysourceId),pathnames,fisher.pval,fisher.adj.pval)
+  colnames(out)=c("SourceID","PathwayName","Fisher P-val","Fisher FDR-adj P-val")
+  return(out)
 }
+

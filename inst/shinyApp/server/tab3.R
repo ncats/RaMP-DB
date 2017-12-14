@@ -186,9 +186,11 @@ output$preview_multi_names <- DT::renderDataTable({
 # bar plot for highcharter.
 meta_path_list <- reactive({
   if(rea_detector$num == 1){
-      bar_plot_info <- RaMP:::rampGenerateBarPlot(data_mul_name()[,c(4,5,6,3)])
+      bar_plot_info <- RaMP:::rampGenerateBarPlot(data_mul_name()[,c("pathwayName",
+		"pathwaysourceId","pathwaysource","metabolite")])
   } else if (rea_detector$num == 2){
-      bar_plot_info <- RaMP:::rampGenerateBarPlot(data_mul_file()[,c(4,5,6,3)])
+      bar_plot_info <- RaMP:::rampGenerateBarPlot(data_mul_file()[,c("pathwayName",
+                "pathwaysourceId","pathwaysource","metabolite")])
   }
   bar_plot_info <- bar_plot_info[order(sapply(bar_plot_info,nrow),decreasing =TRUE)]
 })

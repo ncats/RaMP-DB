@@ -5,15 +5,16 @@
 \title{Do fisher test for only one pathway from search result
 clicked on highchart}
 \usage{
-rampOneFisherTest(pathway_list, pathway, num_of_meta, conpass = NULL,
-  dbname = "ramp", username = "root")
+rampOneFisherTest(pathwaydf, total_analytes = 500,
+  analyte_type = "metabolites", conpass = NULL, dbname = "ramp",
+  username = "root")
 }
 \arguments{
-\item{pathway_list}{a vector of all pathways searched from given metabolites}
+\item{pathwaydf}{a data frame resulting from rampFastPathFromMeta}
 
-\item{pathway}{single pathway name that is applied by Fisher test}
+\item{total_analytes}{number of total genes or metabolites analyzed in the experiment (e.g. background) (default is 500, with assumption that analyte_type is "metabolite")}
 
-\item{num_of_meta}{integer that describe how many initial metabolites}
+\item{analyte_type}{"metabolites" or "genes" (default is "metabolites")}
 
 \item{conpass}{password for database access (string)}
 

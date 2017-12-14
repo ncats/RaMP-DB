@@ -97,31 +97,28 @@ tabItem3 <-  shinydashboard::tabItem(
                  DT::dataTableOutput("preview_multi_names")
               ),
              HTML("</div>")
-           ) # end fluidRow
-  	) # end tabPanel
-) # end Tab Box
-) # end Tabitem
-              #   fluidRow(
-              #     shinydashboard::box(
-              #       width = 6,
-              #       shiny::fileInput(
-              #         "fisher_test_background_tab3_2",
-              #         label = "Input Background for Fisher Test",
-              #         placeholder = "Specific format required",
-              #         buttonLabel = "Upload"
-              #       )
-              #     ),
-              #     shinydashboard::box(
-              #       width = 6,
-              #       actionButton("generateFisherTest",
-              #                    "Pathway Enrichment Analysis"),
-              #       selectInput("pvalue_fisher",
-              #                   "Select significant level for Fisher Exact Test",
-              #                   choices = c(0.01,0.05,0.1),
-              #                   width = "80%"
-              #       )
-              #     )
-              #   )
+           ), # end fluidRow
+          fluidRow(
+            #shinydashboard::box(
+            #  width = 6,
+            #  shiny::fileInput(
+            #    "fisher_test_background_tab3_2",
+            #     label = "Input Background for Fisher Test",
+            #     placeholder = "Specific format required",
+            #     buttonLabel = "Upload"
+            #     )
+            #  ),
+            shinydashboard::box(
+                 width = 6,
+                  numericInput("pvalue_fisher",
+                        "Select significant level for Fisher Exact Test",
+                         value = 0.01,
+			 min=0,max=1,
+                         width = "80%"),
+		   actionButton("generateFisherTest",
+                     "Pathway Enrichment Analysis")
+                )
+              )
              #),
 #             conditionalPanel(condition = "output.preview_multi_names != null",
 #                              highcharter::highchartOutput("tab3_hc_output"),
@@ -146,3 +143,7 @@ tabItem3 <-  shinydashboard::tabItem(
 #                              )
 #             )
 #           ),
+
+        ) # end tabPanel
+) # end Tab Box
+) # end Tabitem
