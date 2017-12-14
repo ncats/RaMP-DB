@@ -99,17 +99,25 @@ observe({
   
   rea_detector$num <- 1
 })
+
+
+# Batch Query
 data_mul_name <- eventReactive(input$sub_mul_tab3,{
   print(input$input_mul_tab3)
-  RaMP:::rampFastPathFromMeta(input$input_mul_tab3,conpass=.conpass)
+  RaMP:::rampFastPathFromMeta(synonym=input$input_mul_tab3,
+	synonymOrIdS=input$synonymOrSourcemult,
+	conpass=.conpass)
 })
+
+
 data_mul_file <- eventReactive(input$sub_file_tab3,{
   infile <- input$inp_file_tab3
   if (is.null(infile))
     return(NULL)
   
-  RaMP:::rampFileOfPathways(infile)
+  RaMP:::rampFileOfPathways(infile,conpass=.conpass,synonymOrIdS=input$synonymOrSource)
 })
+
 observe({
   input$sub_file_tab3
   
@@ -127,26 +135,54 @@ output$tab3_mul_report <- downloadHandler(filename = function(){
 },
 content = function(file) {
   if (rea_detector$num == 1){
-    rampOut <- data_mul_name()[,c(4,5,6,3)]
+    rampOut <- data_mul_name()[,c("pathwayName","pathwaysourceId",
+		"pathwaysource","metabolite")]
+    colnames(rampOut)[4] <- "Analyte"
   } else if (rea_detector$num == 2){
-    rampOut <- data_mul_file()[,c(4,5,6,3)]
+    rampOut <- data_mul_file()[,c("pathwayName","pathwaysourceId",
+                "pathwaysource","metabolite")]
+    colnames(rampOut)[4] <- "Analyte"
   }
   write.csv(rampOut,file,row.names = FALSE)
 }
 )
+
+output$summary_mulpath_out<- DT::renderDataTable({
+  if(is.null(data_mul_name())) {
+	out <- data.frame(Query=NA,Freq=NA)
+  }
+  else {
+    temp <- data_mul_name()
+    out <- as.data.frame(table(temp$metabolite))
+    print(dim(out))
+    colnames(out)[1] <- "Query"
+  }
+  out
+},rownames=FALSE)
+
+#output$mulsummary_path <- renderText({
+#  summary_mulpath_out()
+#})
+
+
+
 output$preview_multi_names <- DT::renderDataTable({
   if(is.null(rea_detector$num))
     return("Waiting for input")
   
   if(rea_detector$num == 1){
-      tb <- data_mul_name()[,c(4,5,6,3)]
+      tb <- data_mul_name()[,c("pathwayName","pathwaysourceId",
+                "pathwaysource","metabolite")]
   } else if (rea_detector$num == 2) {
-      tb <- data_mul_file()[,c(4,5,6,3)]
+      tb <- data_mul_file()[,c("pathwayName","pathwaysourceId",
+                "pathwaysource","metabolite")]
   }
+  colnames(tb)[4]="Analyte"
   tb
 }
 ,rownames = FALSE)
-# Format data from querying database and provide appropriate layout to genrate
+
+# Format data from querying database and provide appropriate layout to generate
 # bar plot for highcharter.
 meta_path_list <- reactive({
   if(rea_detector$num == 1){
@@ -156,6 +192,7 @@ meta_path_list <- reactive({
   }
   bar_plot_info <- bar_plot_info[order(sapply(bar_plot_info,nrow),decreasing =TRUE)]
 })
+
 # bar plot
 # highchart
 # order data in decreasing...

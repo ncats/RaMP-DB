@@ -4,10 +4,19 @@
 \alias{rampFileOfPathways}
 \title{Generate data.frame from given files}
 \usage{
-rampFileOfPathways(infile)
+rampFileOfPathways(infile, synonymOrIdS = "ids", conpass = NULL,
+  dbname = "ramp", username = "root")
 }
 \arguments{
 \item{infile}{a file object given from files}
+
+\item{synonymOrIdS}{whether to return "synonyms" or "ids" (default is "ids")}
+
+\item{conpass}{password for database access (string)}
+
+\item{dbname}{name of the mysql database (default is "ramp")}
+
+\item{username}{username for database access (default is "root")}
 }
 \value{
 a data.frame either from multiple csv file

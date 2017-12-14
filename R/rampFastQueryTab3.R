@@ -223,17 +223,24 @@ rampFastPathFromMeta<- function(synonym,
 #' shiny renderTable function as preview of searching data
 #' 
 #' @param infile a file object given from files 
+#' @param synonymOrIdS whether to return "synonyms" or "ids" (default is "ids")
+#' @param conpass password for database access (string)
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
 #' 
 #' @return a data.frame either from multiple csv file
 #' or search through by a txt file.
-rampFileOfPathways <- function(infile){
+rampFileOfPathways <- function(infile,synonymOrIdS="ids",
+	conpass=NULL,
+	dbname="ramp",
+	username="root"){
   name <- infile[[1,'name']]
     summary <- data.frame(pathway  = character(0),id = character(0),
                           source = character(0),metabolite = character(0))
     rampOut <- list()
     for (i in 1:length(infile[,1])){
       if(infile[[i,'type']]!="text/plain"){
-        rampOut[[i]] <- utils::read.csv(infile[[i,'datapath']])
+        rampOut[[i]] <- utils::read.table(infile[[i,'datapath']])
         name <- infile[[i,'name']]
         print(infile[[i,'type']])
         rampOut[[i]]$new.col <- substr(name,1,nchar(name) - 4)
@@ -241,7 +248,9 @@ rampFileOfPathways <- function(infile){
         summary <- rbind(summary,rampOut[[i]])
       } else {
         rampOut <- readLines(infile[[i,'datapath']])
-        summary <- rampFastPathFromMeta(rampOut)
+        summary <- RaMP:::rampFastPathFromMeta(rampOut,synonymOrIdS=synonymOrIdS,
+		conpass=.conpass,username=username,dbname=dbname
+		)
       }
     }
     return(summary)
