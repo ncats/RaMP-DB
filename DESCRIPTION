@@ -19,5 +19,5 @@ Imports:
     DBI,
     dplyr,
     DT,
-    xtable,
+    xtable
 RoxygenNote: 6.0.1.9000
