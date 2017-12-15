@@ -73,7 +73,6 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
     return(df2)
   }
   synonym <- df2$Synonym
-  print('Hello world')
   synonym
 }
 #' Find all source from given list of RaMP Ids

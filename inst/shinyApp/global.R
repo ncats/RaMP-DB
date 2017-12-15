@@ -1,7 +1,10 @@
 # The global variables that are important to keywords search and fisher test.
-FisherPathwayTable <- read.csv("dataFisherTest.csv")
-FisherPathwayTable_m <- read.csv("FisherTestDataMetabolites.csv")
-FisherPathwayTable_g <- read.csv("FisherTestDataGenes.csv")
+
+FisherTestData <- list(
+  metabolites = read.csv("FisherTestDataMetabolites.csv"),
+  genes = read.csv("FisherTestDataGenes.csv")
+)
+
 # Unlist automatically select first column, the first column should
 # be the data containing keywords
 kw_biofluid <- unique(unlist(read.csv("biofluid.csv",header = F,stringsAsFactors = F),use.names = F))

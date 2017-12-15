@@ -7,58 +7,63 @@
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 rampOneFisherTest <- function(pathwaydf,total_analytes=500,
-	analyte_type="metabolites",conpass=NULL,
-	dbname="ramp",username="root"){
-
-  if(is.null(conpass)) {
-        stop("Please define the password for the mysql connection")
+                              analyte_type="metabolites",conpass=NULL,
+                              dbname="ramp",username="root"){
+  print("Fisher Testing ......")
+  if (analyte_type == "metabolites" | analyte_type == "genes"){
+    fs.data <- FisherTestData[[analyte_type]]
+  } else {
+    stop("Please define the analyte_type variable to 'metabolites' or 'genes'")
   }
-
+  if(is.null(conpass)) {
+    stop("Please define the password for the mysql connection")
+  }
+  
   contingencyTb <- matrix(0,nrow = 2,ncol = 2)
   colnames(contingencyTb) <- c("In Pathway","Not In Pathway")
   rownames(contingencyTb) <- c("All Metabolites","User's Metabolites")
-
+  
   # Get the total number of analytes in the input pathway:
   pid <- unique(pathwaydf$pathwayRampId);
   if(length(pid)>1) {
-	stop("This function is meant to do a Fisher's test on one pathway only (only input one info on one pathway")
+    stop("This function is meant to do a Fisher's test on one pathway only (only input one info on one pathway")
   }
   # Retrieve the Ramp compound ids associated with the ramp pathway id and count them:
-  query1 <- paste0("select rampId from analytehaspathway where pathwayRampId in (\"",
-	pid,"\")")  
-
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
-        password = conpass,
-        dbname = dbname)
-  cids <- DBI::dbGetQuery(con,query1)[[1]]
-  DBI::dbDisconnect(con)
-
-  if(analyte_type=="metabolites") {
-	tot_in_pathway <- length(grep("RAMP_C",cids))
-  } else if (analyte_type=="genes") {
-	tot_in_pathway <- length(grep("RAMP_G",cids))
-  }
-  else {stop("Please define analyte_type as 'metabolites' or 'genes'")}
-
-  # Get the number of analytes
-#  tot_in_pathway <- DBI::dbGetQuery(con,paste0("select count(*) from analyte 
-#                                            where rampId in (select rampId from 
-#                                            analytehaspathway where 
-#                                            pathwayRampId in (select pathwayRampId 
-#                                            from pathway where sourceId = \"",
-#                                            unique(pathwaydf$pathwaysourceId),"\"));"))
-#  DBI::dbDisconnect(con)
-#  tot_in_pathway <- tot_in_pathway[[1]]
-
- # Now get the total number of metabolites
- con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
-	password = conpass, 
-	dbname = dbname)
+  # query1 <- paste0("select rampId from analytehaspathway where pathwayRampId in (\"",
+  # pid,"\")")  
   
-  tot_analytes <- DBI::dbGetQuery(con,"select count(*) from analyte;")[[1]]
-  DBI::dbDisconnect(con)
+  # con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  #       password = conpass,
+  #       dbname = dbname)
+  # cids <- DBI::dbGetQuery(con,query1)[[1]]
+  # DBI::dbDisconnect(con)
+  
+  # if(analyte_type=="metabolites") {
+  tot_in_pathway <- fs.data[which(fs.data$pathwayRampId == pid ),1]
+  #   } else if (analyte_type=="genes") {
+  # 	tot_in_pathway <- length(grep("RAMP_G",cids))
+  #   }
+  # else {stop("Please define analyte_type as 'metabolites' or 'genes'")}
+  
+  # Get the number of analytes
+  #  tot_in_pathway <- DBI::dbGetQuery(con,paste0("select count(*) from analyte 
+  #                                            where rampId in (select rampId from 
+  #                                            analytehaspathway where 
+  #                                            pathwayRampId in (select pathwayRampId 
+  #                                            from pathway where sourceId = \"",
+  #                                            unique(pathwaydf$pathwaysourceId),"\"));"))
+  #  DBI::dbDisconnect(con)
+  #  tot_in_pathway <- tot_in_pathway[[1]]
+  
+  # Now get the total number of metabolites
+  #  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  # 	password = conpass, 
+  # 	dbname = dbname)
+  
+  tot_analytes <- as.numeric(fs.data$total[1])
+  # DBI::dbDisconnect(con)
   tot_out_pathway <- tot_analytes - tot_in_pathway
-
+  
   # fill the rest of the table out 
   user_in_pathway <- nrow(pathwaydf)
   user_out_pathway <- total_analytes - user_in_pathway
@@ -72,6 +77,84 @@ rampOneFisherTest <- function(pathwaydf,total_analytes=500,
   return(pval)
 }
 
+#' Do fisher test for only one pathway from search result
+#' clicked on highchart
+#' @param pathwaydf a data frame resulting from rampFastPathFromMeta
+#' @param total_analytes number of total genes or metabolites analyzed in the experiment (e.g. background) (default is 500, with assumption that analyte_type is "metabolite")
+#' @param analyte_type "metabolites" or "genes" (default is "metabolites")
+#' @param conpass password for database access (string)
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
+rampOneFisherTest2 <- function(pathwaydf,total_analytes=500,
+                              analyte_type="metabolites",conpass=NULL,
+                              dbname="ramp",username="root"){
+  print("Fisher Testing ......")
+  if (analyte_type == "metabolites" | analyte_type == "genes"){
+    fs.data <- FisherTestData[[analyte_type]]
+  } else {
+    stop("Please define the analyte_type variable to 'metabolites' or 'genes'")
+  }
+  if(is.null(conpass)) {
+    stop("Please define the password for the mysql connection")
+  }
+  
+  contingencyTb <- matrix(0,nrow = 2,ncol = 2)
+  colnames(contingencyTb) <- c("In Pathway","Not In Pathway")
+  rownames(contingencyTb) <- c("All Metabolites","User's Metabolites")
+  
+  # Get the total number of analytes in the input pathway:
+  pid <- unique(pathwaydf$pathwayRampId);
+  if(length(pid)>1) {
+    stop("This function is meant to do a Fisher's test on one pathway only (only input one info on one pathway")
+  }
+  # Retrieve the Ramp compound ids associated with the ramp pathway id and count them:
+  # query1 <- paste0("select rampId from analytehaspathway where pathwayRampId in (\"",
+  # pid,"\")")  
+  
+  # con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  #       password = conpass,
+  #       dbname = dbname)
+  # cids <- DBI::dbGetQuery(con,query1)[[1]]
+  # DBI::dbDisconnect(con)
+  
+  # if(analyte_type=="metabolites") {
+  tot_in_pathway <- fs.data[which(fs.data$pathwayRampId == pid ),1]
+  #   } else if (analyte_type=="genes") {
+  # 	tot_in_pathway <- length(grep("RAMP_G",cids))
+  #   }
+  # else {stop("Please define analyte_type as 'metabolites' or 'genes'")}
+  
+  # Get the number of analytes
+  #  tot_in_pathway <- DBI::dbGetQuery(con,paste0("select count(*) from analyte 
+  #                                            where rampId in (select rampId from 
+  #                                            analytehaspathway where 
+  #                                            pathwayRampId in (select pathwayRampId 
+  #                                            from pathway where sourceId = \"",
+  #                                            unique(pathwaydf$pathwaysourceId),"\"));"))
+  #  DBI::dbDisconnect(con)
+  #  tot_in_pathway <- tot_in_pathway[[1]]
+  
+  # Now get the total number of metabolites
+  #  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  # 	password = conpass, 
+  # 	dbname = dbname)
+  
+  tot_analytes <- as.numeric(fs.data$total[1])
+  # DBI::dbDisconnect(con)
+  tot_out_pathway <- tot_analytes - tot_in_pathway
+  
+  # fill the rest of the table out 
+  user_in_pathway <- nrow(pathwaydf)
+  user_out_pathway <- total_analytes - user_in_pathway
+  contingencyTb[1,1] <- tot_in_pathway
+  contingencyTb[1,2] <- tot_out_pathway
+  contingencyTb[2,1] <- user_in_pathway
+  contingencyTb[2,2] <- user_out_pathway
+  
+  result <- stats::fisher.test(contingencyTb)
+  pval <- round(result$p.value,4)
+  return(pval)
+}
 #' Reformat the result of query (get pathways from analyte(s)) for input into barplot
 #' function
 #' 
