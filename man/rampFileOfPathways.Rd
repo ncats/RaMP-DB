@@ -4,13 +4,13 @@
 \alias{rampFileOfPathways}
 \title{Generate data.frame from given files}
 \usage{
-rampFileOfPathways(infile, synonymOrIdS = "ids", conpass = NULL,
+rampFileOfPathways(infile, NameOrIds = "ids", conpass = NULL,
   dbname = "ramp", username = "root")
 }
 \arguments{
 \item{infile}{a file object given from files}
 
-\item{synonymOrIdS}{whether to return "synonyms" or "ids" (default is "ids")}
+\item{NameOrIds}{whether to return "synonyms" or "ids" (default is "ids")}
 
 \item{conpass}{password for database access (string)}
 

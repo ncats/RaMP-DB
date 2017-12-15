@@ -82,10 +82,10 @@ rampGenerateBarPlot <- function(df){
   path_meta_list <- list()
   for (i in 1:nrow(df)){
     if (length(path_meta_list)==0){
-      path_meta_list[[df[i,]$pathwaysourceId]] <- data.frame(metabolite = df[i,]$metabolite,stringsAsFactors = F)
+      path_meta_list[[df[i,]$pathwaysourceId]] <- data.frame(metabolite = df[i,]$rampId,stringsAsFactors = F)
     } else {
       path_meta_list[[df[i,]$pathwaysourceId]] <- 
-		rbind(path_meta_list[[df[i,]$pathwaysourceId]],df[i,]$metabolite)
+		rbind(path_meta_list[[df[i,]$pathwaysourceId]],df[i,]$rampId)
       path_meta_list[[df[i,]$pathwaysourceId]] <- 
 	unique(path_meta_list[[df[i,]$pathwaysourceId]])
     }
@@ -93,23 +93,22 @@ rampGenerateBarPlot <- function(df){
   return(path_meta_list)
 }
 
-#' Fast search given a list of metabolites
-#' @param synonym a vector of synonym that need to be searched
+#' tPathFromMetast search given a list of metabolites
+#' @param analytes a vector of analytes (genes or metabolites) that need to be searched
 #' @param find_synonym find all synonyms or just return same synonym (T/F)
 #' @param conpass password for database access (string)
-#' @param synonymOrIdS whether to return "synonyms" or "ids" (default is "ids")
+#' @param NameOrIds whether input is "names" or "ids" (default is "ids")
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @return a list contains all metabolits as name and pathway inside.
 #' 
-##' Apply famil function...
 #' @export
-rampFastPathFromMeta<- function(synonym,
+rampFastPathFromMeta<- function(analytes,
 	find_synonym = FALSE,
 	conpass=NULL,
 	dbname="ramp",
 	username="root",
-	synonymOrIdS = "ids"){
+	NameOrIds = "ids"){
 
   if(is.null(conpass)) {
         stop("Please define the password for the mysql connection")
@@ -117,74 +116,75 @@ rampFastPathFromMeta<- function(synonym,
 
   now <- proc.time()
 
-  if(synonymOrIdS == "synonyms"){
-    synonym <- RaMP:::rampFindSynonymFromSynonym(synonym=synonym,
+  if(NameOrIds == "names"){
+    synonym <- RaMP:::rampFindSynonymFromSynonym(synonym=analytes,
 	find_synonym=find_synonym,
 	conpass=conpass)
-    list_metabolite <- unique(synonym)
+    colnames(synonym)[1]="commonName"
+    synonym$commonName <- tolower(synonym$commonName)
+    if(nrow(synonym)==0) {
+	stop("Could not find any matches to the analytes entered.  If pasting, please make sure the names are delimited by end of line (not analyte per line)\nand that you are selecting 'names', not 'ids'");
+    }
+    # Get all unique RaMP ids and call it list_metabolite
+    list_metabolite <- unique(synonym$rampId)
     list_metabolite <- sapply(list_metabolite,shQuote)
     list_metabolite <- paste(list_metabolite,collapse = ",")
-  } else if (synonymOrIdS == "ids"){
-    source <- RaMP:::rampFindSourceRampId(sourceId=synonym, conpass=conpass)
-    if (nrow(source)==0) {
-	stop("Make sure you are actually inputting ids and not names (you have synonymOrIdS set to 'ids'")
+  } else if (NameOrIds == "ids"){
+    sourceramp <- RaMP:::rampFindSourceRampId(sourceId=analytes, conpass=conpass)
+    if (nrow(sourceramp)==0) {
+	stop("Make sure you are actually inputting ids and not names (you have NameOrIds set to 'ids'. If you are, then no ids were matched in the RaMP database.")
 	}
-    list_metabolite <- unique(source)
-    sourceIDTable <- list_metabolite
-    list_metabolite <- list_metabolite$rampId
+    # get all unique RaMP ids and call it list_metabolite
+    list_metabolite <- unique(sourceramp$rampId)
+    #sourceIDTable <- list_metabolite
+    #list_metabolite <- list_metabolite$rampId
     list_metabolite <- sapply(list_metabolite,shQuote)
     list_metabolite <- paste(list_metabolite,collapse = ",")
   } else {
-	stop("Make sure synonymOrIdS is set to 'synonyms' or 'ids'")
+	stop("Make sure NameOrIds is set to 'names' or 'ids'")
   }
   # Parse data to fit mysql
   # Can be simplified here
   if(list_metabolite=="") {
 	stop("Unable to retrieve metabolites")
   }
- 
- 
-  if(synonymOrIdS == "synonyms"){
-    # Retrieve IDs for current name and all associated synonyms
-    query1 <- paste0("select distinct Synonym,rampId from analytesynonym where Synonym in (",
-                      list_metabolite,");")
-    con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
-    df1<- DBI::dbGetQuery(con,query1)
-    DBI::dbDisconnect(con)
-    query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where 
-                      rampId in (select rampId from analytesynonym where Synonym in (",
-                      list_metabolite,"));")
-    con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
-    df2 <- DBI::dbGetQuery(con,query2)
-    DBI::dbDisconnect(con)
-  }else if (synonymOrIdS == "ids"){
+
+  # Now using the RaMP compound id, retrieve associated pathway ids 
     query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where 
                       rampId in (",
                      list_metabolite,");")
     con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
     df2 <- DBI::dbGetQuery(con,query2)
     DBI::dbDisconnect(con)
-  }
   pathid_list <- df2$pathwayRampId
   pathid_list <- sapply(pathid_list,shQuote)
   pathid_list <- paste(pathid_list,collapse = ",")
+  # With pathway ids, retrieve pathway information
   query3 <- paste0("select pathwayName,sourceId as pathwaysourceId,type as pathwaysource,pathwayRampId from pathway where pathwayRampId in (",
                     pathid_list,");")
   con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
   df3 <- DBI::dbGetQuery(con,query3)
   DBI::dbDisconnect(con)
-  if(synonymOrIdS == "synonyms"){
-    mdf <- merge(df1,df2,all.x=T)
-    mdf <- mdf[!is.na(mdf[,"pathwayRampId"]),]
-    mdf <- merge(mdf,df3,all.x = T)
-    colnames(mdf)[3] <- "metabolite"
-    print("timing ...")
-    print(proc.time()- now)
-  } else if (synonymOrIdS == "ids"){
-    mdf <- merge(df3,df2,all.x = T)
-    mdf <- merge(mdf,source,all.x = T,by.y = "rampId")
-  }
-  return(mdf)
+ 
+  #Format output
+  mdf <- merge(df3,df2,all.x = T)
+ 
+  # And with rampIds (list_metabolite), get common names when Ids are input
+  if(NameOrIds == "ids"){
+     list_analytes <- sapply(analytes,shQuote) 
+     list_analytes <- paste(list_analytes,collapse = ",")
+  query4 <-paste0("select sourceId,commonName,rampId from source where sourceId in (",list_analytes,");")
+
+  con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
+  df4 <- DBI::dbGetQuery(con,query4)
+  DBI::dbDisconnect(con)
+  mdf <- merge(mdf,df4,,all.x = T,by.y = "rampId")
+  mdf$commonName=tolower(mdf$commonName)
+ } else{ # Just take on the name
+  mdf <- merge(mdf,synonym,all.x = T,by.y = "rampId")
+ }
+
+  return(mdf[!duplicated(mdf),])
 }
 
 #' Generate data.frame from given files
@@ -193,14 +193,14 @@ rampFastPathFromMeta<- function(synonym,
 #' shiny renderTable function as preview of searching data
 #' 
 #' @param infile a file object given from files 
-#' @param synonymOrIdS whether to return "synonyms" or "ids" (default is "ids")
+#' @param NameOrIds whether to return "synonyms" or "ids" (default is "ids")
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' 
 #' @return a data.frame either from multiple csv file
 #' or search through by a txt file.
-rampFileOfPathways <- function(infile,synonymOrIdS="ids",
+rampFileOfPathways <- function(infile,NameOrIds="ids",
 	conpass=NULL,
 	dbname="ramp",
 	username="root"){
@@ -218,7 +218,7 @@ rampFileOfPathways <- function(infile,synonymOrIdS="ids",
         summary <- rbind(summary,rampOut[[i]])
       } else {
         rampOut <- readLines(infile[[i,'datapath']])
-        summary <- RaMP:::rampFastPathFromMeta(rampOut,synonymOrIdS=synonymOrIdS,
+        summary <- RaMP:::rampFastPathFromMeta(rampOut,NameOrIds=NameOrIds,
 		conpass=.conpass,username=username,dbname=dbname
 		)
       }

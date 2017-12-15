@@ -196,8 +196,11 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
 #' @param sourceId a data frame or string separated by comma or string 
 #' separated by new line
 #' @param conpass password for database access (string)
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
 #' @return data.frame that has sourceId and rampId and source as columns
-rampFindSourceRampId <- function(sourceId, conpass=NULL){
+rampFindSourceRampId <- function(sourceId, conpass=NULL,
+	dbname="ramp",username="root"){
   if(is.null(conpass)) {
         stop("Please define the password for the mysql connection")
   }

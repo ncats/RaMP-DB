@@ -2,13 +2,13 @@
 % Please edit documentation in R/rampFastQueryTab3.R
 \name{rampFastPathFromMeta}
 \alias{rampFastPathFromMeta}
-\title{Fast search given a list of metabolites}
+\title{tPathFromMetast search given a list of metabolites}
 \usage{
-rampFastPathFromMeta(synonym, find_synonym = FALSE, conpass = NULL,
-  dbname = "ramp", username = "root", synonymOrIdS = "ids")
+rampFastPathFromMeta(analytes, find_synonym = FALSE, conpass = NULL,
+  dbname = "ramp", username = "root", NameOrIds = "ids")
 }
 \arguments{
-\item{synonym}{a vector of synonym that need to be searched}
+\item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
 \item{find_synonym}{find all synonyms or just return same synonym (T/F)}
 
@@ -18,13 +18,11 @@ rampFastPathFromMeta(synonym, find_synonym = FALSE, conpass = NULL,
 
 \item{username}{username for database access (default is "root")}
 
-\item{synonymOrIdS}{whether to return "synonyms" or "ids" (default is "ids")}
+\item{NameOrIds}{whether input is "names" or "ids" (default is "ids")}
 }
 \value{
 a list contains all metabolits as name and pathway inside.
-
-Apply famil function...
 }
 \description{
-Fast search given a list of metabolites
+tPathFromMetast search given a list of metabolites
 }

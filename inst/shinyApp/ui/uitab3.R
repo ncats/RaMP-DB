@@ -14,8 +14,8 @@ tabItem3 <-  shinydashboard::tabItem(
                       helpText("Given compound's name, 
                                it returns pathways in which the compound get involved in."),
                       textInput("compName","",placeholder = "Input compound synonym or source"),
-                      radioButtons("synonymOrSource","Search by synonyms or source IDs?", choices = c(
-                        "Synonym" = "synonyms", "Source ID" = "ids"
+                      radioButtons("NameOrId","Search by common names or source IDs?", choices = c(
+                        "Names" = "names", "Source ID" = "ids"
                       ),selected = "ids"),
                       selectInput("KW_synonym", "Select from list", choices = NULL),
                       actionButton("submit_compName","Submit")
@@ -64,8 +64,8 @@ tabItem3 <-  shinydashboard::tabItem(
 		 h4("Input list of metabolites, one per line:"),
                  textAreaInput("input_mul_tab3",label = "",
                                placeholder = "Input list of analytes, one per line"),
-		 radioButtons("synonymOrSourcemult","Search by synonyms or source IDs?", choices = c(
-                        "Synonym" = "synonyms", "Source ID" = "ids"
+		 radioButtons("NameOrSourcemult","Search by synonyms or source IDs?", choices = c(
+                        "Names" = "names", "Source ID" = "ids"
                       ),selected = "ids"),
                  actionButton("sub_mul_tab3",label = "Submit"),
 		 br(),
@@ -84,6 +84,8 @@ tabItem3 <-  shinydashboard::tabItem(
 		 p("The query returned the following number of pathways per query gene/metabolite:"),
 		 DT::dataTableOutput("summary_mulpath_out"),
 		 p("Query results should be visible here"),
+		 br(),
+                 br(),
                  downloadButton("tab3_mul_report",label = "Download Results")
 	      )
 	   #HTML("</div>")

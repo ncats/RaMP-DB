@@ -7,8 +7,8 @@ dataInput_name <- eventReactive(input$submit_compName,{
   progress$set(message = "Querying databases to find pathways ...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
 
-      rampOut <- RaMP::rampFastPathFromMeta(synonym=input$KW_synonym,
-                synonymOrIdS=input$synonymOrSource,
+      rampOut <- RaMP::rampFastPathFromMeta(analytes=input$KW_synonym,
+                NameOrIds=input$NameOrId,
                 conpass=.conpass)
   progress$inc(0.7,detail = paste("Done!"))
   return (rampOut)
@@ -28,7 +28,7 @@ output$summary_path <- renderText({
 })
 
 observe({
-   if(input$synonymOrSource == "synonyms"){
+   if(input$NameOrId == "names"){
   choices <- kw_analyte[grepl(input$compName,kw_analyte,ignore.case=TRUE)]
   choices <- choices[order(nchar(choices),choices)]
   if(is.null(choices))
@@ -42,7 +42,7 @@ observe({
                       choices = choices, selected = head(choices,1)
     )
     })
-   } else if (input$synonymOrSource == "ids"){
+   } else if (input$NameOrId == "ids"){
     choices <- kw_source[grepl(input$compName,kw_source,fixed = T)]
     choices <- choices[order(nchar(choices),choices)]
     if(is.null(choices))
@@ -56,7 +56,7 @@ observe({
                         choices = choices, selected = head(choices,1)
       )
     })  
-  }
+  } 
 })
 
 
@@ -104,8 +104,10 @@ observe({
 # Batch Query
 data_mul_name <- eventReactive(input$sub_mul_tab3,{
   print(input$input_mul_tab3)
-  RaMP:::rampFastPathFromMeta(synonym=input$input_mul_tab3,
-	synonymOrIdS=input$synonymOrSourcemult,
+  parsedinput <- paste(strsplit(input$input_mul_tab3,"\n")[[1]])
+  print(parsedinput)
+  RaMP::rampFastPathFromMeta(analytes=parsedinput,
+	NameOrIds=input$NameOrSourcemult,
 	conpass=.conpass)
 })
 
@@ -115,7 +117,7 @@ data_mul_file <- eventReactive(input$sub_file_tab3,{
   if (is.null(infile))
     return(NULL)
   
-  RaMP:::rampFileOfPathways(infile,conpass=.conpass,synonymOrIdS=input$synonymOrSource)
+  RaMP:::rampFileOfPathways(infile,conpass=.conpass,NameOrIds=input$NameOrSourcemult)
 })
 
 observe({
@@ -136,12 +138,12 @@ output$tab3_mul_report <- downloadHandler(filename = function(){
 content = function(file) {
   if (rea_detector$num == 1){
     rampOut <- data_mul_name()[,c("pathwayName","pathwaysourceId",
-		"pathwaysource","metabolite")]
-    colnames(rampOut)[4] <- "Analyte"
+		"pathwaysource","commonName")]
+    #colnames(rampOut)[4] <- "Analyte"
   } else if (rea_detector$num == 2){
     rampOut <- data_mul_file()[,c("pathwayName","pathwaysourceId",
-                "pathwaysource","metabolite")]
-    colnames(rampOut)[4] <- "Analyte"
+                "pathwaysource","commonName")]
+    #colnames(rampOut)[4] <- "Analyte"
   }
   write.csv(rampOut,file,row.names = FALSE)
 }
@@ -153,7 +155,8 @@ output$summary_mulpath_out<- DT::renderDataTable({
   }
   else {
     temp <- data_mul_name()
-    out <- as.data.frame(table(temp$metabolite))
+    print(head(temp))
+    out <- as.data.frame(table(temp$commonName))
     print(dim(out))
     colnames(out)[1] <- "Query"
   }
@@ -172,12 +175,12 @@ output$preview_multi_names <- DT::renderDataTable({
   
   if(rea_detector$num == 1){
       tb <- data_mul_name()[,c("pathwayName","pathwaysourceId",
-                "pathwaysource","metabolite")]
+                "pathwaysource","commonName")]
   } else if (rea_detector$num == 2) {
       tb <- data_mul_file()[,c("pathwayName","pathwaysourceId",
-                "pathwaysource","metabolite")]
+                "pathwaysource","commonName")]
   }
-  colnames(tb)[4]="Analyte"
+  #colnames(tb)[4]="Analyte"
   tb
 }
 ,rownames = FALSE)
@@ -186,11 +189,13 @@ output$preview_multi_names <- DT::renderDataTable({
 # bar plot for highcharter.
 meta_path_list <- reactive({
   if(rea_detector$num == 1){
-      bar_plot_info <- RaMP:::rampGenerateBarPlot(data_mul_name()[,c("pathwayName",
-		"pathwaysourceId","pathwaysource","metabolite")])
+      bar_plot_info <- 
+	RaMP:::rampGenerateBarPlot(data_mul_name()[,c("pathwayName",
+		"pathwaysourceId","pathwaysource","rampId")])
   } else if (rea_detector$num == 2){
-      bar_plot_info <- RaMP:::rampGenerateBarPlot(data_mul_file()[,c("pathwayName",
-                "pathwaysourceId","pathwaysource","metabolite")])
+      bar_plot_info <- 
+	RaMP:::rampGenerateBarPlot(data_mul_file()[,c("pathwayName",
+                "pathwaysourceId","pathwaysource","rampId")])
   }
   bar_plot_info <- bar_plot_info[order(sapply(bar_plot_info,nrow),decreasing =TRUE)]
 })
