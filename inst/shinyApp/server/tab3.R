@@ -282,16 +282,23 @@ striped = T)
 
 fisherTestResult <- eventReactive(input$generateFisherTest,{
   print("Generating fisher test result...")
-  hc_data <- meta_path_list()
- 
-  if (rea_detector$num == 1){
-    RaMP:::rampFisherTest(hc_data,length(unique(data_mul_name()$metabolite)),
-                   FisherPathwayTable = FisherPathwayTable,conpass=.conpass)
-  } else if (rea_detector$num == 2){
-    RaMP:::rampFisherTest(hc_data,length(unique(data_mul_file()$metabolite)),
-                   FisherPathwayTable = FisherPathwayTable,conpass=.conpass)
-  }
+
+  RaMP:::rampFisherTestData(data_mul_name(),
+	analyte_type=input$analyte_type,
+	total_analytes=input$total_analytes,,
+        conpass=.conpass,dbname="ramp",username="root")
+#  hc_data <- meta_path_list()
+# 
+#  if (rea_detector$num == 1){
+#    RaMP:::rampFisherTest(hc_data,length(unique(data_mul_name()$metabolite)),
+ #                  FisherPathwayTable = FisherPathwayTable,conpass=.conpass)
+#  } else if (rea_detector$num == 2){
+ #   RaMP:::rampFisherTest(hc_data,length(unique(data_mul_file()$metabolite)),
+ #                  FisherPathwayTable = FisherPathwayTable,conpass=.conpass)
+ # }
 })
+
+
 fisherHeatMap <- reactive({
   print("Generate data for heatmap ...")
   fisher <- fisherTestResult()

@@ -101,15 +101,6 @@ tabItem3 <-  shinydashboard::tabItem(
              HTML("</div>")
            ), # end fluidRow
           fluidRow(
-            #shinydashboard::box(
-            #  width = 6,
-            #  shiny::fileInput(
-            #    "fisher_test_background_tab3_2",
-            #     label = "Input Background for Fisher Test",
-            #     placeholder = "Specific format required",
-            #     buttonLabel = "Upload"
-            #     )
-            #  ),
             shinydashboard::box(
                  width = 6,
                   numericInput("pvalue_fisher",
@@ -117,10 +108,16 @@ tabItem3 <-  shinydashboard::tabItem(
                          value = 0.01,
 			 min=0,max=1,
                          width = "80%"),
-		   actionButton("generateFisherTest",
-                     "Pathway Enrichment Analysis")
-                )
-              )
+		  selectInput("analyte_type", "Type of analyte",
+			choices = c(
+                            "Metabolites" = "metabolites", 
+			    "Genes" = "genes")),
+		  numericInput("total_analytes",
+			"Input the total number of analytes (genes or metabolites) measured in experiment (to be used as background)",
+			value=500,
+			min=1,max=100000,width="80%")
+                ) #end of Box
+              ) #end of fluidRow
              #),
 #             conditionalPanel(condition = "output.preview_multi_names != null",
 #                              highcharter::highchartOutput("tab3_hc_output"),
