@@ -2,7 +2,7 @@
 % Please edit documentation in R/rampFastQueryTab3.R
 \name{rampFastPathFromMeta}
 \alias{rampFastPathFromMeta}
-\title{tPathFromMetast search given a list of metabolites}
+\title{PathFromMetast search given a list of metabolites}
 \usage{
 rampFastPathFromMeta(analytes, find_synonym = FALSE, conpass = NULL,
   dbname = "ramp", username = "root", NameOrIds = "ids")
@@ -24,5 +24,5 @@ rampFastPathFromMeta(analytes, find_synonym = FALSE, conpass = NULL,
 a list contains all metabolits as name and pathway inside.
 }
 \description{
-tPathFromMetast search given a list of metabolites
+PathFromMetast search given a list of metabolites
 }
