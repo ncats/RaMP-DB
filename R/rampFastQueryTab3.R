@@ -356,9 +356,9 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
 #' @param perc_analyte_overlap Minimum overlap for pathways to be considered similar (Default = 50%)
 #' @param min_pathway_tocluster Minimum number of 'similar' pathways required to start a cluster (medoid) (Default = 3)
 #' @param perc_pathway_overlap Minimum overlap for clusters to merge (Default = 50%)
-#' @param p_cutoff Filter pathways to cluster by FDR p value threshold
+#' @param p_cutoff Filter pathways to cluster by FDR p value threshold (Default = 0.05)
 #' @return a list of clusters identified by the algorithm. Each entry of the list is a cluster, containing a vector of pathways in the cluster
-find_clusters<-function(fishers_df,analyte_type,perc_analyte_overlap = 0.5,min_pathway_tocluster = 3,perc_pathway_overlap = 0.5,p_cutoff){
+find_clusters<-function(fishers_df,analyte_type,perc_analyte_overlap = 0.5,min_pathway_tocluster = 3,perc_pathway_overlap = 0.5,p_cutoff=0.05){
   if(analyte_type=="metabolites"){
     similarity_matrix = metabolite_result2
   } else if(analyte_type=="genes"){

@@ -1,9 +1,9 @@
 # First tab panel
 dataInput_name <- eventReactive(input$submit_compName,{
   progress <- shiny::Progress$new()
-  
+
   on.exit(progress$close())
-  
+
   progress$set(message = "Querying databases to find pathways ...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
 
@@ -55,8 +55,8 @@ observe({
                         label = "Select from the list",
                         choices = choices, selected = head(choices,1)
       )
-    })  
-  } 
+    })
+  }
 })
 
 
@@ -77,7 +77,7 @@ content = function(file) {
 
 #output$preview_tab3 <- renderUI({
 #  input$submit_compName
-  
+
 #  isolate({
 #    if(input$synonymOrSource == "synonyms"){
 #      tables <- RaMP:::rampTablize(dataInput_name())
@@ -96,7 +96,7 @@ rea_detector <- reactiveValues(num = NULL)
 
 observe({
   input$sub_mul_tab3
-  
+
   rea_detector$num <- 1
 })
 
@@ -116,13 +116,13 @@ data_mul_file <- eventReactive(input$sub_file_tab3,{
   infile <- input$inp_file_tab3
   if (is.null(infile))
     return(NULL)
-  
+
   RaMP:::rampFileOfPathways(infile,conpass=.conpass,NameOrIds=input$NameOrSourcemult)
 })
 
 observe({
   input$sub_file_tab3
-  
+
   rea_detector$num <- 2
 })
 
@@ -164,7 +164,7 @@ output$summary_mulpath_out<- DT::renderDataTable({
 output$preview_multi_names <- DT::renderDataTable({
   if(is.null(rea_detector$num))
     return("Waiting for input")
-  
+
   if(rea_detector$num == 1){
       tb <- data_mul_name()[,c("pathwayName","pathwaysourceId",
                 "pathwaysource","commonName")]
@@ -210,7 +210,7 @@ output$preview_multi_names <- DT::renderDataTable({
 #    return("Click plots for fisher test...")
 
   # stats <- fisher_result_tab3()
-  # 
+  #
   # display <- data.frame("Stats result" = c(stats[[input$hcClicked$name]]$p.value,
   #                                                stats[[input$hcClicked$name]]$method))
 #  stats <- fisher_result_bar()
@@ -248,6 +248,23 @@ output$results_fisher <- DT::renderDataTable({
         data <- data.frame(Query=NA,Freq=NA)
   }
   data <- fisherTestResult()
+  cluster_output<-find_clusters(fisherTestResult(),input$analyte_type)
+  if(length(cluster_output)>1){
+    cluster_assignment<-apply(fishers_df,1,function(x){
+      pathway<-x[5]
+      clusters<-""
+      for(i in 1:length(cluster_output)){
+        if(pathway %in% cluster_output[[i]]){
+          clusters<-paste0(clusters,i,sep = ", ",collapse = ", ")
+        }
+      }
+      if(clusters!=""){
+        clusters=substr(clusters,1,nchar(clusters)-2)
+      }
+      return(clusters)
+    })
+    data$clusters<-cluster_assignment
+  }
   #data$Pval <- round(data$Pval,8)
   #data$Adjusted.Pval <- round(data$Adjusted.Pval,8)
   data
@@ -296,7 +313,7 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
 #  heatmap_data <- data.frame(v1 = rep(1,length(pathway)),v2 = 1:length(pathway))
 #  heatmap_data$value <- pvalue
 #  heatmap_data <- list_parse2(heatmap_data)
-#  
+#
 #  fntltp <- highcharter::JS(
 #    "function(){
 #    return this.series.yAxis.categories[this.point.y] + ' p='+this.point.value;
@@ -322,9 +339,9 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
 #    hc_add_series(name = "pvalue",data = heatmap_data) %>%
 #    hc_tooltip(formatter = fntltp, valueDecimals = 2) %>%
 #    hc_exporting(enabled = TRUE)
-#  
+#
 #  hc_colorAxis(hc,minColor ="#FFFFFF", maxColor = "#F44242")
-#  
+#
 #})
 
 # Format data from querying database and provide appropriate layout to generate
