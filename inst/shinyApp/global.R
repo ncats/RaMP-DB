@@ -11,3 +11,5 @@ kw_biofluid <- unique(unlist(read.csv("biofluid.csv",header = F,stringsAsFactors
 kw_pathway <- unique(unlist(read.csv("pathway.csv",header = F,stringsAsFactors = F),use.names = F))
 kw_analyte <- unique(unlist(read.csv("analyte.csv",header = F,stringsAsFactors = F),use.names = F))
 kw_source <- unique(unlist(read.csv("source.csv",header = F,stringsAsFactors = F),use.names = F))
+load("gene_overlap_matrix2.RData")
+load("metabolite_overlap_matrix2.RData")

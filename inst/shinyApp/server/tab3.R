@@ -248,9 +248,9 @@ output$results_fisher <- DT::renderDataTable({
         data <- data.frame(Query=NA,Freq=NA)
   }
   data <- fisherTestResult()
-  cluster_output<-find_clusters(fisherTestResult(),input$analyte_type)
-  if(length(cluster_output)>1){
-    cluster_assignment<-apply(fishers_df,1,function(x){
+  cluster_output<-find_clusters(data,input$analyte_type, p_cutoff = as.numeric(input$pvalue_fisher))
+  #if(length(cluster_output)>1){
+    cluster_assignment<-apply(data,1,function(x){
       pathway<-x[5]
       clusters<-""
       for(i in 1:length(cluster_output)){
@@ -260,14 +260,16 @@ output$results_fisher <- DT::renderDataTable({
       }
       if(clusters!=""){
         clusters=substr(clusters,1,nchar(clusters)-2)
+      }else{
+        clusters = "Did not cluster"
       }
       return(clusters)
     })
-    data$clusters<-cluster_assignment
-  }
+    data_2<-cbind(data,cluster_assignment)
+  #}
   #data$Pval <- round(data$Pval,8)
   #data$Adjusted.Pval <- round(data$Adjusted.Pval,8)
-  data
+  data_2
 },rownames = FALSE,filter = "top")
 
 output$fisher_stats_report <- downloadHandler(filename = function(){
