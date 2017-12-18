@@ -128,8 +128,8 @@ tabItem3 <-  shinydashboard::tabItem(
 		 title = strong("Summary:"),
 		 p("Significant pathways are returned below and can be downloaded by clicking 'Download Results'"),
 		 p("Note that only pathways that contain at least 2 analytes from the user input will be output"),
-                textOutput("summary_Fisher"),
-		#DT::dataTableOutput("summary_mulpath_out"),
+                #textOutput("summary_Fisher"),
+		DT::dataTableOutput("summary_fisher"),
                  downloadButton("fisher_stats_report",label = "Download Results")		 
               ) #end box
 	  ), # end of fluidRow
@@ -137,7 +137,7 @@ tabItem3 <-  shinydashboard::tabItem(
             shinydashboard::box(
                   title="Results of Pathway Enrichment Analysis",
                   width = 12,
-	    	  DT::dataTableOutput("summary_fisher")
+	    	  DT::dataTableOutput("results_fisher")
 	    ) # end box
           ) # end of fluidRow
              #),

@@ -155,9 +155,7 @@ output$summary_mulpath_out<- DT::renderDataTable({
   }
   else {
     temp <- data_mul_name()
-    print(head(temp))
     out <- as.data.frame(table(temp$commonName))
-    print(dim(out))
     colnames(out)[1] <- "Query"
   }
   out
@@ -233,7 +231,19 @@ fisherTestResult <- eventReactive(input$runFisher,{
   out
 })
 
+
 output$summary_fisher <- DT::renderDataTable({
+  if(!is.null(fisherTestResult())) {
+	data <- fisherTestResult()
+  	out=as.data.frame(table(data$pathwaysource))
+	colnames(out)[1]="Pathway_Source"
+  } else {
+	out <- data.frame(Pathway_Source=NA, Freq=NA)
+  }
+  out
+  },rownames=FALSE,filter="top")
+
+output$results_fisher <- DT::renderDataTable({
   if(is.null(fisherTestResult())) {
         data <- data.frame(Query=NA,Freq=NA)
   }

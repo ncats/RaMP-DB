@@ -62,16 +62,15 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
    # test p-value
    pval=totinpath=userinpath=pidused=c()
    for (i in pid) {
-	curpathcids <- unique(cids[which(cids[,"pathwayRampId"]==i),"rampId"])
-	if(analyte_type=="metabolites") {
-		tot_in_pathway <- length(grep("RAMP_C",curpathcids))
-	}else {
-		tot_in_pathway <- length(grep("RAMP_G",curpathcids))
-	}
+        curpathcids <- unique(restcids[which(cids[,"pathwayRampId"]==i),"rampId"])
+        if(analyte_type=="metabolites") {
+                tot_in_pathway <- length(grep("RAMP_C",curpathcids))
+        }else {
+                tot_in_pathway <- length(grep("RAMP_G",curpathcids))
+        }
  	tot_out_pathway <- total_analytes - tot_in_pathway 
 	  # fill the rest of the table out
 	  user_in_pathway <- nrow(pathwaydf[which(pathwaydf$pathwayRampId==i),])
-	  if(user_in_pathway<min_analyte) {next;} else {
 	  user_out_pathway <- total_analytes - user_in_pathway
 	  contingencyTb[1,1] <- tot_in_pathway
 	  contingencyTb[1,2] <- tot_out_pathway
@@ -82,19 +81,62 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 	  userinpath<-c(userinpath,user_in_pathway)
 	  totinpath<-c(totinpath,tot_in_pathway)
 	  pidused <- c(pidused,i)
-	}
   } # end for loop
-  fisher.adj.pval <- p.adjust(pval,method='fdr')
+
+  # Now run fisher's tests for all other pids
+   query <- "select distinct(pathwayRampId) from analytehaspathway"
+   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+         password = conpass,
+         dbname = dbname)
+   allpids <- DBI::dbGetQuery(con,query)
+   DBI::dbDisconnect(con)
+   pidstorun <- setdiff(allpids[,1],pid)
+   pidstorunlist <- sapply(pidstorun,shQuote)
+   pidstorunlist <- paste(pidstorunlist,collapse = ",")
+
+      query2 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
+   pidstorunlist,")")
+
+   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+         password = conpass,
+         dbname = dbname)
+   restcids <- DBI::dbGetQuery(con,query2)#[[1]]
+   DBI::dbDisconnect(con)
+
+   for (i in pidstorun) {
+	tot_in_pathway=0
+        tot_out_pathway <- total_analytes - tot_in_pathway
+          # fill the rest of the table out
+          user_in_pathway <- nrow(pathwaydf[which(pathwaydf$pathwayRampId==i),])
+          user_out_pathway <- total_analytes - user_in_pathway
+          contingencyTb[1,1] <- tot_in_pathway
+          contingencyTb[1,2] <- tot_out_pathway
+          contingencyTb[2,1] <- user_in_pathway
+          contingencyTb[2,2] <- user_out_pathway
+          result <- stats::fisher.test(contingencyTb)
+          pval <- c(pval,result$p.value )
+          userinpath<-c(userinpath,user_in_pathway)
+          totinpath<-c(totinpath,tot_in_pathway)
+          pidused <- c(pidused,i)
+  } # end for loop
+
+  fdr <- p.adjust(pval,method="fdr")
+  holm <- p.adjust(pval,method="holm")
+  print(paste0("Calculated p-values for ",length(pval)," pathways"))
 
   # format output (retrieve pathway name for each unique source id first
-  out <- data.frame(pathwayRampId=pidused, Pval=pval,Adjusted.Pval=fisher.adj.pval,
+  out <- data.frame(pathwayRampId=pidused, Pval=pval,FDR.Adjusted.Pval=fdr,
+	Holm.Adjusted.Pval=holm,
 	Num_In_Path=userinpath,Total_In_Path=totinpath)
   out2 <- merge(out,pathwaydf[,c("pathwayName","pathwayRampId","pathwaysourceId",
 	"pathwaysource")],
 	by="pathwayRampId",all.x=TRUE)
-  finout <- out2[,c("pathwayName", "Pval", "Adjusted.Pval", "pathwaysourceId",
+  finout <- out2[,c("pathwayName", "Pval", "FDR.Adjusted.Pval", 
+	"Holm.Adjusted.Pval","pathwaysourceId",
 	"pathwaysource","Num_In_Path","Total_In_Path")]
-  return(finout[!duplicated(finout),])
+  finout=finout[!duplicated(finout),]
+  
+  return(finout[which(finout$Num_In_Path>=min_analyte),])
 }
 
 #' Reformat the result of query (get pathways from analyte(s)) for input into barplot
