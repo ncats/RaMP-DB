@@ -62,7 +62,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
    # test p-value
    pval=totinpath=userinpath=pidused=c()
    for (i in pid) {
-        curpathcids <- unique(restcids[which(cids[,"pathwayRampId"]==i),"rampId"])
+        curpathcids <- unique(cids[which(cids[,"pathwayRampId"]==i),"rampId"])
         if(analyte_type=="metabolites") {
                 tot_in_pathway <- length(grep("RAMP_C",curpathcids))
         }else {
@@ -250,8 +250,9 @@ rampFastPathFromMeta<- function(analytes,
  } else{ # Just take on the name
   mdf <- merge(mdf,synonym,all.x = T,by.y = "rampId")
  }
+  out<-mdf[!duplicated(mdf),]
 
-  return(mdf[!duplicated(mdf),])
+  return(out[which(out$pathwaysource!="hmdb"),])
 }
 
 #' Generate data.frame from given files
