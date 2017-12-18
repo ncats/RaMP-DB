@@ -19,7 +19,7 @@ for key word}
 \item{username}{username for database access (default is "root")}
 }
 \value{
-If there is at least one itmes in database vaguely matching key
+If there is at least one item in database vaguely matching key
 word, it will return a data frame that contains all search result. Otherwise
 it will return a string value to inform user.
 }
