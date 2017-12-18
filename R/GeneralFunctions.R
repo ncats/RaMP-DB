@@ -180,7 +180,7 @@ rampPathFromMeta <- function(synonym, maxItems,conpass,
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
-#' @return If there is at least one itmes in database vaguely matching key
+#' @return If there is at least one item in database vaguely matching key
 #' word, it will return a data frame that contains all search result. Otherwise
 #' it will return a string value to inform user.
 rampKWsearch <- function(word, database,conpass,
