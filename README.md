@@ -94,5 +94,5 @@ If you encounter any problems, or find installation problems or bugs, please sta
 ## Authors
 * **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
 * **Ewy Mathé** - [Mathelab](https://github.com/MatheLab)
-
+* **Andrew Patt** - andy.patt@osumc.edu
 
