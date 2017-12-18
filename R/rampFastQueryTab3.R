@@ -4,7 +4,7 @@
 #' @param total_metabolites number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param analyte_type "metabolites" or "genes" (default is "metabolites")
-#' @param min_analyte if the number of analytes (gene or metabolite) in a pathway is 
+#' @param min_analyte if the number of analytes (gene or metabolite) in a pathway is
 #' < min_analyte, do not report
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
@@ -18,18 +18,18 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   if(is.null(conpass)) {
     stop("Please define the password for the mysql connection")
   }
- 
+
   if(analyte_type=="metabolites") {total_analytes=total_metabolites
 	} else if (analyte_type=="genes") {
 	total_analytes=total_genes
 	} else {
 	stop("Please define the analyte_type variable to 'metabolites' or 'genes'")
   }
- 
+
   contingencyTb <- matrix(0,nrow = 2,ncol = 2)
   colnames(contingencyTb) <- c("In Pathway","Not In Pathway")
   rownames(contingencyTb) <- c("All Metabolites","User's Metabolites")
-  
+
   # Get pathway ids that contain the user analytes
   pid <- unique(pathwaydf$pathwayRampId);
   list_pid <- sapply(pid,shQuote)
@@ -50,8 +50,8 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   print(paste0("Total metabolites",total_metabolites))
   # Retrieve the Ramp compound ids associated with the ramp pathway id and count them:
    query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
-   list_pid,")")  
-  
+   list_pid,")")
+
    con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
          password = conpass,
          dbname = dbname)
@@ -68,14 +68,14 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
         }else {
                 tot_in_pathway <- length(grep("RAMP_G",curpathcids))
         }
- 	tot_out_pathway <- total_analytes - tot_in_pathway 
+ 	tot_out_pathway <- total_analytes - tot_in_pathway
 	  # fill the rest of the table out
 	  user_in_pathway <- nrow(pathwaydf[which(pathwaydf$pathwayRampId==i),])
 	  user_out_pathway <- total_analytes - user_in_pathway
 	  contingencyTb[1,1] <- tot_in_pathway
 	  contingencyTb[1,2] <- tot_out_pathway
 	  contingencyTb[2,1] <- user_in_pathway
-	  contingencyTb[2,2] <- user_out_pathway 
+	  contingencyTb[2,2] <- user_out_pathway
 	  result <- stats::fisher.test(contingencyTb)
 	  pval <- c(pval,result$p.value )
 	  userinpath<-c(userinpath,user_in_pathway)
@@ -131,17 +131,17 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   out2 <- merge(out,pathwaydf[,c("pathwayName","pathwayRampId","pathwaysourceId",
 	"pathwaysource")],
 	by="pathwayRampId",all.x=TRUE)
-  finout <- out2[,c("pathwayName", "Pval", "FDR.Adjusted.Pval", 
+  finout <- out2[,c("pathwayName", "Pval", "FDR.Adjusted.Pval",
 	"Holm.Adjusted.Pval","pathwaysourceId",
 	"pathwaysource","Num_In_Path","Total_In_Path")]
   finout=finout[!duplicated(finout),]
-  
+
   return(finout[which(finout$Num_In_Path>=min_analyte),])
 }
 
 #' Reformat the result of query (get pathways from analyte(s)) for input into barplot
 #' function
-#' 
+#'
 #' each pathway contains all metabolites inside that pathway
 #' @param df A dataframe that has information for bar plot
 #' @return a list with the analyte names for each pathway that is represented in the list
@@ -151,9 +151,9 @@ rampGenerateBarPlot <- function(df){
     if (length(path_meta_list)==0){
       path_meta_list[[df[i,]$pathwaysourceId]] <- data.frame(metabolite = df[i,]$rampId,stringsAsFactors = F)
     } else {
-      path_meta_list[[df[i,]$pathwaysourceId]] <- 
+      path_meta_list[[df[i,]$pathwaysourceId]] <-
 		rbind(path_meta_list[[df[i,]$pathwaysourceId]],df[i,]$rampId)
-      path_meta_list[[df[i,]$pathwaysourceId]] <- 
+      path_meta_list[[df[i,]$pathwaysourceId]] <-
 	unique(path_meta_list[[df[i,]$pathwaysourceId]])
     }
   }
@@ -168,7 +168,7 @@ rampGenerateBarPlot <- function(df){
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @return a list contains all metabolits as name and pathway inside.
-#' 
+#'
 #' @export
 rampFastPathFromMeta<- function(analytes,
 	find_synonym = FALSE,
@@ -216,8 +216,8 @@ rampFastPathFromMeta<- function(analytes,
 	stop("Unable to retrieve metabolites")
   }
 
-  # Now using the RaMP compound id, retrieve associated pathway ids 
-    query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where 
+  # Now using the RaMP compound id, retrieve associated pathway ids
+    query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where
                       rampId in (",
                      list_metabolite,");")
     con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
@@ -232,13 +232,13 @@ rampFastPathFromMeta<- function(analytes,
   con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
   df3 <- DBI::dbGetQuery(con,query3)
   DBI::dbDisconnect(con)
- 
+
   #Format output
   mdf <- merge(df3,df2,all.x = T)
- 
+
   # And with rampIds (list_metabolite), get common names when Ids are input
   if(NameOrIds == "ids"){
-     list_analytes <- sapply(analytes,shQuote) 
+     list_analytes <- sapply(analytes,shQuote)
      list_analytes <- paste(list_analytes,collapse = ",")
   query4 <-paste0("select sourceId,commonName,rampId from source where sourceId in (",list_analytes,");")
 
@@ -255,16 +255,16 @@ rampFastPathFromMeta<- function(analytes,
 }
 
 #' Generate data.frame from given files
-#' 
-#' identifing the file type, then it returns table output to 
+#'
+#' identifing the file type, then it returns table output to
 #' shiny renderTable function as preview of searching data
-#' 
-#' @param infile a file object given from files 
+#'
+#' @param infile a file object given from files
 #' @param NameOrIds whether to return "synonyms" or "ids" (default is "ids")
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
-#' 
+#'
 #' @return a data.frame either from multiple csv file
 #' or search through by a txt file.
 rampFileOfPathways <- function(infile,NameOrIds="ids",
@@ -294,10 +294,10 @@ rampFileOfPathways <- function(infile,NameOrIds="ids",
 }
 
 #' highchart output for RaMP and fisher test.
-#' 
+#'
 #' Based on given x,y data, type and click event, it returns a highcharter object
 #' to highchartOutput function to display bar plot.
-#' 
+#'
 #' @param x_data vector contains data for categorical x-axis
 #' @param y_data vector contains frequency of each pathway
 #' @param type plot's type of this highcharter object
@@ -347,4 +347,99 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
                useHTML = TRUE) %>%
     highcharter::hc_exporting(enabled = TRUE)
   return(hc)
+}
+
+#' Perform fuzzy multiple linkage partitioning clustering on pathways identified by Fisher's test
+#' @param fishers_df The data frame generated by runFisherTest
+#' @param analyte_type specify whether to use metabolite or gene pathway overlap matrix
+#' @param perc_analyte_overlap Minimum overlap for pathways to be considered similar (Default = 50%)
+#' @param min_pathway_tocluster Minimum number of 'similar' pathways required to start a cluster (medoid) (Default = 3)
+#' @param perc_pathway_overlap Minimum overlap for clusters to merge (Default = 50%)
+#' @param p_cutoff Filter pathways to cluster by FDR p value threshold
+#' @return a list of clusters identified by the algorithm. Each entry of the list is a cluster, containing a vector of pathways in the cluster
+find_clusters<-function(fishers_df,analyte_type,perc_analyte_overlap = 0.5,min_pathway_tocluster = 3,perc_pathway_overlap = 0.5,p_cutoff){
+  if(analyte_type=="metabolites"){
+    similarity_matrix = metabolite_result2
+  } else if(analyte_type=="genes"){
+    similarity_matrix = gene_result2
+  }
+  pathway_list<-fishers_df[,5]
+  pathway_list<-pathway_list[which(fishers_df[,4] < p_cutoff)]
+
+  pathway_indices<-match(pathway_list,rownames(similarity_matrix))
+
+  if(length(which(is.na(pathway_indices)))>0){
+    pathway_indices<-pathway_indices[-which(is.na(pathway_indices))]
+  }
+
+  pathway_matrix<-similarity_matrix[pathway_indices,pathway_indices]
+  unmerged_clusters<-apply(pathway_matrix, 1, function(x){
+    if(length(which(x>=perc_analyte_overlap))>(min_pathway_tocluster+1)){
+      return(colnames(pathway_matrix)[which(x>=perc_analyte_overlap)])
+    } else {
+      return(NA)
+    }
+  })
+  # Remove the unmerged clusters
+  if(length(which(is.na(unmerged_clusters)))>0){
+    unmerged_clusters<-unmerged_clusters[-which(is.na(unmerged_clusters))]
+  }
+
+  if(length(unmerged_clusters)==0){
+    stop("No medoids found, make perc_analyte_overlap or min_pathway_tocluster smaller")
+  }
+
+  # Evaluate similarity between clusters
+  cluster_similarity<-matrix(0,ncol = length(unmerged_clusters),nrow = length(unmerged_clusters))
+  for(i in 1:length(unmerged_clusters)){
+    for(j in 1:length(unmerged_clusters)){
+      cluster_similarity[i,j]<-length(intersect(unmerged_clusters[[i]],unmerged_clusters[[j]]))/
+        length(unique(c(unmerged_clusters[[i]],unmerged_clusters[[j]])))
+    }
+  }
+  colnames(cluster_similarity)<-rownames(cluster_similarity)<-names(unmerged_clusters)
+  unmerged_cluster_similarity<-cluster_similarity
+
+  cluster_list<-unmerged_clusters
+
+  # Merge Clusters
+  count = 1
+  while(length(which(cluster_similarity >= perc_pathway_overlap)) > nrow(cluster_similarity)){
+    cluster_similarity_mod<-cluster_similarity
+    for(i in 1:nrow(cluster_similarity_mod)){
+      cluster_similarity_mod[i,i]<-0
+    }
+
+    clusters_to_merge<-which(cluster_similarity_mod == max(cluster_similarity_mod), arr.ind = TRUE)
+    clusters_to_merge<-unique(t(apply(clusters_to_merge, 1, sort)))
+
+    for(i in 1:nrow(clusters_to_merge)){
+      if(!is.na(cluster_list[[clusters_to_merge[i,1]]])&&!is.na(cluster_list[[clusters_to_merge[i,2]]])){
+        cluster_list[[clusters_to_merge[i,1]]]<-unique(unlist(cluster_list[c(clusters_to_merge[i,1],clusters_to_merge[i,2])]))
+        cluster_list[[clusters_to_merge[i,2]]]<-NA
+      }
+    }
+
+    if(length(which(is.na(cluster_list)))>0){
+      cluster_list<-cluster_list[-which(is.na(cluster_list))]
+    }
+
+    cluster_similarity<-matrix(0,ncol = length(cluster_list),nrow = length(cluster_list))
+    for(i in 1:length(cluster_list)){
+      for(j in 1:length(cluster_list)){
+        cluster_similarity[i,j]<-length(intersect(cluster_list[[i]],cluster_list[[j]]))/
+          length(unique(c(cluster_list[[i]],cluster_list[[j]])))
+      }
+    }
+
+    if(nrow(cluster_similarity)==1){
+      stop("Clusters converged, use larger perc_pathway_overlap")
+    }
+    count = count + 1
+    if(count == length(unmerged_clusters)+1){
+      stop("ERROR:while loop failed to terminate")
+    }
+  }
+  colnames(cluster_similarity) = rownames(cluster_similarity) = paste0("cluster_",c(1:length(cluster_list)))
+  return(cluster_list)
 }
