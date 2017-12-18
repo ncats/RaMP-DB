@@ -37,15 +37,18 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
 
   # Get the total number of metabolites that are mapped to pathways in RaMP (that's the default background)
-   query <- "select distinct(rampId) from analytehaspathway"
+   query <- "select * from analytehaspathway"
    con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
          password = conpass,
          dbname = dbname)
    allids <- DBI::dbGetQuery(con,query)
    DBI::dbDisconnect(con)
+   allids <- allids[!duplicated(allids),]
 
   if((analyte_type == "metabolites") && (is.null(total_metabolites))) {
-	total_analytes <- length(grep("RAMP_C",allids[,"rampId"]))
+	wiki_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$type=="wiki"),"rampId"])]))
+	react_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$type=="reactome"),"rampId"])]))
+	kegg_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$type=="kegg"),"rampId"])]))
   }
   print(paste0("Total metabolites",total_metabolites))
   # Retrieve the Ramp compound ids associated with the ramp pathway id and count them:
@@ -68,7 +71,15 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
         }else {
                 tot_in_pathway <- length(grep("RAMP_G",curpathcids))
         }
- 	tot_out_pathway <- total_analytes - tot_in_pathway
+	if(allids$type[which(allids$pathwayRampId==i)[1]] == "wiki") {
+		total_analytes <- wiki_totanalytes
+	} else if (allids$type[which(allids$pathwayRampId==i)[1]] == "reactome") {
+                total_analytes <- reactome_totanalytes
+        } else if (allids$type[which(allids$pathwayRampId==i)[1]] == "kegg") {
+                total_analytes <- kegg_totanalytes
+        } else {stop("Couldn't find pathway type for current pathway!")}
+
+ 	tot_out_pathway <- total_analytes - tot_in_pathway 
 	  # fill the rest of the table out
 	  user_in_pathway <- nrow(pathwaydf[which(pathwaydf$pathwayRampId==i),])
 	  user_out_pathway <- total_analytes - user_in_pathway
