@@ -102,7 +102,8 @@ tabItem3 <-  shinydashboard::tabItem(
            ), # end fluidRow
           fluidRow(
             shinydashboard::box(
-                 width = 6,
+           	  title="Set Parameters to run Pathway Enrichment Analysis",
+	          width = 6,
                   numericInput("pvalue_fisher",
                         "Select significant level for Fisher Exact Test",
                          value = 0.01,
@@ -112,12 +113,33 @@ tabItem3 <-  shinydashboard::tabItem(
 			choices = c(
                             "Metabolites" = "metabolites", 
 			    "Genes" = "genes")),
-		  numericInput("total_analytes",
-			"Input the total number of analytes (genes or metabolites) measured in experiment (to be used as background)",
-			value=500,
-			min=1,max=100000,width="80%")
-                ) #end of Box
-              ) #end of fluidRow
+		  #numericInput("total_genes",
+		  #	"Input the total number of genes measured in experiment (to be used as background)",
+		  #	value=20000,
+		  #	min=1,max=100000,width="80%"),
+		   #numericInput("total_metabolites",
+                  #      "Input the total number of metabolites measured in experiment (to be used as background)",
+                  #      value=1000,
+                  #      min=1,max=100000,width="80%"),
+		actionButton("runFisher","Run Pathway Enrichment")
+                ),#end of Box
+            shinydashboard::box(
+                 width = 6,
+		 title = strong("Summary:"),
+		 p("Significant pathways are returned below and can be downloaded by clicking 'Download Results'"),
+		 p("Note that only pathways that contain at least 2 analytes from the user input will be output"),
+                textOutput("summary_Fisher"),
+		#DT::dataTableOutput("summary_mulpath_out"),
+                 downloadButton("fisher_stats_report",label = "Download Results")		 
+              ) #end box
+	  ), # end of fluidRow
+	  fluidRow(
+            shinydashboard::box(
+                  title="Results of Pathway Enrichment Analysis",
+                  width = 12,
+	    	  DT::dataTableOutput("summary_fisher")
+	    ) # end box
+          ) # end of fluidRow
              #),
 #             conditionalPanel(condition = "output.preview_multi_names != null",
 #                              highcharter::highchartOutput("tab3_hc_output"),

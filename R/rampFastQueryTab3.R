@@ -1,31 +1,40 @@
 #' Do fisher test for only one pathway from search result
 #' clicked on highchart
 #' @param pathwaydf a data frame resulting from rampFastPathFromMeta
-#' @param total_metabolites number of metabolites analyzed in the experiment (e.g. background) (default is total number of metabolites that map to a pathway in RaMP, with assumption that analyte_type is "metabolite")
+#' @param total_metabolites number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param analyte_type "metabolites" or "genes" (default is "metabolites")
+#' @param min_analyte if the number of analytes (gene or metabolite) in a pathway is 
+#' < min_analyte, do not report
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @return a dataframe with pathway enrichment (based on Fisher's test) results
 #' @export
 runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
-                              analyte_type="metabolites",conpass=NULL,
+                              analyte_type="metabolites",min_analyte=2,conpass=NULL,
                               dbname="ramp",username="root"){
   print("Fisher Testing ......")
-  if (!(analyte_type == "metabolites" | analyte_type == "genes")){
-    stop("Please define the analyte_type variable to 'metabolites' or 'genes'")
-  }
   if(is.null(conpass)) {
     stop("Please define the password for the mysql connection")
   }
-  
+ 
+  if(analyte_type=="metabolites") {total_analytes=total_metabolites
+	} else if (analyte_type=="genes") {
+	total_analytes=total_genes
+	} else {
+	stop("Please define the analyte_type variable to 'metabolites' or 'genes'")
+  }
+ 
   contingencyTb <- matrix(0,nrow = 2,ncol = 2)
   colnames(contingencyTb) <- c("In Pathway","Not In Pathway")
   rownames(contingencyTb) <- c("All Metabolites","User's Metabolites")
   
-  # Get the total number of analytes in the input pathway:
+  # Get pathway ids that contain the user analytes
   pid <- unique(pathwaydf$pathwayRampId);
+  list_pid <- sapply(pid,shQuote)
+  list_pid <- paste(list_pid,collapse = ",")
+
 
   # Get the total number of metabolites that are mapped to pathways in RaMP (that's the default background)
    query <- "select distinct(rampId) from analytehaspathway"
@@ -38,10 +47,10 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   if((analyte_type == "metabolites") && (is.null(total_metabolites))) {
 	total_analytes <- length(grep("RAMP_C",allids[,"rampId"]))
   }
-
+  print(paste0("Total metabolites",total_metabolites))
   # Retrieve the Ramp compound ids associated with the ramp pathway id and count them:
-   query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (\"",
-   pid,"\")")  
+   query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
+   list_pid,")")  
   
    con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
          password = conpass,
@@ -51,32 +60,41 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
    # Loop through each pathway, build the contingency table, and calculate Fisher's Exact
    # test p-value
-   pval=c()
+   pval=totinpath=userinpath=pidused=c()
    for (i in pid) {
 	curpathcids <- unique(cids[which(cids[,"pathwayRampId"]==i),"rampId"])
 	if(analyte_type=="metabolites") {
-		tot_in_pathway <- length(grep("RAMP_C",cids))
+		tot_in_pathway <- length(grep("RAMP_C",curpathcids))
 	}else {
-		tot_in_pathway <- length(grep("RAMP_G",cids))
+		tot_in_pathway <- length(grep("RAMP_G",curpathcids))
 	}
  	tot_out_pathway <- total_analytes - tot_in_pathway 
 	  # fill the rest of the table out
-	  user_in_pathway <- nrow(pathwaydf)
+	  user_in_pathway <- nrow(pathwaydf[which(pathwaydf$pathwayRampId==i),])
+	  if(user_in_pathway<min_analyte) {next;} else {
 	  user_out_pathway <- total_analytes - user_in_pathway
 	  contingencyTb[1,1] <- tot_in_pathway
 	  contingencyTb[1,2] <- tot_out_pathway
 	  contingencyTb[2,1] <- user_in_pathway
 	  contingencyTb[2,2] <- user_out_pathway 
 	  result <- stats::fisher.test(contingencyTb)
-	  pval <- c(pval,round(result$p.value,4) )
-  }
+	  pval <- c(pval,result$p.value )
+	  userinpath<-c(userinpath,user_in_pathway)
+	  totinpath<-c(totinpath,tot_in_pathway)
+	  pidused <- c(pidused,i)
+	}
+  } # end for loop
   fisher.adj.pval <- p.adjust(pval,method='fdr')
 
   # format output (retrieve pathway name for each unique source id first
-  out <- data.frame(pathwayRampId=pid, Pval=pval,Adjusted.Pval=fisher.adj.pval)
-  out2 <- merge(out,pathwaydf,by="pathwayRampId",all.x=TRUE)
-
-  return(out2[,c("pathwayName", "Pval", "Adjusted.Pval", "pathwaysourceId", "pathwaysource")])
+  out <- data.frame(pathwayRampId=pidused, Pval=pval,Adjusted.Pval=fisher.adj.pval,
+	Num_In_Path=userinpath,Total_In_Path=totinpath)
+  out2 <- merge(out,pathwaydf[,c("pathwayName","pathwayRampId","pathwaysourceId",
+	"pathwaysource")],
+	by="pathwayRampId",all.x=TRUE)
+  finout <- out2[,c("pathwayName", "Pval", "Adjusted.Pval", "pathwaysourceId",
+	"pathwaysource","Num_In_Path","Total_In_Path")]
+  return(finout[!duplicated(finout),])
 }
 
 #' Reformat the result of query (get pathways from analyte(s)) for input into barplot

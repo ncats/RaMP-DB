@@ -6,17 +6,20 @@
 clicked on highchart}
 \usage{
 runFisherTest(pathwaydf, total_metabolites = NULL, total_genes = 20000,
-  analyte_type = "metabolites", conpass = NULL, dbname = "ramp",
-  username = "root")
+  analyte_type = "metabolites", min_analyte = 2, conpass = NULL,
+  dbname = "ramp", username = "root")
 }
 \arguments{
 \item{pathwaydf}{a data frame resulting from rampFastPathFromMeta}
 
-\item{total_metabolites}{number of metabolites analyzed in the experiment (e.g. background) (default is total number of metabolites that map to a pathway in RaMP, with assumption that analyte_type is "metabolite")}
+\item{total_metabolites}{number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")}
 
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
 
 \item{analyte_type}{"metabolites" or "genes" (default is "metabolites")}
+
+\item{min_analyte}{if the number of analytes (gene or metabolite) in a pathway is 
+< min_analyte, do not report}
 
 \item{conpass}{password for database access (string)}
 
