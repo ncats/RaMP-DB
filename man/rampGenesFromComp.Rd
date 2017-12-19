@@ -26,7 +26,7 @@ of returned metablites from query.}
 a dataframe that contain given synonym as column name
 }
 \description{
-From user supplied synonym metabolites, it search through whole databases 
+From user supplied synonym metabolites, it search through whole databases
 , and returns all metabolites which are in the same pathways.
 }
 \examples{

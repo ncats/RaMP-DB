@@ -248,7 +248,7 @@ output$results_fisher <- DT::renderDataTable({
         data <- data.frame(Query=NA,Freq=NA)
   }
   data <- fisherTestResult()
-  cluster_output<-find_clusters(data,input$analyte_type, p_cutoff = as.numeric(input$pvalue_fisher))
+  cluster_output<-RaMP::find_clusters(data,input$analyte_type, p_cutoff = as.numeric(input$pvalue_fisher))
   #if(length(cluster_output)>1){
     cluster_assignment<-apply(data,1,function(x){
       pathway<-x[5]

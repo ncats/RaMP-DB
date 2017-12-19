@@ -26,7 +26,7 @@ catalyze that compound. If \code{synonym} is gene, it returns all compound
 catalyzed by this gene.
 }
 \description{
-based on catalyzation relationship. 
+based on catalyzation relationship.
 This function also automate identification about if the given
 metabolites is gene or compound
 }

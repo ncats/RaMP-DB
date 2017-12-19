@@ -15,7 +15,7 @@ rampOntoOut(synonym, maxItems)
 a dataframe that has given synonym as column name.
 }
 \description{
-Based on ontology relationship, it search throught databases to find 
-metabolites or ontology from given name which could be either ontology 
+Based on ontology relationship, it search throught databases to find
+metabolites or ontology from given name which could be either ontology
 location or metabolite's synonym.
 }
