@@ -20,7 +20,7 @@ tabItem2<-  shinydashboard::tabItem(
                         ),
                       fluidRow(
                         shinydashboard::box(width = 12,
-                            title = "Select type of metabolites returned by databases",
+                            title = "Select type of analytes to be returned",
                             radioButtons("geneOrComp2","Return compound or gene", choices = c(
                               "Compound" = "compound", "Gene" = "gene","Both" = "both"
                             ),selected = "compound"),
@@ -37,13 +37,13 @@ tabItem2<-  shinydashboard::tabItem(
                         fluidRow(
                           div(
                             style = "margin:25px",
-                            downloadButton("path_report","Generate Report"),
+                            downloadButton("result_file","Generate Report"),
                             hr(),
-                            textOutput("summary_synonym"),
-                            div(style = "height:300px;overflow-y:auto;overflow-x:auto;",
-                                helpText("Preview of output only display first 20 items."),
-                                DT::dataTableOutput("result2",width = "80%",height = "100%")
-                            )
+                            textOutput("summary_search")
+                            #div(style = "height:300px;overflow-y:auto;overflow-x:auto;",
+                            #    helpText("Preview of output only display first 20 items."),
+                            #    DT::dataTableOutput("result2",width = "80%",height = "100%")
+                            #)
                           )
                         )
                     )
@@ -56,7 +56,7 @@ tabItem2<-  shinydashboard::tabItem(
                       solidHeader = T,
                       collapsible = T,
                       title = strong("Summary"),
-                      uiOutput("preview_tab2")
+		      DT::dataTableOutput("result",width = "80%",height = "100%")
                     ),
                     HTML("</div>")
                   )
@@ -76,7 +76,7 @@ tabItem2<-  shinydashboard::tabItem(
                                 multiple = FALSE,
                                 accept = c("text/csv","text/comma-separated-values,/text/plain",".csv",".txt"),
                                 buttonLabel = "Browse..."),
-                      actionButton("sub_file_tab2",label = "Upload")
+                      actionButton("sub_file_tab2",label = "Submit")
                     )
                   ),
                   hr(),

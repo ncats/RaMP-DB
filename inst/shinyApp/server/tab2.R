@@ -1,3 +1,4 @@
+# Function that runs rampFastMetaFromPath to return analytes from input pathway(s)
 dataInput_path <- eventReactive(input$subText2,{
   progress <- shiny::Progress$new()
   
@@ -9,7 +10,6 @@ dataInput_path <- eventReactive(input$subText2,{
   rampOut <- RaMP::rampFastMetaFromPath(input$KW_path,conpass=.conpass)
   print(dim(rampOut))
   print(input$KW_path)
-  rampOut <- rampOut[,1:(ncol(rampOut) - 1)]
   print(input$geneOrComp2)
   if(input$geneOrComp2 != "both"){
     rampOut <- rampOut[rampOut$geneOrCompound == input$geneOrComp2,]
@@ -20,31 +20,31 @@ dataInput_path <- eventReactive(input$subText2,{
   return(rampOut)
 })
 
+# Counts the number of lines in resulting query
 path_text_out<- eventReactive(input$subText2,{
   if(!is.null(dataInput_path())){
-    return (paste0("There are(is) ",nrow(dataInput_path())," relevent items in the databases."))
+    return (paste0("There are(is) ",nrow(dataInput_path())," ",
+	input$geneOrComp2," returned."))
   } else{
     return ("Given pathway not found.")
   }
   
 })
 
-output$summary_synonym <- renderText({
+output$summary_search <- renderText({
   path_text_out()
 })
 
-output$result2 <- DT::renderDataTable({
+# outputs results of query to a table
+output$result <- DT::renderDataTable({
   out_src <- dataInput_path()
   if (is.null(out_src))
     return(NULL)
-  
-  
   return(out_src)
 },rownames = FALSE)
 
 
 observe({
-  
   choices <- kw_pathway[grepl(input$singleInput2,kw_pathway,ignore.case=TRUE)]
   choices <- choices[order(nchar(choices),choices)]
   if(is.null(choices))
@@ -59,25 +59,17 @@ observe({
     })
 })
 
-
-output$path_report <- downloadHandler(filename = function() {
+# Outputs query results to a file
+output$result_file <- downloadHandler(filename = function() {
   paste0(input$KW_path, ".csv")
 }, content = function(file) {
   ramp <- dataInput_path()
   write.csv(ramp, file, append = TRUE, row.names = FALSE)
 })
 
-
-output$preview_tab2 <- renderUI({
-  input$subText2
-  isolate({
-    tables <- RaMP:::rampTablize(dataInput_path())
-    return(div(HTML(unlist(tables)),class = "shiny-html-output"))
-  })
-})
-
-
+############################################
 # Second Panel 
+###########################################
 
 detector_tab2 <- reactiveValues(num = NULL)
 
@@ -88,6 +80,8 @@ observe({
     detector_tab2$num <- 1
   })
 })
+
+# Runs query given a list of pathways
 data_mul_name_tab2 <- eventReactive(input$sub_mul_tab2,{
   if(is.null(input$sub_mul_tab2))
     return(NULL)
@@ -98,7 +92,7 @@ data_mul_file_tab2 <- eventReactive(input$sub_file_tab2,{
   if (is.null(infile))
     return(NULL)
   
-  RaMP:::rampFileOfPathways_tab2(infile)
+  RaMP:::rampFastMetaFromPath_InputFile(infile,conpass=.conpass)
 })
 
 

@@ -18,7 +18,7 @@ runFisherTest(pathwaydf, total_metabolites = NULL, total_genes = 20000,
 
 \item{analyte_type}{"metabolites" or "genes" (default is "metabolites")}
 
-\item{min_analyte}{if the number of analytes (gene or metabolite) in a pathway is 
+\item{min_analyte}{if the number of analytes (gene or metabolite) in a pathway is
 < min_analyte, do not report}
 
 \item{conpass}{password for database access (string)}
