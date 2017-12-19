@@ -50,6 +50,11 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 	react_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$type=="reactome"),"rampId"])]))
 	kegg_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$type=="kegg"),"rampId"])]))
   }
+  if(analyte_type=="genes") {
+	wiki_totanalytes <- react_totanalytes <- kegg_totanalytes <- total_genes
+  }
+
+
   print(paste0("Total metabolites",total_metabolites))
   # Retrieve the Ramp compound ids associated with the ramp pathway id and count them:
    query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
@@ -74,7 +79,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 	if(allids$type[which(allids$pathwayRampId==i)[1]] == "wiki") {
 		total_analytes <- wiki_totanalytes
 	} else if (allids$type[which(allids$pathwayRampId==i)[1]] == "reactome") {
-                total_analytes <- reactome_totanalytes
+                total_analytes <- react_totanalytes
         } else if (allids$type[which(allids$pathwayRampId==i)[1]] == "kegg") {
                 total_analytes <- kegg_totanalytes
         } else {stop("Couldn't find pathway type for current pathway!")}
