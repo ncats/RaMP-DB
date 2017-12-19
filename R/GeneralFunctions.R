@@ -1,37 +1,3 @@
-#' Generate HTML table output from given data frame
-#' 
-#' The HTML output is accepted by shiny HTML output, and 
-#' form well-format table on webpage
-#' @param data The data converted to table format (data.frame)
-#' @param num_row The rows of table converted from raw data (integer)
-#' @return A string that contains all html output
-rampTablize <- function(data,num_row =5){
-  if(is.character(data))
-    return(NULL)
-  tables <- list()
-  tb_title <- unique(data[,ncol(data)])
-  for(item in tb_title){
-    table <- data[data[,ncol(data)] %in% item,]
-    colnames(table)[1]<-paste(nrow(table),"items from",item)
-    if (nrow(table)>num_row){
-      tables[[item]] <- print(xtable::xtable(table[1:num_row,]),
-                              type = "html",
-                              html.table.attributes ="class = 'data table table-bordered table-condensed'",
-                              caption.placement = "top",
-                              include.rownames = F)
-      
-  
-    } else {
-      tables[[item]] <- print(xtable::xtable(table[1:nrow(table),]),
-                              type = "html",
-                              html.table.attributes ="class = 'data table table-bordered table-condensed'",
-                              caption.placement = "top",
-                              include.rownames = F)
-    }
-  }
-  return(lapply(tables,paste))  
-}
-
 #' Send query to databases to get metabolites 
 #'
 #' From user supplied synonym metabolites, it search through whole databases 
