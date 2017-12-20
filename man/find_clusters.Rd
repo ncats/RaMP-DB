@@ -2,7 +2,7 @@
 % Please edit documentation in R/rampFastQueryTab3.R
 \name{find_clusters}
 \alias{find_clusters}
-\title{Perform fuzzy multiple linkage partitioning clustering on pathways identified by 
+\title{Perform fuzzy multiple linkage partitioning clustering on pathways identified by
 Fisher's test}
 \usage{
 find_clusters(fishers_df, analyte_type, perc_analyte_overlap = 0.5,
@@ -13,10 +13,10 @@ find_clusters(fishers_df, analyte_type, perc_analyte_overlap = 0.5,
 
 \item{analyte_type}{specify whether to use metabolite or gene pathway overlap matrix}
 
-\item{perc_analyte_overlap}{Minimum overlap for pathways to be considered similar 
+\item{perc_analyte_overlap}{Minimum overlap for pathways to be considered similar
 (Default = 50%)}
 
-\item{min_pathway_tocluster}{Minimum number of 'similar' pathways required to start 
+\item{min_pathway_tocluster}{Minimum number of 'similar' pathways required to start
 a cluster (medoid) (Default = 3)}
 
 \item{perc_pathway_overlap}{Minimum overlap for clusters to merge (Default = 50%)}
@@ -24,10 +24,10 @@ a cluster (medoid) (Default = 3)}
 \item{p_cutoff}{Filter pathways to cluster by FDR p value threshold (Default = 0.05)}
 }
 \value{
-a list of clusters identified by the algorithm. Each entry of the list is 
+a list of clusters identified by the algorithm. Each entry of the list is
 a cluster, containing a vector of pathways in the cluster
 }
 \description{
-Perform fuzzy multiple linkage partitioning clustering on pathways identified by 
+Perform fuzzy multiple linkage partitioning clustering on pathways identified by
 Fisher's test
 }
