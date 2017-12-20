@@ -5,19 +5,7 @@ The purpose of RaMP is to provide a publicly available database that integrates 
 Also note that we are working on a server version of RaMP so that users do not have to install anything on their local machines.  Stay tuned!
 
 ## Basic Features:
-The app performs some complex queries (e.g. retrieve allmetabolites and/or genes that belong to a user input pathway or list of pathways).  It also performs pathway enrichment analysis given a list of metabolites and/or genes.
-
-Here are some screenshots to give you an idea.
-
-Front page:
-
-<img src="img/Picture1.png" alt = "FrontPage" width="400"/>
-
-Search WorkFlow:<br/>
-
-<img src="img/Picture2.png" alt = "FrontPage" width="400"/>
-<img src="img/Picture3.png" alt = "FrontPage" width="400"/>
-<img src="img/Picture4.png" alt = "FrontPage" width="400"/>
+The app performs some complex queries (e.g. retrieve all metabolites and/or genes that belong to a user input pathway or list of pathways).  It also performs pathway enrichment analysis given a list of metabolites and/or genes. Run the app to get further details.
 
 ## Installation Instructions
 In order to use the web application, you will need the following:
