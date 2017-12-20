@@ -11,6 +11,9 @@ FilterFishersResults(fishers_df, p_cutoff)
 
 \item{p_cutoff}{p value cutoff determined by the user}
 }
+\value{
+dataframe of fishers results with only significant pathways
+}
 \description{
 Filter pathways by p-value cutoff for display and clustering
 }

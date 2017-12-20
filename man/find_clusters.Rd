@@ -14,12 +14,12 @@ find_clusters(fishers_df, analyte_type, perc_analyte_overlap = 0.5,
 \item{analyte_type}{specify whether to use metabolite or gene pathway overlap matrix}
 
 \item{perc_analyte_overlap}{Minimum overlap for pathways to be considered similar
-(Default = 50%)}
+(Default = 0.5)}
 
 \item{min_pathway_tocluster}{Minimum number of 'similar' pathways required to start
 a cluster (medoid) (Default = 3)}
 
-\item{perc_pathway_overlap}{Minimum overlap for clusters to merge (Default = 50%)}
+\item{perc_pathway_overlap}{Minimum overlap for clusters to merge (Default = 0.5)}
 
 \item{p_cutoff}{Filter pathways to cluster by FDR p value threshold (Default = 0.05)}
 }

@@ -1,6 +1,6 @@
-#' Send query to databases to get metabolites 
+#' Send query to databases to get metabolites
 #'
-#' From user supplied synonym metabolites, it search through whole databases 
+#' From user supplied synonym metabolites, it search through whole databases
 #' , and returns all metabolites which are in the same pathways.
 #'
 #' @param names the string that user defined for given synonym of metablite
@@ -41,7 +41,7 @@ rampGenesFromComp <- function(names, maxItems, geneOrcompound = NULL,conpass=NUL
 }
 
 #' Send query to databases to get metabolites
-#' 
+#'
 #' From given pathway name, it searches through whole databases to find
 #' all metabolites in that pathway.
 #'
@@ -69,9 +69,9 @@ rampNameFromPath <- function(names, maxItems, geneOrCompound,conpass,
         password = conpass,
         dbname = dbname)
 
-      result <- DBI::dbGetQuery(con, paste0("select analytesynonym.Synonym,analytesynonym.geneOrCompound,source.sourceId,source.IDtype 
-                                        from analytesynonym,source where analytesynonym.rampId in 
-                                       (select rampId from analytehaspathway where pathwayRampId in 
+      result <- DBI::dbGetQuery(con, paste0("select analytesynonym.Synonym,analytesynonym.geneOrCompound,source.sourceId,source.IDtype
+                                        from analytesynonym,source where analytesynonym.rampId in
+                                       (select rampId from analytehaspathway where pathwayRampId in
                                        (select pathwayRampId from pathway where pathwayName = \"",
                                         names,"\")) and source.rampId = analytesynonym.rampId and analytesynonym.geneOrCompound = \"",
                                         geneOrCompound,"\" limit ", maxItems,";"))
@@ -81,9 +81,9 @@ rampNameFromPath <- function(names, maxItems, geneOrCompound,conpass,
         password = conpass,
         dbname = dbname)
 
-      result <- DBI::dbGetQuery(con, paste0("select analytesynonym.Synonym,analytesynonym.geneOrCompound,source.sourceId,source.IDtype 
-                                        from analytesynonym,source where analytesynonym.rampId in 
-                                       (select rampId from analytehaspathway where pathwayRampId in 
+      result <- DBI::dbGetQuery(con, paste0("select analytesynonym.Synonym,analytesynonym.geneOrCompound,source.sourceId,source.IDtype
+                                        from analytesynonym,source where analytesynonym.rampId in
+                                       (select rampId from analytehaspathway where pathwayRampId in
                                        (select pathwayRampId from pathway where pathwayName = \"",
                                        names,"\")) and source.rampId = analytesynonym.rampId limit ", maxItems,";"))
    DBI::dbDisconnect(con)
@@ -97,7 +97,7 @@ rampNameFromPath <- function(names, maxItems, geneOrCompound,conpass,
 }
 
 #' Send query to database that find pathway
-#' 
+#'
 #' From given metabolite's synonym, it search through all databases to find
 #' all pathways that have the metabolite.
 #'
@@ -134,7 +134,7 @@ rampPathFromMeta <- function(synonym, maxItems,conpass,
       colnames(query2) <- c(paste0("Search result for ", synonym), "source_id", "source_type")
       container <- rbind(container,query2)
     }
-    
+
     return(container)
 }
 
@@ -171,7 +171,7 @@ rampKWsearch <- function(word, database,conpass,
         dbname = dbname)
 
     query <- paste0("select distinct ", item, " from ", database,
-                    " where (", item, " like \"%", 
+                    " where (", item, " like \"%",
                     word, "%\") order by ",
                     "char_length(",
                     item,"), ",
@@ -184,9 +184,9 @@ rampKWsearch <- function(word, database,conpass,
     return(rampOut)
 }
 
-#' The function send query to databases to find synonym 
-#' 
-#' based on catalyzation relationship. 
+#' The function send query to databases to find synonym
+#'
+#' based on catalyzation relationship.
 #' This function also automate identification about if the given
 #' metabolites is gene or compound
 #'
@@ -223,10 +223,10 @@ rampCataOut <- function(synonym, maxItems = 1000,conpass,
     return(rampOut)
 }
 
-#' The function send query to databases to find ontology or metabolites 
-#' 
-#' Based on ontology relationship, it search throught databases to find 
-#' metabolites or ontology from given name which could be either ontology 
+#' The function send query to databases to find ontology or metabolites
+#'
+#' Based on ontology relationship, it search throught databases to find
+#' metabolites or ontology from given name which could be either ontology
 #' location or metabolite's synonym.
 #'
 #' @param synonym string value that describe given metabolites or ontology
@@ -254,10 +254,10 @@ rampOntoOut <- function(synonym, maxItems) {
 }
 
 #' Kill all databases connection.
-#' 
+#'
 #' If the connections is forgotten to be disconnected, it will cause potential trouble
 #' for further connection.
-#' 
+#'
 killDbConnections <- function() {
     all_cons <- DBI::dbListConnections(RMySQL::MySQL())
 
@@ -267,3 +267,11 @@ killDbConnections <- function() {
     print(paste(length(all_cons), " connections killed."))
 }
 
+#` Load pathway overlap matrices for find_clusters function
+#`
+
+load_overlap_matrices<- function() {
+  load(system.file(package = "RaMP",... = "extdata/gene_overlap_matrix2.RData"))
+  load(system.file(package = "RaMP",... = "extdata/metabolite_overlap_matrix2.RData"))
+  return(list(gene_result2,metabolite_result2))
+}

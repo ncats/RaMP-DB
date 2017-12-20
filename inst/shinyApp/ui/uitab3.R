@@ -11,7 +11,7 @@ tabItem3 <-  shinydashboard::tabItem(
              status = "primary",
              fluidRow(
                column(12,
-                      helpText("Given compound's name, 
+                      helpText("Given compound's name,
                                it returns pathways in which the compound get involved in."),
                       textInput("compName","",placeholder = "Input compound synonym or source"),
                       radioButtons("NameOrId","Search by common names or source IDs?", choices = c(
@@ -102,17 +102,24 @@ tabItem3 <-  shinydashboard::tabItem(
            ), # end fluidRow
           fluidRow(
             shinydashboard::box(
-           	  title="Set Parameters to run Pathway Enrichment Analysis",
+              solidHeader = T,
+              status = "primary",
+           	  title = strong("Set Parameters to run Pathway Enrichment Analysis"),
 	          width = 6,
                   numericInput("pvalue_fisher",
-                        "Select significant level for Fisher Exact Test",
+                        "Select significance threshold for Fisher Exact Test",
                          value = 0.01,
 			 min=0,max=1,
                          width = "80%"),
 		  selectInput("analyte_type", "Type of analyte",
 			choices = c(
-                            "Metabolites" = "metabolites", 
+                            "Metabolites" = "metabolites",
 			    "Genes" = "genes")),
+			h4("Set parameters for functional pathway clustering:"),
+			numericInput("perc_analyte_overlap", "Overlap threshold for pathways to be considered similar (for medoid establishment):",min = 0, max = 1, value = 0.5, step = 0.01),
+			numericInput("min_pathway_tocluster", "Number of similar neighbors required (for medoid establishment):",min = 1, max = 100, value = 3, step = 1),
+			numericInput("perc_pathway_overlap", "Overlap threshold for pathways to be clustered:",min = 0, max = 1, value = 0.5, step = 0.01),
+
 		  #numericInput("total_genes",
 		  #	"Input the total number of genes measured in experiment (to be used as background)",
 		  #	value=20000,
@@ -125,18 +132,27 @@ tabItem3 <-  shinydashboard::tabItem(
                 ),#end of Box
             shinydashboard::box(
                  width = 6,
+                 solidHeader = T,
+                 status = "primary",
 		 title = strong("Summary:"),
 		 p("Significant pathways are returned below and can be downloaded by clicking 'Download Results'"),
 		 p("Note that only pathways that contain at least 2 analytes from the user input will be output"),
                 #textOutput("summary_Fisher"),
 		DT::dataTableOutput("summary_fisher"),
-                 downloadButton("fisher_stats_report",label = "Download Results")		 
+                 downloadButton("fisher_stats_report",label = "Download Results")
               ) #end box
 	  ), # end of fluidRow
 	  fluidRow(
             shinydashboard::box(
-                  title="Results of Pathway Enrichment Analysis",
+                  title=strong("Results of Pathway Enrichment Analysis"),
+                  solidHeader = T,
+                  status = "primary",
                   width = 12,
+                  column(width = 6,
+          selectInput("show_cluster","Display pathways in cluster:",choices = 1),
+          textOutput("cluster_summary_text")
+                  ),
+          column(width = 6,plotOutput("cluster_summary_plot",height = "300px")),
 	    	  DT::dataTableOutput("results_fisher")
 	    ) # end box
           ) # end of fluidRow
