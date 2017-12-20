@@ -346,7 +346,7 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
   #print("Fisher Stats Output has some problems ...")
   rampOut <- total_results_fisher()
   cluster_output <- cluster_output()
-  if(!is.null(rampOut)) {
+  if(!is.null(rampOut)&&length(unique(cluster_output))>1) {
     cluster_assignment<-apply(rampOut,1,function(x){
       pathway<-x[5]
       clusters<-c()
@@ -377,9 +377,12 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
     }
     rampOut<-rampOut[-duplicate_rows,]
     rampOut <- do.call(cbind,rampOut)
-    write.csv(rampOut,file,row.names = FALSE)
   }
-  else{write.csv("No results returned")}
+  if(!is.null(rampOut)){
+  write.csv(rampOut,file,row.names = FALSE)
+  }else{
+    write.csv(c("No significant results"),file,row.names = FALSE)
+  }
 })
 
 
