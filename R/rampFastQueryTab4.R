@@ -44,6 +44,7 @@ rampFastCata <- function(analytes,conpass=NULL,
   df_c <- df_g <- NULL
   mdf_c <- mdf_g <- NULL
   # Process metabolite ids
+  mdf_cfin2 <- mdf_gfin2 <- c()
   if(length(grep("RAMP_C",df1$rampId)!=0)){
     df_c <- df1[grep("RAMP_C",unique(df1$rampId)),]
     print("Get Compound ...")
@@ -66,7 +67,7 @@ rampFastCata <- function(analytes,conpass=NULL,
    DBI::dbDisconnect(con) 
    if(nrow(df_c2) == 0){
       message("No genes found in same reaction")
-      mdf_cfin2 <- c()
+      #mdf_cfin2 <- c()
     } else {
     print("Getting names from gene Id ...")
     analyte2_list <- unique(df_c2$rampId2)
@@ -124,7 +125,7 @@ rampFastCata <- function(analytes,conpass=NULL,
     DBI::dbDisconnect(con)
     if(nrow(df_g2) == 0){
       message("Could not find metabolites in same reaction as input genes")
-      mdf_gfin2=c()
+      #mdf_gfin2=c()
     } else {
     analyte2_list <- df_g2$rampCompoundId
     analyte2_list <- sapply(analyte2_list,shQuote)
