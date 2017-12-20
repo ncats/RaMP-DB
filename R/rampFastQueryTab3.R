@@ -35,7 +35,6 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   list_pid <- sapply(pid,shQuote)
   list_pid <- paste(list_pid,collapse = ",")
 
-
   # Get the total number of metabolites that are mapped to pathways in RaMP (that's the default background)
    query <- "select * from analytehaspathway"
    con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
@@ -54,8 +53,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 	wiki_totanalytes <- react_totanalytes <- kegg_totanalytes <- total_genes
   }
 
-
-  print(paste0("Total metabolites",total_metabolites))
+  print("Calculating p-values for pathways in input")
   # Retrieve the Ramp compound ids associated with the ramp pathway id and count them:
    query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
    list_pid,")")
@@ -87,7 +85,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
  	tot_out_pathway <- total_analytes - tot_in_pathway
 	  # fill the rest of the table out
 	  user_in_pathway <- nrow(pathwaydf[which(pathwaydf$pathwayRampId==i),])
-	  user_out_pathway <- total_analytes - user_in_pathway
+	  user_out_pathway <- length(unique(pathwaydf$rampId)) - user_in_pathway
 	  contingencyTb[1,1] <- tot_in_pathway
 	  contingencyTb[1,2] <- tot_out_pathway
 	  contingencyTb[2,1] <- user_in_pathway
@@ -110,7 +108,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
    pidstorunlist <- sapply(pidstorun,shQuote)
    pidstorunlist <- paste(pidstorunlist,collapse = ",")
 
-      query2 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
+   query2 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
    pidstorunlist,")")
 
    con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
@@ -119,12 +117,39 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
    restcids <- DBI::dbGetQuery(con,query2)#[[1]]
    DBI::dbDisconnect(con)
 
+   query1 <- paste0("select rampId,pathwayRampId from analytehaspathway;")
+
+   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+         password = conpass,
+         dbname = dbname)
+   allcids <- DBI::dbGetQuery(con,query1)#[[1]]
+   DBI::dbDisconnect(con)
+
+   print("Calcullating p-values for all other pathways")
+   # calculating p-values for all other pathways
    for (i in pidstorun) {
-	tot_in_pathway=0
+	user_in_pathway=0
+        curpathcids <- unique(allcids[which(allcids[,"pathwayRampId"]==i),"rampId"])
+        if(analyte_type=="metabolites") {
+                tot_in_pathway <- length(grep("RAMP_C",curpathcids))
+        }else {
+                tot_in_pathway <- length(grep("RAMP_G",curpathcids))
+        }
+        if(allids$type[which(allids$pathwayRampId==i)[1]] == "wiki") {
+                total_analytes <- wiki_totanalytes
+        } else if (allids$type[which(allids$pathwayRampId==i)[1]] == "reactome") {
+                total_analytes <- react_totanalytes
+        } else if (allids$type[which(allids$pathwayRampId==i)[1]] == "kegg") {
+                total_analytes <- kegg_totanalytes
+        } else if (allids$type[which(allids$pathwayRampId==i)[1]] == "hmdb") {
+		total_analytes <- NULL
+	} else {stop("Couldn't find pathway type for current pathway!")}
+	
+	if(is.null(total_analytes)) {next;}
         tot_out_pathway <- total_analytes - tot_in_pathway
           # fill the rest of the table out
-          user_in_pathway <- nrow(pathwaydf[which(pathwaydf$pathwayRampId==i),])
-          user_out_pathway <- total_analytes - user_in_pathway
+          user_out_pathway <- length(unique(pathwaydf$rampId))
+          #user_out_pathway <- total_analytes - user_in_pathway
           contingencyTb[1,1] <- tot_in_pathway
           contingencyTb[1,2] <- tot_out_pathway
           contingencyTb[2,1] <- user_in_pathway
