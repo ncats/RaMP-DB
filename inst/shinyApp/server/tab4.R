@@ -65,7 +65,7 @@ observe({
 })
 
 data_mul_name_tab4 <- eventReactive(input$sub_mul_tab4,{
-  RaMP:::rampFastCata(input$input_mul_tab4,conpass=conpass)
+  RaMP:::rampFastCata(input$input_mul_tab4,conpass=.conpass)
 })
 data_mul_file_tab4 <- eventReactive(input$sub_file_tab4,{
   infile <- input$inp_file_tab4
