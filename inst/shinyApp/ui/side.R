@@ -27,7 +27,7 @@ sideBar <-shinydashboard::dashboardSidebar(
       icon = icon("dashboard")
     ),
     shinydashboard::menuItem(
-      "Return metabolites or genes based on catalyzation",
+      "Return metabolites or genes involved in same reaction",
       tabName = "geneCataComp",
       icon = icon("dashboard")
     ),

@@ -128,7 +128,7 @@ tabItem3 <-  shinydashboard::tabItem(
                   #      "Input the total number of metabolites measured in experiment (to be used as background)",
                   #      value=1000,
                   #      min=1,max=100000,width="80%"),
-		actionButton("runFisher","Run Pathway Enrichment")
+		actionButton("runFisher","Run Pathway Enrichment (please be patient!)")
                 ),#end of Box
             shinydashboard::box(
                  width = 6,

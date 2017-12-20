@@ -36,23 +36,20 @@ tabItem_about <- shinydashboard::tabItem(
                          target = "_blank",
                          "wikipathways"))
         ),
-        p("The imported databases pulls together the information scattered across them 
+        p("RaMP pulls together information from the imported databases 
           -- mainly compounds, genes, pathways, and ontology. The relationship between 
-          metabolites, pathways and ontology are connected by their RaMP ID. Then, user
-          can explore the end from given origins.For example, the current functions
-          for this software include: "),
+          metabolites, pathways and ontology are connected by their internal RaMP ID. 
+          Currently, the following queries are supported through this interface: "),
         tags$ul(
           id = "ramp-function",
-          tags$li("Tab1: Given a metabolite's synonym, it returns all metabolites that 
-                  are involved in same pathway that the metabolite has."),
-          tags$li("Tab2: Given a pathway name, it returns all metabolites' synonyms that have this
-                  pathway"),
-          tags$li("Tab3: Given a metabolite synonym, it returns all pathways that contain this 
-                  metabolite"),
-          tags$li("Tab4: Given a synonym of metabolite, it returns metabolites based on catalyzation
-                  relationship"),
-          tags$li("Tab5: Given a synonym of metabolite or ontology, it returns ontology or metabolite
-                  respectively")
+          tags$li("Tab1: Given one or multiple  pathway names, retrieve all genes and/or
+		metabolites contained in the pathway(s)"),
+          tags$li("Tab2: Given a list of metabolite(s) or gene(s), retrieve all pathways
+		that they are involved in. This tab also support pathway 
+		overrepresentation analysis"),
+          tags$li("Tab3: Given one of multiple metabolite(s) or gene(s), retrieve all 
+		gene(s) or metabolite(s), respectively, that are involved in the sam
+		reaction")
           ),
         p("Based on content of RaMP databases, the overlap under specific condition could be determined 
           and shown in Venn Diagram."),
