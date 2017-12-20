@@ -300,11 +300,13 @@ total_results_fisher <- eventReactive(input$runFisher,{
   }
   data <- fisherTestResultSignificant()
   # Need to remove RaMPID column
+  rampids<-data[,9]
   data<-data[,-9]
+
   cluster_list<-cluster_output()
   if(length(cluster_list)>1){
-    cluster_assignment<-apply(data,1,function(x){
-      pathway<-x[5]
+    cluster_assignment<-sapply(rampids,function(x){
+      pathway<-x
       clusters<-""
       for(i in 1:length(cluster_list)){
         if(pathway %in% cluster_list[[i]]){
@@ -327,7 +329,7 @@ total_results_fisher <- eventReactive(input$runFisher,{
   #data$Adjusted.Pval <- round(data$Adjusted.Pval,8)
   colnames(data_2)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
                       "Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway", "In Cluster")
-  data_2
+  data_2<-cbind(data_2,rampids)
 })
 
 output$results_fisher <- DT::renderDataTable({
@@ -335,11 +337,11 @@ output$results_fisher <- DT::renderDataTable({
   results_fisher<-total_results_fisher()
   cluster_output<-cluster_output()
   if(input$show_cluster=="All"){
-    results_fisher
+    results_fisher[,-10]
   }else if(input$show_cluster=="Did not cluster"){
-    results_fisher[which(results_fisher[,9]=="Did not cluster"),]
+    results_fisher[which(results_fisher[,9]=="Did not cluster"),-10]
   }else{
-    results_fisher[which(results_fisher[,5] %in% cluster_output[[as.numeric(input$show_cluster)]]),]
+    results_fisher[which(results_fisher[,10] %in% cluster_output[[as.numeric(input$show_cluster)]]),-10]
   }
   }else{
     data.frame(rep(NA, times = 9))
@@ -354,7 +356,7 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
   cluster_output <- cluster_output()
   if(!is.null(rampOut)&&length(unique(cluster_output))>1) {
     cluster_assignment<-apply(rampOut,1,function(x){
-      pathway<-x[5]
+      pathway<-x[10]
       clusters<-c()
       for(i in 1:length(cluster_output)){
         if(pathway %in% cluster_output[[i]]){
@@ -363,7 +365,7 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
       }
       return(clusters)
     })
-
+    rampOut<-rampOut[,-10]
     rampOut[,9] <- rep(NA,times = nrow(rampOut))
     colnames(rampOut)[9]<-"In Cluster"
     duplicate_rows<-c()
@@ -383,6 +385,8 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
     }
     rampOut<-rampOut[-duplicate_rows,]
     rampOut <- do.call(cbind,rampOut)
+  }else{
+    rampOut<-rampOut[,-10]
   }
   if(!is.null(rampOut)){
     rampOut<-rampOut[order(rampOut[,"Source DB"]),]
