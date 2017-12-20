@@ -244,13 +244,21 @@ output$summary_fisher <- DT::renderDataTable({
 },rownames=FALSE,filter="top")
 
 fisherTestResultSignificant<-eventReactive(input$runFisher,{
-  FilterFishersResults(fisherTestResult(),p_holmadj_cutoff=as.numeric(input$holmcutoff))
+  result<-FilterFishersResults(fisherTestResult(),p_holmadj_cutoff=as.numeric(input$p_holmadj_cutoff))
+  print(paste0(nrow(result)," significant pathways identified"))
+  result
 })
 
 cluster_output<-eventReactive(input$runFisher,{
   data <- fisherTestResultSignificant()
-  RaMP::find_clusters(data,input$analyte_type, as.numeric(input$perc_analyte_overlap), as.numeric(input$min_pathway_tocluster),
-                      as.numeric(input$perc_pathway_overlap),p_cutoff = as.numeric(input$pvalue_fisher))
+  out<-RaMP::find_clusters(data,input$analyte_type, as.numeric(input$perc_analyte_overlap), as.numeric(input$min_pathway_tocluster),
+                      as.numeric(input$perc_pathway_overlap),p_cutoff = as.numeric(input$p_holmadj_cutoff))
+  if(length(unique(out))>1){
+    print(paste0(length(out)," clusters found"))
+  }else{
+    print("Clustering failed")
+  }
+  out
 })
 
 output$cluster_summary_text<-renderText(
@@ -281,7 +289,9 @@ output$cluster_summary_plot<-renderPlot(
 
 observe({
   updateSelectInput(session,"show_cluster","Display pathways in cluster:",
-                    choices = as.vector(na.exclude(c("All",ifelse(length(unique(cluster_output()))>1,1:length(cluster_output()),NA),"Did not cluster"),selected = "All")))
+                    #choices = as.vector(na.exclude(c("All",ifelse(length(unique(cluster_output()))>1,1:length(cluster_output()),NA),"Did not cluster"),selected = "All")))
+                    #choices = c("All",1:length(cluster_output()),"Did not cluster"),selected = "All")
+                    choices = as.vector(na.exclude(c("All",ifelse(unique(cluster_output())!="Did not cluster",1:length(cluster_output()),NA),"Did not cluster"),selected = "All")))
 })
 
 total_results_fisher <- eventReactive(input$runFisher,{
@@ -299,7 +309,8 @@ total_results_fisher <- eventReactive(input$runFisher,{
           clusters<-paste0(clusters,i,sep = ", ",collapse = ", ")
         }
       }
-      if(clusters!=""&&length(unique(clusters))>1){
+      if(clusters!=""){
+        #&&length(unique(clusters))>1
         clusters=substr(clusters,1,nchar(clusters)-2)
       }else{
         clusters = "Did not cluster"
@@ -348,7 +359,7 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
     })
 
     rampOut[,9] <- rep(NA,times = nrow(rampOut))
-    colnames(rampOut)[9]<-"In cluster"
+    colnames(rampOut)[9]<-"In Cluster"
     duplicate_rows<-c()
     for(i in 1:nrow(rampOut)){
       if(is.null(cluster_assignment[[i]])){
