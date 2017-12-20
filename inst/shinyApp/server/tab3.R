@@ -244,7 +244,7 @@ output$summary_fisher <- DT::renderDataTable({
 },rownames=FALSE,filter="top")
 
 fisherTestResultSignificant<-eventReactive(input$runFisher,{
-  result<-FilterFishersResults(fisherTestResult(),p_holmadj_cutoff=as.numeric(input$p_holmadj_cutoff))
+  result<-FilterFishersResults(fisherTestResult(),p_fdradj_cutoff=as.numeric(input$p_fdradj_cutoff))
   print(paste0(nrow(result)," significant pathways identified"))
   result
 })
@@ -252,7 +252,7 @@ fisherTestResultSignificant<-eventReactive(input$runFisher,{
 cluster_output<-eventReactive(input$runFisher,{
   data <- fisherTestResultSignificant()
   out<-RaMP::find_clusters(data,input$analyte_type, as.numeric(input$perc_analyte_overlap), as.numeric(input$min_pathway_tocluster),
-                      as.numeric(input$perc_pathway_overlap),p_cutoff = as.numeric(input$p_holmadj_cutoff))
+                      as.numeric(input$perc_pathway_overlap),p_cutoff = as.numeric(input$p_fdradj_cutoff))
   if(length(unique(out))>1){
     print(paste0(length(out)," clusters found"))
   }else{
@@ -299,6 +299,8 @@ total_results_fisher <- eventReactive(input$runFisher,{
     data <- data.frame(Query=NA,Freq=NA)
   }
   data <- fisherTestResultSignificant()
+  # Need to remove RaMPID column
+  data<-data[,-9]
   cluster_list<-cluster_output()
   if(length(cluster_list)>1){
     cluster_assignment<-apply(data,1,function(x){
@@ -329,6 +331,7 @@ total_results_fisher <- eventReactive(input$runFisher,{
 })
 
 output$results_fisher <- DT::renderDataTable({
+  if(!is.null(total_results_fisher)){
   results_fisher<-total_results_fisher()
   cluster_output<-cluster_output()
   if(input$show_cluster=="All"){
@@ -337,6 +340,9 @@ output$results_fisher <- DT::renderDataTable({
     results_fisher[which(results_fisher[,9]=="Did not cluster"),]
   }else{
     results_fisher[which(results_fisher[,5] %in% cluster_output[[as.numeric(input$show_cluster)]]),]
+  }
+  }else{
+    data.frame(rep(NA, times = 9))
   }
 },rownames = FALSE,filter = "top")
 

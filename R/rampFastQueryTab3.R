@@ -149,7 +149,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
         } else if (allids$type[which(allids$pathwayRampId==i)[1]] == "hmdb") {
 		total_analytes <- NULL
 	} else {stop("Couldn't find pathway type for current pathway!")}
-	
+
 	if(is.null(total_analytes)) {next;}
         tot_out_pathway <- total_analytes - tot_in_pathway
           # fill the rest of the table out
@@ -423,7 +423,7 @@ find_clusters <- function(fishers_df,analyte_type,perc_analyte_overlap = 0.5,
   } else if(analyte_type=="genes"){
     similarity_matrix = similarity_matrix_list[[1]]
   }
-  pathway_list<-fishers_df[,5]
+  pathway_list<-fishers_df[,9]
   pathway_list<-pathway_list[which(fishers_df[,4] < p_cutoff)]
 
   pathway_indices<-match(pathway_list,rownames(similarity_matrix))
@@ -519,7 +519,7 @@ FilterFishersResults<-function(fishers_df,p_holmadj_cutoff=NULL,p_fdradj_cutoff=
 	} else if (!is.null(p_fdradj_cutoff)) {
 		return(fishers_df[which(fishers_df[,"FDR.Adjusted.Pval"] < p_fdradj_cutoff),])
 	} else {
-		stop("Please set a cutoff for Holm Adjusted pvalues (p_holmadj_cutoff paramter) or FDR Adjusted pvalues 
+		stop("Please set a cutoff for Holm Adjusted pvalues (p_holmadj_cutoff paramter) or FDR Adjusted pvalues
 			(p_fdradj_cutoff)")
 	}
 }
