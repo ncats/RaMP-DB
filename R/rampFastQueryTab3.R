@@ -413,7 +413,8 @@ find_clusters <- function(fishers_df,analyte_type,perc_analyte_overlap = 0.5,
   }
 
   if(length(unmerged_clusters)==0){
-    stop("No medoids found, make perc_analyte_overlap or min_pathway_tocluster smaller")
+    #stop("No medoids found, make perc_analyte_overlap or min_pathway_tocluster smaller")
+    return(rep("Did not cluster",times = nrow(fishers_df)))
   }
 
   # Evaluate similarity between clusters
@@ -460,11 +461,13 @@ find_clusters <- function(fishers_df,analyte_type,perc_analyte_overlap = 0.5,
     }
 
     if(nrow(cluster_similarity)==1){
-      stop("Clusters converged, use larger perc_pathway_overlap")
+      #stop("Clusters converged, use larger perc_pathway_overlap")
+      return(rep(1,times = nrow(fishers_df)))
     }
     count = count + 1
     if(count == length(unmerged_clusters)+1){
-      stop("ERROR: while loop failed to terminate")
+      #stop("ERROR: while loop failed to terminate")
+      return(rep(1,times = nrow(fishers_df)))
     }
   }
   colnames(cluster_similarity) = rownames(cluster_similarity) = paste0("cluster_",c(1:length(cluster_list)))
@@ -477,5 +480,5 @@ find_clusters <- function(fishers_df,analyte_type,perc_analyte_overlap = 0.5,
 #' @return dataframe of fishers results with only significant pathways
 #' @export
 FilterFishersResults<-function(fishers_df,p_cutoff){
-  return(fishers_df[which(fishers_df[,4] < p_cutoff)])
+  return(fishers_df[which(fishers_df[,4] < p_cutoff),])
 }

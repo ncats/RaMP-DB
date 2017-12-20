@@ -7,9 +7,9 @@ dataInput_name <- eventReactive(input$submit_compName,{
   progress$set(message = "Querying databases to find pathways ...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
 
-      rampOut <- RaMP::rampFastPathFromMeta(analytes=input$KW_synonym,
-                NameOrIds=input$NameOrId,
-                conpass=.conpass)
+  rampOut <- RaMP::rampFastPathFromMeta(analytes=input$KW_synonym,
+                                        NameOrIds=input$NameOrId,
+                                        conpass=.conpass)
   progress$inc(0.7,detail = paste("Done!"))
   return (rampOut)
 })
@@ -17,7 +17,7 @@ dataInput_name <- eventReactive(input$submit_compName,{
 summary_path_out<- eventReactive(input$submit_compName,{
   if (!is.null(nrow(dataInput_name()))){
     return (paste0("There are ",nrow(dataInput_name())," pathways returned for ",
-	input$KW_synonym))
+                   input$KW_synonym))
   } else{
     return ("Given metabolites have no search result.")
   }
@@ -28,21 +28,21 @@ output$summary_path <- renderText({
 })
 
 observe({
-   if(input$NameOrId == "names"){
-  choices <- kw_analyte[grepl(input$compName,kw_analyte,ignore.case=TRUE)]
-  choices <- choices[order(nchar(choices),choices)]
-  if(is.null(choices))
-    return(NULL)
-  if(length(choices) >10 ){
-    choices <- choices[1:10]
-  }
-  isolate({
-    updateSelectInput(session, "KW_synonym",
-                      label = "Select from the list",
-                      choices = choices, selected = head(choices,1)
-    )
+  if(input$NameOrId == "names"){
+    choices <- kw_analyte[grepl(input$compName,kw_analyte,ignore.case=TRUE)]
+    choices <- choices[order(nchar(choices),choices)]
+    if(is.null(choices))
+      return(NULL)
+    if(length(choices) >10 ){
+      choices <- choices[1:10]
+    }
+    isolate({
+      updateSelectInput(session, "KW_synonym",
+                        label = "Select from the list",
+                        choices = choices, selected = head(choices,1)
+      )
     })
-   } else if (input$NameOrId == "ids"){
+  } else if (input$NameOrId == "ids"){
     choices <- kw_source[grepl(input$compName,kw_source,fixed = T)]
     choices <- choices[order(nchar(choices),choices)]
     if(is.null(choices))
@@ -107,8 +107,8 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
   parsedinput <- paste(strsplit(input$input_mul_tab3,"\n")[[1]])
   print(parsedinput)
   RaMP::rampFastPathFromMeta(analytes=parsedinput,
-	NameOrIds=input$NameOrSourcemult,
-	conpass=.conpass)
+                             NameOrIds=input$NameOrSourcemult,
+                             conpass=.conpass)
 })
 
 
@@ -138,11 +138,11 @@ output$tab3_mul_report <- downloadHandler(filename = function(){
 content = function(file) {
   if (rea_detector$num == 1){
     rampOut <- data_mul_name()[,c("pathwayName","pathwaysourceId",
-		"pathwaysource","commonName")]
+                                  "pathwaysource","commonName")]
     #colnames(rampOut)[4] <- "Analyte"
   } else if (rea_detector$num == 2){
     rampOut <- data_mul_file()[,c("pathwayName","pathwaysourceId",
-                "pathwaysource","commonName")]
+                                  "pathwaysource","commonName")]
     #colnames(rampOut)[4] <- "Analyte"
   }
   write.csv(rampOut,file,row.names = FALSE)
@@ -151,7 +151,7 @@ content = function(file) {
 
 output$summary_mulpath_out<- DT::renderDataTable({
   if(is.null(data_mul_name())) {
-	out <- data.frame(Query=NA,Freq=NA)
+    out <- data.frame(Query=NA,Freq=NA)
   }
   else {
     temp <- data_mul_name()
@@ -166,11 +166,11 @@ output$preview_multi_names <- DT::renderDataTable({
     return("Waiting for input")
 
   if(rea_detector$num == 1){
-      tb <- data_mul_name()[,c("pathwayName","pathwaysourceId",
-                "pathwaysource","commonName")]
+    tb <- data_mul_name()[,c("pathwayName","pathwaysourceId",
+                             "pathwaysource","commonName")]
   } else if (rea_detector$num == 2) {
-      tb <- data_mul_file()[,c("pathwayName","pathwaysourceId",
-                "pathwaysource","commonName")]
+    tb <- data_mul_file()[,c("pathwayName","pathwaysourceId",
+                             "pathwaysource","commonName")]
   }
   #colnames(tb)[4]="Analyte"
   tb
@@ -209,10 +209,10 @@ output$preview_multi_names <- DT::renderDataTable({
 #  if (is.null(input$hcClicked))
 #    return("Click plots for fisher test...")
 
-  # stats <- fisher_result_tab3()
-  #
-  # display <- data.frame("Stats result" = c(stats[[input$hcClicked$name]]$p.value,
-  #                                                stats[[input$hcClicked$name]]$method))
+# stats <- fisher_result_tab3()
+#
+# display <- data.frame("Stats result" = c(stats[[input$hcClicked$name]]$p.value,
+#                                                stats[[input$hcClicked$name]]$method))
 #  stats <- fisher_result_bar()
 #  display <- data.frame("Stats Result" = c(paste0("p-value:",stats$p.value),
 #                                           paste0("Method: Fisher Exact Test")))
@@ -225,7 +225,7 @@ output$preview_multi_names <- DT::renderDataTable({
 fisherTestResult <- eventReactive(input$runFisher,{
   print("Generating fisher test result...")
   out <- RaMP::runFisherTest(req(data_mul_name()),analyte_type=input$analyte_type,
-        conpass=.conpass)
+                             conpass=.conpass)
   print("Results generated")
   print(paste0("Fisher results size:",nrow(out)))
   out
@@ -234,27 +234,62 @@ fisherTestResult <- eventReactive(input$runFisher,{
 
 output$summary_fisher <- DT::renderDataTable({
   if(!is.null(fisherTestResult())) {
-	data <- fisherTestResult()
-  	out=as.data.frame(table(data$pathwaysource))
-	colnames(out)[1]="Pathway_Source"
+    data <- fisherTestResult()
+    out=as.data.frame(table(data$pathwaysource))
+    colnames(out)[1]="Pathway_Source"
   } else {
-	out <- data.frame(Pathway_Source=NA, Freq=NA)
+    out <- data.frame(Pathway_Source=NA, Freq=NA)
   }
   out
-  },rownames=FALSE,filter="top")
+},rownames=FALSE,filter="top")
 
-output$results_fisher <- DT::renderDataTable({
-  if(is.null(fisherTestResult())) {
-        data <- data.frame(Query=NA,Freq=NA)
+fisherTestResultSignificant<-eventReactive(input$runFisher,{
+  FilterFishersResults(fisherTestResult(),as.numeric(input$pvalue_fisher))
+})
+
+cluster_output<-eventReactive(input$runFisher,{
+  data <- fisherTestResultSignificant()
+  RaMP::find_clusters(data,input$analyte_type, as.numeric(input$perc_analyte_overlap), as.numeric(input$min_pathway_tocluster),
+                      as.numeric(input$perc_pathway_overlap),p_cutoff = as.numeric(input$pvalue_fisher))
+})
+
+output$cluster_summary_text<-renderText(
+  if(!is.null(cluster_output())){
+    paste0("Fuzzy clustering identified ",length(cluster_output()), " distinct cluster(s) of pathways")
   }
-  data <- fisherTestResult()
-  cluster_output<-RaMP::find_clusters(data,input$analyte_type, p_cutoff = as.numeric(input$pvalue_fisher))
-  #if(length(cluster_output)>1){
+)
+
+output$cluster_summary_plot<-renderPlot(
+  if(!is.null(cluster_output())){
+    data<-as.numeric(lapply(cluster_output(),length))
+    ylim<-c(0, 1.1*max(data))
+    xx<- barplot(data, xaxt = 'n', xlab = '', width = 0.85, ylim = ylim, yaxt = 'n',
+                 col = "steelblue")
+    text(x = xx, y = data, label = data, pos = 3, cex = 0.8)
+    axis(1, at=xx, labels=c(1:length(cluster_output())))
+    #axis(4, at=c(1,round(max(data)/2),max(data)))
+    title("Pathways per cluster", xlab="Cluster #")
+    #mtext("# Pathways", side=4, line=-1.5)
+  }
+)
+
+observe({
+  updateSelectInput(session,"show_cluster","Display pathways in cluster:",
+                    choices = c("All",1:length(cluster_output()),"Did not cluster"),selected = "All")
+})
+
+total_results_fisher <- eventReactive(input$runFisher,{
+  if(is.null(fisherTestResult())) {
+    data <- data.frame(Query=NA,Freq=NA)
+  }
+  data <- fisherTestResultSignificant()
+  cluster_list<-cluster_output()
+  if(length(cluster_list)>1){
     cluster_assignment<-apply(data,1,function(x){
       pathway<-x[5]
       clusters<-""
-      for(i in 1:length(cluster_output)){
-        if(pathway %in% cluster_output[[i]]){
+      for(i in 1:length(cluster_list)){
+        if(pathway %in% cluster_list[[i]]){
           clusters<-paste0(clusters,i,sep = ", ",collapse = ", ")
         }
       }
@@ -266,22 +301,66 @@ output$results_fisher <- DT::renderDataTable({
       return(clusters)
     })
     data_2<-cbind(data,cluster_assignment)
-  #}
+  } else{
+    data_2<-cbind(data,rep(1,times=nrow(data)))
+  }
   #data$Pval <- round(data$Pval,8)
   #data$Adjusted.Pval <- round(data$Adjusted.Pval,8)
   data_2
+})
+
+output$results_fisher <- DT::renderDataTable({
+  results_fisher<-total_results_fisher()
+  cluster_output<-cluster_output()
+  if(input$show_cluster=="All"){
+    results_fisher
+  }else if(input$show_cluster=="Did not cluster"){
+    results_fisher[which(results_fisher[,9]=="Did not cluster"),]
+  }else{
+    results_fisher[which(results_fisher[,5] %in% cluster_output[[as.numeric(input$show_cluster)]]),]
+  }
 },rownames = FALSE,filter = "top")
 
 output$fisher_stats_report <- downloadHandler(filename = function(){
   return("fisherText.csv")
 },content = function(file){
   #print("Fisher Stats Output has some problems ...")
-  rampOut <- fisherTestResult()
+  rampOut <- total_results_fisher()
+  cluster_output <- cluster_output()
   if(!is.null(rampOut)) {
-  	rampOut <- do.call(cbind,rampOut)
-  	write.csv(rampOut,file,row.names = FALSE)
-   }
-   else{write.csv("No results returned")}
+    cluster_assignment<-apply(rampOut,1,function(x){
+      pathway<-x[5]
+      clusters<-c()
+      for(i in 1:length(cluster_output)){
+        if(pathway %in% cluster_output[[i]]){
+          clusters<-c(clusters,i)
+        }
+      }
+      return(clusters)
+    })
+
+    rampOut[,9] <- rep(NA,times = nrow(rampOut))
+    colnames(rampOut)[9]<-"In cluster"
+    duplicate_rows<-c()
+    for(i in 1:nrow(rampOut)){
+      if(is.null(cluster_assignment[[i]])){
+        rampOut[i,9]="Did not cluster"
+      } else if(length(cluster_assignment[[i]])>1){
+        duplicate_rows<-c(duplicate_rows,i)
+        for(j in cluster_assignment[[i]]){
+          new_row<-c(rampOut[i,1:8],j)
+          names(new_row)<-colnames(rampOut)
+          rampOut<-rbind(rampOut,new_row)
+        }
+      }else{
+        rampOut[i,9]=cluster_assignment[[i]]
+      }
+    }
+    rampOut<-rampOut[-duplicate_rows,]
+    rampOut <- do.call(cbind,rampOut)
+    write.csv(rampOut,file,row.names = FALSE)
+  }
+  else{write.csv("No results returned")}
 })
 
 
