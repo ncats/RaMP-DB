@@ -68,16 +68,16 @@ tabItem2<-  shinydashboard::tabItem(
                         textAreaInput("input_mul_tab2",label = "",
                                       placeholder = "Input list of metabolites in lines or separated by \",\""),
                         actionButton("sub_mul_tab2",label = "Submit")
-                    ),
-                    shinydashboard::box(
-                      width = 6,
-                      title = strong("Upload the file"),
-                      fileInput("inp_file_tab2",label = "",
-                                multiple = FALSE,
-                                accept = c("text/csv","text/comma-separated-values,/text/plain",".csv",".txt"),
-                                buttonLabel = "Browse..."),
-                      actionButton("sub_file_tab2",label = "Submit")
                     )
+#                    shinydashboard::box(
+#                      width = 6,
+#                      title = strong("Upload the file"),
+#                      fileInput("inp_file_tab2",label = "",
+#                                multiple = FALSE,
+#                                accept = c("text/csv","text/comma-separated-values,/text/plain",".csv",".txt"),
+#                                buttonLabel = "Browse..."),
+#                      actionButton("sub_file_tab2",label = "Submit")
+#                    )
                   ),
                   hr(),
                   fluidRow(
