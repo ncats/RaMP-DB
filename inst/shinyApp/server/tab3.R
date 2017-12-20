@@ -244,7 +244,7 @@ output$summary_fisher <- DT::renderDataTable({
 },rownames=FALSE,filter="top")
 
 fisherTestResultSignificant<-eventReactive(input$runFisher,{
-  FilterFishersResults(fisherTestResult(),as.numeric(input$pvalue_fisher))
+  FilterFishersResults(fisherTestResult(),p_holmadj_cutoff=as.numeric(input$holmcutoff))
 })
 
 cluster_output<-eventReactive(input$runFisher,{
