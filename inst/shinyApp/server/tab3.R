@@ -379,6 +379,7 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
     rampOut <- do.call(cbind,rampOut)
   }
   if(!is.null(rampOut)){
+    rampOut<-rampOut[order(rampOut[,"Source DB"]),]
   write.csv(rampOut,file,row.names = FALSE)
   }else{
     write.csv(c("No significant results"),file,row.names = FALSE)
