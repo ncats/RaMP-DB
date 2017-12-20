@@ -68,14 +68,14 @@ tabItem3 <-  shinydashboard::tabItem(
                         "Names" = "names", "Source ID" = "ids"
                       ),selected = "ids"),
                  actionButton("sub_mul_tab3",label = "Submit"),
-		 br(),
-                 br(),
-		 h4("Upload file, one analyte per line"),
-                 fileInput("inp_file_tab3",label = "",
-                         multiple = TRUE,
-                         accept = c("text/csv","text/comma-separated-values,/text/plain",".csv",".txt"),
-                         buttonLabel = "Browse..."),
-                 actionButton("sub_file_tab3",label = "Upload")
+		 br()
+#                 br(),
+#		 h4("Upload file, one analyte per line"),
+#                 fileInput("inp_file_tab3",label = "",
+#                         multiple = TRUE,
+#                         accept = c("text/csv","text/comma-separated-values,/text/plain",".csv",".txt"),
+#                         buttonLabel = "Browse..."),
+#                 actionButton("sub_file_tab3",label = "Upload")
              ), # end box
              shinydashboard::box(width = 6,
                  title = strong("Summary:"),

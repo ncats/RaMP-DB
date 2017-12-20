@@ -61,18 +61,18 @@ tabItem4<-  shinydashboard::tabItem(
                  textAreaInput("input_mul_tab4",label = "",
                                placeholder = "Input list of metabolites or gene, one per line"),
                  actionButton("sub_mul_tab4",label = "Submit")
-             ),
-             shinydashboard::box(
-               width = 6,
-               title = strong("Upload File"),
-               solidHeader = T,
-               status = "primary",
-               fileInput("inp_file_tab4",label = "",
-                         multiple = FALSE,
-                         accept = c("text/csv","text/comma-separated-values,/text/plain",".csv",".txt"),
-                         buttonLabel = "Browse..."),
-               actionButton("sub_file_tab4",label = "Upload File and Run Query")
              )
+#             shinydashboard::box(
+#               width = 6,
+#               title = strong("Upload File"),
+#               solidHeader = T,
+#               status = "primary",
+#               fileInput("inp_file_tab4",label = "",
+#                         multiple = FALSE,
+#                         accept = c("text/csv","text/comma-separated-values,/text/plain",".csv",".txt"),
+#                         buttonLabel = "Browse..."),
+#               actionButton("sub_file_tab4",label = "Upload File and Run Query")
+#             )
            ),
            hr(),
            fluidRow(

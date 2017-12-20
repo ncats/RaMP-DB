@@ -163,7 +163,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
           pval <- c(pval,result$p.value )
           userinpath<-c(userinpath,user_in_pathway)
           totinpath<-c(totinpath,tot_in_pathway)
-          pidused <- c(pidused,i)
+         # pidused <- c(pidused,i)
   } # end for loop
 
   fdr <- stats::p.adjust(pval,method="fdr")
@@ -171,7 +171,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   print(paste0("Calculated p-values for ",length(pval)," pathways"))
 
   # format output (retrieve pathway name for each unique source id first
-  out <- data.frame(pathwayRampId=pidused, Pval=pval,FDR.Adjusted.Pval=fdr,
+  out <- data.frame(pathwayRampId=c(pidused,pidstorun), Pval=pval,FDR.Adjusted.Pval=fdr,
 	Holm.Adjusted.Pval=holm,
 	Num_In_Path=userinpath,Total_In_Path=totinpath)
   out2 <- merge(out,pathwaydf[,c("pathwayName","pathwayRampId","pathwaysourceId",
