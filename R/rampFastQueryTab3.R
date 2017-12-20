@@ -175,11 +175,11 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 	Holm.Adjusted.Pval=holm,
 	Num_In_Path=userinpath,Total_In_Path=totinpath)
   out2 <- merge(out,pathwaydf[,c("pathwayName","pathwayRampId","pathwaysourceId",
-	"pathwaysource")],
+	"pathwaysource","pathwayRampId")],
 	by="pathwayRampId",all.x=TRUE)
   finout <- out2[,c("pathwayName", "Pval", "FDR.Adjusted.Pval",
 	"Holm.Adjusted.Pval","pathwaysourceId",
-	"pathwaysource","Num_In_Path","Total_In_Path")]
+	"pathwaysource","Num_In_Path","Total_In_Path","pathwayRampId")]
   finout=finout[!duplicated(finout),]
 
   return(finout[which(finout$Num_In_Path>=min_analyte),])
