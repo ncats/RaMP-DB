@@ -14,6 +14,7 @@
 runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
                               analyte_type="metabolites",min_analyte=2,conpass=NULL,
                               dbname="ramp",username="root"){
+    now <- proc.time()
   print("Fisher Testing ......")
   if(is.null(conpass)) {
     stop("Please define the password for the mysql connection")
@@ -98,7 +99,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   } # end for loop
 
   # Now run fisher's tests for all other pids
-   query <- "select distinct(pathwayRampId) from analytehaspathway"
+   query <- "select distinct(pathwayRampId) from analytehaspathway where type != 'hmdb';"
    con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
          password = conpass,
          dbname = dbname)
@@ -125,9 +126,13 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
    allcids <- DBI::dbGetQuery(con,query1)#[[1]]
    DBI::dbDisconnect(con)
 
-   print("Calcullating p-values for all other pathways")
+   print("Calculating p-values for all other pathways")
+   print(paste0(length(pidstorun),"pathways"))
    # calculating p-values for all other pathways
+   count=1;
    for (i in pidstorun) {
+	if(( count %% 100) ==0) {print(paste0("Processed ",count))}
+	count=count+1
 	user_in_pathway=0
         curpathcids <- unique(allcids[which(allcids[,"pathwayRampId"]==i),"rampId"])
         if(analyte_type=="metabolites") {
