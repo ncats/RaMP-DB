@@ -10,7 +10,7 @@
 #' }
 #' @export
 runRaMPapp <- function(conpass = NULL) {
- 
+  .conpass <- con <- c() 
   if(is.null(conpass)) {
         stop("Please define the password for the mysql connection")
   }

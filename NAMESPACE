@@ -3,6 +3,7 @@
 export(FilterFishersResults)
 export(connectToRaMP)
 export(find_clusters)
+export(rampFastCata)
 export(rampFastMetaFromPath)
 export(rampFastPathFromMeta)
 export(rampImportDumpFile)

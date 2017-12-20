@@ -136,8 +136,8 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
           pidused <- c(pidused,i)
   } # end for loop
 
-  fdr <- p.adjust(pval,method="fdr")
-  holm <- p.adjust(pval,method="holm")
+  fdr <- stats::p.adjust(pval,method="fdr")
+  holm <- stats::p.adjust(pval,method="holm")
   print(paste0("Calculated p-values for ",length(pval)," pathways"))
 
   # format output (retrieve pathway name for each unique source id first
@@ -303,8 +303,8 @@ rampFileOfPathways <- function(infile,NameOrIds="ids",
         summary <- rbind(summary,rampOut[[i]])
       } else {
         rampOut <- readLines(infile[[i,'datapath']])
-        summary <- RaMP:::rampFastPathFromMeta(rampOut,NameOrIds=NameOrIds,
-		conpass=.conpass,username=username,dbname=dbname
+        summary <- RaMP::rampFastPathFromMeta(rampOut,NameOrIds=NameOrIds,
+		conpass=conpass,username=username,dbname=dbname
 		)
       }
     }

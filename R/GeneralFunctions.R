@@ -269,8 +269,8 @@ killDbConnections <- function() {
 
 #` Load pathway overlap matrices for find_clusters function
 #`
-
 load_overlap_matrices<- function() {
+  gene_result2 <- metabolite_result2 <- c()
   load(system.file(package = "RaMP",... = "extdata/gene_overlap_matrix2.RData"))
   load(system.file(package = "RaMP",... = "extdata/metabolite_overlap_matrix2.RData"))
   return(list(gene_result2,metabolite_result2))

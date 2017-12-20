@@ -2,18 +2,33 @@
 % Please edit documentation in R/rampFastQueryTab4.R
 \name{rampFileOfAnalytes_tab4}
 \alias{rampFileOfAnalytes_tab4}
-\title{Generate data.frame from given files}
+\title{Return analytes that has catalyzation relation with given list of analytes}
 \usage{
-rampFileOfAnalytes_tab4(infile)
+rampFileOfAnalytes_tab4(infile, conpass = NULL, dbname = "ramp",
+  username = "root")
 }
 \arguments{
 \item{infile}{a file object given from files}
+
+\item{conpass}{password for database access (string)}
+
+\item{dbname}{name of the mysql database (default is "ramp")}
+
+\item{username}{username for database access (default is "root")}
+
+\item{analytes}{string or data.frame contains given analyte}
+
+\item{con}{a connection object returned from the function connectToRaMP()}
 }
 \value{
-a data.frame either from multiple csv file
-or search through by a txt file.
-}
-\description{
+a data.frame that contains search results
+Generate data.frame from given files
+
 identifing the file type, then it returns table output to 
 shiny renderTable function as preview of searching data
+
+a data.frame either from multiple csv file
+}
+\description{
+Return analytes that has catalyzation relation with given list of analytes
 }

@@ -115,8 +115,9 @@ rampFastMetaFromPath_InputFile <- function(infile,conpass=NULL,
   summary <- data.frame(pathway  = character(0),id = character(0),
                         source = character(0),metabolite = character(0))
   rampOut <- list()
-  for (i in 1:length(infile[,1])){
-      rampOut <- readLines(infile[[i,'datapath']])
+ for (i in 1:length(infile[,1])){
+     rampOut <- readLines(infile[[i,'datapath']])
+      rampOut <- readLines(infile)
       summary <- rampFastMetaFromPath(rampOut,conpass=conpass)
   }
   return(summary)

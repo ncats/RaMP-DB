@@ -7,15 +7,16 @@ dataInput_cata <- eventReactive(input$subText_cata,{
   progress$inc(0.3,detail = paste("Send Query ..."))
   
   # rampOut <- rampCataOut(input$KW_cata, 99999)
-  rampOut <- RaMP:::rampFastOneCata(input$KW_cata)
+  rampOut <- RaMP:::rampFastCata(input$KW_cata,conpass=.conpass)
   progress$inc(0.7,detail = paste("Done!"))
-  return (rampOut[,1:4])
+  return (rampOut)
 })
+
 summary_cata_out<- eventReactive(input$subText_cata,{
   if (!is.null(nrow(dataInput_cata()))){
-    return (paste0("There are(is) ",nrow(dataInput_cata())," relevent items in databases."))
+    return (paste0("There are(is) ",nrow(dataInput_cata())," are in the same reaction as input"))
   } else{
-    return ("Given metabolites have no search result.")
+    return ("Input analyte are not involved in any reactions.")
   }
 })
 
@@ -25,15 +26,6 @@ output$summary_cata <- renderText({
 
 
 observe({
-  # x <- rampKWsearch(input$CataInput, "analytesynonym")
-  # if (is.null(x)) {
-  #   x <- character(0)
-  # } else {
-  #   x <- as.matrix(x)
-  #   x <- matrix(x, ncol = ncol(x), dimnames = NULL)
-  # }
-  # 
-  # updateSelectInput(session, "KW_cata", label = "Select from the list", choices = x, selected = head(x,1))
   choices <- kw_analyte[grepl(input$CataInput,kw_analyte,ignore.case=TRUE)]
   choices <- choices[order(nchar(choices),choices)]
   if(is.null(choices))
@@ -58,20 +50,7 @@ output$report_cata <- downloadHandler(filename = function() {
 }, content = function(file) {
   rampOut <- dataInput_cata()
   rampOut <- data.frame(rampOut)
-  write.csv(rampOut, file, row.names = FALSE, sep = ",")
-})
-
-output$preview_tab4 <- renderUI({
-  input$subText_cata
-  
-  isolate({
-    rampout <- dataInput_cata()
-    if(length(rampout) == 0){
-      return(HTML("<strong> No Summary due to small dataset</strong>"))
-    }
-    tables <- RaMP:::rampTablize(rampout)
-    return(div(HTML(unlist(tables)),class = "shiny-html-output"))
-  })
+  write.csv(rampOut, file, row.names = FALSE)
 })
 
 
@@ -84,20 +63,22 @@ observe({
   
   detector_tab4$num <- 1
 })
+
 data_mul_name_tab4 <- eventReactive(input$sub_mul_tab4,{
-  RaMP:::rampFastMulCata(input$input_mul_tab4)
+  RaMP:::rampFastCata(input$input_mul_tab4,conpass=conpass)
 })
 data_mul_file_tab4 <- eventReactive(input$sub_file_tab4,{
   infile <- input$inp_file_tab4
+  print(paste0("Input file is ",infile))
   if (is.null(infile))
     return(NULL)
   
-  rampOut <- RaMP:::rampFileOfAnalytes_tab4(infile)
+  rampOut <- RaMP:::rampFileOfAnalytes_tab4(infile,conpass=.conpass)
   
 })
+
 observe({
   input$sub_file_tab4
-  
   detector_tab4$num <- 2
 })
 

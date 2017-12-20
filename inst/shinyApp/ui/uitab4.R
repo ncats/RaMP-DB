@@ -27,12 +27,12 @@ tabItem4<-  shinydashboard::tabItem(
                       status = "primary",
                       fluidRow(
                         div(style = "margin:25px;",
-                            downloadButton("report_cata","Generate Report"),
+                            downloadButton("report_cata","Download Results"),
                             hr(),
                             textOutput("summary_cata"),
                             div(style = "height:300px;overflow-x:auto;overflow-y:auto;",
-                                helpText("Preview of output only display first 20 items."),
-                                DT::dataTableOutput("result_cata")
+                                helpText("Preview of output only display first 20 items.")
+                                # DT::dataTableOutput("result_cata")
                             )
                         )
                         
@@ -47,7 +47,8 @@ tabItem4<-  shinydashboard::tabItem(
                       collapsible = T,
                       collapsed = F,
                       title = strong("Summary"),
-                      uiOutput("preview_tab4")
+		      DT::dataTableOutput("result_cata")
+                      #uiOutput("preview_tab4")
                     )
          )),
          shiny::tabPanel(
@@ -58,19 +59,19 @@ tabItem4<-  shinydashboard::tabItem(
                  status = "primary",
                  title = strong("Input a list of gene or metabolites:"),
                  textAreaInput("input_mul_tab4",label = "",
-                               placeholder = "Input list of metabolites or gene in lines or separated by \",\""),
+                               placeholder = "Input list of metabolites or gene, one per line"),
                  actionButton("sub_mul_tab4",label = "Submit")
              ),
              shinydashboard::box(
                width = 6,
-               title = strong("Upload the file"),
+               title = strong("Upload File"),
                solidHeader = T,
                status = "primary",
                fileInput("inp_file_tab4",label = "",
                          multiple = FALSE,
                          accept = c("text/csv","text/comma-separated-values,/text/plain",".csv",".txt"),
                          buttonLabel = "Browse..."),
-               actionButton("sub_file_tab4",label = "Upload")
+               actionButton("sub_file_tab4",label = "Upload File and Run Query")
              )
            ),
            hr(),
@@ -80,7 +81,7 @@ tabItem4<-  shinydashboard::tabItem(
                  title = strong("Data preview"),
                  solidHeader = T,
                  status = "primary",
-                 downloadButton("tab4_mul_report",label = "Download Table"),
+                 downloadButton("tab4_mul_report",label = "Download Results"),
                  hr(),
                  DT::dataTableOutput("preview_multi_names_tab4"),
                  highcharter::highchartOutput("tab4_hc_output")
