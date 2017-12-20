@@ -2,7 +2,7 @@
 % Please edit documentation in R/rampFastQueryTab4.R
 \name{rampFileOfAnalytes_tab4}
 \alias{rampFileOfAnalytes_tab4}
-\title{Return analytes that has catalyzation relation with given list of analytes}
+\title{Generate data.frame from given files}
 \usage{
 rampFileOfAnalytes_tab4(infile, conpass = NULL, dbname = "ramp",
   username = "root")
@@ -17,14 +17,9 @@ rampFileOfAnalytes_tab4(infile, conpass = NULL, dbname = "ramp",
 \item{username}{username for database access (default is "root")}
 }
 \value{
-a data.frame that contains search results
-Generate data.frame from given files
-
-identifing the file type, then it returns table output to 
-shiny renderTable function as preview of searching data
-
 a data.frame either from multiple csv file
 }
 \description{
-Return analytes that has catalyzation relation with given list of analytes
+identifing the file type, then it returns table output to 
+shiny renderTable function as preview of searching data
 }
