@@ -15,10 +15,6 @@ rampFileOfAnalytes_tab4(infile, conpass = NULL, dbname = "ramp",
 \item{dbname}{name of the mysql database (default is "ramp")}
 
 \item{username}{username for database access (default is "root")}
-
-\item{analytes}{string or data.frame contains given analyte}
-
-\item{con}{a connection object returned from the function connectToRaMP()}
 }
 \value{
 a data.frame that contains search results
