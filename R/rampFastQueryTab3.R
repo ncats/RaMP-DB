@@ -424,7 +424,7 @@ find_clusters <- function(fishers_df,analyte_type,perc_analyte_overlap = 0.5,
     similarity_matrix = similarity_matrix_list[[1]]
   }
   pathway_list<-fishers_df[,9]
-  pathway_list<-pathway_list[which(fishers_df[,4] < p_cutoff)]
+  #pathway_list<-pathway_list[which(fishers_df[,4] < p_cutoff)]
 
   pathway_indices<-match(pathway_list,rownames(similarity_matrix))
 
