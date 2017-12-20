@@ -254,13 +254,19 @@ cluster_output<-eventReactive(input$runFisher,{
 })
 
 output$cluster_summary_text<-renderText(
-  if(!is.null(cluster_output())){
+  if(as.numeric(input$perc_analyte_overlap) <= 0 || as.numeric(input$perc_analyte_overlap) >= 1 || as.numeric(input$perc_pathway_overlap) <= 0 || as.numeric(input$perc_pathway_overlap) >= 1){
+   print("Clustering warning: overlap thresholds must be a percentage greater than 0 and less than 1!")
+  }else if(!is.null(cluster_output())){
+    if(length(unique(cluster_output()))>1){
     paste0("Fuzzy clustering identified ",length(cluster_output()), " distinct cluster(s) of pathways")
+    }else{
+      print("Fuzzy clustering algorithm did not identify any clusters. Less stringent thresholds may help in identification, or there may not be enough pathways to cluster.")
+    }
   }
 )
 
 output$cluster_summary_plot<-renderPlot(
-  if(!is.null(cluster_output())){
+  if(!is.null(cluster_output())&&length(unique(cluster_output()))>1){
     data<-as.numeric(lapply(cluster_output(),length))
     ylim<-c(0, 1.1*max(data))
     xx<- barplot(data, xaxt = 'n', xlab = '', width = 0.85, ylim = ylim, yaxt = 'n',
@@ -275,7 +281,7 @@ output$cluster_summary_plot<-renderPlot(
 
 observe({
   updateSelectInput(session,"show_cluster","Display pathways in cluster:",
-                    choices = c("All",1:length(cluster_output()),"Did not cluster"),selected = "All")
+                    choices = as.vector(na.exclude(c("All",ifelse(length(unique(cluster_output()))>1,1:length(cluster_output()),NA),"Did not cluster"),selected = "All")))
 })
 
 total_results_fisher <- eventReactive(input$runFisher,{
@@ -293,7 +299,7 @@ total_results_fisher <- eventReactive(input$runFisher,{
           clusters<-paste0(clusters,i,sep = ", ",collapse = ", ")
         }
       }
-      if(clusters!=""){
+      if(clusters!=""&&length(unique(clusters))>1){
         clusters=substr(clusters,1,nchar(clusters)-2)
       }else{
         clusters = "Did not cluster"
@@ -302,10 +308,12 @@ total_results_fisher <- eventReactive(input$runFisher,{
     })
     data_2<-cbind(data,cluster_assignment)
   } else{
-    data_2<-cbind(data,rep(1,times=nrow(data)))
+    data_2<-cbind(data,rep("Did not cluster",times=nrow(data)))
   }
   #data$Pval <- round(data$Pval,8)
   #data$Adjusted.Pval <- round(data$Adjusted.Pval,8)
+  colnames(data_2)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
+                      "Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway", "In Cluster")
   data_2
 })
 
