@@ -244,23 +244,37 @@ output$summary_fisher <- DT::renderDataTable({
 },rownames=FALSE,filter="top")
 
 fisherTestResultSignificant<-eventReactive(input$runFisher,{
-  FilterFishersResults(fisherTestResult(),p_holmadj_cutoff=as.numeric(input$holmcutoff))
+  result<-FilterFishersResults(fisherTestResult(),p_holmadj_cutoff=as.numeric(input$p_holmadj_cutoff))
+  print(paste0(nrow(result)," significant pathways identified"))
+  result
 })
 
 cluster_output<-eventReactive(input$runFisher,{
   data <- fisherTestResultSignificant()
-  RaMP::find_clusters(data,input$analyte_type, as.numeric(input$perc_analyte_overlap), as.numeric(input$min_pathway_tocluster),
-                      as.numeric(input$perc_pathway_overlap),p_cutoff = as.numeric(input$pvalue_fisher))
+  out<-RaMP::find_clusters(data,input$analyte_type, as.numeric(input$perc_analyte_overlap), as.numeric(input$min_pathway_tocluster),
+                      as.numeric(input$perc_pathway_overlap),p_cutoff = as.numeric(input$p_holmadj_cutoff))
+  if(length(unique(out))>1){
+    print(paste0(length(out)," clusters found"))
+  }else{
+    print("Clustering failed")
+  }
+  out
 })
 
 output$cluster_summary_text<-renderText(
-  if(!is.null(cluster_output())){
+  if(as.numeric(input$perc_analyte_overlap) <= 0 || as.numeric(input$perc_analyte_overlap) >= 1 || as.numeric(input$perc_pathway_overlap) <= 0 || as.numeric(input$perc_pathway_overlap) >= 1){
+   print("Clustering warning: overlap thresholds must be a percentage greater than 0 and less than 1!")
+  }else if(!is.null(cluster_output())){
+    if(length(unique(cluster_output()))>1){
     paste0("Fuzzy clustering identified ",length(cluster_output()), " distinct cluster(s) of pathways")
+    }else{
+      print("Fuzzy clustering algorithm did not identify any clusters. Less stringent thresholds may help in identification, or there may not be enough pathways to cluster.")
+    }
   }
 )
 
 output$cluster_summary_plot<-renderPlot(
-  if(!is.null(cluster_output())){
+  if(!is.null(cluster_output())&&length(unique(cluster_output()))>1){
     data<-as.numeric(lapply(cluster_output(),length))
     ylim<-c(0, 1.1*max(data))
     xx<- barplot(data, xaxt = 'n', xlab = '', width = 0.85, ylim = ylim, yaxt = 'n',
@@ -275,7 +289,9 @@ output$cluster_summary_plot<-renderPlot(
 
 observe({
   updateSelectInput(session,"show_cluster","Display pathways in cluster:",
-                    choices = c("All",1:length(cluster_output()),"Did not cluster"),selected = "All")
+                    #choices = as.vector(na.exclude(c("All",ifelse(length(unique(cluster_output()))>1,1:length(cluster_output()),NA),"Did not cluster"),selected = "All")))
+                    #choices = c("All",1:length(cluster_output()),"Did not cluster"),selected = "All")
+                    choices = as.vector(na.exclude(c("All",ifelse(unique(cluster_output())!="Did not cluster",1:length(cluster_output()),NA),"Did not cluster"),selected = "All")))
 })
 
 total_results_fisher <- eventReactive(input$runFisher,{
@@ -294,6 +310,7 @@ total_results_fisher <- eventReactive(input$runFisher,{
         }
       }
       if(clusters!=""){
+        #&&length(unique(clusters))>1
         clusters=substr(clusters,1,nchar(clusters)-2)
       }else{
         clusters = "Did not cluster"
@@ -302,10 +319,12 @@ total_results_fisher <- eventReactive(input$runFisher,{
     })
     data_2<-cbind(data,cluster_assignment)
   } else{
-    data_2<-cbind(data,rep(1,times=nrow(data)))
+    data_2<-cbind(data,rep("Did not cluster",times=nrow(data)))
   }
   #data$Pval <- round(data$Pval,8)
   #data$Adjusted.Pval <- round(data$Adjusted.Pval,8)
+  colnames(data_2)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
+                      "Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway", "In Cluster")
   data_2
 })
 
@@ -327,7 +346,7 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
   #print("Fisher Stats Output has some problems ...")
   rampOut <- total_results_fisher()
   cluster_output <- cluster_output()
-  if(!is.null(rampOut)) {
+  if(!is.null(rampOut)&&length(unique(cluster_output))>1) {
     cluster_assignment<-apply(rampOut,1,function(x){
       pathway<-x[5]
       clusters<-c()
@@ -340,7 +359,7 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
     })
 
     rampOut[,9] <- rep(NA,times = nrow(rampOut))
-    colnames(rampOut)[9]<-"In cluster"
+    colnames(rampOut)[9]<-"In Cluster"
     duplicate_rows<-c()
     for(i in 1:nrow(rampOut)){
       if(is.null(cluster_assignment[[i]])){
@@ -358,9 +377,13 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
     }
     rampOut<-rampOut[-duplicate_rows,]
     rampOut <- do.call(cbind,rampOut)
-    write.csv(rampOut,file,row.names = FALSE)
   }
-  else{write.csv("No results returned")}
+  if(!is.null(rampOut)){
+    rampOut<-rampOut[order(rampOut[,"Source DB"]),]
+  write.csv(rampOut,file,row.names = FALSE)
+  }else{
+    write.csv(c("No significant results"),file,row.names = FALSE)
+  }
 })
 
 

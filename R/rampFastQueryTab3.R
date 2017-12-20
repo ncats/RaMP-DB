@@ -384,6 +384,9 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
 #' @export
 find_clusters <- function(fishers_df,analyte_type,perc_analyte_overlap = 0.5,
 	min_pathway_tocluster = 3,perc_pathway_overlap = 0.5,p_cutoff=0.05){
+  if(perc_analyte_overlap <= 0 || perc_analyte_overlap >= 1 || perc_pathway_overlap <= 0 || perc_pathway_overlap >= 1){
+    return(NULL)
+  }
   similarity_matrix_list<-load_overlap_matrices()
   if(analyte_type=="metabolites"){
     similarity_matrix = similarity_matrix_list[[2]]
