@@ -118,7 +118,7 @@ tabItem3 <-  shinydashboard::tabItem(
 			h4("Set parameters for functional pathway clustering:"),
 			numericInput("perc_analyte_overlap", "Overlap threshold (0-1) for pathways to be considered similar (for medoid establishment):",min = 0.01, max = 1, value = 0.2, step = 0.01),
 			numericInput("min_pathway_tocluster", "Number of similar neighbors required (for medoid establishment):",min = 1, max = 100, value = 2, step = 1),
-			numericInput("perc_pathway_overlap", "Overlap threshold (0-1) for pathways to be clustered:",min = 0.01, max = 1, value = 0.2, step = 0.01),
+			numericInput("perc_pathway_overlap", "Overlap threshold (0-1) for pathways to be clustered:",min = 0.01, max = 1, value = 0.75, step = 0.01),
 
 		  #numericInput("total_genes",
 		  #	"Input the total number of genes measured in experiment (to be used as background)",
