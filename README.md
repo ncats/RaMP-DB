@@ -64,7 +64,7 @@ You can install this package directly from GitHub using the install_github() fun
 ```R
 install.packages(“devtools”)
 library(devtools)
-install_github("Bofei5675/RaMP2")
+install_github("mathelab/RAMP-DB")
 # Load the package
 library(RaMP)
 ```
