@@ -1,16 +1,20 @@
 # RaMP - Relational Database of Metabolomic Pathways
 
-The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene biological pathways from multiple sources. Currently, we have integrated information from HMDB, KEGG, Reactome, and WikiPathways. The relational structure of RaMP enables complex and batch queries.  To facilitate its usage, we have created this R shiny web application that includes a user-friendly R Shiny web application.  Please note that this project is in continuous development and we certainly appreciate your feedback (through our GitHub site at (https://github.com/Mathelab/RaMP-DB](https://github.com/Mathelab/RaMP-DB].  
+The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene biological pathways from multiple sources. Currently, we have integrated information from HMDB, KEGG, Reactome, and WikiPathways. The relational structure of RaMP enables complex and batch queries.  To facilitate its usage, we have created this R shiny web application that includes a user-friendly R Shiny web application.  Please note that this project is in continuous development and we certainly appreciate your feedback (through our GitHub site at (https://github.com/Mathelab/RaMP-DB](https://github.com/Mathelab/RaMP-DB]. 
 
 Also note that we are working on a server version of RaMP so that users do not have to install anything on their local machines.  Stay tuned!
 
 ## Basic Features:
 The app performs some complex queries (e.g. retrieve all metabolites and/or genes that belong to a user input pathway or list of pathways).  It also performs pathway enrichment analysis given a list of metabolites and/or genes. Run the app to get further details.
 
+Last date of dump file update: 12/17/2017
+
 ## Installation Instructions
 In order to use the web application, you will need the following:
 * The R code under this repo
 * The mysql dump file that contains the RaMP database (in the folder inst/extdata/)
+
+If you would like to know how to build RaMP database from scratch, please check another GitHub site at [RaMP-BackEnd](https://github.com/Mathelab/RaMP-BackEnd)
 
 ### MySQL set-up
 RaMP requires that MySQL and the RaMP database be set up on the machine that you will be running the app from.
