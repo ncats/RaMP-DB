@@ -1,6 +1,6 @@
 # RaMP - Relational Database of Metabolomic Pathways
 
-The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene biological pathways from multiple sources. Currently, we have integrated information from HMDB, KEGG, Reactome, and WikiPathways. The relational structure of RaMP enables complex and batch queries.  To facilitate its usage, we have created this R shiny web application that includes a user-friendly R Shiny web application.  Please note that this project is in continuous development and we certainly appreciate your feedback (through our GitHub site at [https://github.com/Mathelab/RaMP-DB](https://github.com/Mathelab/RaMP-DB). 
+The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene biological pathways from multiple sources. Currently, we have integrated information from HMDB, KEGG, Reactome, and WikiPathways. The relational structure of RaMP enables complex and batch queries.  To facilitate its usage, we have created this R shiny web application that includes a user-friendly R Shiny web application.  Please note that this project is in continuous development and we certainly appreciate your feedback (through [our](https://github.com/Mathelab/RaMP-DB) GitHub site). 
 
 Also note that we are working on a server version of RaMP so that users do not have to install anything on their local machines.  Stay tuned!
 
