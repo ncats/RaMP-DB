@@ -5,7 +5,7 @@
 \title{Fast search given a list of metabolites source Id}
 \usage{
 rampFastPathFromSource(sourceid, find_synonym = FALSE, conpass = NULL,
-  dbname = "ramp", username = "root")
+  dbname = "ramp", username = "root", host = "localhost")
 }
 \arguments{
 \item{sourceid}{a vector of synonym that need to be searched}

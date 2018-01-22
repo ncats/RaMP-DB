@@ -9,10 +9,13 @@
 #' runRaMPapp(con=con)
 #' }
 #' @export
-runRaMPapp <- function(conpass = NULL) {
-  .conpass <- con <- c() 
+runRaMPapp <- function(conpass = NULL,host = NULL) {
+  .conpass <- .host <- con <- c() 
   if(is.null(conpass)) {
         stop("Please define the password for the mysql connection")
+  }
+  if(is.null(host)){
+    host <- "localhost"
   }
 
   appDir <- system.file("shinyApp",package = "RaMP")
@@ -22,7 +25,9 @@ runRaMPapp <- function(conpass = NULL) {
   }
   # Make conpass a global variable so that it can be accessed by the shinyApp:
   .GlobalEnv$.conpass <- conpass
+  .GlobalEnv$.host <- host
    on.exit(rm(.conpass, envir=.GlobalEnv))
+   on.exit(rm(.host,envir = .GlobalEnv))
   shiny::runApp(appDir,display.mode = "normal")
   
 }

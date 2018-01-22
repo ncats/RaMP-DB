@@ -6,7 +6,7 @@
 The rampId can be plugged in other functions to continue query}
 \usage{
 rampFindSourceRampId(sourceId, conpass = NULL, dbname = "ramp",
-  username = "root")
+  username = "root", host = "localhost")
 }
 \arguments{
 \item{sourceId}{a data frame or string separated by comma or string 

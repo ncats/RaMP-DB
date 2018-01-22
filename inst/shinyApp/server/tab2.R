@@ -7,7 +7,7 @@ dataInput_path <- eventReactive(input$subText2,{
   progress$set(message = "Querying databases to find metabolites ...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
   
-  rampOut <- RaMP::rampFastMetaFromPath(input$KW_path,conpass=.conpass)
+  rampOut <- RaMP::rampFastMetaFromPath(input$KW_path,conpass=.conpass,host = .host)
   print(dim(rampOut))
   print(input$KW_path)
   print(input$geneOrComp2)
@@ -85,14 +85,14 @@ observe({
 data_mul_name_tab2 <- eventReactive(input$sub_mul_tab2,{
   if(is.null(input$sub_mul_tab2))
     return(NULL)
-  RaMP::rampFastMetaFromPath(input$input_mul_tab2,conpass=.conpass)
+  RaMP::rampFastMetaFromPath(input$input_mul_tab2,conpass=.conpass,host = .host)
 })
 data_mul_file_tab2 <- eventReactive(input$sub_file_tab2,{
   infile <- input$inp_file_tab2
   if (is.null(infile))
     return(NULL)
   
-  RaMP:::rampFastMetaFromPath_InputFile(infile,conpass=.conpass)
+  RaMP:::rampFastMetaFromPath_InputFile(infile,conpass=.conpass,host = .host)
 })
 
 

@@ -12,7 +12,7 @@
 connectToRaMP <- function(dbname = "ramp",
                        username = "root",
                        conpass = NULL,
-                       host = NULL){
+                       host ="localhost"){
 #                       update = FALSE){
   
   if(is.null(conpass)) {
@@ -23,7 +23,8 @@ connectToRaMP <- function(dbname = "ramp",
     drv = RMySQL::MySQL(),
     dbname = dbname,
     username = username,
-    password = conpass
+    password = conpass,
+    host = host
   )
  return(con) 
 }

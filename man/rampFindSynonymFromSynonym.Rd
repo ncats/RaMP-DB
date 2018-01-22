@@ -8,7 +8,8 @@ Now, this function only format the user input, so the user vector, dataframe,
 and entire string separated by comma are working.}
 \usage{
 rampFindSynonymFromSynonym(synonym, full = FALSE, find_synonym = FALSE,
-  conpass = NULL, dbname = "ramp", username = "root")
+  conpass = NULL, dbname = "ramp", username = "root",
+  host = "localhost")
 }
 \arguments{
 \item{synonym}{name to search for}

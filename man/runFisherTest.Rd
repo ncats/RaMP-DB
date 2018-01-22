@@ -7,7 +7,7 @@ clicked on highchart}
 \usage{
 runFisherTest(pathwaydf, total_metabolites = NULL, total_genes = 20000,
   analyte_type = "metabolites", min_analyte = 2, conpass = NULL,
-  dbname = "ramp", username = "root")
+  dbname = "ramp", username = "root", host = "localhost")
 }
 \arguments{
 \item{pathwaydf}{a data frame resulting from rampFastPathFromMeta}
