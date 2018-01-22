@@ -4,7 +4,8 @@
 \alias{rampFastCata}
 \title{Return analytes that has catalyzation relation with given analyte}
 \usage{
-rampFastCata(analytes, conpass = NULL, dbname = "ramp", username = "root")
+rampFastCata(analytes, conpass = NULL, dbname = "ramp", username = "root",
+  host = "localhost")
 }
 \arguments{
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}

@@ -5,7 +5,7 @@
 \title{Connect to RaMP database (requires mysql password when running locally)}
 \usage{
 connectToRaMP(dbname = "ramp", username = "root", conpass = NULL,
-  host = NULL)
+  host = "localhost")
 }
 \arguments{
 \item{dbname}{the name of the database (by default a string that is database name including all tables}

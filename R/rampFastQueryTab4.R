@@ -7,7 +7,8 @@
 #' @return a data.frame that contains search results
 #' @export
 rampFastCata <- function(analytes,conpass=NULL,
-	dbname="ramp",username="root") {
+	dbname="ramp",username="root",
+	host = "localhost") {
   if(is.null(conpass)) {
     stop("Please define the password for the mysql connection")
   }
@@ -34,7 +35,8 @@ rampFastCata <- function(analytes,conpass=NULL,
    # Retrieve RaMP analyte ids 
    con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
          password = conpass,
-         dbname = dbname)
+         dbname = dbname,
+         host = host)
   query1 <- paste0("select Synonym as analyte1,rampId,geneOrCompound as type1 from analytesynonym where Synonym in (",
                    list_metabolite,");")
   df1<- DBI::dbGetQuery(con,query1)
@@ -62,7 +64,8 @@ rampFastCata <- function(analytes,conpass=NULL,
     print("Geting gene Id from Compound Id ...")
        con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
          password = conpass,
-         dbname = dbname)
+         dbname = dbname,
+         host = host)
     df_c2 <- DBI::dbGetQuery(con,query_c)
    DBI::dbDisconnect(con) 
    if(nrow(df_c2) == 0){
@@ -78,7 +81,8 @@ rampFastCata <- function(analytes,conpass=NULL,
              where rampId in (",analyte2_list,");")
     con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
          password = conpass,
-         dbname = dbname)
+         dbname = dbname,
+         host = host)
     df_c3 <- DBI::dbGetQuery(con,query2)
     DBI::dbDisconnect(con)
 
@@ -120,7 +124,8 @@ rampFastCata <- function(analytes,conpass=NULL,
 
     con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
        password = conpass,
-       dbname = dbname)
+       dbname = dbname,
+       host = host)
     df_g2 <- DBI::dbGetQuery(con,query_g)
     DBI::dbDisconnect(con)
     if(nrow(df_g2) == 0){

@@ -5,7 +5,7 @@
 \title{Generate data.frame from given files}
 \usage{
 rampFileOfPathways(infile, NameOrIds = "ids", conpass = NULL,
-  dbname = "ramp", username = "root")
+  dbname = "ramp", username = "root", host = "localhost")
 }
 \arguments{
 \item{infile}{a file object given from files}

@@ -6,7 +6,8 @@
 returns associated pathways}
 \usage{
 rampFastPathFromMeta(analytes, find_synonym = FALSE, conpass = NULL,
-  dbname = "ramp", username = "root", NameOrIds = "ids")
+  host = "localhost", dbname = "ramp", username = "root",
+  NameOrIds = "ids")
 }
 \arguments{
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}

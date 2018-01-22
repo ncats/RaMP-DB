@@ -4,6 +4,7 @@
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
+#' @param host host name for database access (default is "localhost")
 #' @return a data.frame that contains all search results
 #' @examples
 #' \dontrun{
@@ -12,7 +13,7 @@
 #' }
 #' @export
 rampFastMetaFromPath <- function(pathway,conpass=NULL,
-	dbname="ramp",username="root"){
+	dbname="ramp",username="root",host = "localhost"){
 
   if(is.null(conpass)) {
         stop("Please define the password for the mysql connection")
@@ -38,7 +39,8 @@ rampFastMetaFromPath <- function(pathway,conpass=NULL,
   list_pathway <- sapply(list_pathway,shQuote)
   list_pathway <- paste(list_pathway,collapse = ",")
   # Retrieve pathway RaMP id
-  con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
+  con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass,
+                       host = host)
   query1 <- paste0("select * from pathway where pathwayName
                    in (",list_pathway,");")
   
@@ -52,7 +54,8 @@ rampFastMetaFromPath <- function(pathway,conpass=NULL,
   query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where 
                    pathwayRampId in (select pathwayRampId from pathway where 
                    pathwayName in (",list_pathway,"));")
-  con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass) 
+  con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass,
+                       host = host) 
   df2 <- DBI::dbGetQuery(con,query2)
   DBI::dbDisconnect(con)
   cid_list <- unlist(df2[,2])
@@ -61,7 +64,8 @@ rampFastMetaFromPath <- function(pathway,conpass=NULL,
 
   # Retrieve all common name from compounds associated with RaMP compound ids (query2)
   query3 <- paste0("select * from source where rampId in (",cid_list,");")
-  con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
+  con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass,
+                       host = host)
   df3 <- DBI::dbGetQuery(con,query3)
   DBI::dbDisconnect(con)
 
@@ -110,7 +114,7 @@ rampFastMetaFromPath <- function(pathway,conpass=NULL,
 #' @return a data.frame either from multiple csv file
 #' or search through by a txt file.
 rampFastMetaFromPath_InputFile <- function(infile,conpass=NULL,
-	dbname="ramp",username="root"){
+	dbname="ramp",username="root",host = "localhost"){
   name <- infile[[1,'name']]
   summary <- data.frame(pathway  = character(0),id = character(0),
                         source = character(0),metabolite = character(0))
@@ -118,7 +122,7 @@ rampFastMetaFromPath_InputFile <- function(infile,conpass=NULL,
  for (i in 1:length(infile[,1])){
      rampOut <- readLines(infile[[i,'datapath']])
       rampOut <- readLines(infile)
-      summary <- rampFastMetaFromPath(rampOut,conpass=conpass)
+      summary <- rampFastMetaFromPath(rampOut,conpass=conpass,host = host)
   }
   return(summary)
 }

@@ -5,7 +5,7 @@
 \title{Use fast search algorithm to find all pathways from given analytes}
 \usage{
 rampFastMetaFromPath(pathway, conpass = NULL, dbname = "ramp",
-  username = "root")
+  username = "root", host = "localhost")
 }
 \arguments{
 \item{pathway}{a string or a data.fram that contains all pathways}
@@ -15,6 +15,8 @@ rampFastMetaFromPath(pathway, conpass = NULL, dbname = "ramp",
 \item{dbname}{name of the mysql database (default is "ramp")}
 
 \item{username}{username for database access (default is "root")}
+
+\item{host}{host name for database access (default is "localhost")}
 }
 \value{
 a data.frame that contains all search results

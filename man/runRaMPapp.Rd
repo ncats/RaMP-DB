@@ -4,7 +4,7 @@
 \alias{runRaMPapp}
 \title{Run Shiny App}
 \usage{
-runRaMPapp(conpass = NULL)
+runRaMPapp(conpass = NULL, host = NULL)
 }
 \arguments{
 \item{conpass}{password for database access (string)}

@@ -5,7 +5,7 @@
 \title{Generate data.frame that has all search results from given files}
 \usage{
 rampFastMetaFromPath_InputFile(infile, conpass = NULL, dbname = "ramp",
-  username = "root")
+  username = "root", host = "localhost")
 }
 \arguments{
 \item{infile}{a file object given from files}

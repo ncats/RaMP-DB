@@ -13,7 +13,8 @@
 #' @export
 runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
                               analyte_type="metabolites",min_analyte=2,conpass=NULL,
-                              dbname="ramp",username="root"){
+                              dbname="ramp",username="root",
+                          host = "localhost"){
     now <- proc.time()
   print("Fisher Testing ......")
   if(is.null(conpass)) {
@@ -40,7 +41,8 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
    query <- "select * from analytehaspathway"
    con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
          password = conpass,
-         dbname = dbname)
+         dbname = dbname,
+         host = host)
    allids <- DBI::dbGetQuery(con,query)
    DBI::dbDisconnect(con)
    allids <- allids[!duplicated(allids),]
@@ -61,7 +63,8 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
    con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
          password = conpass,
-         dbname = dbname)
+         dbname = dbname,
+         host = host)
    cids <- DBI::dbGetQuery(con,query1)#[[1]]
    DBI::dbDisconnect(con)
 
@@ -102,7 +105,8 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
    query <- "select distinct(pathwayRampId) from analytehaspathway where type != 'hmdb';"
    con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
          password = conpass,
-         dbname = dbname)
+         dbname = dbname,
+         host = host)
    allpids <- DBI::dbGetQuery(con,query)
    DBI::dbDisconnect(con)
    pidstorun <- setdiff(allpids[,1],pid)
@@ -114,7 +118,8 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
    con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
          password = conpass,
-         dbname = dbname)
+         dbname = dbname,
+         host = host)
    restcids <- DBI::dbGetQuery(con,query2)#[[1]]
    DBI::dbDisconnect(con)
 
@@ -122,7 +127,8 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
    con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
          password = conpass,
-         dbname = dbname)
+         dbname = dbname,
+         host = host)
    allcids <- DBI::dbGetQuery(con,query1)#[[1]]
    DBI::dbDisconnect(con)
 
@@ -220,6 +226,7 @@ rampGenerateBarPlot <- function(df){
 rampFastPathFromMeta<- function(analytes,
 	find_synonym = FALSE,
 	conpass=NULL,
+	host = "localhost",
 	dbname="ramp",
 	username="root",
 	NameOrIds = "ids"){
@@ -267,7 +274,7 @@ rampFastPathFromMeta<- function(analytes,
     query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where
                       rampId in (",
                      list_metabolite,");")
-    con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
+    con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
     df2 <- DBI::dbGetQuery(con,query2)
     DBI::dbDisconnect(con)
   pathid_list <- df2$pathwayRampId
@@ -289,7 +296,7 @@ rampFastPathFromMeta<- function(analytes,
      list_analytes <- paste(list_analytes,collapse = ",")
   query4 <-paste0("select sourceId,commonName,rampId from source where sourceId in (",list_analytes,");")
 
-  con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
+  con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
   df4 <- DBI::dbGetQuery(con,query4)
   DBI::dbDisconnect(con)
   mdf <- merge(mdf,df4,,all.x = T,by.y = "rampId")
@@ -318,7 +325,8 @@ rampFastPathFromMeta<- function(analytes,
 rampFileOfPathways <- function(infile,NameOrIds="ids",
 	conpass=NULL,
 	dbname="ramp",
-	username="root"){
+	username="root",
+	host = "localhost"){
   name <- infile[[1,'name']]
     summary <- data.frame(pathway  = character(0),id = character(0),
                           source = character(0),metabolite = character(0))
@@ -334,7 +342,8 @@ rampFileOfPathways <- function(infile,NameOrIds="ids",
       } else {
         rampOut <- readLines(infile[[i,'datapath']])
         summary <- RaMP::rampFastPathFromMeta(rampOut,NameOrIds=NameOrIds,
-		conpass=conpass,username=username,dbname=dbname
+		conpass=conpass,username=username,dbname=dbname,
+		host = host
 		)
       }
     }

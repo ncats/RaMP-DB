@@ -10,7 +10,8 @@
 #' @param username username for database access (default is "root")
 #' as input (there are some common synonyms that will mess up whole searching)
 rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
-	find_synonym = FALSE,conpass=NULL,dbname="ramp",username="root"){
+	find_synonym = FALSE,conpass=NULL,dbname="ramp",username="root",
+	host = "localhost"){
   if(is.null(conpass)) {
         stop("Please define the password for the mysql connection")
   }
@@ -41,7 +42,8 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
                     ");")
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
-        dbname = dbname)
+        dbname = dbname,
+        host = host)
 
     df1 <- DBI::dbGetQuery(con,query)
     DBI::dbDisconnect(con)
@@ -55,7 +57,8 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
                   ");")
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
-        dbname = dbname)
+        dbname = dbname,
+        host = host)
 
   df1 <- DBI::dbGetQuery(con,query)
   DBI::dbDisconnect(con)  
@@ -65,7 +68,8 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
   query <- paste0("select * from analyteSynonym where rampId in(",rampid,");")
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
-	dbname = dbname)
+	      dbname = dbname,
+        host = host)
   df2 <- DBI::dbGetQuery(con,query)
   DBI::dbDisconnect(con)
   df2 <- merge(df1,df2)
@@ -84,7 +88,8 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
 #' @param username username for database access (default is "root")
 #' @param full return whole searching result or not (TRUE/FALSE)
 rampFindSourceFromId <- function(rampId=NULL,full = TRUE,
-	conpass=NULL,dbname="ramp",username="root"){
+	conpass=NULL,dbname="ramp",username="root",
+	host = "localhost"){
   if(is.null(conpass)) {
         stop("Please define the password for the mysql connection")
   }
@@ -112,7 +117,8 @@ rampFindSourceFromId <- function(rampId=NULL,full = TRUE,
 
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
-        dbname = dbname)
+        dbname = dbname,
+        host = host)
   df <- DBI::dbGetQuery(con,query)
   DBI::dbDisconnect(con)
   if(full){
@@ -133,7 +139,7 @@ rampFindSourceFromId <- function(rampId=NULL,full = TRUE,
 #' 
 #' Apply famil function...
 rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
-	conpass=NULL,dbname="ramp",username="root"){
+	conpass=NULL,dbname="ramp",username="root",host = "localhost"){
   # progress<- shiny::Progress$new()
   # progress$set(message = "Querying databases ...",value = 0)
   now <- proc.time()
@@ -154,7 +160,8 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
                    list_metabolite,");")
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
-        dbname = dbname)
+        dbname = dbname,
+        host = host)
 
   df1<- DBI::dbGetQuery(con,query1)
   DBI::dbDisconnect(con)
@@ -167,7 +174,8 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
                    rampId in (",rampid,");")
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
-        dbname = dbname)
+        dbname = dbname,
+        host = host)
   df2 <- DBI::dbGetQuery(con,query2)
   DBI::dbDisconnect(con)
   #return(df2)
@@ -179,7 +187,8 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
                    id_list,");")
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
-        dbname = dbname)
+        dbname = dbname,
+        host = host)
   df3 <- DBI::dbGetQuery(con,query3)
   DBI::dbDisconnect(con)
   #return(df3)
@@ -199,7 +208,8 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
 #' @param username username for database access (default is "root")
 #' @return data.frame that has sourceId and rampId and source as columns
 rampFindSourceRampId <- function(sourceId, conpass=NULL,
-	dbname="ramp",username="root"){
+	dbname="ramp",username="root",
+	host = "localhost"){
   if(is.null(conpass)) {
         stop("Please define the password for the mysql connection")
   }
@@ -224,7 +234,8 @@ rampFindSourceRampId <- function(sourceId, conpass=NULL,
   list_metabolite <- paste(list_metabolite,collapse = ",")
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
-        dbname = dbname)
+        dbname = dbname,
+        host = host)
   query <- paste0("select sourceId,IDtype as analytesource, rampId from source where sourceId in (",list_metabolite,");")
   df <- DBI::dbGetQuery(con,query)
   DBI::dbDisconnect(con)
