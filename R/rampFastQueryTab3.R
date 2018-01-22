@@ -9,6 +9,7 @@
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
+#' @param host host name for database access (default is "localhost")
 #' @return a dataframe with pathway enrichment (based on Fisher's test) results
 #' @export
 runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
@@ -319,7 +320,7 @@ rampFastPathFromMeta<- function(analytes,
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
-#'
+#' @param host host name for database access (default is "localhost")
 #' @return a data.frame either from multiple csv file
 #' or search through by a txt file.
 rampFileOfPathways <- function(infile,NameOrIds="ids",

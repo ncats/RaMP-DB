@@ -4,7 +4,8 @@
 \alias{rampKWsearch}
 \title{The function does key word search from given synonym on within databases}
 \usage{
-rampKWsearch(word, database, conpass, dbname = "ramp", username = "root")
+rampKWsearch(word, database, conpass, dbname = "ramp", username = "root",
+  host = "localhost")
 }
 \arguments{
 \item{word}{string value that describe the keyword user want to search}
@@ -17,6 +18,8 @@ for key word}
 \item{dbname}{name of the mysql database (default is "ramp")}
 
 \item{username}{username for database access (default is "root")}
+
+\item{host}{host name for database access (default is "localhost")}
 }
 \value{
 If there is at least one item in database vaguely matching key

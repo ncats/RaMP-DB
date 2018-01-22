@@ -5,7 +5,7 @@
 \title{Send query to databases to get metabolites}
 \usage{
 rampGenesFromComp(names, maxItems, geneOrcompound = NULL, conpass = NULL,
-  dbname = "ramp", username = "root")
+  dbname = "ramp", username = "root", host = "localhost")
 }
 \arguments{
 \item{names}{the string that user defined for given synonym of metablite}
@@ -21,6 +21,8 @@ of returned metablites from query.}
 \item{dbname}{name of the mysql database (default is "ramp")}
 
 \item{username}{username for database access (default is "root")}
+
+\item{host}{host name for database access (default is "localhost")}
 }
 \value{
 a dataframe that contain given synonym as column name

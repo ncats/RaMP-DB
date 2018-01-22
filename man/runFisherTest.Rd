@@ -26,6 +26,8 @@ runFisherTest(pathwaydf, total_metabolites = NULL, total_genes = 20000,
 \item{dbname}{name of the mysql database (default is "ramp")}
 
 \item{username}{username for database access (default is "root")}
+
+\item{host}{host name for database access (default is "localhost")}
 }
 \value{
 a dataframe with pathway enrichment (based on Fisher's test) results

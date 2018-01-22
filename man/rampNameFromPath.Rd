@@ -5,7 +5,7 @@
 \title{Send query to databases to get metabolites}
 \usage{
 rampNameFromPath(names, maxItems, geneOrCompound, conpass, dbname = "ramp",
-  username = "root")
+  username = "root", host = "localhost")
 }
 \arguments{
 \item{names}{the string value that describes pathway name.}
@@ -21,6 +21,8 @@ compound) of returned metabolites.}
 \item{dbname}{name of the mysql database (default is "ramp")}
 
 \item{username}{username for database access (default is "root")}
+
+\item{host}{host name for database access (default is "localhost")}
 }
 \value{
 a dataframe that has given pathwayname as column names

@@ -4,6 +4,7 @@
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
+#' @param host host name for database access (default is "localhost")
 #' @return a data.frame that contains search results
 #' @export
 rampFastCata <- function(analytes,conpass=NULL,
@@ -185,10 +186,11 @@ rampFastCata <- function(analytes,conpass=NULL,
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
+#' @param host host name for database access (default is "localhost")
 #' 
 #' @return a data.frame either from multiple csv file
 rampFileOfAnalytes_tab4 <- function(infile,conpass=NULL,
-	dbname="ramp",username="root"){
+	dbname="ramp",username="root",host = "localhost"){
   if(is.null(conpass)) {
     stop("Please define the password for the mysql connection")
   }
@@ -199,7 +201,8 @@ rampFileOfAnalytes_tab4 <- function(infile,conpass=NULL,
   rampOut <- list()
   for (i in 1:length(infile[,1])){
     rampOut <- readLines(infile[[i,'datapath']])
-    summary <- rampFastCata(analytes=rampOut,conpass=conpass)
+    summary <- rampFastCata(analytes=rampOut,conpass=conpass,
+                            host = host)
   }
   return(summary)
 }

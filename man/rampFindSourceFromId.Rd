@@ -19,6 +19,8 @@ rampId}
 \item{dbname}{name of the mysql database (default is "ramp")}
 
 \item{username}{username for database access (default is "root")}
+
+\item{host}{host name for database access (default is "localhost")}
 }
 \description{
 Find all source from given list of RaMP Ids

@@ -22,7 +22,9 @@ rampFindSynonymFromSynonym(synonym, full = FALSE, find_synonym = FALSE,
 
 \item{dbname}{name of the mysql database (default is "ramp")}
 
-\item{username}{username for database access (default is "root")
+\item{username}{username for database access (default is "root")}
+
+\item{host}{host name for database access (default is "localhost")
 as input (there are some common synonyms that will mess up whole searching)}
 }
 \description{

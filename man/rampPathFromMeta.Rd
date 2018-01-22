@@ -5,7 +5,7 @@
 \title{Send query to database that find pathway}
 \usage{
 rampPathFromMeta(synonym, maxItems, conpass, dbname = "ramp",
-  username = "root")
+  username = "root", host = "localhost")
 }
 \arguments{
 \item{synonym}{the string that describe given synonym name.}
@@ -18,6 +18,8 @@ rampPathFromMeta(synonym, maxItems, conpass, dbname = "ramp",
 
 \item{username}{username for database access (default is "root")
 query}
+
+\item{host}{host name for database access (default is "localhost")}
 }
 \value{
 a dataframe that has given synonym as column name

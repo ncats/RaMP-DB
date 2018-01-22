@@ -111,6 +111,7 @@ rampFastMetaFromPath <- function(pathway,conpass=NULL,
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
+#' @param host host name for database access (default is "localhost")
 #' @return a data.frame either from multiple csv file
 #' or search through by a txt file.
 rampFastMetaFromPath_InputFile <- function(infile,conpass=NULL,

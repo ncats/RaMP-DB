@@ -15,6 +15,8 @@ rampFastCata(analytes, conpass = NULL, dbname = "ramp", username = "root",
 \item{dbname}{name of the mysql database (default is "ramp")}
 
 \item{username}{username for database access (default is "root")}
+
+\item{host}{host name for database access (default is "localhost")}
 }
 \value{
 a data.frame that contains search results

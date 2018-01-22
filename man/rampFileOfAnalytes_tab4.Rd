@@ -5,7 +5,7 @@
 \title{Generate data.frame from given files}
 \usage{
 rampFileOfAnalytes_tab4(infile, conpass = NULL, dbname = "ramp",
-  username = "root")
+  username = "root", host = "localhost")
 }
 \arguments{
 \item{infile}{a file object given from files}
@@ -15,6 +15,8 @@ rampFileOfAnalytes_tab4(infile, conpass = NULL, dbname = "ramp",
 \item{dbname}{name of the mysql database (default is "ramp")}
 
 \item{username}{username for database access (default is "root")}
+
+\item{host}{host name for database access (default is "localhost")}
 }
 \value{
 a data.frame either from multiple csv file

@@ -17,6 +17,8 @@ separated by new line}
 \item{dbname}{name of the mysql database (default is "ramp")}
 
 \item{username}{username for database access (default is "root")}
+
+\item{host}{host name for database access (default is "localhost")}
 }
 \value{
 data.frame that has sourceId and rampId and source as columns

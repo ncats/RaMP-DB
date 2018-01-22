@@ -17,6 +17,8 @@ rampFastPathFromSource(sourceid, find_synonym = FALSE, conpass = NULL,
 \item{dbname}{name of the mysql database (default is "ramp")}
 
 \item{username}{username for database access (default is "root")}
+
+\item{host}{host name for database access (default is "localhost")}
 }
 \value{
 a list contains all metabolits as name and pathway inside.
