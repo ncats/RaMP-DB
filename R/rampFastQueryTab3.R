@@ -220,6 +220,7 @@ rampGenerateBarPlot <- function(df){
 #' @param find_synonym find all synonyms or just return same synonym (T/F)
 #' @param conpass password for database access (string)
 #' @param NameOrIds whether input is "names" or "ids" (default is "ids")
+#' @param host host name for database access (default is "localhost")
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @return a list contains all metabolits as name and pathway inside.

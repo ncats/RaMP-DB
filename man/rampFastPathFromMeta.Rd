@@ -16,6 +16,8 @@ rampFastPathFromMeta(analytes, find_synonym = FALSE, conpass = NULL,
 
 \item{conpass}{password for database access (string)}
 
+\item{host}{host name for database access (default is "localhost")}
+
 \item{dbname}{name of the mysql database (default is "ramp")}
 
 \item{username}{username for database access (default is "root")}

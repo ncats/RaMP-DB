@@ -3,6 +3,7 @@
 #' This function launches the RShiny app.  It requires a connection to the RaMP database as input, which requires running the function connectoToRaMP() and providing the MySQL password.  
 #' 
 #' @param conpass password for database access (string)
+#' @param host host name for database access (default is "localhost")
 #' @examples
 #' \dontrun{
 #' con <- connectToRaMP(dbname="ramp",username="root",password="mypassword")
