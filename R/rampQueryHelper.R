@@ -8,6 +8,7 @@
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
+#' @param host host name for database access (default is "localhost")
 #' as input (there are some common synonyms that will mess up whole searching)
 rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
 	find_synonym = FALSE,conpass=NULL,dbname="ramp",username="root",
@@ -86,6 +87,7 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
+#' @param host host name for database access (default is "localhost")
 #' @param full return whole searching result or not (TRUE/FALSE)
 rampFindSourceFromId <- function(rampId=NULL,full = TRUE,
 	conpass=NULL,dbname="ramp",username="root",
@@ -135,6 +137,7 @@ rampFindSourceFromId <- function(rampId=NULL,full = TRUE,
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
+#' @param host host name for database access (default is "localhost")
 #' @return a list contains all metabolits as name and pathway inside.
 #' 
 #' Apply famil function...
@@ -206,6 +209,7 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
+#' @param host host name for database access (default is "localhost")
 #' @return data.frame that has sourceId and rampId and source as columns
 rampFindSourceRampId <- function(sourceId, conpass=NULL,
 	dbname="ramp",username="root",
