@@ -245,6 +245,16 @@ output$summary_fisher <- DT::renderDataTable({
   out
 },rownames=FALSE,filter="top")
 
+
+output$num_mapped_namesids <- renderText({
+	data <- data_mul_name()
+	if(!is.null(data)) {
+		parsedinput <- paste(strsplit(input$input_mul_tab3,"\n")[[1]])
+		print(paste0("Found ",length(unique(data$commonName))," out of ",
+		length(parsedinput)))
+	}
+})	
+
 fisherTestResultSignificant<-eventReactive(input$runFisher,{
   result<-FilterFishersResults(fisherTestResult(),p_fdradj_cutoff=as.numeric(input$p_fdradj_cutoff))
   print(paste0(nrow(result)," significant pathways identified"))
