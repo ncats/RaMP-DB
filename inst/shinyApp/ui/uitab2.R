@@ -64,9 +64,9 @@ tabItem2<-  shinydashboard::tabItem(
          shiny::tabPanel(title = "Input a list of pathways",
                   fluidRow(
                     shinydashboard::box(width = 6,
-                        title = strong("Input a list of pathways:"),
+                        title = strong("Input a list of pathways, one per line:"),
                         textAreaInput("input_mul_tab2",label = "",
-                                      placeholder = "Input list of metabolites in lines or separated by \",\""),
+                                      placeholder = "Input list of pathways, one per line"),
                         actionButton("sub_mul_tab2",label = "Submit")
                     )
 #                    shinydashboard::box(
