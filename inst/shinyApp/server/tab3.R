@@ -256,7 +256,7 @@ output$num_mapped_namesids <- renderText({
 })	
 
 fisherTestResultSignificant<-eventReactive(input$runFisher,{
-  result<-FilterFishersResults(fisherTestResult(),p_fdradj_cutoff=as.numeric(input$p_fdradj_cutoff))
+  result<-RaMP::FilterFishersResults(fisherTestResult(),p_fdradj_cutoff=as.numeric(input$p_fdradj_cutoff))
   print(paste0(nrow(result)," significant pathways identified"))
   result
 })
