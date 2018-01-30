@@ -48,7 +48,7 @@ rampFastCata <- function(analytes,conpass=NULL,
   mdf_c <- mdf_g <- NULL
   # Process metabolite ids
   mdf_cfin2 <- mdf_gfin2 <- c()
-  if(length(grep("RAMP_C",df1$rampId)!=0)){
+  if(length(grep("RAMP_C",df1$rampId))!=0){
     df_c <- df1[grep("RAMP_C",unique(df1$rampId)),]
     print("Get Compound ...")
     c_id <- unique(df_c$rampId)
@@ -71,7 +71,7 @@ rampFastCata <- function(analytes,conpass=NULL,
    DBI::dbDisconnect(con) 
    if(nrow(df_c2) == 0){
       message("No genes found in same reaction")
-      #mdf_cfin2 <- c()
+      mdf_cfin2 <- NULL 
     } else {
     print("Getting names from gene Id ...")
     analyte2_list <- unique(df_c2$rampId2)
@@ -86,27 +86,32 @@ rampFastCata <- function(analytes,conpass=NULL,
          host = host)
     df_c3 <- DBI::dbGetQuery(con,query2)
     DBI::dbDisconnect(con)
-
-    # Now merge it all:
-    mdc_c <- merge(df_c,df_c2)
-    colnames(df_c3)[which(colnames(df_c3)=="rampId")]="rampId2"
-    mdf_cfin <- merge(mdc_c,df_c3)
-    mdf_cfin <- mdf_cfin[,c("analyte1","sourceId","IDtype","commonName")]
-    colnames(mdf_cfin) <- c("Input_Metabolite","Gene_sourceId","Gene_IDtype",
-	"Gene_CommonName")
+ 
+    if(nrow(df_c3) == 0){
+      message("Cannot retrieve names for those metabolites")
+      mdf_cfin2 <- NULL
+    } else {
+	    # Now merge it all:
+	    mdc_c <- merge(df_c,df_c2)
+	    colnames(df_c3)[which(colnames(df_c3)=="rampId")]="rampId2"
+	    mdf_cfin <- merge(mdc_c,df_c3)
+	    mdf_cfin <- mdf_cfin[,c("analyte1","sourceId","IDtype","commonName")]
+   	    colnames(mdf_cfin) <- c("Input_Metabolite","Gene_sourceId","Gene_IDtype",
+		"Gene_CommonName")
     
-    # Collapse source ids:
-    mdf_cfin$temp <- paste(mdf_cfin[,"Input_Metabolite"],mdf_cfin[,"Gene_CommonName"])
-    tempout <- data.frame(Input_Metabolite=NA,Gene_CommonName=NA,Gene_sourceIds=NA)
-    mdf_cfin2=c()
-    for (i in unique(mdf_cfin$temp)) {
-	temp <- mdf_cfin[which(mdf_cfin$temp==i),]
-	tempout$Input_Metabolite=temp[1,"Input_Metabolite"]
-	tempout$Gene_sourceIds <- 
-		paste(paste(temp$Gene_IDtype,temp$Gene_sourceId,sep=": "),collapse="; ")
-	tempout$Gene_CommonName=temp[1,"Gene_CommonName"]
-	mdf_cfin2 <- rbind(mdf_cfin2,tempout)
-    }
+	    # Collapse source ids:
+	    mdf_cfin$temp <- paste(mdf_cfin[,"Input_Metabolite"],mdf_cfin[,"Gene_CommonName"])
+	    tempout <- data.frame(Input_Metabolite=NA,Gene_CommonName=NA,Gene_sourceIds=NA)
+	    mdf_cfin2=c()
+	    for (i in unique(mdf_cfin$temp)) {
+			temp <- mdf_cfin[which(mdf_cfin$temp==i),]
+		tempout$Input_Metabolite=temp[1,"Input_Metabolite"]
+		tempout$Gene_sourceIds <- 
+			paste(paste(temp$Gene_IDtype,temp$Gene_sourceId,sep=": "),collapse="; ")
+		tempout$Gene_CommonName=temp[1,"Gene_CommonName"]
+		mdf_cfin2 <- rbind(mdf_cfin2,tempout)
+	    }
+	} # end else couldn't retrieve names for metabolites
    } # end else couldn't find metabolite ids
   } # end if compound ids found
  
@@ -118,6 +123,11 @@ rampFastCata <- function(analytes,conpass=NULL,
     g_id <- df_g$rampId
     g_id <- sapply(unique(g_id),shQuote)
     g_id <- paste(g_id,collapse = ",")
+
+    if(length(g_id) == 0){
+      message("No IDs found for input genes")
+      return(NULL)
+    }
 
     # Get rampID for genes and catalyzed metabolites
     query_g <- paste0("select * from catalyzed where rampGeneId in (",
@@ -145,36 +155,42 @@ rampFastCata <- function(analytes,conpass=NULL,
        dbname = dbname)
     df_g3 <-DBI::dbGetQuery(con,query2)
     DBI::dbDisconnect(con)
+    if(nrow(df_g3) == 0){
+      message("Cannot retrieve names for those genes")
+      mdf_cfin2 <- NULL
+    } else {
+	   # Now merge it all:
+	    mdc_g <- merge(df_g,df_g2)
+	    colnames(df_g3)[which(colnames(df_g3)=="rampId")]="rampId2"
+	    mdf_gfin <- merge(mdc_g,df_g3)
+	    mdf_gfin <- mdf_gfin[,c("analyte1","sourceId","IDtype","commonName")]
+	    colnames(mdf_gfin) <- c("Input_Metabolite","Gene_sourceId","Gene_IDtype",
+	        "Gene_CommonName")
 
-   # Now merge it all:
-    mdc_g <- merge(df_g,df_g2)
-    colnames(df_g3)[which(colnames(df_g3)=="rampId")]="rampId2"
-    mdf_gfin <- merge(mdc_g,df_g3)
-    mdf_gfin <- mdf_gfin[,c("analyte1","sourceId","IDtype","commonName")]
-    colnames(mdf_gfin) <- c("Input_Metabolite","Gene_sourceId","Gene_IDtype",
-        "Gene_CommonName")
-
-    # Collapse source ids:
-    mdf_gfin$temp <- paste(mdf_gfin[,"Input_Metabolite"],mdf_gfin[,"Gene_CommonName"])
-    tempout <- data.frame(Input_Metabolite=NA,Gene_CommonName=NA,Gene_sourceIds=NA)
-    mdf_gfin2=c()
-    for (i in unique(mdf_gfin$temp)) {
-        temp <- mdf_gfin[which(mdf_gfin$temp==i),]
-        tempout$Input_Metabolite=temp[1,"Input_Metabolite"]
-        tempout$Gene_sourceIds <-
-                paste(paste(temp$Gene_IDtype,temp$Gene_sourceId,sep=": "),collapse="; ")
-        tempout$Gene_CommonName=temp[1,"Gene_CommonName"]
-        mdf_gfin2 <- rbind(mdf_gfin2,tempout)
-    }
+	    # Collapse source ids:
+	    mdf_gfin$temp <- paste(mdf_gfin[,"Input_Metabolite"],mdf_gfin[,"Gene_CommonName"])
+	    tempout <- data.frame(Input_Metabolite=NA,Gene_CommonName=NA,Gene_sourceIds=NA)
+	    mdf_gfin2=c()
+	    for (i in unique(mdf_gfin$temp)) {
+	        temp <- mdf_gfin[which(mdf_gfin$temp==i),]
+	        tempout$Input_Metabolite=temp[1,"Input_Metabolite"]
+	        tempout$Gene_sourceIds <-
+	                paste(paste(temp$Gene_IDtype,temp$Gene_sourceId,sep=": "),collapse="; ")
+	        tempout$Gene_CommonName=temp[1,"Gene_CommonName"]
+	        mdf_gfin2 <- rbind(mdf_gfin2,tempout)
+	    }
+	} # else couldn't retrieve names for those genes
     } # end else couldn't find ids
   } # end gene
   mdf <- rbind(mdf_cfin2,mdf_gfin2)
   print("Done ...")
   print("timing ...")
   print(proc.time() - now)
-  colnames(mdf) <- c("Input_Analyte","Input_CatalyzedBy_CommonName",
-	"Input_CatalyzedBy_SourceIds")
-  return(mdf)
+  if(is.null(nrow(mdf))) {return(NULL)} else {
+  	colnames(mdf) <- c("Input_Analyte","Input_CatalyzedBy_CommonName",
+		"Input_CatalyzedBy_SourceIds")
+  	return(mdf)
+   }
 }
 
 #' Generate data.frame from given files
