@@ -75,13 +75,16 @@ install_github("mathelab/RAMP-DB")
 # Load the package
 library(RaMP)
 ```
-
 Now, you're set to use the web application locally.  Just type:
 ```R
 RaMP::runRaMPapp(conpass="mysql_password")
 ```
 
 If the username is different then root, then specify the username in the "username" parameter.  Similarly, if the name of the database is different than "ramp", then specify the "dbname" parameter.
+
+## Note
+
+If you reinstall the latest version of the RaMP package, be sure to also install the latest version of the mysql RaMP dump file.  
 
 ## Reporting Issues
 If you encounter any problems, or find installation problems or bugs, please start an issue on the Issues tab or email Ewy.Mathe@osumc.edu directly. Thanks!
