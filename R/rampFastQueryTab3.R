@@ -285,7 +285,7 @@ rampFastPathFromMeta<- function(analytes,
   pathid_list <- sapply(pathid_list,shQuote)
   pathid_list <- paste(pathid_list,collapse = ",")
   # With pathway ids, retrieve pathway information
-  query3 <- paste0("select pathwayName,sourceId as pathwaysourceId,pathwaySource as pathwaysource,pathwayRampId from pathway where pathwayRampId in (",
+  query3 <- paste0("select pathwayName,sourceId as pathwaysourceId,type as pathwaysource,pathwayRampId from pathway where pathwayRampId in (",
                     pathid_list,");")
   con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
   df3 <- DBI::dbGetQuery(con,query3)
