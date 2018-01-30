@@ -47,11 +47,11 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
    allids <- DBI::dbGetQuery(con,query)
    DBI::dbDisconnect(con)
    allids <- allids[!duplicated(allids),]
-
+  
   if((analyte_type == "metabolites") && (is.null(total_metabolites))) {
-	wiki_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$type=="wiki"),"rampId"])]))
-	react_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$type=="reactome"),"rampId"])]))
-	kegg_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$type=="kegg"),"rampId"])]))
+	wiki_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="wiki"),"rampId"])]))
+	react_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="reactome"),"rampId"])]))
+	kegg_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="kegg"),"rampId"])]))
   }
   if(analyte_type=="genes") {
 	wiki_totanalytes <- react_totanalytes <- kegg_totanalytes <- total_genes
@@ -59,6 +59,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
   print("Calculating p-values for pathways in input")
   # Retrieve the Ramp compound ids associated with the ramp pathway id and count them:
+ 
    query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
    list_pid,")")
 
@@ -67,6 +68,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
          dbname = dbname,
          host = host)
    cids <- DBI::dbGetQuery(con,query1)#[[1]]
+  
    DBI::dbDisconnect(con)
 
    # Loop through each pathway, build the contingency table, and calculate Fisher's Exact
@@ -79,11 +81,11 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
         }else {
                 tot_in_pathway <- length(grep("RAMP_G",curpathcids))
         }
-	if(allids$type[which(allids$pathwayRampId==i)[1]] == "wiki") {
+	if(allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "wiki") {
 		total_analytes <- wiki_totanalytes
-	} else if (allids$type[which(allids$pathwayRampId==i)[1]] == "reactome") {
+	} else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "reactome") {
                 total_analytes <- react_totanalytes
-        } else if (allids$type[which(allids$pathwayRampId==i)[1]] == "kegg") {
+        } else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "kegg") {
                 total_analytes <- kegg_totanalytes
         } else {stop("Couldn't find pathway type for current pathway!")}
 
@@ -103,7 +105,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   } # end for loop
 
   # Now run fisher's tests for all other pids
-   query <- "select distinct(pathwayRampId) from analytehaspathway where type != 'hmdb';"
+   query <- "select distinct(pathwayRampId) from analytehaspathway where pathwaySource != 'hmdb';"
    con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
          password = conpass,
          dbname = dbname,
@@ -147,13 +149,13 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
         }else {
                 tot_in_pathway <- length(grep("RAMP_G",curpathcids))
         }
-        if(allids$type[which(allids$pathwayRampId==i)[1]] == "wiki") {
+        if(allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "wiki") {
                 total_analytes <- wiki_totanalytes
-        } else if (allids$type[which(allids$pathwayRampId==i)[1]] == "reactome") {
+        } else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "reactome") {
                 total_analytes <- react_totanalytes
-        } else if (allids$type[which(allids$pathwayRampId==i)[1]] == "kegg") {
+        } else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "kegg") {
                 total_analytes <- kegg_totanalytes
-        } else if (allids$type[which(allids$pathwayRampId==i)[1]] == "hmdb") {
+        } else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "hmdb") {
 		total_analytes <- NULL
 	} else {stop("Couldn't find pathway type for current pathway!")}
 
@@ -283,7 +285,7 @@ rampFastPathFromMeta<- function(analytes,
   pathid_list <- sapply(pathid_list,shQuote)
   pathid_list <- paste(pathid_list,collapse = ",")
   # With pathway ids, retrieve pathway information
-  query3 <- paste0("select pathwayName,sourceId as pathwaysourceId,type as pathwaysource,pathwayRampId from pathway where pathwayRampId in (",
+  query3 <- paste0("select pathwayName,sourceId as pathwaysourceId,pathwaySource as pathwaysource,pathwayRampId from pathway where pathwayRampId in (",
                     pathid_list,");")
   con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
   df3 <- DBI::dbGetQuery(con,query3)
