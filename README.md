@@ -82,7 +82,7 @@ RaMP::runRaMPapp(conpass="mysql_password")
 
 If the username is different then root, then specify the username in the "username" parameter.  Similarly, if the name of the database is different than "ramp", then specify the "dbname" parameter.
 
-## Note
+### Note
 
 If you reinstall the latest version of the RaMP package, be sure to also install the latest version of the mysql RaMP dump file.  
 
