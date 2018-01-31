@@ -136,7 +136,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
    DBI::dbDisconnect(con)
 
    print("Calculating p-values for all other pathways")
-   print(paste0(length(pidstorun),"pathways"))
+   #print(paste0(length(pidstorun),"pathways"))
    # calculating p-values for all other pathways
    count=1;
    for (i in pidstorun) {
@@ -175,14 +175,18 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
          # pidused <- c(pidused,i)
   } # end for loop
 
-  fdr <- stats::p.adjust(pval,method="fdr")
-  holm <- stats::p.adjust(pval,method="holm")
+  # only keep pathways that have > 8 or < 100 coumpounds
+  keepers <- intersect(which(totinpath>=8),which(totinpath<100))
+
+  fdr <- stats::p.adjust(pval[keepers],method="fdr")
+  holm <- stats::p.adjust(pval[keepers],method="holm")
   print(paste0("Calculated p-values for ",length(pval)," pathways"))
 
   # format output (retrieve pathway name for each unique source id first
-  out <- data.frame(pathwayRampId=c(pidused,pidstorun), Pval=pval,FDR.Adjusted.Pval=fdr,
+  out <- data.frame(pathwayRampId=c(pidused,pidstorun)[keepers], 
+	Pval=pval[keepers],FDR.Adjusted.Pval=fdr,
 	Holm.Adjusted.Pval=holm,
-	Num_In_Path=userinpath,Total_In_Path=totinpath)
+	Num_In_Path=userinpath[keepers],Total_In_Path=totinpath[keepers])
   out2 <- merge(out,pathwaydf[,c("pathwayName","pathwayRampId","pathwaysourceId",
 	"pathwaysource","pathwayRampId")],
 	by="pathwayRampId",all.x=TRUE)
@@ -342,7 +346,7 @@ rampFileOfPathways <- function(infile,NameOrIds="ids",
       if(infile[[i,'type']]!="text/plain"){
         rampOut[[i]] <- utils::read.table(infile[[i,'datapath']])
         name <- infile[[i,'name']]
-        print(infile[[i,'type']])
+        #print(infile[[i,'type']])
         rampOut[[i]]$new.col <- substr(name,1,nchar(name) - 4)
         colnames(rampOut[[i]]) <- c("pathway","id","source","metabolite")
         summary <- rbind(summary,rampOut[[i]])
@@ -423,13 +427,12 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
 #' @param min_pathway_tocluster Minimum number of 'similar' pathways required to start
 #' a cluster (medoid) (Default = 3)
 #' @param perc_pathway_overlap Minimum overlap for clusters to merge (Default = 0.5)
-#' @param p_cutoff Filter pathways to cluster by FDR p value threshold (Default = 0.05)
 #'
 #' @return a list of clusters identified by the algorithm. Each entry of the list is
 #' a cluster, containing a vector of pathways in the cluster
 #' @export
 find_clusters <- function(fishers_df,analyte_type,perc_analyte_overlap = 0.5,
-	min_pathway_tocluster = 3,perc_pathway_overlap = 0.5,p_cutoff=0.05){
+	min_pathway_tocluster = 3,perc_pathway_overlap = 0.5){
   if(perc_analyte_overlap <= 0 || perc_analyte_overlap >= 1 || perc_pathway_overlap <= 0 || perc_pathway_overlap >= 1){
     return(NULL)
   }
@@ -442,7 +445,6 @@ find_clusters <- function(fishers_df,analyte_type,perc_analyte_overlap = 0.5,
 	stop("analyte_type should be 'genes' or metabolites'")
   }
   pathway_list<-fishers_df[,9]
-  #pathway_list<-pathway_list[which(fishers_df[,4] < p_cutoff)]
 
   pathway_indices<-match(pathway_list,rownames(similarity_matrix))
 
