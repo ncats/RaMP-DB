@@ -438,6 +438,8 @@ find_clusters <- function(fishers_df,analyte_type,perc_analyte_overlap = 0.5,
     similarity_matrix = similarity_matrix_list[[2]]
   } else if(analyte_type=="genes"){
     similarity_matrix = similarity_matrix_list[[1]]
+  } else {
+	stop("analyte_type should be 'genes' or metabolites'")
   }
   pathway_list<-fishers_df[,9]
   #pathway_list<-pathway_list[which(fishers_df[,4] < p_cutoff)]
