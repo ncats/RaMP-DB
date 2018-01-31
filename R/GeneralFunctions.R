@@ -286,7 +286,7 @@ killDbConnections <- function() {
 #`
 load_overlap_matrices<- function() {
   gene_result <- metabolite_result <- c()
-  load(system.file(package = "RaMP",... = "extdata/gene_matrix.RData"))
-  load(system.file(package = "RaMP",... = "extdata/metabolite_matrix.RData"))
+  load(system.file(package = "RaMP",... = "extdata/genes_overlap_matrix.RData"))
+  load(system.file(package = "RaMP",... = "extdata/metabolites_overlap_matrix.RData"))
   return(list(gene_result,metabolite_result))
 }
