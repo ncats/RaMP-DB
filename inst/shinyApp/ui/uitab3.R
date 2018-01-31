@@ -108,8 +108,8 @@ tabItem3 <-  shinydashboard::tabItem(
               status = "primary",
            	  title = strong("Set Parameters to run Pathway Enrichment Analysis"),
 	          width = 6,
-                  numericInput("p_fdradj_cutoff",
-                        "Select cutoff for FDR Adjusted p-values (will only return pathways with FDR adj p-values < cutoff)",
+                  numericInput("p_holmadj_cutoff",
+                        "Select cutoff for Holm Adjusted p-values (will only return pathways with Holm adj p-values < cutoff)",
                          value = 0.01,
 			 min=0,max=1,
                          width = "80%"),
@@ -137,9 +137,10 @@ tabItem3 <-  shinydashboard::tabItem(
                  solidHeader = T,
                  status = "primary",
 		 title = strong("Summary:"),
-		 p("Significant pathways are returned below and can be downloaded by clicking 'Download Results'"),
-		 p("Note that only pathways that contain at least 2 analytes from the user input will be output"),
+		 p("Significant pathways are returned under 'Results of Pathway Enrichment Analysis' and can be downloaded by clicking 'Download Results'"),
+		 p("Note that only pathways that contain at least 3 analytes from the user input will be output"),
                 #textOutput("summary_Fisher"),
+		p("The following number of pathways per database were processed:"),
 		DT::dataTableOutput("summary_fisher"),
                  downloadButton("fisher_stats_report",label = "Download Results")
               ) #end box

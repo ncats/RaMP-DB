@@ -256,7 +256,7 @@ output$num_mapped_namesids <- renderText({
 })	
 
 fisherTestResultSignificant<-eventReactive(input$runFisher,{
-  result<-RaMP::FilterFishersResults(fisherTestResult(),p_fdradj_cutoff=as.numeric(input$p_fdradj_cutoff))
+  result<-RaMP::FilterFishersResults(fisherTestResult(),p_holmadj_cutoff=as.numeric(input$p_holmadj_cutoff))
   print(paste0(nrow(result)," significant pathways identified"))
   result
 })
@@ -264,7 +264,7 @@ fisherTestResultSignificant<-eventReactive(input$runFisher,{
 cluster_output<-eventReactive(input$runFisher,{
   data <- fisherTestResultSignificant()
   out<-RaMP::find_clusters(data,input$analyte_type, as.numeric(input$perc_analyte_overlap), as.numeric(input$min_pathway_tocluster),
-                      as.numeric(input$perc_pathway_overlap),p_cutoff = as.numeric(input$p_fdradj_cutoff))
+                      as.numeric(input$perc_pathway_overlap))
   if(length(unique(out))>1){
     print(paste0(length(out)," clusters found"))
   }else{
@@ -347,6 +347,7 @@ total_results_fisher <- eventReactive(input$runFisher,{
 output$results_fisher <- DT::renderDataTable({
   if(!is.null(total_results_fisher)){
   results_fisher<-total_results_fisher()
+  results_fisher <- results_fisher[order(results_fisher[,"In Cluster"]),]
   cluster_output<-cluster_output()
   if(input$show_cluster=="All"){
     results_fisher[,-10]
@@ -401,7 +402,9 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
     rampOut<-rampOut[,-10]
   }
   if(!is.null(rampOut)){
-    rampOut<-rampOut[order(rampOut[,"Source DB"]),]
+    print(colnames(rampOut))
+    rampOut<-rampOut[order(rampOut[,"Holm Adjusted P Value"]),]
+    rampOut<-rampOut[!duplicated(rampOut),]
   write.csv(rampOut,file,row.names = FALSE)
   }else{
     write.csv(c("No significant results"),file,row.names = FALSE)
