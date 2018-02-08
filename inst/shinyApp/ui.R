@@ -13,7 +13,7 @@ source(file.path("ui","uitab3.R"),local = T)$value
 
 source(file.path("ui","uitab4.R"),local = T)$value
 
-#source(file.path("ui","uitab5.R"),local = T)$value
+source(file.path("ui","uitab5.R"),local = T)$value
 
 #source(file.path("ui","uitab6.R"),local = T)$value
 body <- shinydashboard::dashboardBody(
@@ -27,8 +27,8 @@ body <- shinydashboard::dashboardBody(
     #tabItem1,
     tabItem2,
     tabItem3,
-    tabItem4
-    #tabItem5,
+    tabItem4,
+    tabItem5
     #tabItem6
   )
 ) 
