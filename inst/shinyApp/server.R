@@ -18,7 +18,7 @@ server <- function(input, output, session) {
   source(file.path("server","tab4.R"),local = TRUE)$value
   
   # Tab 5 Find the ontology relationship between compounds/gene and ontology location
-  # source(file.path("server","tab5.R"),local = TRUE)$value
+  source(file.path("server","tab5.R"),local = TRUE)$value
   
   # Tab 6 Customize query to database 
   # source(file.path("server","tab6.R"),local = TRUE)$value
