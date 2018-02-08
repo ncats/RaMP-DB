@@ -7,7 +7,16 @@ dataInput_onto <- eventReactive(input$subText_onto,{
   progress$inc(0.3,detail = paste("Send Query ..."))
   
   # rampOut <- rampOntoOut(input$KW_onto, 99999)
-  rampOut <- rampFastBiofluid(input$KW_onto,input$metaOrOnto)
+  if(input$metaOrOnto %in% c('source','name')){
+    rampOut <- RaMP:::rampFastOntoFromMeta(input$KW_onto,
+                                          conpass =.conpass,
+                                          host = .host,
+                                          sourceOrName = input$metaOrOnto)
+  } else if(input$metaOrOnto == 'ontology'){
+    rampOut <- RaMP:::rampFastMetaFromOnto(input$KW_onto,
+                                          conpass = .conpass,
+                                          host = .host)
+  }
   progress$inc(0.7,detail = paste("Done!"))
   return (rampOut[,1:3])
 })
@@ -19,23 +28,40 @@ summary_onto_out<- eventReactive(input$subText_onto,{
   }
 })
 
-
 observe({
-  if (input$metaOrOnto == "ontology") {
-    # x <- rampKWsearch(input$ontoInput, "ontology")
+  if(input$metaOrOnto == 'ontology'){
     choices <- kw_biofluid[grepl(input$ontoInput,kw_biofluid,fixed = T)]
     choices <- choices[order(nchar(choices),choices)]
-  } else {
-    # x <- rampKWsearch(input$ontoInput, "analytesynonym")
-    choices <- kw_analyte[grepl(input$ontoInput,kw_analyte)]
-    choices <- choices[order(nchar(choices),choices)]
+    choices <- c(choices,kw_biofluid[!(kw_biofluid %in% choices)])
+    updateSelectInput(session,
+                      "KW_onto", 
+                      label = "Select from list", 
+                      choices = choices, 
+                      selected = head(choices,1))
   }
-  if(length(choices) == length(kw_pathway))
-    return(NULL)
+})
+observe({
+  if(input$metaOrOnto == 'ontology'){
+    choices <- kw_biofluid[grepl(input$ontoInput,kw_biofluid,fixed = T)]
+    choices <- choices[order(nchar(choices),choices)]
+    choices <- c(choices,kw_biofluid[!(kw_biofluid %in% choices)])
+    
+  }
+  else if (input$metaOrOnto == 'name') {
+    # x <- rampKWsearch(input$ontoInput, "analytesynonym")
+    choices <- kw_analyte[grepl(input$ontoInput,kw_analyte,
+                                fixed = T)]
+    choices <- choices[order(nchar(choices),choices)]
+  } else if (input$metaOrOnto == 'source'){
+    choices <- kw_source[grepl(input$ontoInput,kw_source,
+                               fixed = T)]
+    choices <- choices[order(nchar(choices),choices)]
+  } 
+
   isolate({
     if(is.null(choices))
       return(NULL)
-    if(length(choices) >10 ){
+    if(length(choices) >10 & input$metaOrOnto != 'ontology'){
       choices <- choices[1:10]
     }
     
@@ -65,101 +91,91 @@ output$report_onto <- downloadHandler(filename = function() {
 })
 
 
-
-output$preview_tab5 <- renderUI({
-  input$subText_onto
-  
-  isolate({
-    rampout <- dataInput_onto()
-    if(length(rampout) == 0){
-      return(HTML("<strong> No Summary due to small dataset</strong>"))
-    }
-    tables <- rampTablize(rampout)
-    return(div(HTML(unlist(tables)),class = "shiny-html-output"))
-  })
-})
-
 # second sub Tab
-detector_tab5 <- reactiveValues(num = NULL)
-
+clicked <- reactiveValues(content = NULL)
+# Identify which button user clicked
 observe({
   input$sub_mul_tab5
   
-  detector_tab5$num <- 1
-})
-data_mul_name_tab5 <- eventReactive(input$sub_mul_tab5,{
-  rampFastBiofluid(input$input_mul_tab5)
-})
-data_mul_file_tab5 <- eventReactive(input$sub_file_tab5,{
-  infile <- input$inp_file_tab5
-  if (is.null(infile))
-    return(NULL)
+  clicked$content <- 'name'
   
-  rampOut <- rampFileOfBiofluid(infile)
 })
 observe({
-  input$sub_file_tab5
+  input$sub_mul_tab5_sourceid
   
-  detector_tab5$num <- 2
+  clicked$content <- 'source'
+  
+})
+observe({
+  input$sub_mul_tab5_biofluid
+  
+  clicked$content <- 'ontology'
+  
 })
 
-output$preview_multi_names_tab5_A <- DT::renderDataTable({
-  if(detector_tab5$num == 1){
-    rampout <- data_mul_name_tab5()
-    rampout[['analyte']]
-  } else if (detector_tab5$num == 2){
-    rampout <- data_mul_file_tab5()
-    rampout[['analyte']]
-  } else {
+data_mul_name_tab5 <- eventReactive(input$sub_mul_tab5,{
+  RaMP:::rampFastOntoFromMeta(input$input_mul_tab5,
+                              conpass = .conpass,
+                              host =.host,
+                              username = .username,
+                              dbname = .dbname,
+                              sourceOrName ='name')
+})
+data_mul_source_tab5 <- eventReactive(input$sub_mul_tab5_sourceid,{
+  RaMP:::rampFastOntoFromMeta(input$input_mul_tab5_sourceid,
+                              conpass = .conpass,
+                              host =.host,
+                              username = .username,
+                              dbname = .dbname,
+                              sourceOrName ='source')
+})
+data_mul_biofluid_tab5 <- eventReactive(input$sub_mul_tab5_biofluid,{
+  RaMP:::rampFastMetaFromOnto(input$input_mul_tab5_biofluid,
+                              conpass = .conpass,
+                              host =.host,
+                              username = .username,
+                              dbname = .dbname
+                              )
+})
+# data_mul_file_tab5 <- eventReactive(input$sub_file_tab5,{
+#   infile <- input$inp_file_tab5
+#   if (is.null(infile))
+#     return(NULL)
+#   
+#   rampOut <- rampFileOfBiofluid(infile)
+# })
+# observe({
+#   input$sub_file_tab5
+#   
+#   detector_tab5$num <- 2
+# })
+
+output$preview_multi_names_tab5 <- DT::renderDataTable({
+  if(is.null(clicked$content))
     return(NULL)
+  if(clicked$content == 'source'){
+    data_mul_source_tab5()
+  } else if (clicked$content == 'name'){
+    data_mul_name_tab5()
+  } else if (clicked$content == 'ontology' ){
+    data_mul_biofluid_tab5()
   }
 },rownames = F)
 
-output$preview_multi_names_tab5_B <- DT::renderDataTable({
-  if(detector_tab5$num == 1){
-    rampout <- data_mul_name_tab5()
-    rampout[['biofluid']]
-  } else if (detector_tab5$num == 2) {
-    rampout <- data_mul_file_tab5()
-    rampout[['biofluid']]
-  } else {
-    return(NULL)
-  }
-},rownames = F)
-
-output$tab5_mul_report_A <- downloadHandler(filename = function() {
+output$tab5_mul_report <- downloadHandler(filename = function() {
   if(detector_tab5$num == 1){
     paste0("textAreaInput", ".csv")
   } else if (detector_tab5$num == 2) {
     paste0("fileInput",".csv")
   }
 }, content = function(file) {
-  if(detector_tab5$num == 1){
+  if(clicked$content == 'name'){
     rampout <- data_mul_name_tab5()
-    rampout <- rampout[['analyte']]
-  } else if (detector_tab5$num == 2){
-    rampout <- data_mul_file_tab5()
-    rampout <- rampout[['analyte']]
-  } else {
-    return(NULL)
-  }
-  
-  write.csv(rampout, file, row.names = FALSE)
-})
-
-output$tab5_mul_report_B <- downloadHandler(filename = function() {
-  if(detector_tab5$num == 1){
-    paste0("textAreaInput", ".csv")
-  } else if (detector_tab5$num == 2) {
-    paste0("fileInput",".csv")
-  }
-}, content = function(file) {
-  if(detector_tab5$num == 1){
-    rampout <- data_mul_name_tab5()
-    rampout <- rampout[['biofluid']]
-  } else if (detector_tab5$num == 2){
-    rampout <- data_mul_file_tab5()
-    rampout <- rampout[['biofluid']]
+  } else if (clicked$content == 'source'){
+    rampout <- data_mul_source_tab5() 
+    
+  } else if (clicked$conttent == 'ontology') {
+    rampout <- data_mul_biofluid_tab5()
   } else {
     return(NULL)
   }
