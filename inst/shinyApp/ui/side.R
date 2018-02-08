@@ -31,11 +31,11 @@ sideBar <-shinydashboard::dashboardSidebar(
       tabName = "geneCataComp",
       icon = icon("dashboard")
     ),
-    # shinydashboard::menuItem(
-    #   "Return metabolites or biofluid location",
-    #   tabName = "geneCompOnto",
-    #   icon = icon("dashboard")
-    # ),
+    shinydashboard::menuItem(
+      "Return metabolites or biofluid location",
+      tabName = "geneCompOnto",
+      icon = icon("dashboard")
+    ),
     # shinydashboard::menuItem(
     #   "Customize Query",
     #   tabName = "customizeQuery",

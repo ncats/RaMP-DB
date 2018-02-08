@@ -100,9 +100,19 @@ observe({
 
   rea_detector$num <- 1
 })
+# reactive event for inputing gene or metabolites
+isGeneMetabolites <- reactiveValues(content = NULL)
+observe({
+  input$sub_mul_tab3
+  
+  isGeneMetabolites$content <- 'metabolites'
+})
+observe({
+  input$sub_mul_tab3_genes
+  isGeneMetabolites$content <- 'genes'
+}) # end of this reactive event
 
-
-# Batch Query
+# Batch Query for metabolites
 data_mul_name <- eventReactive(input$sub_mul_tab3,{
   print(input$input_mul_tab3)
   parsedinput <- paste(strsplit(input$input_mul_tab3,"\n")[[1]])
@@ -112,7 +122,16 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
                              conpass=.conpass,
                              host = .host)
 })
-
+# Batch Query for genes.
+data_mul_name_genes <- eventReactive(input$sub_mul_tab3_genes,{
+  print(input$input_mul_tab3_genes)
+  parsedinput <- paste(strsplit(input$input_mul_tab3_genes,"\n")[[1]])
+  print(parsedinput)
+  RaMP::rampFastPathFromMeta(analytes=parsedinput,
+                             NameOrIds=input$NameOrSourcemult_genes,
+                             conpass=.conpass,
+                             host = .host)
+}) # end for batch query of genes
 
 data_mul_file <- eventReactive(input$sub_file_tab3,{
   infile <- input$inp_file_tab3
@@ -131,7 +150,11 @@ observe({
 # Download table in a csv file.
 output$tab3_mul_report <- downloadHandler(filename = function(){
   if (rea_detector$num == 1){
-    paste0("pathwayOutput.csv")
+    if (isGeneMetabolites$content == 'metabolites'){
+      paste0("pathwayFromMetabolitesOutput.csv")
+    } else if (isGeneMetabolites$content == 'genes'){
+      paste0("pathwayFromGenesOutput.csv")
+    }
   } else if (rea_detector$num == 2){
     infile <- input$inp_file_tab3
     paste0(infile[[1,'name']],"Output",".csv")
@@ -139,8 +162,13 @@ output$tab3_mul_report <- downloadHandler(filename = function(){
 },
 content = function(file) {
   if (rea_detector$num == 1){
-    rampOut <- data_mul_name()[,c("pathwayName","pathwaysourceId",
-                                  "pathwaysource","commonName")]
+    if (isGeneMetabolites$content == 'metabolites'){
+      rampOut <- data_mul_name()[,c("pathwayName","pathwaysourceId",
+                                    "pathwaysource","commonName")]
+    } else if (isGeneMetabolites$content == 'genes'){
+      rampOut <- data_mul_name_genes()[,c("pathwayName","pathwaysourceId",
+                                    "pathwaysource","commonName")]
+    }
     #colnames(rampOut)[4] <- "Analyte"
   } else if (rea_detector$num == 2){
     rampOut <- data_mul_file()[,c("pathwayName","pathwaysourceId",
@@ -168,8 +196,13 @@ output$preview_multi_names <- DT::renderDataTable({
     return("Waiting for input")
 
   if(rea_detector$num == 1){
-    tb <- data_mul_name()[,c("pathwayName","pathwaysourceId",
-                             "pathwaysource","commonName")]
+    if(isGeneMetabolites$content =='metabolites'){
+      tb <- data_mul_name()[,c("pathwayName","pathwaysourceId",
+                               "pathwaysource","commonName")]
+    } else if(isGeneMetabolites$content == 'genes'){
+      tb <- data_mul_name_genes()[,c("pathwayName","pathwaysourceId",
+                               "pathwaysource","commonName")]
+    }
   } else if (rea_detector$num == 2) {
     tb <- data_mul_file()[,c("pathwayName","pathwaysourceId",
                              "pathwaysource","commonName")]
@@ -225,14 +258,40 @@ output$preview_multi_names <- DT::renderDataTable({
 
 
 fisherTestResult <- eventReactive(input$runFisher,{
-  print("Generating fisher test result...")
-  out <- RaMP::runFisherTest(req(data_mul_name()),analyte_type=input$analyte_type,
-                             conpass=.conpass)
-  print("Results generated")
-  print(paste0("Fisher results size:",nrow(out)))
+  if(isGeneMetabolites$content =='metabolites'){
+    print("Generating fisher test result for input metabolites...")
+    
+    out <- RaMP::runFisherTest(req(data_mul_name()),analyte_type=input$analyte_type,
+                               conpass=.conpass)
+    print("Results generated")
+    print(paste0("Fisher results size:",nrow(out)))
+  } else if (isGeneMetabolites$content == 'genes'){
+    print("Generating fisher test result for input genes...")
+    
+    out <- RaMP::runFisherTest(req(data_mul_name_genes()),analyte_type=input$analyte_type,
+                               conpass=.conpass)
+    print("Results generated")
+    print(paste0("Fisher results size:",nrow(out)))
+  }
   out
 })
-
+# update select input of analyte_type based on input type
+observe({
+  userChoice <- isGeneMetabolites$content
+  if(is.null(userChoice)) return()
+  
+  if(userChoice == 'metabolites'){
+    shiny::updateSelectInput(session,'analyte_type',label = 'Type of analyte',
+                             choices = c("Metabolites" = "metabolites","Genes" = "genes"),
+                             selected = 'metabolites')
+  }
+  else if (userChoice =='genes'){
+    shiny::updateSelectInput(session,'analyte_type',label = 'Type of analyte',
+                             choices = c("Metabolites" = "metabolites","Genes" = "genes"),
+                             selected = 'genes')
+  }
+  
+})
 
 output$summary_fisher <- DT::renderDataTable({
   if(!is.null(fisherTestResult())) {
@@ -247,9 +306,15 @@ output$summary_fisher <- DT::renderDataTable({
 
 
 output$num_mapped_namesids <- renderText({
-	data <- data_mul_name()
+  if(isGeneMetabolites$content == 'metabolites'){
+	  data <- data_mul_name()
+	  inputlist <- input$input_mul_tab3
+  } else if (isGeneMetabolites$content == 'genes'){
+    data <- data_mul_name_genes()
+    inputlist <- input$input_mul_tab3_genes
+  }
 	if(!is.null(data)) {
-		parsedinput <- paste(strsplit(input$input_mul_tab3,"\n")[[1]])
+		parsedinput <- paste(strsplit(inputlist,"\n")[[1]])
 		print(paste0("Found ",length(unique(data$commonName))," out of ",
 		length(parsedinput)))
 	}
