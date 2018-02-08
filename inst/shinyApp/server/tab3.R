@@ -95,11 +95,6 @@ content = function(file) {
 #
 rea_detector <- reactiveValues(num = NULL)
 
-observe({
-  input$sub_mul_tab3
-
-  rea_detector$num <- 1
-})
 # reactive event for inputing gene or metabolites
 isGeneMetabolites <- reactiveValues(content = NULL)
 observe({
@@ -133,58 +128,65 @@ data_mul_name_genes <- eventReactive(input$sub_mul_tab3_genes,{
                              host = .host)
 }) # end for batch query of genes
 
-data_mul_file <- eventReactive(input$sub_file_tab3,{
-  infile <- input$inp_file_tab3
-  if (is.null(infile))
-    return(NULL)
+# data_mul_file <- eventReactive(input$sub_file_tab3,{
+#   infile <- input$inp_file_tab3
+#   if (is.null(infile))
+#     return(NULL)
+# 
+#   RaMP:::rampFileOfPathways(infile,conpass=.conpass,host = .host,NameOrIds=input$NameOrSourcemult)
+# })
 
-  RaMP:::rampFileOfPathways(infile,conpass=.conpass,host = .host,NameOrIds=input$NameOrSourcemult)
-})
-
-observe({
-  input$sub_file_tab3
-
-  rea_detector$num <- 2
-})
+# observe({
+#   input$sub_file_tab3
+# 
+#   rea_detector$num <- 2
+# })
 
 # Download table in a csv file.
 output$tab3_mul_report <- downloadHandler(filename = function(){
-  if (rea_detector$num == 1){
-    if (isGeneMetabolites$content == 'metabolites'){
-      paste0("pathwayFromMetabolitesOutput.csv")
-    } else if (isGeneMetabolites$content == 'genes'){
-      paste0("pathwayFromGenesOutput.csv")
-    }
-  } else if (rea_detector$num == 2){
-    infile <- input$inp_file_tab3
-    paste0(infile[[1,'name']],"Output",".csv")
+  
+  if (isGeneMetabolites$content == 'metabolites'){
+    paste0("pathwayFromMetabolitesOutput.csv")
+  } else if (isGeneMetabolites$content == 'genes'){
+    paste0("pathwayFromGenesOutput.csv")
   }
+  
+  # else if (rea_detector$num == 2){
+  #   infile <- input$inp_file_tab3
+  #   paste0(infile[[1,'name']],"Output",".csv")
+  # }
 },
 content = function(file) {
-  if (rea_detector$num == 1){
-    if (isGeneMetabolites$content == 'metabolites'){
-      rampOut <- data_mul_name()[,c("pathwayName","pathwaysourceId",
-                                    "pathwaysource","commonName")]
-    } else if (isGeneMetabolites$content == 'genes'){
-      rampOut <- data_mul_name_genes()[,c("pathwayName","pathwaysourceId",
-                                    "pathwaysource","commonName")]
-    }
-    #colnames(rampOut)[4] <- "Analyte"
-  } else if (rea_detector$num == 2){
-    rampOut <- data_mul_file()[,c("pathwayName","pathwaysourceId",
+  
+  if (isGeneMetabolites$content == 'metabolites'){
+    rampOut <- data_mul_name()[,c("pathwayName","pathwaysourceId",
                                   "pathwaysource","commonName")]
-    #colnames(rampOut)[4] <- "Analyte"
+  } else if (isGeneMetabolites$content == 'genes'){
+    rampOut <- data_mul_name_genes()[,c("pathwayName","pathwaysourceId",
+                                  "pathwaysource","commonName")]
   }
+
+    #colnames(rampOut)[4] <- "Analyte"
+  # } else if (rea_detector$num == 2){
+  #   rampOut <- data_mul_file()[,c("pathwayName","pathwaysourceId",
+  #                                 "pathwaysource","commonName")]
+  #   #colnames(rampOut)[4] <- "Analyte"
+  # }
   write.csv(rampOut,file,row.names = FALSE)
 }
 )
 
 output$summary_mulpath_out<- DT::renderDataTable({
-  if(is.null(data_mul_name())) {
+  
+  if(is.null(data_mul_name()) & is.null(data_mul_name_genes())) {
     out <- data.frame(Query=NA,Freq=NA)
   }
   else {
-    temp <- data_mul_name()
+    if(isGeneMetabolites$content == 'metabolites'){
+      temp <- data_mul_name()
+    } else if(isGeneMetabolites$content == 'genes'){
+      temp <- data_mul_name_genes()
+    }
     out <- as.data.frame(table(temp$commonName))
     colnames(out)[1] <- "Query"
   }
@@ -192,21 +194,22 @@ output$summary_mulpath_out<- DT::renderDataTable({
 },rownames=FALSE)
 
 output$preview_multi_names <- DT::renderDataTable({
-  if(is.null(rea_detector$num))
+  if(is.null(isGeneMetabolites$content))
     return("Waiting for input")
 
-  if(rea_detector$num == 1){
-    if(isGeneMetabolites$content =='metabolites'){
-      tb <- data_mul_name()[,c("pathwayName","pathwaysourceId",
-                               "pathwaysource","commonName")]
-    } else if(isGeneMetabolites$content == 'genes'){
-      tb <- data_mul_name_genes()[,c("pathwayName","pathwaysourceId",
-                               "pathwaysource","commonName")]
-    }
-  } else if (rea_detector$num == 2) {
-    tb <- data_mul_file()[,c("pathwayName","pathwaysourceId",
+  # if(rea_detector$num == 1){
+  if(isGeneMetabolites$content =='metabolites'){
+    tb <- data_mul_name()[,c("pathwayName","pathwaysourceId",
+                             "pathwaysource","commonName")]
+  } else if(isGeneMetabolites$content == 'genes'){
+    tb <- data_mul_name_genes()[,c("pathwayName","pathwaysourceId",
                              "pathwaysource","commonName")]
   }
+  #   }
+  # } else if (rea_detector$num == 2) {
+  #   tb <- data_mul_file()[,c("pathwayName","pathwaysourceId",
+  #                            "pathwaysource","commonName")]
+  # }
   #colnames(tb)[4]="Analyte"
   tb
 }
