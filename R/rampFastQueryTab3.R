@@ -462,7 +462,8 @@ rampFastPathFromMeta<- function(analytes=NULL,
   # For now, not returning HMDB pathways because they include the 30K 
   # new pathways that are mainly drug and lipid pathways (need more proper 
   # structural resolution matching)
-  return(out[which(out$pathwaysource!="hmdb"),])
+  return(out[which(out$pathwaysource!="hmdb"),c("rampId","pathwayRampId","pathwayName",
+	"pathwaysourceId","pathwaysource","commonName")])
 }
 
 #' Generate data.frame from given files
