@@ -131,20 +131,11 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
                              conpass=.conpass,
                              host = .host)
   }
+  print(paste("metabsearch: ",ncol(metabsearch)))
+  print(paste("genesearch: ",ncol(genesearch)))
   print(paste0("DIM of data_mul_name",nrow(rbind(metabsearch,genesearch))))
   rbind(metabsearch,genesearch)
 })
-
-# Batch Query for genes.
-#data_mul_name_genes <- eventReactive(input$sub_mul_tab3_genes,{
-#  print(input$input_mul_tab3_genes)
-#  parsedinput <- paste(strsplit(input$input_mul_tab3_genes,"\n")[[1]])
-#  print(parsedinput)
-#  RaMP::rampFastPathFromMeta(analytes=parsedinput,
-#                             NameOrIds=input$NameOrSourcemult_genes,
-#                             conpass=.conpass,
-#                             host = .host)
-#}) # end for batch query of genes
 
 data_mul_file <- eventReactive(input$sub_file_tab3,{
   infile <- input$inp_file_tab3
@@ -162,42 +153,21 @@ observe({
 # Download table in a csv file.
 output$tab3_mul_report <- downloadHandler(filename = function(){
   if (rea_detector$num == 1){
-#    if (isGeneMetabolites$content == 'metabolites'){
       paste0("pathwayFromMetabolitesOutput.csv")
-#    } else if (isGeneMetabolites$content == 'genes'){
-#      paste0("pathwayFromGenesOutput.csv")
-#    }
   } else if (rea_detector$num == 2){
     infile <- input$inp_file_tab3
     paste0(infile[[1,'name']],"Output",".csv")
   }
   
-  # else if (rea_detector$num == 2){
-  #   infile <- input$inp_file_tab3
-  #   paste0(infile[[1,'name']],"Output",".csv")
-  # }
 },
 content = function(file) {
   if (rea_detector$num == 1){
-#    if (isGeneMetabolites$content == 'metabolites'){
       rampOut <- data_mul_name()[,c("pathwayName","pathwaysourceId",
                                     "pathwaysource","commonName")]
-#    } else if (isGeneMetabolites$content == 'genes'){
-#      rampOut <- data_mul_name_genes()[,c("pathwayName","pathwaysourceId",
-#                                    "pathwaysource","commonName")]
-#    }
-    #colnames(rampOut)[4] <- "Analyte"
   } else if (rea_detector$num == 2){
     rampOut <- data_mul_file()[,c("pathwayName","pathwaysourceId",
                                   "pathwaysource","commonName")]
   }
-
-    #colnames(rampOut)[4] <- "Analyte"
-  # } else if (rea_detector$num == 2){
-  #   rampOut <- data_mul_file()[,c("pathwayName","pathwaysourceId",
-  #                                 "pathwaysource","commonName")]
-  #   #colnames(rampOut)[4] <- "Analyte"
-  # }
   write.csv(rampOut,file,row.names = FALSE)
 }
 )
@@ -216,28 +186,19 @@ output$summary_mulpath_out<- DT::renderDataTable({
 output$preview_multi_names <- DT::renderDataTable({
   #if(is.null(isGeneMetabolites$content))
   #  return("Waiting for input")
-  if(is.null(data_mul_name())) 
+  if(is.null(data_mul_name())) {
     return("No input found")
+  } else {
 
   if(rea_detector$num == 1){
-#    if(isGeneMetabolites$content =='metabolites'){
       tb <- data_mul_name()[,c("pathwayName","pathwaysourceId",
                                "pathwaysource","commonName")]
-#    } else if(isGeneMetabolites$content == 'genes'){
-#      tb <- data_mul_name_genes()[,c("pathwayName","pathwaysourceId",
-#                               "pathwaysource","commonName")]
-#    }
   } else if (rea_detector$num == 2) {
 	    tb <- data_mul_file()[,c("pathwayName","pathwaysourceId",
                              "pathwaysource","commonName")]
   }
-  #   }
-  # } else if (rea_detector$num == 2) {
-  #   tb <- data_mul_file()[,c("pathwayName","pathwaysourceId",
-  #                            "pathwaysource","commonName")]
-  # }
-  #colnames(tb)[4]="Analyte"
-  tb
+  return(tb)
+ }
 }
 ,rownames = FALSE)
 
@@ -358,8 +319,9 @@ fisherTestResultSignificant<-eventReactive(input$runFisher,{
 
 cluster_output<-eventReactive(input$runFisher,{
   data <- fisherTestResultSignificant()
-  out<-RaMP::find_clusters(data,input$analyte_type, as.numeric(input$perc_analyte_overlap), as.numeric(input$min_pathway_tocluster),
-                      as.numeric(input$perc_pathway_overlap))
+  out<-RaMP::find_clusters(pathwaydf=data,perc_analyte_overlap=as.numeric(input$perc_analyte_overlap), 
+	min_pathway_tocluster=as.numeric(input$min_pathway_tocluster),
+                      perc_pathway_overlap=as.numeric(input$perc_pathway_overlap))
   if(length(unique(out))>1){
     print(paste0(length(out)," clusters found"))
   }else{

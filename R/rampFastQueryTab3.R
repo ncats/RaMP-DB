@@ -417,9 +417,9 @@ rampFastPathFromMeta<- function(analytes=NULL,
   # Parse data to fit mysql
   # Can be simplified here
   if(list_metabolite=="") {
-	stop("Unable to retrieve metabolites")
+	warning("Unable to retrieve metabolites")
+	return(NULL)
   }
-
   # Now using the RaMP compound id, retrieve associated pathway ids
     query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where
                       rampId in (",
@@ -432,6 +432,10 @@ rampFastPathFromMeta<- function(analytes=NULL,
   pathid_list <- sapply(pathid_list,shQuote)
   pathid_list <- paste(pathid_list,collapse = ",")
   # With pathway ids, retrieve pathway information
+  if(pathid_list=="") {
+	warning("The input list of analytes do not map to any pathways")
+	return(NULL)
+  }
   query3 <- paste0("select pathwayName,sourceId as pathwaysourceId,type as pathwaysource,pathwayRampId from pathway where pathwayRampId in (",
                     pathid_list,");")
   con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
@@ -458,7 +462,8 @@ rampFastPathFromMeta<- function(analytes=NULL,
   # For now, not returning HMDB pathways because they include the 30K 
   # new pathways that are mainly drug and lipid pathways (need more proper 
   # structural resolution matching)
-  return(out[which(out$pathwaysource!="hmdb"),])
+  return(out[which(out$pathwaysource!="hmdb"),c("rampId","pathwayRampId","pathwayName",
+	"pathwaysourceId","pathwaysource","commonName")])
 }
 
 #' Generate data.frame from given files
