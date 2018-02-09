@@ -6,7 +6,7 @@ tabItem5<- shinydashboard::tabItem(
   tabName = "geneCompOnto",
   shinydashboard::tabBox(width = 12,
          id = "tabset5",
-         height = "660px",
+         height = "100%",
          shiny::tabPanel(strong("Input one by one."),"",
               shinydashboard::box(width=6,
                   title = strong("Input metabolites or ontology location"),
@@ -49,45 +49,17 @@ tabItem5<- shinydashboard::tabItem(
                   solidHeader = T,
                   status = "primary",
                   title = strong("Input a list of analyte or biofluid location"),
-                  shiny::mainPanel(
-                    width = 12,
-                    shiny::tabsetPanel(
-                      type = 'tab',
-                      shiny::tabPanel(
-                        title = h4('Input analytes synonym'),
-                        textAreaInput("input_mul_tab5",label = "",
-                                      placeholder = "Input list of analytes"),
-                        actionButton("sub_mul_tab5",label = "Submit synonyms")
-                      ),
-                      shiny::tabPanel(
-                        title = h4('Input source Id'),
-                        textAreaInput('input_mul_tab5_sourceid',label = '',
-                                      placeholder = 'Input list of analytes source Id'),
-                        actionButton('sub_mul_tab5_sourceid',label = 'Submite source ID')
-                      ),
-                      shiny::tabPanel(
-                        title = h4('Input biofluid location'),
-                        textAreaInput('input_mul_tab5_biofluid',label = '',
-                                      placeholder = 'Input list of biofluids location'),
-                        actionButton('sub_mul_tab5_biofluid',label = 'Submit biofluids')
-                      )
-                    )
+                  textAreaInput("input_mul_tab5",label = "",
+                                placeholder = "Input list of analytes"),
+                  radioButtons('input_categories_tab5',label = 'Select from list',
+                               choices = c(
+                                 'Analytes Source ID' = 'source',
+                                 "Analytes Synonyms" = "name",
+                                 "Biofluid Location" = "ontology"
+                               )),
+                  actionButton("sub_mul_tab5",label = "Submit")
                   )
-              )
-          ),
-         
-              # ,
-              # shinydashboard::box(
-              #   solidHeader = T,
-              #   status = "primary",
-              #   width = 6,
-              #   title = strong("Upload the file"),
-              #   fileInput("inp_file_tab5",label = "",
-              #             multiple = FALSE,
-              #             accept = c("text/csv","text/comma-separated-values,/text/plain",".csv",".txt"),
-              #             buttonLabel = "Browse..."),
-              #   actionButton("sub_file_tab5",label = "Upload")
-              # )
+            ),
             hr(),
             fluidRow(
               HTML("<div id='database-group-output'>"),
@@ -96,7 +68,7 @@ tabItem5<- shinydashboard::tabItem(
                   status = "primary",
                   title = strong("Data preview"),
                   downloadButton("tab5_mul_report",
-                                 label = "Download Biofluid"),
+                                 label = "Download"),
                   hr(),
                   DT::dataTableOutput("preview_multi_names_tab5")
               ),
@@ -105,6 +77,7 @@ tabItem5<- shinydashboard::tabItem(
           )
         )
 )
+
 
 
 

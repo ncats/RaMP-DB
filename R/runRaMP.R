@@ -14,7 +14,7 @@
 #' @export
 runRaMPapp <- function(conpass = NULL,host = 'localhost',
                        username = 'root',dbname = 'ramp') {
-  .conpass <- .host <- con <- c() 
+  .conpass <- .host <-.username <- .dbname <- con <- c() 
   if(is.null(conpass)) {
         stop("Please define the password for the mysql connection")
   }
