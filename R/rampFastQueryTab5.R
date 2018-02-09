@@ -82,6 +82,6 @@ rampFastOnto <- function(analytes,conpass = NULL,
 rampFastMetaFromOnto <- function(ontology,conpass = NULL,
                                  dbname = 'mathelabramp',
                                  host = 'localhost',
-                                 username = 'root',){
+                                 username = 'root'){
   
 }

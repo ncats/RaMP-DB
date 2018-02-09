@@ -5,9 +5,9 @@
 \title{Function that search analytes (gene or compounds)  or a list of analytes and
 returns associated pathways}
 \usage{
-rampFastPathFromMeta(analytes, find_synonym = FALSE, conpass = NULL,
-  host = "localhost", dbname = "ramp", username = "root",
-  NameOrIds = "ids")
+rampFastPathFromMeta(analytes = NULL, find_synonym = FALSE,
+  conpass = NULL, host = "localhost", dbname = "ramp",
+  username = "root", NameOrIds = "ids")
 }
 \arguments{
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}

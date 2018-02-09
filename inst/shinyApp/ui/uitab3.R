@@ -61,33 +61,25 @@ tabItem3 <-  shinydashboard::tabItem(
              shinydashboard::box(width = 6,
                  solidHeader = T,
                  status = "primary",
-                 title = strong("Input a list of genes or metabolites, or a file"),
-                 h4(strong('Input a list of genes or metabolites, one pre line')),
+                 title = strong("Input a list of genes and/or metabolites"),
+                 # h4(strong('Input a list of genes, one per line')),
                  shiny::mainPanel(
                    width = 12,
-                   shiny::tabsetPanel(
-                     type = 'tab',
-                     shiny::tabPanel(
-                       title = h4("Metabolites"),
-                       label = 'input_metabolites',
+		       h4(strong('Input a list of metabolites, one per line')),
                        textAreaInput("input_mul_tab3",label = "",
                                       placeholder = "Input list of metabolites, one per line"),
     	                 radioButtons("NameOrSourcemult","Search by synonyms or source IDs?", choices = c(
                                     "Names" = "names", "Source ID" = "ids"
                         ),selected = "ids"),
-                       actionButton("sub_mul_tab3",label = "Submit Metabolites"),
-    		               br()),
-                     shiny::tabPanel(
-                       title = h4('Genes'),
-                       label = 'input_gens',
-                       textAreaInput("input_mul_tab3_genes",label = "",
+		       h4(strong('Input a list of genes, one per line')),
+		       textAreaInput("input_mul_tab3_genes",label = "",
                                      placeholder = "Input list of genes, one per line"),
                        radioButtons("NameOrSourcemult_genes","Search by synonyms or source IDs?", choices = c(
                          "Names" = "names", "Source ID" = "ids"
                        ),selected = "ids"),
-                       actionButton("sub_mul_tab3_genes",label = "Submit Genes"),
-                       br())
-                   )
+
+                       actionButton("sub_mul_tab3",label = "Submit Query"),
+    		               br()#)
                  )
 #                 br(),
 #		 h4("Upload file, one analyte per line"),
@@ -133,9 +125,9 @@ tabItem3 <-  shinydashboard::tabItem(
                          value = 0.01,
 			 min=0,max=1,
                          width = "80%"),
-		  selectInput("analyte_type", "Type of analyte",
-			            choices = c("Metabolites" = "metabolites","Genes" = "genes")
-			),
+		  #selectInput("analyte_type", "Type of analyte",
+		#	            choices = c("Metabolites" = "metabolites","Genes" = "genes")
+		#	),
 			h4("Set parameters for functional pathway clustering:"),
 			numericInput("perc_analyte_overlap", "Overlap threshold (0-1) for pathways to be considered similar (for medoid establishment):",min = 0.01, max = 1, value = 0.2, step = 0.01),
 			numericInput("min_pathway_tocluster", "Number of similar neighbors required (for medoid establishment):",min = 1, max = 100, value = 2, step = 1),

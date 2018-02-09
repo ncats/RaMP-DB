@@ -4,8 +4,6 @@
 #' @param total_metabolites number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param analyte_type "metabolites" or "genes" (default is "metabolites")
-#' @param min_analyte if the number of analytes (gene or metabolite) in a pathway is
-#' < min_analyte, do not report
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
@@ -13,7 +11,7 @@
 #' @return a dataframe with pathway enrichment (based on Fisher's test) results
 #' @export
 runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
-                              analyte_type="metabolites",min_analyte=2,conpass=NULL,
+                              analyte_type="metabolites",conpass=NULL,
                               dbname="ramp",username="root",
                           host = "localhost"){
     now <- proc.time()
@@ -121,7 +119,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
    con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
          password = conpass,
-         dbname = dbname,
+        dbname = dbname,
          host = host)
    restcids <- DBI::dbGetQuery(con,query2)#[[1]]
    DBI::dbDisconnect(con)
@@ -139,6 +137,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
    #print(paste0(length(pidstorun),"pathways"))
    # calculating p-values for all other pathways
    count=1;
+   pval2=userinpath2=totinpath2=c()
    for (i in pidstorun) {
 	if(( count %% 100) ==0) {print(paste0("Processed ",count))}
 	count=count+1
@@ -169,34 +168,162 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
           contingencyTb[2,1] <- user_in_pathway
           contingencyTb[2,2] <- user_out_pathway
           result <- stats::fisher.test(contingencyTb)
-          pval <- c(pval,result$p.value )
-          userinpath<-c(userinpath,user_in_pathway)
-          totinpath<-c(totinpath,tot_in_pathway)
+          pval2 <- c(pval2,result$p.value )
+          userinpath2<-c(userinpath2,user_in_pathway)
+          totinpath2<-c(totinpath2,tot_in_pathway)
          # pidused <- c(pidused,i)
   } # end for loop
 
   # only keep pathways that have > 8 or < 100 coumpounds
-  keepers <- intersect(which(totinpath>=8),which(totinpath<100))
-
-  fdr <- stats::p.adjust(pval[keepers],method="fdr")
-  holm <- stats::p.adjust(pval[keepers],method="holm")
-  print(paste0("Calculated p-values for ",length(pval)," pathways"))
+  keepers <- intersect(which(c(totinpath,totinpath2)>=8),
+		which(c(totinpath,totinpath2)<100))
+  #hist(totinpath,breaks=1000)
+  print(paste0("Keeping ",length(keepers)," pathways"))
+  #fdr <- stats::p.adjust(c(pval,pval2)[keepers],method="fdr")
+  #holm <- stats::p.adjust(c(pval,pval2)[keepers],method="holm")
+  print(paste0("Calculated p-values for ",length(c(pval,pval2))," pathways"))
 
   # format output (retrieve pathway name for each unique source id first
   out <- data.frame(pathwayRampId=c(pidused,pidstorun)[keepers], 
-	Pval=pval[keepers],FDR.Adjusted.Pval=fdr,
-	Holm.Adjusted.Pval=holm,
-	Num_In_Path=userinpath[keepers],Total_In_Path=totinpath[keepers])
-  out2 <- merge(out,pathwaydf[,c("pathwayName","pathwayRampId","pathwaysourceId",
-	"pathwaysource","pathwayRampId")],
-	by="pathwayRampId",all.x=TRUE)
-  finout <- out2[,c("pathwayName", "Pval", "FDR.Adjusted.Pval",
-	"Holm.Adjusted.Pval","pathwaysourceId",
-	"pathwaysource","Num_In_Path","Total_In_Path","pathwayRampId")]
-  finout=finout[!duplicated(finout),]
+	Pval=c(pval,pval2)[keepers],   #FDR.Adjusted.Pval=fdr,
+	# Holm.Adjusted.Pval=holm,
+	Num_In_Path=c(userinpath,userinpath2)[keepers],
+	Total_In_Path=c(totinpath,totinpath2)[keepers])
+print(dim(out))
+  #out2 <- merge(out,pathwaydf[,c("pathwayName","pathwayRampId","pathwaysourceId",
+  #	"pathwaysource","pathwayRampId")],
+  #	by="pathwayRampId",all.x=TRUE)
+  #finout <- out[,c("pathwayName", "Pval", #"FDR.Adjusted.Pval",
+	# "Holm.Adjusted.Pval",
+#	"pathwaysourceId",
+#	"pathwaysource","Num_In_Path","Total_In_Path","pathwayRampId")]
+#  finout=finout[!duplicated(finout),]
+  out = out[!duplicated(out),]
+  print(colnames(out))
 
-  return(finout[which(finout$Num_In_Path>=min_analyte),])
+  # foruser is the output needed, based on what user input
+  return(out)
 }
+
+
+#' Do fisher test for only one pathway from search result
+#' clicked on highchart
+#' @param pathwaydf a data frame resulting from rampFastPathFromMeta
+#' @param total_metabolites number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")
+#' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
+#' @param min_analyte if the number of analytes (gene or metabolite) in a pathway is
+#' < min_analyte, do not report
+#' @param conpass password for database access (string)
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
+#' @param host host name for database access (default is "localhost")
+#' @return a dataframe with pathway enrichment (based on Fisher's test) results
+#'@examples
+#'\dontrun{
+#' pathwaydf<-pathwaydf=rampFastPathFromMeta(c("MDM2","TP53","glutamate","creatinine"),
+#'                 NameOrIds="names", conpass=conpass)
+#' fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
+#'}
+#' @export
+runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
+	min_analyte=2,conpass=NULL,
+	dbname="ramp",username="root",
+	host = "localhost"){
+
+    if(is.null(conpass)) {
+    stop("Please define the password for the mysql connection")
+  }
+	
+    # Grab pathways that contain metabolites to run Fisher on metabolites
+    # This will return all pathways that have at 8-120 metabolites/genes in them
+    fishmetab <- pathwaydf[grep("RAMP_C_",pathwaydf$rampId),]
+    if(nrow(fishmetab) == 0) {outmetab=NULL} else{
+	print("Running Fisher's tests on metabolites")
+	outmetab <- runFisherTest(pathwaydf=fishmetab,analyte_type="metabolites",
+		total_metabolites=total_metabolites,total_genes=total_genes,
+		conpass=conpass,dbname=dbname,
+		username=username,host=host)
+	}
+
+    # Grab pathways that contain genes to run Fisher on genes
+    fishgene <- pathwaydf[grep("RAMP_G_",pathwaydf$rampId),]
+    if(nrow(fishgene) == 0) {outgene=NULL} else{
+	print("Running Fisher's tests on genes")
+        outgene <- runFisherTest(pathwaydf=fishgene,analyte_type="genes",
+                total_metabolites=total_metabolites,total_genes=total_genes,
+		conpass=conpass,dbname=dbname,
+                username=username,host=host)
+        }
+
+    if(is.null(outgene) & !is.null(outmetab)) {
+	out <- outmetab
+	fdr <- p.adjust(out$Pval,method="fdr")
+	out<-cbind(out,fdr);colnames(out)[ncol(out)]="Pval_FDR"
+	holm <- p.adjust(out$Pval,method="holm")
+        out<-cbind(out,holm);colnames(out)[ncol(out)]="Pval_Holm"
+	keepers <- which(out$Num_In_Path>=min_analyte)
+	out2 <- merge(out[keepers,],
+        	pathwaydf[,c("pathwayName","pathwayRampId","pathwaysourceId",
+        	"pathwaysource")],by="pathwayRampId")
+     } else if (!is.null(outgene) & is.null(outmetab)) {
+        out <- outgene
+        fdr <- p.adjust(out$Pval,method="fdr")
+        out<-cbind(out,fdr);colnames(out)[ncol(out)]="Pval_FDR"
+        holm <- p.adjust(out$Pval,method="holm")
+        out<-cbind(out,holm);colnames(out)[ncol(out)]="Pval_Holm"
+        keepers <- which(out$Num_In_Path>=min_analyte)
+        out2 <- merge(out[keepers,],
+                pathwaydf[,c("pathwayName","pathwayRampId","pathwaysourceId",
+                "pathwaysource")],by="pathwayRampId")
+    } else {
+	    # merge the results if both genes and metabolites were run
+	    allfish <- merge(outmetab,outgene,
+		by="pathwayRampId",all.x=T,all.y=T)
+	    colnames(allfish)[which(colnames(allfish)=="Pval.x")]="Pval.Metab"
+	    colnames(allfish)[which(colnames(allfish)=="Pval.y")]="Pval.Gene"
+	    colnames(allfish)[which(colnames(allfish)=="Total_In_Path.x")]="Total_In_Path.Metab"
+	    colnames(allfish)[which(colnames(allfish)=="Total_In_Path.y")]="Total_In_Path.Gene"
+	    colnames(allfish)[which(colnames(allfish)=="Num_In_Path.x")]="Num_In_Path.Metab"
+	    colnames(allfish)[which(colnames(allfish)=="Num_In_Path.y")]="Num_In_Path.Gene"
+	
+	    # Calculate combined p-values for pathways that have both genes and metabolites
+	    gm <- intersect(which(!is.na(allfish$Pval.Metab)),which(!is.na(allfish$Pval.Gene)))
+	    combpval <- pchisq(-2 * (log(allfish$Pval.Metab[gm])+log(allfish$Pval.Gene[gm])),
+		df=2,lower.tail=FALSE)
+	    
+	    g <- which(is.na(allfish$Pval.Metab))
+	    gpval <- allfish$Pval.Gene[g]
+	    m <- which(is.na(allfish$Pval.Gene))
+	    mpval <- allfish$Pval.Metab[m]
+	 
+	    out <- rbind(allfish[gm,],allfish[g,],allfish[m,])
+	    out <- cbind(out,c(combpval,gpval,mpval))
+	    colnames(out)[ncol(out)]="Pval_combined"
+	    fdr <- p.adjust(out$Pval_combined,method="fdr")
+	    out <- cbind(out,fdr)
+	    colnames(out)[ncol(out)]="Pval_combined_FDR"
+	    holm <- p.adjust(out$Pval_combined,method="holm")
+	    out <- cbind(out,holm)
+	    colnames(out)[ncol(out)]="Pval_combined_Holm"
+
+	    keepers <- intersect(c(which(out$Num_In_Path.Metab>=min_analyte),
+				which(is.na(out$Num_In_Path.Metab))),
+			c(which(out$Num_In_Path.Gene>=min_analyte),
+				which(is.na(out$Num_In_Path.Gene)))
+			)
+
+
+	    # Now that p-values are calculated, only return pathways that are in the list 
+	    # of pathways that contain user genes and metabolites
+	    out2 <- merge(out[keepers,],
+		pathwaydf[,c("pathwayName","pathwayRampId","pathwaysourceId",
+		"pathwaysource")],by="pathwayRampId")
+	} # end merging when genes and metabolites were run
+    out2 <- out2[!duplicated(out2),]
+ 
+    return(out2)
+}
+
 
 #' Reformat the result of query (get pathways from analyte(s)) for input into barplot
 #' function
@@ -231,7 +358,7 @@ rampGenerateBarPlot <- function(df){
 #' @param username username for database access (default is "root")
 #' @return a list contains all metabolits as name and pathway inside.
 #' @export
-rampFastPathFromMeta<- function(analytes,
+rampFastPathFromMeta<- function(analytes=NULL,
 	find_synonym = FALSE,
 	conpass=NULL,
 	host = "localhost",
@@ -244,6 +371,8 @@ rampFastPathFromMeta<- function(analytes,
   }
 
   now <- proc.time()
+  if(is.null(analytes)) {return(NULL)}
+
 
   if(NameOrIds == "names"){
     synonym <- RaMP:::rampFindSynonymFromSynonym(synonym=analytes,
@@ -283,6 +412,7 @@ rampFastPathFromMeta<- function(analytes,
                       rampId in (",
                      list_metabolite,");")
     con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
+    #print(query2)
     df2 <- DBI::dbGetQuery(con,query2)
     DBI::dbDisconnect(con)
   pathid_list <- df2$pathwayRampId
@@ -294,7 +424,6 @@ rampFastPathFromMeta<- function(analytes,
   con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
   df3 <- DBI::dbGetQuery(con,query3)
   DBI::dbDisconnect(con)
-
   #Format output
   mdf <- merge(df3,df2,all.x = T)
 
@@ -303,11 +432,10 @@ rampFastPathFromMeta<- function(analytes,
      list_analytes <- sapply(analytes,shQuote)
      list_analytes <- paste(list_analytes,collapse = ",")
   query4 <-paste0("select sourceId,commonName,rampId from source where sourceId in (",list_analytes,");")
-
   con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
   df4 <- DBI::dbGetQuery(con,query4)
   DBI::dbDisconnect(con)
-  mdf <- merge(mdf,df4,,all.x = T,by.y = "rampId")
+  mdf <- merge(mdf,df4,all.x = T,by.y = "rampId")
   mdf$commonName=tolower(mdf$commonName)
  } else{ # Just take on the name
   mdf <- merge(mdf,synonym,all.x = T,by.y = "rampId")
