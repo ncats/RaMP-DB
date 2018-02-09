@@ -146,7 +146,6 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
   # progress<- shiny::Progress$new()
   # progress$set(message = "Querying databases ...",value = 0)
   now <- proc.time()
-  # con <- dbConnect(MySQL(), user = "root", password = "Ramp340!", dbname = "mathelabramp")
   # on.exit(dbDisconnect(con))
   # find synonym
 

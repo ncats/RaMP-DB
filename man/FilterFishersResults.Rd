@@ -16,6 +16,12 @@ FilterFishersResults(fishers_df, p_holmadj_cutoff = NULL,
 }
 \value{
 dataframe of fishers results with only significant pathways
+\dontrun{
+pathwaydf<-rampFastPathFromMeta(c("MDM2","TP53","glutamate","creatinine"),
+                NameOrIds="names", conpass=conpass)
+fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
+filtered.fisher.results <- FilterFishersResults(fisher.results,p_holmadj_cutoff=0.05)
+}
 }
 \description{
 Filter pathways by p-value cutoff for display and clustering
