@@ -7,7 +7,7 @@
 #' @param conpass password for the database
 #' @param sourceOrName specify the type of given data
 rampFastOntoFromMeta <- function(analytes,conpass = NULL,
-                         dbname = 'mathelabramp',
+                         dbname = 'ramp',
                          host = 'localhost',
                          username = 'root',
                          sourceOrName = 'source'){
@@ -100,7 +100,7 @@ rampFastOntoFromMeta <- function(analytes,conpass = NULL,
 #' @param host host name for the database
 #' @param username user name for the database
 rampFastMetaFromOnto <- function(ontology,conpass = NULL,
-                                 dbname = 'mathelabramp',
+                                 dbname = 'ramp',
                                  host = 'localhost',
                                  username = 'root'){
   if(is.null(conpass)) {
