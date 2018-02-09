@@ -22,6 +22,12 @@ a cluster (medoid) (Default = 3)}
 \value{
 a list of clusters identified by the algorithm. Each entry of the list is
 a cluster, containing a vector of pathways in the cluster
+}
+\description{
+Perform fuzzy multiple linkage partitioning clustering on pathways identified by
+Fisher's test
+}
+\examples{
 \dontrun{
 pathwaydf<-rampFastPathFromMeta(c("MDM2","TP53","glutamate","creatinine"),
                 NameOrIds="names", conpass=conpass)
@@ -29,8 +35,4 @@ fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
 filtered.fisher.results <- FilterFishersResults(fisher.results,p_holmadj_cutoff=0.05)
 filteredclust.fisher.results <- find_clusters(filtered.fisher.results)
 }
-}
-\description{
-Perform fuzzy multiple linkage partitioning clustering on pathways identified by
-Fisher's test
 }

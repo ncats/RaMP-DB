@@ -570,6 +570,7 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
 #'
 #' @return a list of clusters identified by the algorithm. Each entry of the list is
 #' a cluster, containing a vector of pathways in the cluster
+#'@examples
 #'\dontrun{
 #' pathwaydf<-rampFastPathFromMeta(c("MDM2","TP53","glutamate","creatinine"),
 #'                 NameOrIds="names", conpass=conpass)
@@ -685,6 +686,7 @@ find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
 #' @param p_holmadj_cutoff return pathways where Holm adjusted pvalues are < p_holmadj_cutoff
 #' @param p_fdradj_cutoff return pathways where FDR adjusted pvalues are < p_fdradj_cutoff
 #' @return dataframe of fishers results with only significant pathways
+#'@examples
 #'\dontrun{
 #' pathwaydf<-rampFastPathFromMeta(c("MDM2","TP53","glutamate","creatinine"),
 #'                 NameOrIds="names", conpass=conpass)
