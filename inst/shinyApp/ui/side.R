@@ -15,24 +15,24 @@ sideBar <-shinydashboard::dashboardSidebar(
     # Given pathway name, it returns genes or compound based on user choice which are involved
     # in that pathway.
     shinydashboard::menuItem(
-      "Return analyte from given pathway name",
+      "Retrieve analyte from given pathway name",
       tabName = "metaFromPath",
       icon = icon("dashboard")
     ),
     # Given metabolites' synonym, it returns pathway name in which the metabolites are 
     # involved in.
     shinydashboard::menuItem(
-      "Return pathway from given analytes",
+      "Retrieve pathway from given analytes",
       tabName = "pathFromMeta",
       icon = icon("dashboard")
     ),
     shinydashboard::menuItem(
-      "Return metabolites or genes involved in same reaction",
+      "Retrieve analytes involved in same reaction",
       tabName = "geneCataComp",
       icon = icon("dashboard")
     ),
     shinydashboard::menuItem(
-      "Return metabolites or biofluid location",
+      "Retrieve metabolites or biofluid location",
       tabName = "geneCompOnto",
       icon = icon("dashboard")
     ),
