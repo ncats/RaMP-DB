@@ -16,6 +16,8 @@ tabItem4<-  shinydashboard::tabItem(
                                helpText("If given compound's synonym, it returns all of genes that catalyzed it.
                                         If given gene's synonym, it returns all of compounds catalyzed by this gene"),
                                textInput("CataInput","", placeholder = "Input compound's synonym"),
+                               radioButtons('CataInput_choices',label = 'Search by synonyms or source',
+                                            choices = c('Synonyms' = 'synonym','Source ID' = 'source')),
                                selectInput("KW_cata", "Select from list", choices = NULL),
                                actionButton("subText_cata","Submit")
                                )
@@ -45,7 +47,7 @@ tabItem4<-  shinydashboard::tabItem(
                       collapsible = T,
                       collapsed = F,
                       title = strong("Summary"),
-		      DT::dataTableOutput("result_cata")
+		                  DT::dataTableOutput("result_cata")
                       #uiOutput("preview_tab4")
                     )
          )),
@@ -58,6 +60,8 @@ tabItem4<-  shinydashboard::tabItem(
                  title = strong("Input a list of gene or metabolites:"),
                  textAreaInput("input_mul_tab4",label = "",
                                placeholder = "Input list of metabolites or gene, one per line"),
+                 radioButtons('input_mul_tab4_choices',label = 'Search by source or synonyms?',
+                              choices = c('Synonym' = 'synonym','Source ID' = 'source')),
                  actionButton("sub_mul_tab4",label = "Submit")
              )
 #             shinydashboard::box(

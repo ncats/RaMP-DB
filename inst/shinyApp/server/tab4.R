@@ -7,7 +7,8 @@ dataInput_cata <- eventReactive(input$subText_cata,{
   progress$inc(0.3,detail = paste("Send Query ..."))
   
   # rampOut <- rampCataOut(input$KW_cata, 99999)
-  rampOut <- RaMP:::rampFastCata(input$KW_cata,conpass=.conpass,host = .host)
+  rampOut <- RaMP:::rampFastCata(input$KW_cata,conpass=.conpass,host = .host,
+                                 synonymOrSource = input$CataInput_choices)
   progress$inc(0.7,detail = paste("Done!"))
   return (rampOut)
 })
@@ -26,14 +27,20 @@ output$summary_cata <- renderText({
 
 
 observe({
-  choices <- kw_analyte[grepl(input$CataInput,kw_analyte,ignore.case=TRUE)]
-  choices <- choices[order(nchar(choices),choices)]
+  if(input$CataInput_choices == 'synonym'){
+    choices <- kw_analyte[grepl(input$CataInput,kw_analyte,ignore.case=TRUE)]
+    choices <- choices[order(nchar(choices),choices)]
+  } else if(input$CataInput_choices == 'source'){
+    choices <- kw_source[grepl(input$CataInput,kw_source,ignore.case=TRUE)]
+    choices <- choices[order(nchar(choices),choices)]
+  }
   if(is.null(choices))
     return(NULL)
   if(length(choices) >10 ){
     choices <- choices[1:10]
   }
   isolate({
+    
     updateSelectInput(session, "KW_cata",
                       label = "Select from the list",
                       choices = choices, selected = head(choices,1)
@@ -66,7 +73,8 @@ observe({
 
 data_mul_name_tab4 <- eventReactive(input$sub_mul_tab4,{
   RaMP:::rampFastCata(input$input_mul_tab4,conpass=.conpass,
-                      host = .host)
+                      host = .host,
+                      synonymOrSource = input$input_mul_tab4_choices)
 })
 data_mul_file_tab4 <- eventReactive(input$sub_file_tab4,{
   infile <- input$inp_file_tab4
