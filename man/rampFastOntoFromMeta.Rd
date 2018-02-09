@@ -5,7 +5,7 @@
 \title{Function that query database to find ontology information based on 
 the given list of analytes}
 \usage{
-rampFastOntoFromMeta(analytes, conpass = NULL, dbname = "mathelabramp",
+rampFastOntoFromMeta(analytes, conpass = NULL, dbname = "ramp",
   host = "localhost", username = "root", sourceOrName = "source")
 }
 \arguments{
