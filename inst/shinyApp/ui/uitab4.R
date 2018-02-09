@@ -4,10 +4,10 @@
 tabItem4<-  shinydashboard::tabItem(
   tabName = "geneCataComp",
   shinydashboard::tabBox(width = 12,id = "tabset4",height = "100%",
-         shiny::tabPanel(strong("Input metabolite or gene one by one."),
+         shiny::tabPanel(strong("Input metabolite or gene one by one"),
                   "",
                   shinydashboard::box(width=6,
-                      title = strong("Input synonym of gene or compound"),
+                      title = strong("Input gene or compound"),
                       solidHeader = T,
                       height = "100%",
                       status = "primary",
