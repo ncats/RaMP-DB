@@ -5,11 +5,16 @@
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
+#' @param synonymOrSource search by 'synonym' or 'source'
 #' @return a data.frame that contains search results
 #' @export
 rampFastCata <- function(analytes,conpass=NULL,
 	dbname="ramp",username="root",
-	host = "localhost") {
+	host = "localhost",
+	synonymOrSource) {
+  
+  if (!(synonymOrSource %in% c('synonym','source')))
+    stop('Please specify search by "synonym" or "source"')
   if(is.null(conpass)) {
     stop("Please define the password for the mysql connection")
   }
@@ -38,8 +43,13 @@ rampFastCata <- function(analytes,conpass=NULL,
          password = conpass,
          dbname = dbname,
          host = host)
-  query1 <- paste0("select Synonym as analyte1,rampId,geneOrCompound as type1 from analytesynonym where Synonym in (",
-                   list_metabolite,");")
+  if (synonymOrSource == 'synonym'){
+    query1 <- paste0("select Synonym as analyte1,rampId,geneOrCompound as type1 from analytesynonym where Synonym in (",
+                     list_metabolite,");")
+  } else if (synonymOrSource == 'source'){
+    query1 <- paste0('select Synonym as analyte1,rampId,geneOrCompound as type1 from analytesynonym where rampId in (
+                     select rampId from source where sourceId in (',list_metabolite,'));')
+  }
   df1<- DBI::dbGetQuery(con,query1)
   DBI::dbDisconnect(con)
 
