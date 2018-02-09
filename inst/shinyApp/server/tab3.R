@@ -131,6 +131,8 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
                              conpass=.conpass,
                              host = .host)
   }
+  print(paste("metabsearch: ",ncol(metabsearch)))
+  print(paste("genesearch: ",ncol(genesearch)))
   print(paste0("DIM of data_mul_name",nrow(rbind(metabsearch,genesearch))))
   rbind(metabsearch,genesearch)
 })
