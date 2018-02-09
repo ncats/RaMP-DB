@@ -95,10 +95,10 @@ content = function(file) {
 #
 rea_detector <- reactiveValues(num = NULL)
 
-observe({
-  input$sub_mul_tab3
-  rea_detector$num <- 1
-})
+#observe({
+#  input$sub_mul_tab3
+#  rea_detector$num <- 1
+#})
 # reactive event for inputing gene or metabolites
 #isGeneMetabolites <- reactiveValues(content = NULL)
 observe({
@@ -171,6 +171,11 @@ output$tab3_mul_report <- downloadHandler(filename = function(){
     infile <- input$inp_file_tab3
     paste0(infile[[1,'name']],"Output",".csv")
   }
+  
+  # else if (rea_detector$num == 2){
+  #   infile <- input$inp_file_tab3
+  #   paste0(infile[[1,'name']],"Output",".csv")
+  # }
 },
 content = function(file) {
   if (rea_detector$num == 1){
@@ -185,18 +190,29 @@ content = function(file) {
   } else if (rea_detector$num == 2){
     rampOut <- data_mul_file()[,c("pathwayName","pathwaysourceId",
                                   "pathwaysource","commonName")]
-    #colnames(rampOut)[4] <- "Analyte"
   }
+
+    #colnames(rampOut)[4] <- "Analyte"
+  # } else if (rea_detector$num == 2){
+  #   rampOut <- data_mul_file()[,c("pathwayName","pathwaysourceId",
+  #                                 "pathwaysource","commonName")]
+  #   #colnames(rampOut)[4] <- "Analyte"
+  # }
   write.csv(rampOut,file,row.names = FALSE)
 }
 )
 
 output$summary_mulpath_out<- DT::renderDataTable({
-  if(is.null(data_mul_name())) {
+  
+  if(is.null(data_mul_name()) & is.null(data_mul_name_genes())) {
     out <- data.frame(Query=NA,Freq=NA)
   }
   else {
-    temp <- data_mul_name()
+    if(isGeneMetabolites$content == 'metabolites'){
+      temp <- data_mul_name()
+    } else if(isGeneMetabolites$content == 'genes'){
+      temp <- data_mul_name_genes()
+    }
     out <- as.data.frame(table(temp$commonName))
     colnames(out)[1] <- "Query"
   }
@@ -204,7 +220,7 @@ output$summary_mulpath_out<- DT::renderDataTable({
 },rownames=FALSE)
 
 output$preview_multi_names <- DT::renderDataTable({
-  if(is.null(rea_detector$num))
+  if(is.null(isGeneMetabolites$content))
     return("Waiting for input")
   if(is.null(data_mul_name())) 
     return("No input found")
@@ -221,6 +237,11 @@ output$preview_multi_names <- DT::renderDataTable({
 	    tb <- data_mul_file()[,c("pathwayName","pathwaysourceId",
                              "pathwaysource","commonName")]
   }
+  #   }
+  # } else if (rea_detector$num == 2) {
+  #   tb <- data_mul_file()[,c("pathwayName","pathwaysourceId",
+  #                            "pathwaysource","commonName")]
+  # }
   #colnames(tb)[4]="Analyte"
   tb
 }
