@@ -319,8 +319,9 @@ fisherTestResultSignificant<-eventReactive(input$runFisher,{
 
 cluster_output<-eventReactive(input$runFisher,{
   data <- fisherTestResultSignificant()
-  out<-RaMP::find_clusters(data,input$analyte_type, as.numeric(input$perc_analyte_overlap), as.numeric(input$min_pathway_tocluster),
-                      as.numeric(input$perc_pathway_overlap))
+  out<-RaMP::find_clusters(pathwaydf=data,perc_analyte_overlap=as.numeric(input$perc_analyte_overlap), 
+	min_pathway_tocluster=as.numeric(input$min_pathway_tocluster),
+                      perc_pathway_overlap=as.numeric(input$perc_pathway_overlap))
   if(length(unique(out))>1){
     print(paste0(length(out)," clusters found"))
   }else{
