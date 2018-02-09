@@ -36,7 +36,7 @@ clicked on highchart
 }
 \examples{
 \dontrun{
-pathwaydf<-pathwaydf=rampFastPathFromMeta(c("MDM2","TP53","glutamate","creatinine"),
+pathwaydf<-rampFastPathFromMeta(c("MDM2","TP53","glutamate","creatinine"),
                 NameOrIds="names", conpass=conpass)
 fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
 }

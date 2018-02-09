@@ -203,25 +203,19 @@ content = function(file) {
 )
 
 output$summary_mulpath_out<- DT::renderDataTable({
-  
-  if(is.null(data_mul_name()) & is.null(data_mul_name_genes())) {
+  if(is.null(data_mul_name())) {
     out <- data.frame(Query=NA,Freq=NA)
-  }
-  else {
-    if(isGeneMetabolites$content == 'metabolites'){
+  } else {
       temp <- data_mul_name()
-    } else if(isGeneMetabolites$content == 'genes'){
-      temp <- data_mul_name_genes()
     }
     out <- as.data.frame(table(temp$commonName))
     colnames(out)[1] <- "Query"
-  }
   out
 },rownames=FALSE)
 
 output$preview_multi_names <- DT::renderDataTable({
-  if(is.null(isGeneMetabolites$content))
-    return("Waiting for input")
+  #if(is.null(isGeneMetabolites$content))
+  #  return("Waiting for input")
   if(is.null(data_mul_name())) 
     return("No input found")
 
@@ -356,7 +350,8 @@ output$num_mapped_namesids <- renderText({
 })	
 
 fisherTestResultSignificant<-eventReactive(input$runFisher,{
-  result<-RaMP::FilterFishersResults(fisherTestResult(),p_holmadj_cutoff=as.numeric(input$p_holmadj_cutoff))
+  result<-RaMP::FilterFishersResults(fisherTestResult(),
+	p_holmadj_cutoff=as.numeric(input$p_holmadj_cutoff))
   print(paste0(nrow(result)," significant pathways identified"))
   result
 })

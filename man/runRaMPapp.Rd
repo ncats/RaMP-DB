@@ -5,7 +5,7 @@
 \title{Run Shiny App}
 \usage{
 runRaMPapp(conpass = NULL, host = "localhost", username = "root",
-  dbname = "mathelabramp")
+  dbname = "ramp")
 }
 \arguments{
 \item{conpass}{password for database access (string)}
