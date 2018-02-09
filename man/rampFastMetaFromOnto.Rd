@@ -4,7 +4,7 @@
 \alias{rampFastMetaFromOnto}
 \title{function that query database to find analytes in given ontologies}
 \usage{
-rampFastMetaFromOnto(ontology, conpass = NULL, dbname = "mathelabramp",
+rampFastMetaFromOnto(ontology, conpass = NULL, dbname = "ramp",
   host = "localhost", username = "root")
 }
 \arguments{

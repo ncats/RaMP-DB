@@ -367,10 +367,10 @@ total_results_fisher <- eventReactive(input$runFisher,{
   if(is.null(fisherTestResult())) {
     data <- data.frame(Query=NA,Freq=NA)
   }
-  data <- fisherTestResultSignificant()
-  # Need to remove RaMPID column
-  rampids<-data[,9]
-  data<-data[,-9]
+  data <- fisherTestResultSignificant()$fishresults
+  # Need to remove pathwayRaMPID column
+  rampids<-data[,"pathwayRampId"]
+  data<-data[,-c(which(colnames(data)=="pathwayRampId"))]
 
   cluster_list<-cluster_output()
   if(length(cluster_list)>1){
