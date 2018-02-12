@@ -4,10 +4,10 @@
 tabItem4<-  shinydashboard::tabItem(
   tabName = "geneCataComp",
   shinydashboard::tabBox(width = 12,id = "tabset4",height = "100%",
-         shiny::tabPanel(strong("Input metabolite one by one"),
+         shiny::tabPanel(strong("Input metabolite or gene one by one"),
                   "",
                   shinydashboard::box(width=6,
-                      title = strong("Input metabolite"),
+                      title = strong("Input metabolite or gene"),
                       solidHeader = T,
                       height = "100%",
                       status = "primary",
@@ -15,7 +15,7 @@ tabItem4<-  shinydashboard::tabItem(
                         column(12,
                                helpText("If a compound is input, 
 		all genes that catalyze reactions involving the compound are returned."),
-		#	       helpText("Conversely,if a gene is input, all compounds in reactions that are catalyzed by that gene are returned"),
+			       helpText("Conversely,if a gene is input, all compounds in reactions that are catalyzed by that gene are returned"),
                                textInput("CataInput","", placeholder = "Input compound name or id"),
                                radioButtons('CataInput_choices',label = 'Search by name or source id',
                                             choices = c('Names' = 'names','Source ID' = 'ids')),
@@ -50,6 +50,16 @@ tabItem4<-  shinydashboard::tabItem(
                       title = strong("Summary"),
 		                  DT::dataTableOutput("result_cata")
                       #uiOutput("preview_tab4")
+                    ),
+		  hr(),
+                    shinydashboard::box(
+                      width = 12,
+                      solidHeader = T,
+                      status = "info",
+                      collapsible = T,
+                      collapsed = F,
+                      title = strong("Visuazlize gene-metabolite interaction network"),
+                      visNetworkOutput("network")
                     )
          )),
          shiny::tabPanel(
@@ -89,7 +99,16 @@ tabItem4<-  shinydashboard::tabItem(
                  DT::dataTableOutput("preview_multi_names_tab4"),
                  highcharter::highchartOutput("tab4_hc_output")
              ),
-             HTML("</div>")
+             hr()
+            #shinydashboard::box(
+            #width = 12,
+            #solidHeader = T,
+            #status = "info",
+            #collapsible = T,
+            #collapsed = F,
+            #title = strong("Visuazlize gene-metabolite interaction network"),
+            #visNetworkOutput("network")
+            #        )
            )
          )
   )
