@@ -80,12 +80,12 @@ content = function(file) {
 # Second Tab
 #
 #
-rea_detector <- reactiveValues(num = NULL)
-
-observe({
-  input$sub_mul_tab3
-  #isGeneMetabolites$content <- 'metabolites'
-})
+# rea_detector <- reactiveValues(num = NULL)
+# 
+# observe({
+#   input$sub_mul_tab3
+#   #isGeneMetabolites$content <- 'metabolites'
+# })
 
 data_mul_name <- eventReactive(input$sub_mul_tab3,{
   print(input$input_mul_tab3)
@@ -113,18 +113,18 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
   rbind(metabsearch,genesearch)
 })
 
-data_mul_file <- eventReactive(input$sub_file_tab3,{
-  infile <- input$inp_file_tab3
-  if (is.null(infile))
-    return(NULL)
-
-  RaMP:::rampFileOfPathways(infile,conpass=.conpass,host = .host,NameOrIds=input$NameOrSourcemult)
-})
-
-observe({
-  input$sub_file_tab3
-  rea_detector$num <- 2
-})
+# data_mul_file <- eventReactive(input$sub_file_tab3,{
+#   infile <- input$inp_file_tab3
+#   if (is.null(infile))
+#     return(NULL)
+# 
+#   RaMP:::rampFileOfPathways(infile,conpass=.conpass,host = .host,NameOrIds=input$NameOrSourcemult)
+# })
+# 
+# observe({
+#   input$sub_file_tab3
+#   rea_detector$num <- 2
+# })
 
 # Download table in a csv file.
 output$tab3_mul_report <- downloadHandler(filename = function(){
@@ -166,13 +166,13 @@ output$preview_multi_names <- DT::renderDataTable({
     return("No input found")
   } else {
 
-  if(rea_detector$num == 1){
-      tb <- data_mul_name()[,c("pathwayName","pathwaysourceId",
-                               "pathwaysource","commonName")]
-  } else if (rea_detector$num == 2) {
-	    tb <- data_mul_file()[,c("pathwayName","pathwaysourceId",
+  # if(rea_detector$num == 1){
+    tb <- data_mul_name()[,c("pathwayName","pathwaysourceId",
                              "pathwaysource","commonName")]
-  }
+#   } else if (rea_detector$num == 2) {
+# 	    tb <- data_mul_file()[,c("pathwayName","pathwaysourceId",
+#                              "pathwaysource","commonName")]
+#   }
   return(tb)
  }
 }
