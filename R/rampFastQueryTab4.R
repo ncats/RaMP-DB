@@ -291,6 +291,12 @@ plotCataNetwork <- function(catalyzedf = NULL) {
                  dragView = TRUE,hideEdgesOnDrag=TRUE,hideNodesOnDrag=TRUE, 
                  navigationButtons=TRUE,zoomView = TRUE) %>%
   		visNetwork::visLayout(randomSeed = 123) %>%
-		visNetwork::visPhysics(stabilization = FALSE)
+		visNetwork::visPhysics(
+		  barnesHut = list(
+		    gravitationalConstant = -100,
+		    centralGravity = 0,
+		    springConstant = 0
+		  ),
+		  stabilization = TRUE)
         #return(NULL) #return(list(nodes=mynodes,edges=myedges))
 }
