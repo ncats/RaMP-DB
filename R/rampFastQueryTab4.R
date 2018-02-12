@@ -188,6 +188,8 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
 	    mdc_g <- merge(df_g,df_g2)
 	    colnames(df_g3)[which(colnames(df_g3)=="rampId")]="rampId2"
 	    mdf_gfin <- merge(mdc_g,df_g3)
+	    colnames(mdf_gfin)[colnames(mdf_gfin) == 'InputMetabolite'] = 'InputAnalyte'
+	    print(colnames(mdf_gfin))
 	    mdf_gfin <- mdf_gfin[,c("InputAnalyte","sourceId","IDtype","commonName")]
 	    colnames(mdf_gfin) <- c("Input_Gene","Gene_sourceId","Gene_IDtype",
 	        "Gene_CommonName")
