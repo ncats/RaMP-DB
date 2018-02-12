@@ -7,16 +7,17 @@ dataInput_cata <- eventReactive(input$subText_cata,{
   progress$inc(0.3,detail = paste("Send Query ..."))
   
   # rampOut <- rampCataOut(input$KW_cata, 99999)
-  rampOut <- RaMP:::rampFastCata(input$KW_cata,conpass=.conpass,host = .host)
+  rampOut <- RaMP:::rampFastCata(input$KW_cata,conpass=.conpass,host = .host,
+                                 NameOrIds = input$CataInput_choices)
   progress$inc(0.7,detail = paste("Done!"))
   return (rampOut)
 })
 
 summary_cata_out<- eventReactive(input$subText_cata,{
   if (!is.null(nrow(dataInput_cata()))){
-    return (paste0("There are(is) ",nrow(dataInput_cata())," are in the same reaction as input"))
+    return (paste0("There are ",nrow(dataInput_cata())," analytes in the same reaction as input"))
   } else{
-    return ("Input analyte are not involved in any reactions.")
+    return ("Input analyte is not involved in any reactions.")
   }
 })
 
@@ -26,14 +27,20 @@ output$summary_cata <- renderText({
 
 
 observe({
-  choices <- kw_analyte[grepl(input$CataInput,kw_analyte,ignore.case=TRUE)]
-  choices <- choices[order(nchar(choices),choices)]
+  if(input$CataInput_choices == 'names'){
+    choices <- kw_analyte[grepl(input$CataInput,kw_analyte,ignore.case=TRUE)]
+    choices <- choices[order(nchar(choices),choices)]
+  } else if(input$CataInput_choices == 'ids'){
+    choices <- kw_source[grepl(input$CataInput,kw_source,ignore.case=TRUE)]
+    choices <- choices[order(nchar(choices),choices)]
+  }
   if(is.null(choices))
     return(NULL)
   if(length(choices) >10 ){
     choices <- choices[1:10]
   }
   isolate({
+    
     updateSelectInput(session, "KW_cata",
                       label = "Select from the list",
                       choices = choices, selected = head(choices,1)
@@ -60,13 +67,13 @@ detector_tab4 <- reactiveValues(num = NULL)
 
 observe({
   input$sub_mul_tab4
-  
   detector_tab4$num <- 1
 })
 
 data_mul_name_tab4 <- eventReactive(input$sub_mul_tab4,{
   RaMP:::rampFastCata(input$input_mul_tab4,conpass=.conpass,
-                      host = .host)
+                      host = .host,
+                      NameOrIds = input$input_mul_tab4_choices)
 })
 data_mul_file_tab4 <- eventReactive(input$sub_file_tab4,{
   infile <- input$inp_file_tab4
@@ -115,3 +122,19 @@ output$preview_multi_names_tab4 <- DT::renderDataTable({
   tb
 }
 )
+
+  output$network <- renderVisNetwork({
+	if(!is.null(dataInput_cata())) {
+		plotCataNetwork(dataInput_cata())
+	}
+
+})
+
+   output$networkmulti <- renderVisNetwork({
+        if(!is.null(data_mul_name_tab4())) {
+                plotCataNetwork(data_mul_name_tab4())
+        }
+
+})
+
+

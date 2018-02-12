@@ -47,7 +47,7 @@ sideBar <-shinydashboard::dashboardSidebar(
           type = "button",
           class = "btn action-button",
           onclick = "setTimeout(function()
-          {window.close();},50);",
+          	{window.close();},50);",
           "Click to Exit RaMP"
         ),
         icon = icon("sign-out")
