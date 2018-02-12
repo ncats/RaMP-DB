@@ -7,35 +7,33 @@ tabItem4<-  shinydashboard::tabItem(
          shiny::tabPanel(strong("Input metabolite or gene one by one"),
                   "",
                   shinydashboard::box(width=6,
-                      title = strong("Input gene or compound"),
+                      title = strong("Input metabolite or gene"),
                       solidHeader = T,
                       height = "100%",
                       status = "primary",
                       fluidRow(
                         column(12,
-                               helpText("If given compound's synonym, it returns all of genes that catalyzed it.
-                                        If given gene's synonym, it returns all of compounds catalyzed by this gene"),
-                               textInput("CataInput","", placeholder = "Input compound's synonym"),
+                               helpText("If a compound is input, 
+		all genes that catalyze reactions involving the compound are returned."),
+			       helpText("Conversely,if a gene is input, all compounds in reactions that are catalyzed by that gene are returned"),
+                               textInput("CataInput","", placeholder = "Input compound name or id"),
+                               radioButtons('CataInput_choices',label = 'Search by name or source id',
+                                            choices = c('Names' = 'names','Source ID' = 'ids')),
                                selectInput("KW_cata", "Select from list", choices = NULL),
                                actionButton("subText_cata","Submit")
-                               )
-                      )
-                  ),
+                        ) # end column
+                      ) # end fluidRow
+                    ),# end box
                   shinydashboard::box(width = 6,title = strong("Search Result:"),solidHeader = T,
                       status = "primary",
                       fluidRow(
                         div(style = "margin:25px;",
                             downloadButton("report_cata","Download Results"),
                             hr(),
-                            textOutput("summary_cata"),
-                            div(style = "height:300px;overflow-x:auto;overflow-y:auto;",
-                                helpText("Preview of output only display first 20 items.")
-                                # DT::dataTableOutput("result_cata")
-                            )
+                            textOutput("summary_cata")
                         )
-                        
-                      )
-                  ),
+                      ) #end fluidRow
+                  ), # end box
                   hr(),
                   fluidRow(
                     shinydashboard::box(
@@ -47,19 +45,46 @@ tabItem4<-  shinydashboard::tabItem(
                       title = strong("Summary"),
 		      DT::dataTableOutput("result_cata")
                       #uiOutput("preview_tab4")
-                    )
-         )),
+                    ) # end box
+		  ), # end fluid row
+		  hr(),
+		  fluidRow(
+                    shinydashboard::box(
+                      width = 12,
+                      solidHeader = T,
+                      status = "info",
+                      collapsible = T,
+                      collapsed = F,
+                      title = strong("Visuazlize gene-metabolite interaction network"),
+                      visNetworkOutput("network")
+                    ) # end box
+		   ) # end fluidRow
+         ),
          shiny::tabPanel(
-           title = strong("Input a list of gene or metabolites"),
+           title = strong("Input a list of genes or metabolites"),
            fluidRow(
              shinydashboard::box(width = 6,
                  solidHeader = T,
                  status = "primary",
-                 title = strong("Input a list of gene or metabolites:"),
+                 title = strong("Input a list of genes or metabolites:"),
                  textAreaInput("input_mul_tab4",label = "",
-                               placeholder = "Input list of metabolites or gene, one per line"),
+                               placeholder = "Input list of genes or metabolites, one per line"),
+                 radioButtons('input_mul_tab4_choices',label = 'Search by source id or name?',
+                              choices = c('Name' = 'names','Source ID' = 'ids')),
                  actionButton("sub_mul_tab4",label = "Submit")
-             )
+             ), # end box
+             shinydashboard::box(width = 6,
+                 solidHeader = T,
+                 status = "primary",
+                 title = strong("Search Result"),
+		fluidRow(
+			div(style = "margin:25px;",
+ 	 			downloadButton("tab4_mul_report",label = "Download Results"),
+				hr()
+			) # end div
+		) # end fluidRow
+	     ) # end box
+
 #             shinydashboard::box(
 #               width = 6,
 #               title = strong("Upload File"),
@@ -71,24 +96,33 @@ tabItem4<-  shinydashboard::tabItem(
 #                         buttonLabel = "Browse..."),
 #               actionButton("sub_file_tab4",label = "Upload File and Run Query")
 #             )
-           ),
+           ), # end fluidRow (with two boxes)
            hr(),
            fluidRow(
-             HTML("<div id='database-group-output'>"),
+             #HTML("<div id='database-group-output'>"),
              shinydashboard::box(width = 12,
-                 title = strong("Data preview"),
+                 title = strong("Summary"),
                  solidHeader = T,
                  status = "primary",
-                 downloadButton("tab4_mul_report",label = "Download Results"),
-                 hr(),
-                 DT::dataTableOutput("preview_multi_names_tab4"),
-                 highcharter::highchartOutput("tab4_hc_output")
-             ),
-             HTML("</div>")
-           )
-         )
-  )
-  )
+                 #downloadButton("tab4_mul_report",label = "Download Results"),
+                 #hr(),
+                 DT::dataTableOutput("preview_multi_names_tab4")
+                 #highcharter::highchartOutput("tab4_hc_output")
+             ), # end box
+             hr(),
+             shinydashboard::box(
+            	width = 12,
+            	solidHeader = T,
+            	status = "info",
+            	collapsible = T,
+            	collapsed = F,
+            	title = strong("Visuazlize gene-metabolite interaction network"),
+            	visNetworkOutput("networkmulti")
+             )
+           ) # end 2nd fluidRow
+         ) # end tab
+     )# end tabBox
+  )# end tabItem
 
 
 
