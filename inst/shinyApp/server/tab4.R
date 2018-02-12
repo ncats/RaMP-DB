@@ -123,3 +123,10 @@ output$preview_multi_names_tab4 <- DT::renderDataTable({
   tb
 }
 )
+
+  output$network <- renderVisNetwork({
+	if(!is.null(dataInput_cata())) {
+		plotCataNetwork(dataInput_cata())
+	}
+
+})

@@ -114,7 +114,7 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
 		  	mdc_c <- merge(df_c,df_c2)
 	    		colnames(df_c3)[which(colnames(df_c3)=="rampId")]="rampId2"
 	    		mdf_cfin <- merge(mdc_c,df_c3)
-	    		mdf_cfin <- mdf_cfin[,c("InputAnalyte","sourceId","IDtype","commonName")]
+			mdf_cfin <- mdf_cfin[,c("InputAnalyte","sourceId","IDtype","commonName")]
    	    		colnames(mdf_cfin) <- c("Input_Metabolite","Gene_sourceId","Gene_IDtype",
 				"Gene_CommonName")
     
@@ -131,6 +131,8 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
 				tempout$Gene_CommonName=temp[1,"Gene_CommonName"]
 				mdf_cfin2 <- rbind(mdf_cfin2,tempout)
 	    		}
+			colnames(mdf_cfin2) <- c("Input_Analyte","Input_CatalyzedBy_CommonName",
+				"Input_CatalyzedBy_SourceIds")
 		} # end else couldn't retrieve names for metabolites
     	} # end else couldn't find metabolite ids
     } # no catalyzation information
@@ -280,5 +282,5 @@ plotCataNetwork <- function(catalyzedf = NULL) {
 
         # Now plot
         visNetwork(mynodes, myedges, width = "100%")
-        return(NULL) #return(list(nodes=mynodes,edges=myedges))
+        #return(NULL) #return(list(nodes=mynodes,edges=myedges))
 }
