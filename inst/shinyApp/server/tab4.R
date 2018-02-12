@@ -67,7 +67,6 @@ detector_tab4 <- reactiveValues(num = NULL)
 
 observe({
   input$sub_mul_tab4
-  
   detector_tab4$num <- 1
 })
 
