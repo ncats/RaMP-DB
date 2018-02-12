@@ -7,9 +7,9 @@ tabItem5<- shinydashboard::tabItem(
   shinydashboard::tabBox(width = 12,
          id = "tabset5",
          height = "100%",
-         shiny::tabPanel(strong("Input one by one."),"",
+         shiny::tabPanel(strong("Input one metabolite or one ontology"),"",
               shinydashboard::box(width=6,
-                  title = strong("Input metabolites or ontology location"),
+                  title = strong("Input a metabolite or ontology"),
                   solidHeader = T,
                   height = "100%",status = "primary",
                   fluidRow(
@@ -23,16 +23,16 @@ tabItem5<- shinydashboard::tabItem(
                                         choices = c(
                                           'Analyte Source ID' = 'source',
                                           "Analyte Name" = "name",
-                                          "Biofluid Location" = "ontology")),
+                                          "Ontology Name" = "ontology")),
                            actionButton("subText_onto","Submit")
                            )
                   )
               ),
-              shinydashboard::box(width = 6,title = strong("Search Result:"),solidHeader = T,
+              shinydashboard::box(width = 6,title = strong("Preview Result"),solidHeader = T,
                   status = "primary",
                   fluidRow(
                     div(style = "margin:25px;",
-                        downloadButton("report_onto","Generate Report"),
+                        downloadButton("report_onto","Download Results"),
                         hr(),
                         textOutput("summary_onto"),
                         div(style = "height:300px;overflow-x:auto;overflow-y:auto;",
@@ -48,14 +48,14 @@ tabItem5<- shinydashboard::tabItem(
               shinydashboard::box(width = 8,
                   solidHeader = T,
                   status = "primary",
-                  title = strong("Input a list of metabolites or biofluid location"),
+                  title = strong("Input a list of metabolites or ontologies"),
                   textAreaInput("input_mul_tab5",label = "",
                                 placeholder = "Input list of metabolites"),
                   radioButtons('input_categories_tab5',label = 'Select from list',
                                choices = c(
-                                 'Analytes Source ID' = 'source',
-                                 "Analytes Names" = "name",
-                                 "Biofluid Location" = "ontology"
+                                 'Analyte Source IDs' = 'source',
+                                 "Analyte Names" = "name",
+                                 "Ontology Names" = "ontology"
                                )),
                   actionButton("sub_mul_tab5",label = "Submit")
                   )
@@ -66,7 +66,7 @@ tabItem5<- shinydashboard::tabItem(
               shinydashboard::box(width = 12,
                   solidHeader = T,
                   status = "primary",
-                  title = strong("Data preview"),
+                  title = strong("Preview Results"),
                   downloadButton("tab5_mul_report",
                                  label = "Download"),
                   hr(),
