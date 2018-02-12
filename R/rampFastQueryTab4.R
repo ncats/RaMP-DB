@@ -281,6 +281,6 @@ plotCataNetwork <- function(catalyzedf = NULL) {
         mynodes=data.frame(color=mycol,size=mysize,id=mynames,label=mynames)
 
         # Now plot
-        visNetwork(mynodes, myedges, width = "100%")
+        visNetwork::visNetwork(mynodes, myedges, width = "100%")
         #return(NULL) #return(list(nodes=mynodes,edges=myedges))
 }
