@@ -57,7 +57,7 @@ tabItem4<-  shinydashboard::tabItem(
                       collapsible = T,
                       collapsed = F,
                       title = strong("Visuazlize gene-metabolite interaction network"),
-                      visNetwork::visNetworkOutput("network")
+                      visNetwork::visNetworkOutput("network",height = '1000px')
                     ) # end box
 		   ) # end fluidRow
          ),
@@ -119,7 +119,7 @@ tabItem4<-  shinydashboard::tabItem(
             	collapsible = T,
             	collapsed = F,
             	title = strong("Visuazlize gene-metabolite interaction network"),
-            	visNetwork::visNetworkOutput("networkmulti")
+            	visNetwork::visNetworkOutput("networkmulti",height = '1000px')
              )
            ) # end 2nd fluidRow
          ) # end tab
