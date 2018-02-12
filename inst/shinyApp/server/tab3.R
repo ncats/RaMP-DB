@@ -98,7 +98,7 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
                              host = .host)
 	  print(input$input_mul_tab3_genes)
   }
- 
+
   parsedinputg <- paste(strsplit(input$input_mul_tab3_genes,"\n")[[1]])
   print(parsedinputg)
   if(length(parsedinputg)==0) {genesearch=NULL} else{
@@ -134,7 +134,7 @@ output$tab3_mul_report <- downloadHandler(filename = function(){
     infile <- input$inp_file_tab3
     paste0(infile[[1,'name']],"Output",".csv")
   }
-  
+
 },
 content = function(file) {
   if (rea_detector$num == 1){
@@ -180,11 +180,11 @@ output$preview_multi_names <- DT::renderDataTable({
 
 
 fisherTestResult <- eventReactive(input$runFisher,{
-    
+
     out <- RaMP::runCombinedFisherTest(req(data_mul_name()),
                                conpass=.conpass)
     print("Results generated")
-    print(paste0("Fisher results size:",nrow(out)))
+    print(paste0("Fisher results size:",nrow(out[[1]])))
   out
 })
 
@@ -208,18 +208,21 @@ output$num_mapped_namesids <- renderText({
 		print(paste0("Found ",length(unique(data$commonName))," out of ",
 		length(parsedinput)))
 	}
-})	
-
-fisherTestResultSignificant<-eventReactive(input$runFisher,{
-  result<-RaMP::FilterFishersResults(fisherTestResult(),
-	p_holmadj_cutoff=as.numeric(input$p_holmadj_cutoff))
-  print(paste0(nrow(result)," significant pathways identified"))
-  result
 })
 
-cluster_output<-eventReactive(input$runFisher,{
+fisherTestResultSignificant<-eventReactive(input$runFisher,{
+  if(!is.null(fisherTestResult())){
+    result<-RaMP::FilterFishersResults(fisherTestResult(),p_holmadj_cutoff=as.numeric(input$p_holmadj_cutoff))
+    return(result)
+  }else{
+    return(NULL)
+  }
+})
+
+cluster_output<-eventReactive(c(input$runFisher,input$runClustering),{
   data <- fisherTestResultSignificant()
-  out<-RaMP::find_clusters(fishers_df=data,perc_analyte_overlap=as.numeric(input$perc_analyte_overlap), 
+
+  out<-RaMP::find_clusters(fishers_df=data,perc_analyte_overlap=as.numeric(input$perc_analyte_overlap),
 	min_pathway_tocluster=as.numeric(input$min_pathway_tocluster),
                       perc_pathway_overlap=as.numeric(input$perc_pathway_overlap))
   if(length(unique(out))>1){
@@ -227,7 +230,7 @@ cluster_output<-eventReactive(input$runFisher,{
   }else{
     print("Clustering failed")
   }
-  out
+  return(out)
 })
 
 output$cluster_summary_text<-renderText(
@@ -264,68 +267,79 @@ observe({
 			1:length(cluster_output()),NA),"Did not cluster"),selected = "All")))
 })
 
-total_results_fisher <- eventReactive(input$runFisher,{
+results_fisher_clust <- reactive({
+  # Turn this into a function in GeneralFunctions
+  cluster_list<-cluster_output()
   if(is.null(fisherTestResult())) {
     data <- data.frame(Query=NA,Freq=NA)
+  }else{
+    data <- fisherTestResultSignificant()
   }
-  data <- fisherTestResultSignificant()$fishresults
-  # Need to remove pathwayRaMPID column
-  rampids<-data[,"pathwayRampId"]
-  data<-data[,-c(which(colnames(data)=="pathwayRampId"))]
+  if(is.null(cluster_list)){
+    return(data)
+  }else{
+    # Need to remove RaMPID column
+    fisher_df<-data[[1]]
+    rampids<-fisher_df$pathwayRampId
+    fisher_df$pathwayRampId<-NULL
 
-  cluster_list<-cluster_output()
-  if(length(cluster_list)>1){
-    cluster_assignment<-sapply(rampids,function(x){
-      pathway<-x
-      clusters<-""
-      for(i in 1:length(cluster_list)){
-        if(pathway %in% cluster_list[[i]]){
-          clusters<-paste0(clusters,i,sep = ", ",collapse = ", ")
+    if(length(cluster_list)>1){
+      cluster_assignment<-sapply(rampids,function(x){
+        pathway<-x
+        clusters<-""
+        for(i in 1:length(cluster_list)){
+          if(pathway %in% cluster_list[[i]]){
+            clusters<-paste0(clusters,i,sep = ", ",collapse = ", ")
+          }
         }
-      }
-      if(clusters!=""){
-        #&&length(unique(clusters))>1
-        clusters=substr(clusters,1,nchar(clusters)-2)
-      }else{
-        clusters = "Did not cluster"
-      }
-      return(clusters)
-    })
-    data_2<-cbind(data,cluster_assignment)
-  } else{
-    data_2<-cbind(data,rep("Did not cluster",times=nrow(data)))
+        if(clusters!=""){
+          clusters=substr(clusters,1,nchar(clusters)-2)
+        }else{
+          clusters = "Did not cluster"
+        }
+        return(clusters)
+      })
+      data[[1]]<-cbind(fisher_df,cluster_assignment)
+    }else{
+      data[[1]]<-cbind(fisher_df,rep("Did not cluster",times=nrow(fisher_df)))
+    }
+    #data$Pval <- round(data$Pval,8)
+    #data$Adjusted.Pval <- round(data$Adjusted.Pval,8)
+    #colnames(data_2)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
+    #"Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway", "In Cluster")
+    data[[1]]$rampids<-rampids
+    return(data)
   }
-  colnames(data_2)[ncol(data_2)]="In Cluster"
-  #data$Pval <- round(data$Pval,8)
-  #data$Adjusted.Pval <- round(data$Adjusted.Pval,8)
-  #colnames(data_2)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
-  #                    "Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway", "In Cluster")
-  data_2<-cbind(data_2,rampids)
 })
 
 output$results_fisher <- DT::renderDataTable({
-  if(!is.null(total_results_fisher)){
-  results_fisher<-total_results_fisher()
+  results_fisher<-results_fisher_clust()
+  results_fisher<-results_fisher$fishresults
+  #results_fisher<-results_fisher[,c("pathwayName","Pval","Pval_FDR","Pval_Holm","pathwaysourceId","pathwaysource",
+  #                                  "Num_In_Path","Total_In_Path","cluster_assignment","rampid")]
+  results_fisher<-results_fisher[,c(6,1,4,5,7,8,2,3,9,10)]
+  colnames(results_fisher)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
+  "Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway", "In Cluster","rampids")
+  rampids <- results_fisher$rampids
+  rampids <- rampids[order(results_fisher[,"In Cluster"])]
+  results_fisher$rampids <- NULL
   results_fisher <- results_fisher[order(results_fisher[,"In Cluster"]),]
   cluster_output<-cluster_output()
   if(input$show_cluster=="All"){
-    results_fisher[,"In Cluster"]
+    results_fisher
   }else if(input$show_cluster=="Did not cluster"){
-    results_fisher[which(results_fisher[,"In Cluster"]=="Did not cluster"),-10]
+    results_fisher[which(results_fisher[,"In Cluster"]=="Did not cluster"),]
   }else{
-    results_fisher[which(results_fisher[,which(colnames(results_fisher)=="pathwayRampId")] %in% 
-	cluster_output[[as.numeric(input$show_cluster)]]),-c(which(colnames(results_fisher)=="pathwayRampId"))]
+    results_fisher[which(rampids %in% cluster_output[[as.numeric(input$show_cluster)]]),]
   }
-  }else{
-    data.frame(rep(NA, times = 9))
-  }
+  # data.frame(rep(NA, times = 9))
 },rownames = FALSE,filter = "top")
 
 output$fisher_stats_report <- downloadHandler(filename = function(){
   return("fisherText.csv")
 },content = function(file){
   #print("Fisher Stats Output has some problems ...")
-  rampOut <- total_results_fisher()
+  rampOut <- results_fisher_clust()
   cluster_output <- cluster_output()
   if(!is.null(rampOut)&&length(unique(cluster_output))>1) {
     cluster_assignment<-apply(rampOut,1,function(x){
