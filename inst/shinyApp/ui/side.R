@@ -32,7 +32,7 @@ sideBar <-shinydashboard::dashboardSidebar(
       icon = icon("dashboard")
     ),
     shinydashboard::menuItem(
-      "Retrieve metabolites or biofluid location",
+      "Retrieve ontologies from given metabolites",
       tabName = "geneCompOnto",
       icon = icon("dashboard")
     ),
