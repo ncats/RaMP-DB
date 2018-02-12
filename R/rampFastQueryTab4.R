@@ -281,6 +281,11 @@ plotCataNetwork <- function(catalyzedf = NULL) {
         mynodes=data.frame(color=mycol,size=mysize,id=mynames,label=mynames)
 
         # Now plot
-        visNetwork::visNetwork(mynodes, myedges, width = "100%")
+        visNetwork::visNetwork(mynodes, myedges, width = "100%",height="1000px") %>%
+		visNetwork::visInteraction(dragNodes = FALSE, 
+                 dragView = TRUE,hideEdgesOnDrag=TRUE,hideNodesOnDrag=TRUE, 
+                 navigationButtons=TRUE,zoomView = TRUE) %>%
+  		visNetwork::visLayout(randomSeed = 123) %>%
+		visNetwork::visPhysics(stabilization = FALSE)
         #return(NULL) #return(list(nodes=mynodes,edges=myedges))
 }
