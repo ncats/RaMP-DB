@@ -2,7 +2,7 @@
 % Please edit documentation in R/rampFastQueryTab4.R
 \name{rampFileOfAnalytes_tab4}
 \alias{rampFileOfAnalytes_tab4}
-\title{Generate data.frame from given files}
+\title{Generate dataframe from given files for shiny app input list of metabolites}
 \usage{
 rampFileOfAnalytes_tab4(infile, conpass = NULL, dbname = "ramp",
   username = "root", host = "localhost")
@@ -19,9 +19,8 @@ rampFileOfAnalytes_tab4(infile, conpass = NULL, dbname = "ramp",
 \item{host}{host name for database access (default is "localhost")}
 }
 \value{
-a data.frame either from multiple csv file
+a dataframe either from multiple csv file
 }
 \description{
-identifing the file type, then it returns table output to 
-shiny renderTable function as preview of searching data
+Generate dataframe from given files for shiny app input list of metabolites
 }
