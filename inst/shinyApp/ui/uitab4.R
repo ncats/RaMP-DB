@@ -51,6 +51,7 @@ tabItem4<-  shinydashboard::tabItem(
 		  fluidRow(
                     shinydashboard::box(
                       width = 12,
+		      height= "1000px",
                       solidHeader = T,
                       status = "info",
                       collapsible = T,
@@ -77,6 +78,7 @@ tabItem4<-  shinydashboard::tabItem(
                  solidHeader = T,
                  status = "primary",
                  title = strong("Search Result"),
+		 DT::dataTableOutput("preview_multi_names_tab4"),
 		fluidRow(
 			div(style = "margin:25px;",
  	 			downloadButton("tab4_mul_report",label = "Download Results"),
@@ -100,18 +102,18 @@ tabItem4<-  shinydashboard::tabItem(
            hr(),
            fluidRow(
              #HTML("<div id='database-group-output'>"),
-             shinydashboard::box(width = 12,
-                 title = strong("Summary"),
-                 solidHeader = T,
-                 status = "primary",
-                 #downloadButton("tab4_mul_report",label = "Download Results"),
-                 #hr(),
-                 DT::dataTableOutput("preview_multi_names_tab4")
+             #shinydashboard::box(width = 12,
+             #    title = strong("Summary"),
+             #    solidHeader = T,
+             #    status = "primary",
+             #    #downloadButton("tab4_mul_report",label = "Download Results"),
+             #    #hr(),
+             #    DT::dataTableOutput("preview_multi_names_tab4")
                  #highcharter::highchartOutput("tab4_hc_output")
-             ), # end box
-             hr(),
+             #), # end box
+             #hr(),
              shinydashboard::box(
-            	width = 12,
+             width = 12,height="1000px",
             	solidHeader = T,
             	status = "info",
             	collapsible = T,
