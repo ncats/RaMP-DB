@@ -115,7 +115,11 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
 	    		colnames(df_c3)[which(colnames(df_c3)=="rampId")]="rampId2"
 	    		mdf_cfin <- merge(mdc_c,df_c3)
 	    #print(colnames(mdf_cfin))
-			mdf_cfin <- mdf_cfin[,c("InputMetabolite","sourceId","IDtype","commonName")]
+	    if (NameOrIds == 'names'){
+  			mdf_cfin <- mdf_cfin[,c("InputAnalyte","sourceId","IDtype","commonName")]
+	    } else if (NameOrIds == 'ids'){
+	      mdf_cfin <- mdf_cfin[,c("InputMetabolite","sourceId","IDtype","commonName")]
+	    }
    	    		colnames(mdf_cfin) <- c("Input_Metabolite","Gene_sourceId","Gene_IDtype",
 				"Gene_CommonName")
     
