@@ -31,10 +31,6 @@ tabItem4<-  shinydashboard::tabItem(
                             downloadButton("report_cata","Download Results"),
                             hr(),
                             textOutput("summary_cata")
-                            #div(style = "height:300px;overflow-x:auto;overflow-y:auto;",
-                                #helpText("Preview of output only display first 20 items.")
-                                # DT::dataTableOutput("result_cata")
-                            #)
                         )
                       ) #end fluidRow
                   ), # end box
@@ -121,7 +117,7 @@ tabItem4<-  shinydashboard::tabItem(
             	collapsible = T,
             	collapsed = F,
             	title = strong("Visuazlize gene-metabolite interaction network"),
-            	visNetworkOutput("network")
+            	visNetworkOutput("networkmulti")
              )
            ) # end 2nd fluidRow
          ) # end tab
