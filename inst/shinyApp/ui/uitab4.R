@@ -4,20 +4,21 @@
 tabItem4<-  shinydashboard::tabItem(
   tabName = "geneCataComp",
   shinydashboard::tabBox(width = 12,id = "tabset4",height = "100%",
-         shiny::tabPanel(strong("Input metabolite or gene one by one"),
+         shiny::tabPanel(strong("Input metabolite one by one"),
                   "",
                   shinydashboard::box(width=6,
-                      title = strong("Input gene or compound"),
+                      title = strong("Input metabolite"),
                       solidHeader = T,
                       height = "100%",
                       status = "primary",
                       fluidRow(
                         column(12,
-                               helpText("If given compound's synonym, it returns all of genes that catalyzed it.
-                                        If given gene's synonym, it returns all of compounds catalyzed by this gene"),
-                               textInput("CataInput","", placeholder = "Input compound's synonym"),
-                               radioButtons('CataInput_choices',label = 'Search by synonyms or source',
-                                            choices = c('Synonyms' = 'synonym','Source ID' = 'source')),
+                               helpText("If a compound is input, 
+		all genes that catalyze reactions involving the compound are returned."),
+		#	       helpText("Conversely,if a gene is input, all compounds in reactions that are catalyzed by that gene are returned"),
+                               textInput("CataInput","", placeholder = "Input compound name or id"),
+                               radioButtons('CataInput_choices',label = 'Search by name or source id',
+                                            choices = c('Names' = 'names','Source ID' = 'ids')),
                                selectInput("KW_cata", "Select from list", choices = NULL),
                                actionButton("subText_cata","Submit")
                                )
@@ -52,16 +53,16 @@ tabItem4<-  shinydashboard::tabItem(
                     )
          )),
          shiny::tabPanel(
-           title = strong("Input a list of gene or metabolites"),
+           title = strong("Input a list of metabolites"),
            fluidRow(
              shinydashboard::box(width = 6,
                  solidHeader = T,
                  status = "primary",
-                 title = strong("Input a list of gene or metabolites:"),
+                 title = strong("Input a list of metabolites:"),
                  textAreaInput("input_mul_tab4",label = "",
-                               placeholder = "Input list of metabolites or gene, one per line"),
-                 radioButtons('input_mul_tab4_choices',label = 'Search by source or synonyms?',
-                              choices = c('Synonym' = 'synonym','Source ID' = 'source')),
+                               placeholder = "Input list of genes or metabolites, one per line"),
+                 radioButtons('input_mul_tab4_choices',label = 'Search by source id or name?',
+                              choices = c('Name' = 'names','Source ID' = 'ids')),
                  actionButton("sub_mul_tab4",label = "Submit")
              )
 #             shinydashboard::box(

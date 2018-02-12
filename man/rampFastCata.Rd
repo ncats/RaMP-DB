@@ -2,13 +2,13 @@
 % Please edit documentation in R/rampFastQueryTab4.R
 \name{rampFastCata}
 \alias{rampFastCata}
-\title{Return analytes that has catalyzation relation with given analyte}
+\title{Retrieves analytes that involved in same reaction as input metabolite}
 \usage{
-rampFastCata(analytes, conpass = NULL, dbname = "ramp", username = "root",
-  host = "localhost")
+rampFastCata(analytes = NULL, conpass = NULL, dbname = "ramp",
+  username = "root", host = "localhost", NameOrIds = "ids")
 }
 \arguments{
-\item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
+\item{analytes}{a vector of analytes (metabolites) that need to be searched}
 
 \item{conpass}{password for database access (string)}
 
@@ -17,10 +17,17 @@ rampFastCata(analytes, conpass = NULL, dbname = "ramp", username = "root",
 \item{username}{username for database access (default is "root")}
 
 \item{host}{host name for database access (default is "localhost")}
+
+\item{NameOrIds}{whether input is "names" or "ids" (default is "ids")}
 }
 \value{
-a data.frame that contains search results
+a dataframe that contains search results
 }
 \description{
-Return analytes that has catalyzation relation with given analyte
+Retrieves analytes that involved in same reaction as input metabolite
+}
+\examples{
+\dontrun{
+rampFastCata(analytes="creatine",conpass="mypassword",NameOrIds="names")
+}
 }

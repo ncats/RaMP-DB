@@ -14,15 +14,15 @@ tabItem5<- shinydashboard::tabItem(
                   height = "100%",status = "primary",
                   fluidRow(
                     column(12,
-                           helpText("If given metabolites' synonym, it returns all of ontology location.
-                                    If given ontology, it returns all of metabolites"),
+                           helpText("When metabolites are input, it returns associated ontologies (e.g. biofluid location, cellular location, origins (e.g. drug, food, microbial), and/or tissue location"),
+                           helpText("When an ontology name is input, it returns all associated metabolites"),
                            textInput("ontoInput","", placeholder = "Input metabolites or ontology location"),
                            selectInput("KW_onto", "Select from list", choices = NULL),
                            radioButtons("metaOrOnto",
                                         "Define the type of given data",
                                         choices = c(
-                                          'Analytes Source ID' = 'source',
-                                          "Analytes Synonyms" = "name",
+                                          'Analyte Source ID' = 'source',
+                                          "Analyte Name" = "name",
                                           "Biofluid Location" = "ontology")),
                            actionButton("subText_onto","Submit")
                            )
@@ -48,13 +48,13 @@ tabItem5<- shinydashboard::tabItem(
               shinydashboard::box(width = 8,
                   solidHeader = T,
                   status = "primary",
-                  title = strong("Input a list of analyte or biofluid location"),
+                  title = strong("Input a list of metabolites or biofluid location"),
                   textAreaInput("input_mul_tab5",label = "",
-                                placeholder = "Input list of analytes"),
+                                placeholder = "Input list of metabolites"),
                   radioButtons('input_categories_tab5',label = 'Select from list',
                                choices = c(
                                  'Analytes Source ID' = 'source',
-                                 "Analytes Synonyms" = "name",
+                                 "Analytes Names" = "name",
                                  "Biofluid Location" = "ontology"
                                )),
                   actionButton("sub_mul_tab5",label = "Submit")
