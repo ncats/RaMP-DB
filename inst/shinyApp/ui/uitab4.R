@@ -54,7 +54,7 @@ tabItem4<-  shinydashboard::tabItem(
                       width = 12,
 		      height= "1000px",
                       solidHeader = T,
-                      status = "info",
+                      status = "primary",
                       collapsible = T,
                       collapsed = F,
                       title = strong("Visuazlize gene-metabolite interaction network"),
@@ -116,7 +116,7 @@ tabItem4<-  shinydashboard::tabItem(
              shinydashboard::box(
              width = 12,height="1000px",
             	solidHeader = T,
-            	status = "info",
+            	status = "primary",
             	collapsible = T,
             	collapsed = F,
             	title = strong("Visuazlize gene-metabolite interaction network"),
