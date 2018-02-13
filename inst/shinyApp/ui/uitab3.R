@@ -90,7 +90,7 @@ tabItem3 <-  shinydashboard::tabItem(
 #                 actionButton("sub_file_tab3",label = "Upload")
              ), # end box
              shinydashboard::box(width = 6,
-                 title = strong("Summary:"),
+                 title = strong("Summary"),
                  solidHeader = T,
                  status = "primary",
 		p("The following number of names/ids were mapped:"),
