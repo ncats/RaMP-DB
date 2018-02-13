@@ -221,7 +221,7 @@ output$num_mapped_namesids <- renderText({
 	}
 })
 
-fisherTestResultSignificant<-eventReactive(input$runFisher,{
+fisherTestResultSignificant<-eventReactive(input$runClustering,{
   if(!is.null(fisherTestResult())){
     result<-RaMP::FilterFishersResults(fisherTestResult(),p_holmadj_cutoff=as.numeric(input$p_holmadj_cutoff))
     return(result)

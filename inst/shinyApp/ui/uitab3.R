@@ -61,7 +61,7 @@ tabItem3 <-  shinydashboard::tabItem(
              shinydashboard::box(width = 6,
                  solidHeader = T,
                  status = "primary",
-                 title = strong("Input a list of genes and/or metabolites"),
+                 title = strong("1. Input a list of genes and/or metabolites"),
                  # h4(strong('Input a list of genes, one per line')),
                  shiny::mainPanel(
                    width = 12,
@@ -119,24 +119,25 @@ fluidRow(
          shinydashboard::box(
            solidHeader = T,
            status = "primary",
-           title = strong("Set Parameters to run Pathway Enrichment Analysis"),
+           title = strong("2. Run pathway enrichment analysis"),
+           width = NULL,
+           actionButton("runFisher","Run Pathway Enrichment (please be patient!)")),#end of box
+
+         shinydashboard::box(
+           solidHeader = T,
+           status = "primary",
+           title = strong("3. Set parameters for signifance filtering and functional pathway clustering:"),
            width = NULL,
            numericInput("p_holmadj_cutoff",
                         "Select cutoff for Holm Adjusted p-values (will only return pathways with Holm adj p-values < cutoff)",
                         value = 0.01,
                         min=0,max=1,
                         width = "80%"),
-           actionButton("runFisher","Run Pathway Enrichment (please be patient!)")),#end of box
-
-         shinydashboard::box(
-           solidHeader = T,
-           status = "primary",
-           title = strong("Set parameters for functional pathway clustering:"),
-           width = NULL,
+           h2("Clustering Parameters:"),
            numericInput("perc_analyte_overlap", "Overlap threshold (0-1) for pathways to be considered similar (for medoid establishment):",min = 0.01, max = 1, value = 0.2, step = 0.01),
            numericInput("min_pathway_tocluster", "Number of similar neighbors required (for medoid establishment):",min = 1, max = 100, value = 2, step = 1),
            numericInput("perc_pathway_overlap", "Overlap threshold (0-1) for pathways to be clustered:",min = 0.01, max = 1, value = 0.75, step = 0.01),
-           actionButton("runClustering","Run Pathway Clustering")
+           actionButton("runClustering","Filter and Cluster Results")
          )),#end of Box
 
   column(width = 6,
@@ -144,7 +145,7 @@ fluidRow(
            width = "100%",
            solidHeader = T,
            status = "primary",
-           title = strong("Summary:"),
+           title = strong("4. Download results:"),
            p("Significant pathways are returned under 'Results of Pathway Enrichment Analysis' and can be downloaded by clicking 'Download Results'"),
            p("Note that only pathways that contain at least 3 analytes from the user input will be output"),
            #textOutput("summary_Fisher"),
