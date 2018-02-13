@@ -128,12 +128,12 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
 
 # Download table in a csv file.
 output$tab3_mul_report <- downloadHandler(filename = function(){
-  if (rea_detector$num == 1){
+  # if (rea_detector$num == 1){
       paste0("pathwayFromMetabolitesOutput.csv")
-  } else if (rea_detector$num == 2){
-    infile <- input$inp_file_tab3
-    paste0(infile[[1,'name']],"Output",".csv")
-  }
+  # } else if (rea_detector$num == 2){
+  #   infile <- input$inp_file_tab3
+  #   paste0(infile[[1,'name']],"Output",".csv")
+  # }
 
 },
 content = function(file) {
