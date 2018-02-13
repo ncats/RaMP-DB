@@ -81,7 +81,7 @@ content = function(file) {
 #
 #
 # rea_detector <- reactiveValues(num = NULL)
-# 
+#
 # observe({
 #   input$sub_mul_tab3
 #   #isGeneMetabolites$content <- 'metabolites'
@@ -117,10 +117,10 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
 #   infile <- input$inp_file_tab3
 #   if (is.null(infile))
 #     return(NULL)
-# 
+#
 #   RaMP:::rampFileOfPathways(infile,conpass=.conpass,host = .host,NameOrIds=input$NameOrSourcemult)
 # })
-# 
+#
 # observe({
 #   input$sub_file_tab3
 #   rea_detector$num <- 2
@@ -221,7 +221,6 @@ fisherTestResultSignificant<-eventReactive(input$runFisher,{
 
 cluster_output<-eventReactive(c(input$runFisher,input$runClustering),{
   data <- fisherTestResultSignificant()
-
   out<-RaMP::find_clusters(fishers_df=data,perc_analyte_overlap=as.numeric(input$perc_analyte_overlap),
 	min_pathway_tocluster=as.numeric(input$min_pathway_tocluster),
                       perc_pathway_overlap=as.numeric(input$perc_pathway_overlap))
@@ -313,13 +312,27 @@ results_fisher_clust <- reactive({
 })
 
 output$results_fisher <- DT::renderDataTable({
-  results_fisher<-results_fisher_clust()
-  results_fisher<-results_fisher$fishresults
-  #results_fisher<-results_fisher[,c("pathwayName","Pval","Pval_FDR","Pval_Holm","pathwaysourceId","pathwaysource",
-  #                                  "Num_In_Path","Total_In_Path","cluster_assignment","rampid")]
-  results_fisher<-results_fisher[,c(6,1,4,5,7,8,2,3,9,10)]
-  colnames(results_fisher)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
-  "Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway", "In Cluster","rampids")
+  results_fisher_total<-results_fisher_clust()
+  results_fisher<-results_fisher_total$fishresults
+  #results_fisher<-results_fisher[,c(6,1,4,5,7,8,2,3,9,10)]
+  if(results_fisher_total$analyte_type=="both"){
+    results_fisher<-results_fisher[,c("pathwayName","Pval.Metab","Num_In_Path.Metab","Total_In_Path.Metab",
+                                      "Pval.Gene","Num_In_Path.Gene","Total_In_Path.Gene", "Pval_combined",
+                                      "Pval_combined_FDR","Pval_combined_Holm","pathwaysourceId","pathwaysource",
+                                      "cluster_assignment","rampids")]
+
+    colnames(results_fisher)<-c("Pathway Name", "Raw Fisher's P Value (Metabolites)","User Metabolites in Pathway",
+                                "Total Metabolites in Pathway","Raw Fisher's P Value (Genes)","User Genes in Pathway",
+                                "Total Genes in Pathway","Raw Fisher's P Value (Combined)","FDR Adjusted P Value (Combined)",
+                                "Holm Adjusted P Value (Combined)","Source ID","Source DB","In Cluster","rampids")
+  }else{
+    #print(colnames(results_fisher))
+    results_fisher<-results_fisher[,c("pathwayName","Pval","Pval_FDR","Pval_Holm","pathwaysourceId","pathwaysource",
+                                      "Num_In_Path","Total_In_Path","cluster_assignment","rampids")]
+    colnames(results_fisher)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
+                                "Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway",
+                                "In Cluster","rampids")
+  }
   rampids <- results_fisher$rampids
   rampids <- rampids[order(results_fisher[,"In Cluster"])]
   results_fisher$rampids <- NULL
