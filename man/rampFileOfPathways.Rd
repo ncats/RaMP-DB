@@ -2,7 +2,8 @@
 % Please edit documentation in R/rampFastQueryTab3.R
 \name{rampFileOfPathways}
 \alias{rampFileOfPathways}
-\title{Generate data.frame from given files}
+\title{Generate data.frame from given files identifying the file type, then it returns table output to
+shiny renderTable function as preview of searching data}
 \usage{
 rampFileOfPathways(infile, NameOrIds = "ids", conpass = NULL,
   dbname = "ramp", username = "root", host = "localhost")
@@ -25,6 +26,6 @@ a data.frame either from multiple csv file
 or search through by a txt file.
 }
 \description{
-identifing the file type, then it returns table output to
+Generate data.frame from given files identifying the file type, then it returns table output to
 shiny renderTable function as preview of searching data
 }
