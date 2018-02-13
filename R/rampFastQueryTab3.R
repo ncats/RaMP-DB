@@ -55,7 +55,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 	wiki_totanalytes <- react_totanalytes <- kegg_totanalytes <- total_genes
   }
 
-  print("Calculating p-values for pathways in input")
+  print("Calculating p-values for pathways in input that have genes")
   # Retrieve the Ramp compound ids associated with the ramp pathway id and count them:
 
    query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
@@ -174,7 +174,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
          # pidused <- c(pidused,i)
   } # end for loop
 
-  # only keep pathways that have > 8 or < 100 coumpounds
+  # only keep pathways that have > 8 or < 100 compounds
   keepers <- intersect(which(c(totinpath,totinpath2)>=8),
 		which(c(totinpath,totinpath2)<100))
   #hist(totinpath,breaks=1000)
@@ -281,6 +281,7 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
                 "pathwaysource")],by="pathwayRampId")
     } else {
 	    # merge the results if both genes and metabolites were run
+	    G = M = 1
 	    allfish <- merge(outmetab,outgene,
 		by="pathwayRampId",all.x=T,all.y=T)
 	    colnames(allfish)[which(colnames(allfish)=="Pval.x")]="Pval.Metab"
@@ -369,7 +370,11 @@ rampGenerateBarPlot <- function(df){
 #' @param host host name for database access (default is "localhost")
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
-#' @return a list contains all metabolits as name and pathway inside.
+#' @return a list contains all metabolites as name and pathway inside.
+#' @examples
+#' \dontrun{
+#' mypath <- rampFastPathFromMeta(analytes=c("2-hydroxyglutarate","glutamate"), conpass="mypassword")
+#' }
 #' @export
 rampFastPathFromMeta<- function(analytes=NULL,
 	find_synonym = FALSE,
@@ -585,8 +590,7 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
 #'}
 #' @export
 find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
-                            min_pathway_tocluster = 3,perc_pathway_overlap = 0.5){
-
+	min_pathway_tocluster = 2,perc_pathway_overlap = 0.5){
   if(perc_analyte_overlap <= 0 || perc_analyte_overlap >= 1 ||
      perc_pathway_overlap <= 0 || perc_pathway_overlap >= 1){
     return(NULL)
@@ -595,13 +599,13 @@ find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
   analyte_type=fishers_df$analyte_type
   fishers_df=fishers_df$fishresults
 
-  similarity_matrix_list<-load_overlap_matrices()
+  similarity_matrix_list<-RaMP:::load_overlap_matrices()
   if(analyte_type=="both"){
-    similarity_matrix = similarity_matrix_list[[3]]
+    similarity_matrix = similarity_matrix_list[["analyte"]]
   }else if(analyte_type=="metabolites"){
-    similarity_matrix = similarity_matrix_list[[2]]
+    similarity_matrix = similarity_matrix_list[["metab"]]
   } else if(analyte_type=="genes"){
-    similarity_matrix = similarity_matrix_list[[1]]
+    similarity_matrix = similarity_matrix_list[["gene"]]
   } else {
     stop("analyte_type should be 'genes' or metabolites'")
   }
@@ -615,7 +619,8 @@ find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
 
   pathway_matrix<-similarity_matrix[pathway_indices,pathway_indices]
   unmerged_clusters<-apply(pathway_matrix, 1, function(x){
-    if(length(which(x>=perc_analyte_overlap))>(min_pathway_tocluster+1)){
+    # if(length(which(x>=perc_analyte_overlap))>(min_pathway_tocluster+1)){
+    if(length(which(x>=perc_analyte_overlap))>(min_pathway_tocluster-1)){
       return(colnames(pathway_matrix)[which(x>=perc_analyte_overlap)])
     } else {
       return(NA)

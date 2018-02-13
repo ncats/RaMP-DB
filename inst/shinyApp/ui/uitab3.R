@@ -141,7 +141,7 @@ fluidRow(
 
   column(width = 6,
          shinydashboard::box(
-           width = NULL,
+           width = "100%",
            solidHeader = T,
            status = "primary",
            title = strong("Summary:"),
