@@ -126,8 +126,6 @@ fluidRow(
                         value = 0.01,
                         min=0,max=1,
                         width = "80%"),
-           selectInput("analyte_type", "Type of analyte", choices = c("Metabolites" = "metabolites",
-                                                                      "Genes" = "genes")),
            actionButton("runFisher","Run Pathway Enrichment (please be patient!)")),#end of box
 
          shinydashboard::box(
@@ -143,7 +141,7 @@ fluidRow(
 
   column(width = 6,
          shinydashboard::box(
-           width = NULL,
+           width = "100%",
            solidHeader = T,
            status = "primary",
            title = strong("Summary:"),
