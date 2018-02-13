@@ -25,9 +25,14 @@ rampFastPathFromMeta(analytes = NULL, find_synonym = FALSE,
 \item{NameOrIds}{whether input is "names" or "ids" (default is "ids")}
 }
 \value{
-a list contains all metabolits as name and pathway inside.
+a list contains all metabolites as name and pathway inside.
 }
 \description{
 Function that search analytes (gene or compounds)  or a list of analytes and
 returns associated pathways
+}
+\examples{
+\dontrun{
+mypath <- rampFastPathFromMeta(analytes=c("2-hydroxyglutarate","glutamate"), conpass="mypassword")
+}
 }
