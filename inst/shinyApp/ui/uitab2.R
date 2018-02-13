@@ -52,7 +52,7 @@ tabItem2<-  shinydashboard::tabItem(
                     HTML("<div id='database-group-output'>"),
                     shinydashboard::box(
                       width = 12,
-                      status = "info",
+                      status = "summary",
                       solidHeader = T,
                       collapsible = T,
                       title = strong("Summary"),
@@ -64,6 +64,8 @@ tabItem2<-  shinydashboard::tabItem(
          shiny::tabPanel(title = "Input a list of pathways",
                   fluidRow(
                     shinydashboard::box(width = 6,
+			status="primary",
+			solidHeader = T,
                         title = strong("Input a list of pathways, one per line:"),
                         textAreaInput("input_mul_tab2",label = "",
                                       placeholder = "Input list of pathways, one per line"),
@@ -83,6 +85,8 @@ tabItem2<-  shinydashboard::tabItem(
                   fluidRow(
                     HTML("<div id='database-group-output'>"),
                     shinydashboard::box(width = 12,
+			status="primary",
+			solidHeader = T,
                         title = strong("Data preview"),
                         downloadButton("tab2_mul_report",label = "Download Table"),
                         hr(),
