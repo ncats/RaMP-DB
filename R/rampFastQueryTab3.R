@@ -578,7 +578,9 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
 #' a cluster (medoid) (Default = 3)
 #' @param perc_pathway_overlap Minimum overlap for clusters to merge (Default = 0.5)
 #'
-#' @return a list of clusters identified by the algorithm. Each entry of the list is
+#' @return a list of 3: First entry is fishers_df with cluster membership column appended
+#' to each pathway. Second entry is query type (metabolites, genes, or both). Third entry is
+#' a list of clusters identified by the algorithm. Each entry of the list is
 #' a cluster, containing a vector of pathways in the cluster
 #'@examples
 #'\dontrun{
@@ -590,7 +592,7 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
 #'}
 #' @export
 find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
-	min_pathway_tocluster = 2,perc_pathway_overlap = 0.5){
+                            min_pathway_tocluster = 2,perc_pathway_overlap = 0.5){
   if(perc_analyte_overlap <= 0 || perc_analyte_overlap >= 1 ||
      perc_pathway_overlap <= 0 || perc_pathway_overlap >= 1){
     return(NULL)
@@ -633,63 +635,67 @@ find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
 
   if(length(unmerged_clusters)==0){
     #stop("No medoids found, make perc_analyte_overlap or min_pathway_tocluster smaller")
-    return(rep("Did not cluster",times = nrow(fishers_df)))
-  }
-
-  # Evaluate similarity between clusters
-  cluster_similarity<-matrix(0,ncol = length(unmerged_clusters),nrow = length(unmerged_clusters))
-  for(i in 1:length(unmerged_clusters)){
-    for(j in 1:length(unmerged_clusters)){
-      cluster_similarity[i,j]<-length(intersect(unmerged_clusters[[i]],unmerged_clusters[[j]]))/
-        length(unique(c(unmerged_clusters[[i]],unmerged_clusters[[j]])))
-    }
-  }
-  colnames(cluster_similarity)<-rownames(cluster_similarity)<-names(unmerged_clusters)
-  unmerged_cluster_similarity<-cluster_similarity
-
-  cluster_list<-unmerged_clusters
-
-  # Merge Clusters
-  count = 1
-  while(length(which(cluster_similarity >= perc_pathway_overlap)) > nrow(cluster_similarity)){
-    cluster_similarity_mod<-cluster_similarity
-    for(i in 1:nrow(cluster_similarity_mod)){
-      cluster_similarity_mod[i,i]<-0
-    }
-
-    clusters_to_merge<-which(cluster_similarity_mod == max(cluster_similarity_mod), arr.ind = TRUE)
-    clusters_to_merge<-unique(t(apply(clusters_to_merge, 1, sort)))
-
-    for(i in 1:nrow(clusters_to_merge)){
-      if(!is.na(cluster_list[[clusters_to_merge[i,1]]])&&!is.na(cluster_list[[clusters_to_merge[i,2]]])){
-        cluster_list[[clusters_to_merge[i,1]]]<-unique(unlist(cluster_list[c(clusters_to_merge[i,1],clusters_to_merge[i,2])]))
-        cluster_list[[clusters_to_merge[i,2]]]<-NA
+    cluster_list<-rep("Did not cluster",times = nrow(fishers_df))
+  }else{
+    # Evaluate similarity between clusters
+    cluster_similarity<-matrix(0,ncol = length(unmerged_clusters),nrow = length(unmerged_clusters))
+    for(i in 1:length(unmerged_clusters)){
+      for(j in 1:length(unmerged_clusters)){
+        cluster_similarity[i,j]<-length(intersect(unmerged_clusters[[i]],unmerged_clusters[[j]]))/
+          length(unique(c(unmerged_clusters[[i]],unmerged_clusters[[j]])))
       }
     }
+    colnames(cluster_similarity)<-rownames(cluster_similarity)<-names(unmerged_clusters)
+    unmerged_cluster_similarity<-cluster_similarity
 
-    if(length(which(is.na(cluster_list)))>0){
-      cluster_list<-cluster_list[-which(is.na(cluster_list))]
-    }
+    cluster_list<-unmerged_clusters
 
-    cluster_similarity<-matrix(0,ncol = length(cluster_list),nrow = length(cluster_list))
-    for(i in 1:length(cluster_list)){
-      for(j in 1:length(cluster_list)){
-        cluster_similarity[i,j]<-length(intersect(cluster_list[[i]],cluster_list[[j]]))/
-          length(unique(c(cluster_list[[i]],cluster_list[[j]])))
+    # Merge Clusters
+    count = 1
+    while(length(which(cluster_similarity >= perc_pathway_overlap)) > nrow(cluster_similarity)){
+      cluster_similarity_mod<-cluster_similarity
+      for(i in 1:nrow(cluster_similarity_mod)){
+        cluster_similarity_mod[i,i]<-0
+      }
+
+      clusters_to_merge<-which(cluster_similarity_mod == max(cluster_similarity_mod), arr.ind = TRUE)
+      clusters_to_merge<-unique(t(apply(clusters_to_merge, 1, sort)))
+
+      for(i in 1:nrow(clusters_to_merge)){
+        if(!is.na(cluster_list[[clusters_to_merge[i,1]]])&&!is.na(cluster_list[[clusters_to_merge[i,2]]])){
+          cluster_list[[clusters_to_merge[i,1]]]<-unique(unlist(cluster_list[c(clusters_to_merge[i,1],clusters_to_merge[i,2])]))
+          cluster_list[[clusters_to_merge[i,2]]]<-NA
+        }
+      }
+
+      if(length(which(is.na(cluster_list)))>0){
+        cluster_list<-cluster_list[-which(is.na(cluster_list))]
+      }
+
+      cluster_similarity<-matrix(0,ncol = length(cluster_list),nrow = length(cluster_list))
+      for(i in 1:length(cluster_list)){
+        for(j in 1:length(cluster_list)){
+          cluster_similarity[i,j]<-length(intersect(cluster_list[[i]],cluster_list[[j]]))/
+            length(unique(c(cluster_list[[i]],cluster_list[[j]])))
+        }
+      }
+
+      if(nrow(cluster_similarity)==1){
+        #stop("Clusters converged, use larger perc_pathway_overlap")
+        #return(rep(1,times = nrow(fishers_df)))
+        cluster_list<-rep("Did not cluster",times = nrow(fishers_df))
+      }
+      count = count + 1
+      if(count == length(unmerged_clusters)+1){
+        stop("ERROR: while loop failed to terminate")
+        #return(rep(1,times = nrow(fishers_df)))
+        #cluster_list<-rep("Did not cluster",times = nrow(fishers_df))
       }
     }
-
-    if(nrow(cluster_similarity)==1){
-      #stop("Clusters converged, use larger perc_pathway_overlap")
-      return(rep(1,times = nrow(fishers_df)))
-    }
-    count = count + 1
-    if(count == length(unmerged_clusters)+1){
-      #stop("ERROR: while loop failed to terminate")
-      return(rep(1,times = nrow(fishers_df)))
+    if(length(unique(cluster_list))!=1){
+      colnames(cluster_similarity) = rownames(cluster_similarity) = paste0("cluster_",c(1:length(cluster_list)))
     }
   }
-  colnames(cluster_similarity) = rownames(cluster_similarity) = paste0("cluster_",c(1:length(cluster_list)))
   #return(cluster_list)
 
   # New stuff
@@ -717,8 +723,8 @@ find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
     fishers_df<-cbind(fishers_df,rep("Did not cluster",times=nrow(fishers_df)))
   }
   fishers_df$rampids<-rampids
-  output<-list(fishers_df,analyte_type)
-  names(output)<-c(fishresults,analyte_type)
+  output<-list(fishers_df,analyte_type,cluster_list)
+  names(output)<-c("fishresults","analyte_type","cluster_list")
   return(output)
 }
 

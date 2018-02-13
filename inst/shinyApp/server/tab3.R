@@ -224,60 +224,70 @@ cluster_output<-eventReactive(c(input$runFisher,input$runClustering),{
   out<-RaMP::find_clusters(fishers_df=data,perc_analyte_overlap=as.numeric(input$perc_analyte_overlap),
 	min_pathway_tocluster=as.numeric(input$min_pathway_tocluster),
                       perc_pathway_overlap=as.numeric(input$perc_pathway_overlap))
-  if(length(unique(out))>1){
-    print(paste0(length(out)," clusters found"))
+  cluster_list<-out$cluster_list
+  if(length(unique(cluster_list))>1){
+    print(paste0(length(cluster_list)," clusters found"))
   }else{
     print("Clustering failed")
   }
   return(out)
 })
 
+cluster_list<-reactive({
+  out<-cluster_output()
+  if(!is.null(out)){
+    cluster_list<-out$cluster_list
+  }
+})
+
 output$cluster_summary_text<-renderText(
+  #out<-cluster_output()
   if(as.numeric(input$perc_analyte_overlap) <= 0 || as.numeric(input$perc_analyte_overlap) >= 1 || as.numeric(input$perc_pathway_overlap) <= 0 || as.numeric(input$perc_pathway_overlap) >= 1){
    print("Clustering warning: overlap thresholds must be a percentage greater than 0 and less than 1!")
   }else if(!is.null(cluster_output())){
-    if(length(unique(cluster_output()))>1){
-    paste0("Fuzzy clustering identified ",length(cluster_output()), " distinct cluster(s) of pathways")
+    #cluster_list<-out$cluster_list
+    if(length(unique(cluster_list()))>1){
+    paste0("Fuzzy clustering identified ",length(cluster_list()), " distinct cluster(s) of pathways")
     }else{
       print("Fuzzy clustering algorithm did not identify any clusters. Less stringent thresholds may help in identification, or there may not be enough pathways to cluster.")
     }
   }
 )
 
-output$cluster_summary_plot<-renderPlot(
-  if(!is.null(cluster_output())&&length(unique(cluster_output()))>1){
-    data<-as.numeric(lapply(cluster_output(),length))
+output$cluster_summary_plot<-renderPlot({
+  out<-cluster_output()
+  if(!is.null(out)&&length(unique(cluster_list()))>1){
+    data<-as.numeric(lapply(cluster_list(),length))
     ylim<-c(0, 1.1*max(data))
     xx<- barplot(data, xaxt = 'n', xlab = '', width = 0.85, ylim = ylim, yaxt = 'n',
                  col = "steelblue")
     text(x = xx, y = data, label = data, pos = 3, cex = 0.8)
-    axis(1, at=xx, labels=c(1:length(cluster_output())))
+    axis(1, at=xx, labels=c(1:length(cluster_list())))
     #axis(4, at=c(1,round(max(data)/2),max(data)))
     title("Pathways per cluster", xlab="Cluster #")
     #mtext("# Pathways", side=4, line=-1.5)
   }
-)
+})
 
 observe({
+  out<-cluster_output()
+  cluster_list<-out$cluster_list
   updateSelectInput(session,"show_cluster","Display pathways in cluster:",
-                    #choices = as.vector(na.exclude(c("All",ifelse(length(unique(cluster_output()))>1,1:length(cluster_output()),NA),"Did not cluster"),selected = "All")))
-                    #choices = c("All",1:length(cluster_output()),"Did not cluster"),selected = "All")
-                    choices = as.vector(na.exclude(c("All",ifelse(unique(cluster_output())!="Did not cluster",
-			1:length(cluster_output()),NA),"Did not cluster"),selected = "All")))
+                    choices = as.vector(na.exclude(c("All",ifelse(unique(cluster_list())!="Did not cluster",
+			1:length(cluster_list()),NA),"Did not cluster"),selected = "All")))
 })
 
 results_fisher_clust <- reactive({
-  # Turn this into a function in GeneralFunctions
-  cluster_list<-cluster_output()
+  cluster_out<-cluster_output()
   if(is.null(fisherTestResult())) {
     data <- data.frame(Query=NA,Freq=NA)
   }else{
     data <- fisherTestResultSignificant()
   }
-  if(is.null(cluster_list)){
+  if(is.null(cluster_out)){
     return(data)
   }else{
-    return(cluster_list)
+    return(cluster_out)
     # # Need to remove RaMPID column
     # fisher_df<-data[[1]]
     # rampids<-fisher_df$pathwayRampId
@@ -314,9 +324,7 @@ results_fisher_clust <- reactive({
 
 output$results_fisher <- DT::renderDataTable({
   results_fisher_total<-results_fisher_clust()
-  print(head(results_fisher_total[[1]]))
   results_fisher<-results_fisher_total$fishresults
-  #results_fisher<-results_fisher[,c(6,1,4,5,7,8,2,3,9,10)]
   if(results_fisher_total$analyte_type=="both"){
     results_fisher<-results_fisher[,c("pathwayName","Num_In_Path.Metab","Total_In_Path.Metab",
                                       "Num_In_Path.Gene","Total_In_Path.Gene", "Pval_combined",
@@ -343,7 +351,7 @@ output$results_fisher <- DT::renderDataTable({
   rampids <- rampids[order(results_fisher[,"In Cluster"])]
   results_fisher$rampids <- NULL
   results_fisher <- results_fisher[order(results_fisher[,"In Cluster"]),]
-  cluster_output<-cluster_output()
+  cluster_output<-cluster_list()
   if(input$show_cluster=="All"){
     results_fisher
   }else if(input$show_cluster=="Did not cluster"){
@@ -395,7 +403,7 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
     rampOut<-rampOut[,-10]
   }
   if(!is.null(rampOut)){
-    print(colnames(rampOut))
+    #print(colnames(rampOut))
     rampOut<-rampOut[order(rampOut[,"Holm Adjusted P Value"]),]
     rampOut<-rampOut[!duplicated(rampOut),]
   write.csv(rampOut,file,row.names = FALSE)
