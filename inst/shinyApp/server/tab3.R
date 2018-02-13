@@ -88,7 +88,7 @@ content = function(file) {
 # })
 
 data_mul_name <- eventReactive(input$sub_mul_tab3,{
-  print(input$input_mul_tab3)
+  #print(input$input_mul_tab3)
   parsedinput <- paste(strsplit(input$input_mul_tab3,"\n")[[1]])
   print(parsedinput)
   if(length(parsedinput)==0) {metabsearch=NULL} else{
@@ -155,7 +155,7 @@ output$summary_mulpath_out<- DT::renderDataTable({
       temp <- data_mul_name()
     }
     out <- as.data.frame(table(temp$commonName))
-    colnames(out)[1] <- "Query"
+    colnames(out) <- c("Query","Num_Pathways")
   out
 },rownames=FALSE)
 
@@ -191,7 +191,7 @@ fisherTestResult <- eventReactive(input$runFisher,{
 output$summary_fisher <- DT::renderDataTable({
   if(!is.null(fisherTestResult())) {
     data <- fisherTestResult()
-    out=as.data.frame(table(data$pathwaysource))
+    out=as.data.frame(table(data$fishresults$pathwaysource))
     colnames(out)[1]="Pathway_Source"
   } else {
     out <- data.frame(Pathway_Source=NA, Freq=NA)
@@ -203,10 +203,21 @@ output$summary_fisher <- DT::renderDataTable({
 output$num_mapped_namesids <- renderText({
 	  data <- data_mul_name()
 	  inputlist <- input$input_mul_tab3
-	if(!is.null(data)) {
-		parsedinput <- paste(strsplit(inputlist,"\n")[[1]])
+	  inputlist2 <-input$input_mul_tab3_genes
+	  inputsize=0
+	  if(!is.null(inputlist) && !is.null(inputlist2)) {
+	  	#inputsize <- length(inputlist)+length(inputlist2)
+		inputsize <- length(strsplit(inputlist,"\n")[[1]])+length(strsplit(inputlist2,"\n")[[1]])
+	  } else if (!is.null(inputlist) && is.null(inputlist2)) {
+		#inputsize <- length(inputlist)
+		inputsize <- length(strsplit(inputlist,"\n")[[1]])
+          } else if (is.null(inputlist) && !is.null(inputlist2)) {
+		#inputsize <- length(inputlist2)
+		inputsize <- length(strsplit(inputlist2,"\n")[[1]])
+	  }
+	if(!is.null(data) && inputsize>0) {
 		print(paste0("Found ",length(unique(data$commonName))," out of ",
-		length(parsedinput)))
+		inputsize))
 	}
 })
 

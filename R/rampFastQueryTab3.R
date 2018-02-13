@@ -471,9 +471,7 @@ rampFastPathFromMeta<- function(analytes=NULL,
 	"pathwaysourceId","pathwaysource","commonName")])
 }
 
-#' Generate data.frame from given files
-#'
-#' identifing the file type, then it returns table output to
+#' Generate data.frame from given files identifying the file type, then it returns table output to
 #' shiny renderTable function as preview of searching data
 #'
 #' @param infile a file object given from files
@@ -698,7 +696,7 @@ find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
   }
   #return(cluster_list)
 
-  # New stuff
+  # Reformat cluster list to embed into results file 
   rampids<-as.vector(fishers_df$pathwayRampId)
   fishers_df$pathwayRampId<-NULL
 
@@ -723,8 +721,7 @@ find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
     fishers_df<-cbind(fishers_df,rep("Did not cluster",times=nrow(fishers_df)))
   }
   fishers_df$rampids<-rampids
-  output<-list(fishers_df,analyte_type,cluster_list)
-  names(output)<-c("fishresults","analyte_type","cluster_list")
+  output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list=cluster_list)
   return(output)
 }
 
