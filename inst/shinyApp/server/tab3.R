@@ -365,47 +365,29 @@ output$results_fisher <- DT::renderDataTable({
 output$fisher_stats_report <- downloadHandler(filename = function(){
   return("fisherText.csv")
 },content = function(file){
-  #print("Fisher Stats Output has some problems ...")
-  rampOut <- results_fisher_clust()
-  cluster_output <- cluster_output()
-  if(!is.null(rampOut)&&length(unique(cluster_output))>1) {
-    cluster_assignment<-apply(rampOut,1,function(x){
-      pathway<-x[10]
-      clusters<-c()
-      for(i in 1:length(cluster_output)){
-        if(pathway %in% cluster_output[[i]]){
-          clusters<-c(clusters,i)
-        }
-      }
-      return(clusters)
-    })
-    rampOut<-rampOut[,-10]
-    rampOut[,9] <- rep(NA,times = nrow(rampOut))
-    colnames(rampOut)[9]<-"In Cluster"
-    duplicate_rows<-c()
-    for(i in 1:nrow(rampOut)){
-      if(is.null(cluster_assignment[[i]])){
-        rampOut[i,9]="Did not cluster"
-      } else if(length(cluster_assignment[[i]])>1){
-        duplicate_rows<-c(duplicate_rows,i)
-        for(j in cluster_assignment[[i]]){
-          new_row<-c(rampOut[i,1:8],j)
-          names(new_row)<-colnames(rampOut)
-          rampOut<-rbind(rampOut,new_row)
-        }
-      }else{
-        rampOut[i,9]=cluster_assignment[[i]]
-      }
+  out <- results_fisher_clust()
+  rampOut <- out$fishresults
+  cluster_output <- cluster_list()
+  if(!is.null(rampOut)) {
+    if(out$analyte_type=="both"){
+      rampOut<-rampOut[,c("pathwayName","Pval.Metab","Num_In_Path.Metab","Total_In_Path.Metab",
+                                        "Pval.Gene", "Num_In_Path.Gene","Total_In_Path.Gene", "Pval_combined",
+                                        "Pval_combined_FDR","Pval_combined_Holm","pathwaysourceId","pathwaysource",
+                                        "cluster_assignment","rampids")]
+
+      colnames(rampOut)<-c("Pathway Name", "Raw Fisher's P Value (Metabolites)","User Metabolites in Pathway",
+                                  "Total Metabolites in Pathway","Raw Fisher's P Value (Genes)","User Genes in Pathway",
+                                  "Total Genes in Pathway","Raw Fisher's P Value (Combined)","FDR Adjusted P Value (Combined)",
+                                  "Holm Adjusted P Value (Combined)","Source ID","Source DB","In Cluster","rampids")
+      rampOut<-rampOut[order(rampOut[,"Holm Adjusted P Value (Combined)"]),]
+    }else{
+      results_fisher<-rampOut[,c("pathwayName","Pval","Pval_FDR","Pval_Holm","pathwaysourceId","pathwaysource",
+                                        "Num_In_Path","Total_In_Path","cluster_assignment","rampids")]
+      colnames(rampOut)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
+                                  "Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway",
+                                  "In Cluster","rampids")
+      rampOut<-rampOut[order(rampOut[,"Holm Adjusted P Value"]),]
     }
-    rampOut<-rampOut[-duplicate_rows,]
-    rampOut <- do.call(cbind,rampOut)
-  }else{
-    rampOut<-rampOut[,-10]
-  }
-  if(!is.null(rampOut)){
-    #print(colnames(rampOut))
-    rampOut<-rampOut[order(rampOut[,"Holm Adjusted P Value"]),]
-    rampOut<-rampOut[!duplicated(rampOut),]
   write.csv(rampOut,file,row.names = FALSE)
   }else{
     write.csv(c("No significant results"),file,row.names = FALSE)

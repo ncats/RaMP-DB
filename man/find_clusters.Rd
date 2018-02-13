@@ -20,6 +20,8 @@ a cluster (medoid) (Default = 3)}
 \item{perc_pathway_overlap}{Minimum overlap for clusters to merge (Default = 0.5)}
 }
 \value{
+a list of 3: First entry is fishers_df with cluster membership column appended
+to each pathway. Second entry is query type (metabolites, genes, or both). Third entry is
 a list of clusters identified by the algorithm. Each entry of the list is
 a cluster, containing a vector of pathways in the cluster
 }
