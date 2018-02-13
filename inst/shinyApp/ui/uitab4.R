@@ -30,23 +30,24 @@ tabItem4<-  shinydashboard::tabItem(
                         div(style = "margin:25px;",
                             downloadButton("report_cata","Download Results"),
                             hr(),
-                            textOutput("summary_cata")
+                            textOutput("summary_cata"),
+                            DT::dataTableOutput("result_cata")
                         )
                       ) #end fluidRow
                   ), # end box
                   hr(),
-                  fluidRow(
-                    shinydashboard::box(
-                      width = 12,
-                      solidHeader = T,
-                      status = "info",
-                      collapsible = T,
-                      collapsed = F,
-                      title = strong("Summary"),
-		      DT::dataTableOutput("result_cata")
-                      #uiOutput("preview_tab4")
-                    ) # end box
-		  ), # end fluid row
+#                   fluidRow(
+#                     shinydashboard::box(
+#                       width = 12,
+#                       solidHeader = T,
+#                       status = "info",
+#                       collapsible = T,
+#                       collapsed = F,
+#                       title = strong("Summary"),
+# 		      DT::dataTableOutput("result_cata")
+#                       #uiOutput("preview_tab4")
+#                     ) # end box
+# 		  ), # end fluid row
 		  hr(),
 		  fluidRow(
                     shinydashboard::box(
