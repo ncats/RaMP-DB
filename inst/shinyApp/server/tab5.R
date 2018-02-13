@@ -18,7 +18,7 @@ dataInput_onto <- eventReactive(input$subText_onto,{
                                           host = .host)
   }
   progress$inc(0.7,detail = paste("Done!"))
-  return (rampOut[,1:3])
+  return (rampOut)
 })
 summary_onto_out<- eventReactive(input$subText_onto,{
   if (!is.null(nrow(dataInput_onto()))){
@@ -79,7 +79,26 @@ output$summary_onto <- renderText(
   }
 )
 output$result_onto <- DT::renderDataTable({
-  dataInput_onto()
+  df <- dataInput_onto()
+  if(input$metaOrOnto %in% c('source','name')){
+    df <- transform(df,sourceId = paste(IDtype,sourceId,sep = ':'))
+    print(colnames(df))
+    df <- df[c('Metabolites','Ontology','biofluidORcellular','sourceId')]
+    df2 <- aggregate(.~Metabolites+biofluidORcellular,df,FUN = function(x){
+      paste(unique(x),collapse = ',')
+    })
+    colnames(df2) <- c('Metabolites','Ontology_type','Ontology','metabolites_source')
+    return(df2)
+  } else if(input$metaOrOnto == 'ontology'){
+    df <- transform(df,sourceId = paste(IDtype,sourceId,sep = ':'))
+    df <- df[c('Metabolites','Ontology','biofluidORcellular','sourceId')]
+    df2 <- aggregate(.~Metabolites+biofluidORcellular,df,FUN = function(x){
+      paste(unique(x),collapse = ',')
+    })
+    colnames(df2) <- c('Metabolites','Ontology_type','Ontology','metabolites_source')
+    return(df2)
+  }
+  
 }, rownames = FALSE)
 
 output$report_onto <- downloadHandler(filename = function() {
@@ -133,7 +152,14 @@ data_mul_tab5 <- eventReactive(input$sub_mul_tab5,{
 output$preview_multi_names_tab5 <- DT::renderDataTable({
   if(is.null(clicked$content))
     return(NULL)
-  data_mul_tab5()
+  df <- data_mul_tab5()
+  df <- transform(df,sourceId = paste(IDtype,sourceId,sep = ':'))
+  df <- df[c('Metabolites','Ontology','biofluidORcellular','sourceId')]
+  df2 <- aggregate(.~Metabolites+biofluidORcellular,df,FUN = function(x){
+    paste(unique(x),collapse = ',')
+  })
+  colnames(df2) <- c('Metabolites','Ontology_type','Ontology','metabolites_source')
+  return(df2)
 },rownames = F)
 
 output$tab5_mul_report <- downloadHandler(filename = function() {
