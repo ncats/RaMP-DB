@@ -137,13 +137,11 @@ output$tab3_mul_report <- downloadHandler(filename = function(){
 
 },
 content = function(file) {
-  if (rea_detector$num == 1){
+  # if (rea_detector$num == 1){
       rampOut <- data_mul_name()[,c("pathwayName","pathwaysourceId",
                                     "pathwaysource","commonName")]
-  } else if (rea_detector$num == 2){
-    rampOut <- data_mul_file()[,c("pathwayName","pathwaysourceId",
-                                  "pathwaysource","commonName")]
-  }
+  # } else if (rea_detector$num == 2){
+  # }
   write.csv(rampOut,file,row.names = FALSE)
 }
 )
