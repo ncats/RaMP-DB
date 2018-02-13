@@ -102,14 +102,33 @@ tabItem3 <-  shinydashboard::tabItem(
              HTML("</div>")
            ), # end fluidRow
 	fluidRow(
-	   column(width = 6,
-           shinydashboard::box(
-           	solidHeader = T,
-           	status = "primary",
-           	title = strong("2. Run pathway enrichment analysis"),
-           	width = NULL,
-           	actionButton("runFisher","Run Pathway Enrichment (please be patient!)")
-	    ),#end of box
+	 	column(width = 6,
+         		shinydashboard::box(
+           			solidHeader = T,
+		  	        status = "primary",
+           			title = strong("2. Run pathway enrichment analysis"),
+           			width = NULL,
+           			tags$head(tags$style(type="text/css", "
+             			#loadmessage {
+                                position: fixed;
+                                top: 0px;
+                                left: 0px;
+                                width: 100%;
+                                padding: 5px 0px 5px 0px;
+                                text-align: center;
+                                font-weight: bold;
+                                font-size: 100%;
+                                color: #000000;
+                                background-color: #FFA500;
+                                z-index: 105;
+                                }
+                                ")),
+           			conditionalPanel(condition="$('html').hasClass('shiny-busy')",
+                            	tags$div("Processing request...",id="loadmessage")),
+           			actionButton("runFisher","Run Pathway Enrichment (please be patient!)"),
+           			textOutput("fishersProgress")
+
+           		),#end of box
 
             shinydashboard::box(
            	solidHeader = T,
