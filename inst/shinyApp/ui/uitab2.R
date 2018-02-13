@@ -11,7 +11,7 @@ tabItem2<-  shinydashboard::tabItem(
                       status = "primary",
                       fluidRow(
                         column(12,
-                               helpText("Given pathway's name, it returns 
+                               helpText("Given pathway's name, it returns
                                         all of compounds' synonym contained in that pathway"),
                                textInput("singleInput2","",placeholder ="Input one pathway name"),
                                selectInput("KW_path", "Select from list", choices = NULL),
@@ -52,7 +52,7 @@ tabItem2<-  shinydashboard::tabItem(
                     HTML("<div id='database-group-output'>"),
                     shinydashboard::box(
                       width = 12,
-                      status = "summary",
+                      status = "primary",
                       solidHeader = T,
                       collapsible = T,
                       title = strong("Summary"),
