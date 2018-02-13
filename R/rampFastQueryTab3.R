@@ -585,10 +585,10 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
 #'}
 #' @export
 find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
-	min_pathway_tocluster = 3,perc_pathway_overlap = 0.5){
+                            min_pathway_tocluster = 3,perc_pathway_overlap = 0.5){
 
   if(perc_analyte_overlap <= 0 || perc_analyte_overlap >= 1 ||
-	perc_pathway_overlap <= 0 || perc_pathway_overlap >= 1){
+     perc_pathway_overlap <= 0 || perc_pathway_overlap >= 1){
     return(NULL)
   }
 
@@ -603,7 +603,7 @@ find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
   } else if(analyte_type=="genes"){
     similarity_matrix = similarity_matrix_list[[1]]
   } else {
-	stop("analyte_type should be 'genes' or metabolites'")
+    stop("analyte_type should be 'genes' or metabolites'")
   }
   pathway_list<-fishers_df[,"pathwayRampId"]
 
@@ -685,7 +685,36 @@ find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
     }
   }
   colnames(cluster_similarity) = rownames(cluster_similarity) = paste0("cluster_",c(1:length(cluster_list)))
-  return(cluster_list)
+  #return(cluster_list)
+
+  # New stuff
+  rampids<-as.vector(fishers_df$pathwayRampId)
+  fishers_df$pathwayRampId<-NULL
+
+  if(length(cluster_list)>1){
+    cluster_assignment<-sapply(rampids,function(x){
+      pathway<-x
+      clusters<-""
+      for(i in 1:length(cluster_list)){
+        if(pathway %in% cluster_list[[i]]){
+          clusters<-paste0(clusters,i,sep = ", ",collapse = ", ")
+        }
+      }
+      if(clusters!=""){
+        clusters=substr(clusters,1,nchar(clusters)-2)
+      }else{
+        clusters = "Did not cluster"
+      }
+      return(clusters)
+    })
+    fishers_df<-cbind(fishers_df,cluster_assignment)
+  }else{
+    fishers_df<-cbind(fishers_df,rep("Did not cluster",times=nrow(fishers_df)))
+  }
+  fishers_df$rampids<-rampids
+  output<-list(fishers_df,analyte_type)
+  names(output)<-c(fishresults,analyte_type)
+  return(output)
 }
 
 #' Filter pathways by p-value cutoff for display and clustering

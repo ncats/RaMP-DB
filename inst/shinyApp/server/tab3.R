@@ -277,37 +277,38 @@ results_fisher_clust <- reactive({
   if(is.null(cluster_list)){
     return(data)
   }else{
-    # Need to remove RaMPID column
-    fisher_df<-data[[1]]
-    rampids<-fisher_df$pathwayRampId
-    fisher_df$pathwayRampId<-NULL
-
-    if(length(cluster_list)>1){
-      cluster_assignment<-sapply(rampids,function(x){
-        pathway<-x
-        clusters<-""
-        for(i in 1:length(cluster_list)){
-          if(pathway %in% cluster_list[[i]]){
-            clusters<-paste0(clusters,i,sep = ", ",collapse = ", ")
-          }
-        }
-        if(clusters!=""){
-          clusters=substr(clusters,1,nchar(clusters)-2)
-        }else{
-          clusters = "Did not cluster"
-        }
-        return(clusters)
-      })
-      data[[1]]<-cbind(fisher_df,cluster_assignment)
-    }else{
-      data[[1]]<-cbind(fisher_df,rep("Did not cluster",times=nrow(fisher_df)))
-    }
-    #data$Pval <- round(data$Pval,8)
-    #data$Adjusted.Pval <- round(data$Adjusted.Pval,8)
-    #colnames(data_2)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
-    #"Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway", "In Cluster")
-    data[[1]]$rampids<-rampids
-    return(data)
+    return(cluster_list)
+    # # Need to remove RaMPID column
+    # fisher_df<-data[[1]]
+    # rampids<-fisher_df$pathwayRampId
+    # fisher_df$pathwayRampId<-NULL
+    #
+    # if(length(cluster_list)>1){
+    #   cluster_assignment<-sapply(rampids,function(x){
+    #     pathway<-x
+    #     clusters<-""
+    #     for(i in 1:length(cluster_list)){
+    #       if(pathway %in% cluster_list[[i]]){
+    #         clusters<-paste0(clusters,i,sep = ", ",collapse = ", ")
+    #       }
+    #     }
+    #     if(clusters!=""){
+    #       clusters=substr(clusters,1,nchar(clusters)-2)
+    #     }else{
+    #       clusters = "Did not cluster"
+    #     }
+    #     return(clusters)
+    #   })
+    #   data[[1]]<-cbind(fisher_df,cluster_assignment)
+    # }else{
+    #   data[[1]]<-cbind(fisher_df,rep("Did not cluster",times=nrow(fisher_df)))
+    # }
+    # #data$Pval <- round(data$Pval,8)
+    # #data$Adjusted.Pval <- round(data$Adjusted.Pval,8)
+    # #colnames(data_2)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
+    # #"Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway", "In Cluster")
+    # data[[1]]$rampids<-rampids
+    # return(data)
   }
 })
 
@@ -316,15 +317,19 @@ output$results_fisher <- DT::renderDataTable({
   results_fisher<-results_fisher_total$fishresults
   #results_fisher<-results_fisher[,c(6,1,4,5,7,8,2,3,9,10)]
   if(results_fisher_total$analyte_type=="both"){
-    results_fisher<-results_fisher[,c("pathwayName","Pval.Metab","Num_In_Path.Metab","Total_In_Path.Metab",
-                                      "Pval.Gene","Num_In_Path.Gene","Total_In_Path.Gene", "Pval_combined",
+    results_fisher<-results_fisher[,c("pathwayName","Num_In_Path.Metab","Total_In_Path.Metab",
+                                      "Num_In_Path.Gene","Total_In_Path.Gene", "Pval_combined",
                                       "Pval_combined_FDR","Pval_combined_Holm","pathwaysourceId","pathwaysource",
                                       "cluster_assignment","rampids")]
+    # Filtered:
+    #"Pval.Metab","Pval.Gene",
 
-    colnames(results_fisher)<-c("Pathway Name", "Raw Fisher's P Value (Metabolites)","User Metabolites in Pathway",
-                                "Total Metabolites in Pathway","Raw Fisher's P Value (Genes)","User Genes in Pathway",
+    colnames(results_fisher)<-c("Pathway Name", "User Metabolites in Pathway",
+                                "Total Metabolites in Pathway","User Genes in Pathway",
                                 "Total Genes in Pathway","Raw Fisher's P Value (Combined)","FDR Adjusted P Value (Combined)",
                                 "Holm Adjusted P Value (Combined)","Source ID","Source DB","In Cluster","rampids")
+    # Filtered:
+    # "Raw Fisher's P Value (Metabolites)","Raw Fisher's P Value (Genes)",
   }else{
     #print(colnames(results_fisher))
     results_fisher<-results_fisher[,c("pathwayName","Pval","Pval_FDR","Pval_Holm","pathwaysourceId","pathwaysource",
