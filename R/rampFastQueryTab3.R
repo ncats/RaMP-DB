@@ -45,7 +45,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
    allids <- DBI::dbGetQuery(con,query)
    DBI::dbDisconnect(con)
    allids <- allids[!duplicated(allids),]
-  
+
   if((analyte_type == "metabolites") && (is.null(total_metabolites))) {
 	wiki_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="wiki"),"rampId"])]))
 	react_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="reactome"),"rampId"])]))
@@ -55,9 +55,9 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 	wiki_totanalytes <- react_totanalytes <- kegg_totanalytes <- total_genes
   }
 
-  print("Calculating p-values for pathways in input")
+  print("Calculating p-values for pathways in input that have genes")
   # Retrieve the Ramp compound ids associated with the ramp pathway id and count them:
- 
+
    query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
    list_pid,")")
 
@@ -66,7 +66,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
          dbname = dbname,
          host = host)
    cids <- DBI::dbGetQuery(con,query1)#[[1]]
-  
+
    DBI::dbDisconnect(con)
 
    # Loop through each pathway, build the contingency table, and calculate Fisher's Exact
@@ -174,7 +174,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
          # pidused <- c(pidused,i)
   } # end for loop
 
-  # only keep pathways that have > 8 or < 100 coumpounds
+  # only keep pathways that have > 8 or < 100 compounds
   keepers <- intersect(which(c(totinpath,totinpath2)>=8),
 		which(c(totinpath,totinpath2)<100))
   #hist(totinpath,breaks=1000)
@@ -184,7 +184,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   print(paste0("Calculated p-values for ",length(c(pval,pval2))," pathways"))
 
   # format output (retrieve pathway name for each unique source id first
-  out <- data.frame(pathwayRampId=c(pidused,pidstorun)[keepers], 
+  out <- data.frame(pathwayRampId=c(pidused,pidstorun)[keepers],
 	Pval=c(pval,pval2)[keepers],   #FDR.Adjusted.Pval=fdr,
 	# Holm.Adjusted.Pval=holm,
 	Num_In_Path=c(userinpath,userinpath2)[keepers],
@@ -235,7 +235,7 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
   }
 
     G <- M <- 0
-	
+
     # Grab pathways that contain metabolites to run Fisher on metabolites
     # This will return all pathways that have at 8-120 metabolites/genes in them
     fishmetab <- pathwaydf[grep("RAMP_C_",pathwaydf$rampId),]
@@ -281,6 +281,7 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
                 "pathwaysource")],by="pathwayRampId")
     } else {
 	    # merge the results if both genes and metabolites were run
+	    G = M = 1
 	    allfish <- merge(outmetab,outgene,
 		by="pathwayRampId",all.x=T,all.y=T)
 	    colnames(allfish)[which(colnames(allfish)=="Pval.x")]="Pval.Metab"
@@ -289,17 +290,17 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
 	    colnames(allfish)[which(colnames(allfish)=="Total_In_Path.y")]="Total_In_Path.Gene"
 	    colnames(allfish)[which(colnames(allfish)=="Num_In_Path.x")]="Num_In_Path.Metab"
 	    colnames(allfish)[which(colnames(allfish)=="Num_In_Path.y")]="Num_In_Path.Gene"
-	
+
 	    # Calculate combined p-values for pathways that have both genes and metabolites
 	    gm <- intersect(which(!is.na(allfish$Pval.Metab)),which(!is.na(allfish$Pval.Gene)))
 	    combpval <- pchisq(-2 * (log(allfish$Pval.Metab[gm])+log(allfish$Pval.Gene[gm])),
 		df=2,lower.tail=FALSE)
-	    
+
 	    g <- which(is.na(allfish$Pval.Metab))
 	    gpval <- allfish$Pval.Gene[g]
 	    m <- which(is.na(allfish$Pval.Gene))
 	    mpval <- allfish$Pval.Metab[m]
-	 
+
 	    out <- rbind(allfish[gm,],allfish[g,],allfish[m,])
 	    out <- cbind(out,c(combpval,gpval,mpval))
 	    colnames(out)[ncol(out)]="Pval_combined"
@@ -317,7 +318,7 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
 			)
 
 
-	    # Now that p-values are calculated, only return pathways that are in the list 
+	    # Now that p-values are calculated, only return pathways that are in the list
 	    # of pathways that contain user genes and metabolites
 	    out2 <- merge(out[keepers,],
 		pathwaydf[,c("pathwayName","pathwayRampId","pathwaysourceId",
@@ -327,13 +328,13 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
 
     analyte_type=c()
     if(G==1 && M==1) {
-	analyte_type="genes"
+	analyte_type="both"
     } else if (G==1 && M==0) {
 		analyte_type="genes"
     } else if (G==0 && M==1) {
 	analyte_type="metabolites"
     }
- 
+
     return(list(fishresults=out2,analyte_type=analyte_type))
 }
 
@@ -369,7 +370,11 @@ rampGenerateBarPlot <- function(df){
 #' @param host host name for database access (default is "localhost")
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
-#' @return a list contains all metabolits as name and pathway inside.
+#' @return a list contains all metabolites as name and pathway inside.
+#' @examples
+#' \dontrun{
+#' mypath <- rampFastPathFromMeta(analytes=c("2-hydroxyglutarate","glutamate"), conpass="mypassword")
+#' }
 #' @export
 rampFastPathFromMeta<- function(analytes=NULL,
 	find_synonym = FALSE,
@@ -459,8 +464,8 @@ rampFastPathFromMeta<- function(analytes=NULL,
  }
   out<-mdf[!duplicated(mdf),]
 
-  # For now, not returning HMDB pathways because they include the 30K 
-  # new pathways that are mainly drug and lipid pathways (need more proper 
+  # For now, not returning HMDB pathways because they include the 30K
+  # new pathways that are mainly drug and lipid pathways (need more proper
   # structural resolution matching)
   return(out[which(out$pathwaysource!="hmdb"),c("rampId","pathwayRampId","pathwayName",
 	"pathwaysourceId","pathwaysource","commonName")])
@@ -585,9 +590,9 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
 #'}
 #' @export
 find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
-	min_pathway_tocluster = 3,perc_pathway_overlap = 0.5){
+	min_pathway_tocluster = 2,perc_pathway_overlap = 0.5){
 
-  if(perc_analyte_overlap <= 0 || perc_analyte_overlap >= 1 || 
+  if(perc_analyte_overlap <= 0 || perc_analyte_overlap >= 1 ||
 	perc_pathway_overlap <= 0 || perc_pathway_overlap >= 1){
     return(NULL)
   }
@@ -595,11 +600,13 @@ find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
   analyte_type=fishers_df$analyte_type
   fishers_df=fishers_df$fishresults
 
-  similarity_matrix_list<-load_overlap_matrices()
-  if(analyte_type=="metabolites"){
-    similarity_matrix = similarity_matrix_list[[2]]
+  similarity_matrix_list<-RaMP:::load_overlap_matrices()
+  if(analyte_type=="both"){
+    similarity_matrix = similarity_matrix_list[["analyte"]]
+  }else if(analyte_type=="metabolites"){
+    similarity_matrix = similarity_matrix_list[["metab"]]
   } else if(analyte_type=="genes"){
-    similarity_matrix = similarity_matrix_list[[1]]
+    similarity_matrix = similarity_matrix_list[["gene"]]
   } else {
 	stop("analyte_type should be 'genes' or metabolites'")
   }
@@ -613,7 +620,8 @@ find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
 
   pathway_matrix<-similarity_matrix[pathway_indices,pathway_indices]
   unmerged_clusters<-apply(pathway_matrix, 1, function(x){
-    if(length(which(x>=perc_analyte_overlap))>(min_pathway_tocluster+1)){
+    # if(length(which(x>=perc_analyte_overlap))>(min_pathway_tocluster+1)){
+    if(length(which(x>=perc_analyte_overlap))>(min_pathway_tocluster-1)){
       return(colnames(pathway_matrix)[which(x>=perc_analyte_overlap)])
     } else {
       return(NA)
@@ -701,7 +709,7 @@ find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
 #' @export
 FilterFishersResults<-function(fishers_df,p_holmadj_cutoff=NULL,
 	p_fdradj_cutoff=NULL){
-	
+
 	# Check to see whether the output is from ORA performed on genes and metabolites
 	# or genes or metabolites
 	analyte_type=fishers_df$analyte_type
@@ -709,22 +717,22 @@ FilterFishersResults<-function(fishers_df,p_holmadj_cutoff=NULL,
 
 	if(length(grep("Pval_combined",colnames(fishers_df)))==0) {
 		if(!is.null(p_holmadj_cutoff)) {
-  			return(list(fishresults=fishers_df[which(fishers_df[,"Pval_Holm"] < 
+  			return(list(fishresults=fishers_df[which(fishers_df[,"Pval_Holm"] <
 				p_holmadj_cutoff),],analyte_type=analyte_type))
 		} else if (!is.null(p_fdradj_cutoff)) {
-			return(list(fishresults=fishers_df[which(fishers_df[,"Pval_FDR"] < 
+			return(list(fishresults=fishers_df[which(fishers_df[,"Pval_FDR"] <
 				p_fdradj_cutoff),],analyte_type=analyte_type))
 		} else {
-			stop("Please set a cutoff for Holm Adjusted pvalues 
+			stop("Please set a cutoff for Holm Adjusted pvalues
 			(p_holmadj_cutoff paramter) or FDR Adjusted pvalues
 			(p_fdradj_cutoff)")
 		}
 	}  else { # ORA was performed on both genes and metabolites:
                 if(!is.null(p_holmadj_cutoff)) {
-                        return(list(fishresults=fishers_df[which(fishers_df[,"Pval_combined_Holm"] < 
+                        return(list(fishresults=fishers_df[which(fishers_df[,"Pval_combined_Holm"] <
 				p_holmadj_cutoff),],analyte_type=analyte_type))
                 } else if (!is.null(p_fdradj_cutoff)) {
-                        return(list(fishresults=fishers_df[which(fishers_df[,"Pval_combined_FDR"] < 
+                        return(list(fishresults=fishers_df[which(fishers_df[,"Pval_combined_FDR"] <
 				p_fdradj_cutoff),],analyte_type=analyte_type))
                 } else {
                         stop("Please set a cutoff for Holm Adjusted pvalues
