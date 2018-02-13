@@ -203,9 +203,18 @@ output$summary_fisher <- DT::renderDataTable({
 output$num_mapped_namesids <- renderText({
 	  data <- data_mul_name()
 	  inputlist <- input$input_mul_tab3
-	if(!is.null(data)) {
+	  inputlist2 <-input$input_mul_tab3_genes
+	  inputsize=0
+	  if(!is.null(inputlist) && !is.null(inputlist2)) {
+	  	inputsize <- length(inputlist)+length(inputlist2)
+	  } else if (!is.null(inputlist) && is.null(inputlist2)) {
+		inputsize <- length(inputlist)
+          } else if (is.null(inputlist) && !is.null(inputlist2)) {
+		inputsize <- length(inputlist2)
+	  }
+	if(!is.null(data) && inputsize>0) {
 		parsedinput <- paste(strsplit(inputlist,"\n")[[1]])
-		print(paste0("Found ",length(unique(data$commonName))," out of ",
+		print(paste0("Found ",inputsize," out of ",
 		length(parsedinput)))
 	}
 })
@@ -278,7 +287,7 @@ results_fisher_clust <- reactive({
     return(data)
   }else{
     # Need to remove RaMPID column
-    fisher_df<-data[[1]]
+    fisher_df<-data[["fishresults"]]
     rampids<-fisher_df$pathwayRampId
     fisher_df$pathwayRampId<-NULL
 
@@ -298,15 +307,15 @@ results_fisher_clust <- reactive({
         }
         return(clusters)
       })
-      data[[1]]<-cbind(fisher_df,cluster_assignment)
+      data[["fishresults"]]<-cbind(fisher_df,cluster_assignment)
     }else{
-      data[[1]]<-cbind(fisher_df,rep("Did not cluster",times=nrow(fisher_df)))
+      data[["fishresults"]]<-cbind(fisher_df,rep("Did not cluster",times=nrow(fisher_df)))
     }
     #data$Pval <- round(data$Pval,8)
     #data$Adjusted.Pval <- round(data$Adjusted.Pval,8)
     #colnames(data_2)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
     #"Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway", "In Cluster")
-    data[[1]]$rampids<-rampids
+    data[["fishresults"]]$rampids<-rampids
     return(data)
   }
 })
@@ -352,11 +361,11 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
   return("fisherText.csv")
 },content = function(file){
   #print("Fisher Stats Output has some problems ...")
-  rampOut <- results_fisher_clust()
+  rampOut <- results_fisher_clust()$fishresults
   cluster_output <- cluster_output()
   if(!is.null(rampOut)&&length(unique(cluster_output))>1) {
     cluster_assignment<-apply(rampOut,1,function(x){
-      pathway<-x[10]
+      pathway<-as.character(unlist(x["rampids"]))
       clusters<-c()
       for(i in 1:length(cluster_output)){
         if(pathway %in% cluster_output[[i]]){
@@ -365,28 +374,28 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
       }
       return(clusters)
     })
-    rampOut<-rampOut[,-10]
-    rampOut[,9] <- rep(NA,times = nrow(rampOut))
-    colnames(rampOut)[9]<-"In Cluster"
+    rampOut<-rampOut[, which(colnames(rampOut)=="rampids")] # -10
+    rampOut[,"cluster_assignment"] <- rep(NA,times = nrow(rampOut)) #9
+    colnames(rampOut)["cluster_assignment"]<-"In Cluster" #9
     duplicate_rows<-c()
     for(i in 1:nrow(rampOut)){
       if(is.null(cluster_assignment[[i]])){
-        rampOut[i,9]="Did not cluster"
+        rampOut[i,"In Cluster"]="Did not cluster" # 9
       } else if(length(cluster_assignment[[i]])>1){
         duplicate_rows<-c(duplicate_rows,i)
         for(j in cluster_assignment[[i]]){
-          new_row<-c(rampOut[i,1:8],j)
+          new_row<-c(rampOut[i,],j) # 1:8
           names(new_row)<-colnames(rampOut)
           rampOut<-rbind(rampOut,new_row)
         }
       }else{
-        rampOut[i,9]=cluster_assignment[[i]]
+        rampOut[i,"In Cluster"]=cluster_assignment[[i]]
       }
     }
     rampOut<-rampOut[-duplicate_rows,]
     rampOut <- do.call(cbind,rampOut)
   }else{
-    rampOut<-rampOut[,-10]
+    rampOut<-rampOut[,which(colnames(rampOut)=="rampids")] # -10
   }
   if(!is.null(rampOut)){
     print(colnames(rampOut))
