@@ -221,6 +221,12 @@ output$num_mapped_namesids <- renderText({
 	}
 })
 
+output$fishersProgress<-renderText(
+  if(!is.null(fisherTestResult())){
+    print("Hit 'Filter and Cluster Results' to view below and download")
+  }
+)
+
 fisherTestResultSignificant<-eventReactive(input$runClustering,{
   if(!is.null(fisherTestResult())){
     result<-RaMP::FilterFishersResults(fisherTestResult(),p_holmadj_cutoff=as.numeric(input$p_holmadj_cutoff))

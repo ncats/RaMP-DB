@@ -136,9 +136,11 @@ fluidRow(
                                 z-index: 105;
                                 }
                                 ")),
-           actionButton("runFisher","Run Pathway Enrichment (please be patient!)"),
            conditionalPanel(condition="$('html').hasClass('shiny-busy')",
-                            tags$div("Processing request...",id="loadmessage"))
+                            tags$div("Processing request...",id="loadmessage")),
+           actionButton("runFisher","Run Pathway Enrichment (please be patient!)"),
+           textOutput("fishersProgress")
+
            ),#end of box
 
          shinydashboard::box(
