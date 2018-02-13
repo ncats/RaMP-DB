@@ -47,7 +47,7 @@ rampFastOntoFromMeta <- function(analytes,conpass = NULL,
                   list_metabolite,'));')
   }
   df <- DBI::dbGetQuery(con,sql)
-  print(colnames(df))
+  #print(colnames(df))
   DBI::dbDisconnect(con)
   if(nrow(df) == 0) {
     message('No searching result since this source id 
@@ -82,15 +82,17 @@ rampFastOntoFromMeta <- function(analytes,conpass = NULL,
                         host = host,
                         password = conpass)
   df3 <- DBI::dbGetQuery(con,sql)
-  print(colnames(df3))
+  #print(colnames(df3))
   DBI::dbDisconnect(con)
   mdf <- unique(merge(df3,df2,all.x=T))
   mdf <- unique(merge(mdf,df,all.x = T,by.x = 'rampCompoundId',
                       by.y= 'rampId'))
+  colnames(mdf)[colnames(mdf) == 'commonName.x'] = 'Ontology'
+  colnames(mdf)[colnames(mdf) == 'commonName.y'] = 'Metabolites'
   
-  mdf <- mdf[c('sourceId','commonName.x','biofluidORcellular')]
+  mdf <- mdf[c('Metabolites','sourceId','IDtype','Ontology','biofluidORcellular')]
   
-  colnames(mdf) <- c('Metabolites','Ontology','Ontology_Type')
+  # colnames(mdf) <- c('Metabolites','Ontology','Ontology_Type')
   return(mdf)
 }
 #' function that query database to find analytes in given ontologies 
@@ -171,8 +173,12 @@ rampFastMetaFromOnto <- function(ontology,conpass = NULL,
   mdf <- unique(merge(mdf,df,by.x = 'rampOntologyIdLocation',
                       by.y = 'rampOntologyIdLocation',
                       all.x = T))
-  mdf <- mdf[c('sourceId','commonName.y','biofluidORcellular')]
-  colnames(mdf) <- c('Metabolites','Ontology','Ontology_Type')
+  # mdf <- mdf[c('sourceId','commonName.y','biofluidORcellular')]
+  # colnames(mdf) <- c('Metabolites','Ontology','Ontology_Type')
+  colnames(mdf)[colnames(mdf) == 'commonName.x'] = 'Metabolites'
+  colnames(mdf)[colnames(mdf) == 'commonName.y'] = 'Ontology'
+  
+  mdf <- mdf[c('Metabolites','sourceId','IDtype','Ontology','biofluidORcellular')]
   return(mdf)
   
 }
