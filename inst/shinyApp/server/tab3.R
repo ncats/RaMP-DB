@@ -342,41 +342,45 @@ results_fisher_clust <- reactive({
 output$results_fisher <- DT::renderDataTable({
   results_fisher_total<-results_fisher_clust()
   results_fisher<-results_fisher_total$fishresults
-  if(results_fisher_total$analyte_type=="both"){
-    results_fisher<-results_fisher[,c("pathwayName","Num_In_Path.Metab","Total_In_Path.Metab",
-                                      "Num_In_Path.Gene","Total_In_Path.Gene", "Pval_combined",
-                                      "Pval_combined_FDR","Pval_combined_Holm","pathwaysourceId","pathwaysource",
-                                      "cluster_assignment","rampids")]
-    # Filtered:
-    #"Pval.Metab","Pval.Gene",
+  if(nrow(results_fisher)==0){
+    #return(data.frame(rep(NA, times = 9)))
+    stop("No significant pathways identified. Less stringent filters required")
+  }else{
+    if(results_fisher_total$analyte_type=="both"){
+      results_fisher<-results_fisher[,c("pathwayName","Num_In_Path.Metab","Total_In_Path.Metab",
+                                        "Num_In_Path.Gene","Total_In_Path.Gene", "Pval_combined",
+                                        "Pval_combined_FDR","Pval_combined_Holm","pathwaysourceId","pathwaysource",
+                                        "cluster_assignment","rampids")]
+      # Filtered:
+      #"Pval.Metab","Pval.Gene",
 
-    colnames(results_fisher)<-c("Pathway Name", "User Metabolites in Pathway",
-                                "Total Metabolites in Pathway","User Genes in Pathway",
-                                "Total Genes in Pathway","Raw Fisher's P Value (Combined)","FDR Adjusted P Value (Combined)",
-                                "Holm Adjusted P Value (Combined)","Source ID","Source DB","In Cluster","rampids")
-    # Filtered:
-    # "Raw Fisher's P Value (Metabolites)","Raw Fisher's P Value (Genes)",
-  }else{
-    #print(colnames(results_fisher))
-    results_fisher<-results_fisher[,c("pathwayName","Pval","Pval_FDR","Pval_Holm","pathwaysourceId","pathwaysource",
-                                      "Num_In_Path","Total_In_Path","cluster_assignment","rampids")]
-    colnames(results_fisher)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
-                                "Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway",
-                                "In Cluster","rampids")
+      colnames(results_fisher)<-c("Pathway Name", "User Metabolites in Pathway",
+                                  "Total Metabolites in Pathway","User Genes in Pathway",
+                                  "Total Genes in Pathway","Raw Fisher's P Value (Combined)","FDR Adjusted P Value (Combined)",
+                                  "Holm Adjusted P Value (Combined)","Source ID","Source DB","In Cluster","rampids")
+      # Filtered:
+      # "Raw Fisher's P Value (Metabolites)","Raw Fisher's P Value (Genes)",
+    }else{
+      #print(colnames(results_fisher))
+      results_fisher<-results_fisher[,c("pathwayName","Pval","Pval_FDR","Pval_Holm","pathwaysourceId","pathwaysource",
+                                        "Num_In_Path","Total_In_Path","cluster_assignment","rampids")]
+      colnames(results_fisher)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
+                                  "Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway",
+                                  "In Cluster","rampids")
+    }
+    rampids <- results_fisher$rampids
+    rampids <- rampids[order(results_fisher[,"In Cluster"])]
+    results_fisher$rampids <- NULL
+    results_fisher <- results_fisher[order(results_fisher[,"In Cluster"]),]
+    cluster_output<-cluster_list()
+    if(input$show_cluster=="All"){
+      results_fisher
+    }else if(input$show_cluster=="Did not cluster"){
+      results_fisher[which(results_fisher[,"In Cluster"]=="Did not cluster"),]
+    }else{
+      results_fisher[which(rampids %in% cluster_output[[as.numeric(input$show_cluster)]]),]
+    }
   }
-  rampids <- results_fisher$rampids
-  rampids <- rampids[order(results_fisher[,"In Cluster"])]
-  results_fisher$rampids <- NULL
-  results_fisher <- results_fisher[order(results_fisher[,"In Cluster"]),]
-  cluster_output<-cluster_list()
-  if(input$show_cluster=="All"){
-    results_fisher
-  }else if(input$show_cluster=="Did not cluster"){
-    results_fisher[which(results_fisher[,"In Cluster"]=="Did not cluster"),]
-  }else{
-    results_fisher[which(rampids %in% cluster_output[[as.numeric(input$show_cluster)]]),]
-  }
-  # data.frame(rep(NA, times = 9))
 },rownames = FALSE,filter = "top")
 
 output$fisher_stats_report <- downloadHandler(filename = function(){
