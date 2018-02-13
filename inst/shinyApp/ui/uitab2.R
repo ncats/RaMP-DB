@@ -52,7 +52,7 @@ tabItem2<-  shinydashboard::tabItem(
                     HTML("<div id='database-group-output'>"),
                     shinydashboard::box(
                       width = 12,
-                      status = "info",
+                      status = "summary",
                       solidHeader = T,
                       collapsible = T,
                       title = strong("Summary"),
