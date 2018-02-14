@@ -590,7 +590,7 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
 #'}
 #' @export
 find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
-                            min_pathway_tocluster = 2,perc_pathway_overlap = 0.5){
+                          min_pathway_tocluster = 2,perc_pathway_overlap = 0.5){
   if(perc_analyte_overlap <= 0 || perc_analyte_overlap >= 1 ||
      perc_pathway_overlap <= 0 || perc_pathway_overlap >= 1){
     return(NULL)
@@ -598,131 +598,140 @@ find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
 
   analyte_type=fishers_df$analyte_type
   fishers_df=fishers_df$fishresults
-
-  similarity_matrix_list<-RaMP:::load_overlap_matrices()
-  if(analyte_type=="both"){
-    similarity_matrix = similarity_matrix_list[["analyte"]]
-  }else if(analyte_type=="metabolites"){
-    similarity_matrix = similarity_matrix_list[["metab"]]
-  } else if(analyte_type=="genes"){
-    similarity_matrix = similarity_matrix_list[["gene"]]
+  if(nrow(fishers_df)==0){
+    return(NULL)
+  }else if(nrow(fishers_df)==1){
+    fishers_df$cluster_assignment="Did not cluster"
+    fishers_df$rampids<-fishers_df$pathwayRampId
+    fishers_df$pathwayRampId<-NULL
+    output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list=cluster_list)
+    return(output)
   } else {
-    stop("analyte_type should be 'genes' or metabolites'")
-  }
-  pathway_list<-fishers_df[,"pathwayRampId"]
-
-  pathway_indices<-match(pathway_list,rownames(similarity_matrix))
-
-  if(length(which(is.na(pathway_indices)))>0){
-    pathway_indices<-pathway_indices[-which(is.na(pathway_indices))]
-  }
-
-  pathway_matrix<-similarity_matrix[pathway_indices,pathway_indices]
-  unmerged_clusters<-apply(pathway_matrix, 1, function(x){
-    # if(length(which(x>=perc_analyte_overlap))>(min_pathway_tocluster+1)){
-    if(length(which(x>=perc_analyte_overlap))>(min_pathway_tocluster-1)){
-      return(colnames(pathway_matrix)[which(x>=perc_analyte_overlap)])
+    similarity_matrix_list<-RaMP:::load_overlap_matrices()
+    if(analyte_type=="both"){
+      similarity_matrix = similarity_matrix_list[["analyte"]]
+    }else if(analyte_type=="metabolites"){
+      similarity_matrix = similarity_matrix_list[["metab"]]
+    } else if(analyte_type=="genes"){
+      similarity_matrix = similarity_matrix_list[["gene"]]
     } else {
-      return(NA)
+      stop("analyte_type should be 'genes' or metabolites'")
     }
-  })
-  # Remove the unmerged clusters
-  if(length(which(is.na(unmerged_clusters)))>0){
-    unmerged_clusters<-unmerged_clusters[-which(is.na(unmerged_clusters))]
-  }
+    pathway_list<-fishers_df[,"pathwayRampId"]
 
-  if(length(unmerged_clusters)==0){
-    #stop("No medoids found, make perc_analyte_overlap or min_pathway_tocluster smaller")
-    cluster_list<-rep("Did not cluster",times = nrow(fishers_df))
-  }else{
-    # Evaluate similarity between clusters
-    cluster_similarity<-matrix(0,ncol = length(unmerged_clusters),nrow = length(unmerged_clusters))
-    for(i in 1:length(unmerged_clusters)){
-      for(j in 1:length(unmerged_clusters)){
-        cluster_similarity[i,j]<-length(intersect(unmerged_clusters[[i]],unmerged_clusters[[j]]))/
-          length(unique(c(unmerged_clusters[[i]],unmerged_clusters[[j]])))
-      }
+    pathway_indices<-match(pathway_list,rownames(similarity_matrix))
+
+    if(length(which(is.na(pathway_indices)))>0){
+      pathway_indices<-pathway_indices[-which(is.na(pathway_indices))]
     }
-    colnames(cluster_similarity)<-rownames(cluster_similarity)<-names(unmerged_clusters)
-    unmerged_cluster_similarity<-cluster_similarity
 
-    cluster_list<-unmerged_clusters
-
-    # Merge Clusters
-    count = 1
-    while(length(which(cluster_similarity >= perc_pathway_overlap)) > nrow(cluster_similarity)){
-      cluster_similarity_mod<-cluster_similarity
-      for(i in 1:nrow(cluster_similarity_mod)){
-        cluster_similarity_mod[i,i]<-0
+    pathway_matrix<-similarity_matrix[pathway_indices,pathway_indices]
+    unmerged_clusters<-apply(pathway_matrix, 1, function(x){
+      # if(length(which(x>=perc_analyte_overlap))>(min_pathway_tocluster+1)){
+      if(length(which(x>=perc_analyte_overlap))>(min_pathway_tocluster-1)){
+        return(colnames(pathway_matrix)[which(x>=perc_analyte_overlap)])
+      } else {
+        return(NA)
       }
-
-      clusters_to_merge<-which(cluster_similarity_mod == max(cluster_similarity_mod), arr.ind = TRUE)
-      clusters_to_merge<-unique(t(apply(clusters_to_merge, 1, sort)))
-
-      for(i in 1:nrow(clusters_to_merge)){
-        if(!is.na(cluster_list[[clusters_to_merge[i,1]]])&&!is.na(cluster_list[[clusters_to_merge[i,2]]])){
-          cluster_list[[clusters_to_merge[i,1]]]<-unique(unlist(cluster_list[c(clusters_to_merge[i,1],clusters_to_merge[i,2])]))
-          cluster_list[[clusters_to_merge[i,2]]]<-NA
-        }
-      }
-
-      if(length(which(is.na(cluster_list)))>0){
-        cluster_list<-cluster_list[-which(is.na(cluster_list))]
-      }
-
-      cluster_similarity<-matrix(0,ncol = length(cluster_list),nrow = length(cluster_list))
-      for(i in 1:length(cluster_list)){
-        for(j in 1:length(cluster_list)){
-          cluster_similarity[i,j]<-length(intersect(cluster_list[[i]],cluster_list[[j]]))/
-            length(unique(c(cluster_list[[i]],cluster_list[[j]])))
-        }
-      }
-
-      if(nrow(cluster_similarity)==1){
-        #stop("Clusters converged, use larger perc_pathway_overlap")
-        #return(rep(1,times = nrow(fishers_df)))
-        cluster_list<-rep("Did not cluster",times = nrow(fishers_df))
-      }
-      count = count + 1
-      if(count == length(unmerged_clusters)+1){
-        stop("ERROR: while loop failed to terminate")
-        #return(rep(1,times = nrow(fishers_df)))
-        #cluster_list<-rep("Did not cluster",times = nrow(fishers_df))
-      }
-    }
-    if(length(unique(cluster_list))!=1){
-      colnames(cluster_similarity) = rownames(cluster_similarity) = paste0("cluster_",c(1:length(cluster_list)))
-    }
-  }
-  #return(cluster_list)
-
-  # Reformat cluster list to embed into results file 
-  rampids<-as.vector(fishers_df$pathwayRampId)
-  fishers_df$pathwayRampId<-NULL
-
-  if(length(cluster_list)>1){
-    cluster_assignment<-sapply(rampids,function(x){
-      pathway<-x
-      clusters<-""
-      for(i in 1:length(cluster_list)){
-        if(pathway %in% cluster_list[[i]]){
-          clusters<-paste0(clusters,i,sep = ", ",collapse = ", ")
-        }
-      }
-      if(clusters!=""){
-        clusters=substr(clusters,1,nchar(clusters)-2)
-      }else{
-        clusters = "Did not cluster"
-      }
-      return(clusters)
     })
-    fishers_df<-cbind(fishers_df,cluster_assignment)
-  }else{
-    fishers_df<-cbind(fishers_df,rep("Did not cluster",times=nrow(fishers_df)))
+    # Remove the unmerged clusters
+    if(length(which(is.na(unmerged_clusters)))>0){
+      unmerged_clusters<-unmerged_clusters[-which(is.na(unmerged_clusters))]
+    }
+
+    if(length(unmerged_clusters)==0){
+      #stop("No medoids found, make perc_analyte_overlap or min_pathway_tocluster smaller")
+      cluster_list<-rep("Did not cluster",times = nrow(fishers_df))
+    }else{
+      # Evaluate similarity between clusters
+      cluster_similarity<-matrix(0,ncol = length(unmerged_clusters),nrow = length(unmerged_clusters))
+      for(i in 1:length(unmerged_clusters)){
+        for(j in 1:length(unmerged_clusters)){
+          cluster_similarity[i,j]<-length(intersect(unmerged_clusters[[i]],unmerged_clusters[[j]]))/
+            length(unique(c(unmerged_clusters[[i]],unmerged_clusters[[j]])))
+        }
+      }
+      colnames(cluster_similarity)<-rownames(cluster_similarity)<-names(unmerged_clusters)
+      unmerged_cluster_similarity<-cluster_similarity
+
+      cluster_list<-unmerged_clusters
+
+      # Merge Clusters
+      count = 1
+      while(length(which(cluster_similarity >= perc_pathway_overlap)) > nrow(cluster_similarity)){
+        cluster_similarity_mod<-cluster_similarity
+        for(i in 1:nrow(cluster_similarity_mod)){
+          cluster_similarity_mod[i,i]<-0
+        }
+
+        clusters_to_merge<-which(cluster_similarity_mod == max(cluster_similarity_mod), arr.ind = TRUE)
+        clusters_to_merge<-unique(t(apply(clusters_to_merge, 1, sort)))
+
+        for(i in 1:nrow(clusters_to_merge)){
+          if(!is.na(cluster_list[[clusters_to_merge[i,1]]])&&!is.na(cluster_list[[clusters_to_merge[i,2]]])){
+            cluster_list[[clusters_to_merge[i,1]]]<-unique(unlist(cluster_list[c(clusters_to_merge[i,1],clusters_to_merge[i,2])]))
+            cluster_list[[clusters_to_merge[i,2]]]<-NA
+          }
+        }
+
+        if(length(which(is.na(cluster_list)))>0){
+          cluster_list<-cluster_list[-which(is.na(cluster_list))]
+        }
+
+        cluster_similarity<-matrix(0,ncol = length(cluster_list),nrow = length(cluster_list))
+        for(i in 1:length(cluster_list)){
+          for(j in 1:length(cluster_list)){
+            cluster_similarity[i,j]<-length(intersect(cluster_list[[i]],cluster_list[[j]]))/
+              length(unique(c(cluster_list[[i]],cluster_list[[j]])))
+          }
+        }
+
+        if(nrow(cluster_similarity)==1){
+          #stop("Clusters converged, use larger perc_pathway_overlap")
+          #return(rep(1,times = nrow(fishers_df)))
+          cluster_list<-rep("Did not cluster",times = nrow(fishers_df))
+        }
+        count = count + 1
+        if(count == length(unmerged_clusters)+1){
+          stop("ERROR: while loop failed to terminate")
+          #return(rep(1,times = nrow(fishers_df)))
+          #cluster_list<-rep("Did not cluster",times = nrow(fishers_df))
+        }
+      }
+      if(length(unique(cluster_list))!=1){
+        colnames(cluster_similarity) = rownames(cluster_similarity) = paste0("cluster_",c(1:length(cluster_list)))
+      }
+    }
+    #return(cluster_list)
+
+    # Reformat cluster list to embed into results file
+    rampids<-as.vector(fishers_df$pathwayRampId)
+    fishers_df$pathwayRampId<-NULL
+
+    if(length(cluster_list)>1){
+      cluster_assignment<-sapply(rampids,function(x){
+        pathway<-x
+        clusters<-""
+        for(i in 1:length(cluster_list)){
+          if(pathway %in% cluster_list[[i]]){
+            clusters<-paste0(clusters,i,sep = ", ",collapse = ", ")
+          }
+        }
+        if(clusters!=""){
+          clusters=substr(clusters,1,nchar(clusters)-2)
+        }else{
+          clusters = "Did not cluster"
+        }
+        return(clusters)
+      })
+      fishers_df<-cbind(fishers_df,cluster_assignment)
+    }else{
+      fishers_df<-cbind(fishers_df,rep("Did not cluster",times=nrow(fishers_df)))
+    }
+    fishers_df$rampids<-rampids
+    output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list=cluster_list)
+    return(output)
   }
-  fishers_df$rampids<-rampids
-  output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list=cluster_list)
-  return(output)
 }
 
 #' Filter pathways by p-value cutoff for display and clustering
@@ -748,10 +757,10 @@ FilterFishersResults<-function(fishers_df,p_holmadj_cutoff=NULL,
 
 	if(length(grep("Pval_combined",colnames(fishers_df)))==0) {
 		if(!is.null(p_holmadj_cutoff)) {
-  			return(list(fishresults=fishers_df[which(fishers_df[,"Pval_Holm"] <
+  			return(list(fishresults=fishers_df[which(fishers_df[,"Pval_Holm"] <=
 				p_holmadj_cutoff),],analyte_type=analyte_type))
 		} else if (!is.null(p_fdradj_cutoff)) {
-			return(list(fishresults=fishers_df[which(fishers_df[,"Pval_FDR"] <
+			return(list(fishresults=fishers_df[which(fishers_df[,"Pval_FDR"] <=
 				p_fdradj_cutoff),],analyte_type=analyte_type))
 		} else {
 			stop("Please set a cutoff for Holm Adjusted pvalues
@@ -760,10 +769,10 @@ FilterFishersResults<-function(fishers_df,p_holmadj_cutoff=NULL,
 		}
 	}  else { # ORA was performed on both genes and metabolites:
                 if(!is.null(p_holmadj_cutoff)) {
-                        return(list(fishresults=fishers_df[which(fishers_df[,"Pval_combined_Holm"] <
+                        return(list(fishresults=fishers_df[which(fishers_df[,"Pval_combined_Holm"] <=
 				p_holmadj_cutoff),],analyte_type=analyte_type))
                 } else if (!is.null(p_fdradj_cutoff)) {
-                        return(list(fishresults=fishers_df[which(fishers_df[,"Pval_combined_FDR"] <
+                        return(list(fishresults=fishers_df[which(fishers_df[,"Pval_combined_FDR"] <=
 				p_fdradj_cutoff),],analyte_type=analyte_type))
                 } else {
                         stop("Please set a cutoff for Holm Adjusted pvalues
