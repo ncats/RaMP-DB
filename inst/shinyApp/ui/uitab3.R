@@ -158,7 +158,7 @@ tabItem3 <-  shinydashboard::tabItem(
         	   p("Note that only pathways that contain at least 3 analytes from the user input will be output"),
         	   #textOutput("summary_Fisher"),
                	   p("The following number of pathways per database were processed:"),
-           	   DT::dataTableOutput("summary_fisher"),
+           	   DT::dataTableOutput("summary_fisher",width = '80%'),
            	   downloadButton("fisher_stats_report",label = "Download Results")
           	) # end box
 	   )   #end column
@@ -176,7 +176,7 @@ tabItem3 <-  shinydashboard::tabItem(
           	  column(width = 6,
 			plotOutput("cluster_summary_plot",height = "300px")
 		   ), # end column
-	    	   DT::dataTableOutput("results_fisher")
+	    	   DT::dataTableOutput("results_fisher",width = '80%')
 	    ) # end box
           ) # end of fluidRow
         ) # end tabPanel
