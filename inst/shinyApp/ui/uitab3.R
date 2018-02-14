@@ -65,20 +65,12 @@ tabItem3 <-  shinydashboard::tabItem(
 		       h4(strong('Input a list of metabolites, one per line')),
                        textAreaInput("input_mul_tab3",label = "",
                                       placeholder = "Input list of metabolites, one per line"),
-<<<<<<< HEAD
     	               radioButtons("NameOrSourcemult","Search by names or source IDs?", 
-=======
-    	               radioButtons("NameOrSourcemult","Search by synonyms or source IDs?",
->>>>>>> aca66152ab176e15ff7a817873ba1185b1664697
 				choices = c("Names" = "names", "Source ID" = "ids"),selected = "ids"),
 		       h4(strong('Input a list of genes, one per line')),
 		       textAreaInput("input_mul_tab3_genes",label = "",
                                      placeholder = "Input list of genes, one per line"),
-<<<<<<< HEAD
                        radioButtons("NameOrSourcemult_genes","Search by names or source IDs?", 
-=======
-                       radioButtons("NameOrSourcemult_genes","Search by synonyms or source IDs?",
->>>>>>> aca66152ab176e15ff7a817873ba1185b1664697
 				choices = c("Names" = "names", "Source ID" = "ids"),selected = "ids"),
                        actionButton("sub_mul_tab3",label = "Submit Query"),
     		       br()
