@@ -6,7 +6,7 @@ tabItem3 <-  shinydashboard::tabItem(
            label ="sub_tab_1_TAB3",
            shinydashboard::box(
              width = 6,
-             title = strong("Input synonym"),
+             title = strong("Input analyte"),
              solidHeader = T,
              status = "primary",
              fluidRow(
@@ -14,7 +14,7 @@ tabItem3 <-  shinydashboard::tabItem(
                       helpText("Given compound's name,
                                it returns pathways in which the compound get involved in."),
                       column(width = 6),
-                      textInput("compName","",placeholder = "Input compound synonym or source"),
+                      textInput("compName","",placeholder = "Input compound name or source id"),
                       radioButtons("NameOrId","Search by common names or source IDs?",
 			choices = c("Names" = "names", "Source ID" = "ids"),selected = "ids"),
                       selectInput("KW_synonym", "Select from list", choices = NULL),
@@ -65,12 +65,12 @@ tabItem3 <-  shinydashboard::tabItem(
 		       h4(strong('Input a list of metabolites, one per line')),
                        textAreaInput("input_mul_tab3",label = "",
                                       placeholder = "Input list of metabolites, one per line"),
-    	               radioButtons("NameOrSourcemult","Search by synonyms or source IDs?",
+    	               radioButtons("NameOrSourcemult","Search by names or source IDs?", 
 				choices = c("Names" = "names", "Source ID" = "ids"),selected = "ids"),
 		       h4(strong('Input a list of genes, one per line')),
 		       textAreaInput("input_mul_tab3_genes",label = "",
                                      placeholder = "Input list of genes, one per line"),
-                       radioButtons("NameOrSourcemult_genes","Search by synonyms or source IDs?",
+                       radioButtons("NameOrSourcemult_genes","Search by names or source IDs?", 
 				choices = c("Names" = "names", "Source ID" = "ids"),selected = "ids"),
                        actionButton("sub_mul_tab3",label = "Submit Query"),
     		       br()
