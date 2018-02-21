@@ -73,7 +73,7 @@ output$comp_report <- downloadHandler(filename = function() {
 content = function(file) {
   rampOut <- dataInput_name()
   rampOut <- data.frame(rampOut)
-  write.csv(rampOut, file, row.names = FALSE, sep = ",")
+  write.csv(rampOut, file, row.names = FALSE)
 })
 
 
@@ -113,37 +113,12 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
   rbind(metabsearch,genesearch)
 })
 
-# data_mul_file <- eventReactive(input$sub_file_tab3,{
-#   infile <- input$inp_file_tab3
-#   if (is.null(infile))
-#     return(NULL)
-#
-#   RaMP:::rampFileOfPathways(infile,conpass=.conpass,host = .host,NameOrIds=input$NameOrSourcemult)
-# })
-#
-# observe({
-#   input$sub_file_tab3
-#   rea_detector$num <- 2
-# })
-
 # Download table in a csv file.
 output$tab3_mul_report <- downloadHandler(filename = function(){
-  # if (rea_detector$num == 1){
       paste0("pathwayFromMetabolitesOutput.csv")
-  # } else if (rea_detector$num == 2){
-  #   infile <- input$inp_file_tab3
-  #   paste0(infile[[1,'name']],"Output",".csv")
-  # }
-
-},
-content = function(file) {
-  if (rea_detector$num == 1){
+}, content = function(file) {
       rampOut <- data_mul_name()[,c("pathwayName","pathwaysourceId",
                                     "pathwaysource","commonName")]
-  } else if (rea_detector$num == 2){
-    rampOut <- data_mul_file()[,c("pathwayName","pathwaysourceId",
-                                  "pathwaysource","commonName")]
-  }
   write.csv(rampOut,file,row.names = FALSE)
 }
 )
@@ -160,19 +135,12 @@ output$summary_mulpath_out<- DT::renderDataTable({
 },rownames=FALSE)
 
 output$preview_multi_names <- DT::renderDataTable({
-  #if(is.null(isGeneMetabolites$content))
-  #  return("Waiting for input")
   if(is.null(data_mul_name())) {
     return("No input found")
   } else {
 
-  # if(rea_detector$num == 1){
     tb <- data_mul_name()[,c("pathwayName","pathwaysourceId",
                              "pathwaysource","commonName")]
-#   } else if (rea_detector$num == 2) {
-# 	    tb <- data_mul_file()[,c("pathwayName","pathwaysourceId",
-#                              "pathwaysource","commonName")]
-#   }
   return(tb)
  }
 }
