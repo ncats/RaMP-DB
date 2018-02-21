@@ -393,9 +393,11 @@ rampFastPathFromMeta<- function(analytes=NULL,
 
 
   if(NameOrIds == "names"){
+    print(analytes)
     synonym <- RaMP:::rampFindSynonymFromSynonym(synonym=analytes,
-	find_synonym=find_synonym,
-	conpass=conpass)
+	  find_synonym=find_synonym,
+	  conpass=conpass)
+    
     colnames(synonym)[1]="commonName"
     synonym$commonName <- tolower(synonym$commonName)
     if(nrow(synonym)==0) {
@@ -429,7 +431,7 @@ rampFastPathFromMeta<- function(analytes=NULL,
     query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where
                       rampId in (",
                      list_metabolite,");")
-    con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
+    con <- RaMP:::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
     #print(query2)
     df2 <- DBI::dbGetQuery(con,query2)
     DBI::dbDisconnect(con)
@@ -443,7 +445,7 @@ rampFastPathFromMeta<- function(analytes=NULL,
   }
   query3 <- paste0("select pathwayName,sourceId as pathwaysourceId,type as pathwaysource,pathwayRampId from pathway where pathwayRampId in (",
                     pathid_list,");")
-  con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass)
+  con <- RaMP:::connectToRaMP(dbname=dbname,username=username,conpass=conpass)
   df3 <- DBI::dbGetQuery(con,query3)
   DBI::dbDisconnect(con)
   #Format output
@@ -454,7 +456,7 @@ rampFastPathFromMeta<- function(analytes=NULL,
      list_analytes <- sapply(analytes,shQuote)
      list_analytes <- paste(list_analytes,collapse = ",")
   query4 <-paste0("select sourceId,commonName,rampId from source where sourceId in (",list_analytes,");")
-  con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
+  con <- RaMP:::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
   df4 <- DBI::dbGetQuery(con,query4)
   DBI::dbDisconnect(con)
   mdf <- merge(mdf,df4,all.x = T,by.y = "rampId")

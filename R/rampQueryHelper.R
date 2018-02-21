@@ -10,6 +10,7 @@
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
 #' as input (there are some common synonyms that will mess up whole searching)
+#' @return a data frame that contains synonym in the first column rampId in the second column
 rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
 	find_synonym = FALSE,conpass=NULL,dbname="ramp",username="root",
 	host = "localhost"){
@@ -89,6 +90,7 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
 #' @param full return whole searching result or not (TRUE/FALSE)
+#' @return a data frame that has all source Id in the column or the source table that has metaoblites entry
 rampFindSourceFromId <- function(rampId=NULL,full = TRUE,
 	conpass=NULL,dbname="ramp",username="root",
 	host = "localhost"){

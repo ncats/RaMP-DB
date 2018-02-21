@@ -22,6 +22,9 @@ rampId}
 
 \item{host}{host name for database access (default is "localhost")}
 }
+\value{
+a data frame that has all source Id in the column or the source table that has metaoblites entry
+}
 \description{
 Find all source from given list of RaMP Ids
 }
