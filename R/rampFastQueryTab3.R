@@ -607,7 +607,7 @@ find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
     output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list=cluster_list)
     return(output)
   } else {
-    similarity_matrix_list<-RaMP:::load_overlap_matrices()
+    similarity_matrix_list<-RaMP:::loadOverlapMatrices()
     if(analyte_type=="both"){
       similarity_matrix = similarity_matrix_list[["analyte"]]
     }else if(analyte_type=="metabolites"){
