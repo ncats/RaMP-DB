@@ -1,7 +1,7 @@
 Package: RaMP
 Title: RaMP (Relational Database of Metabolomic Pathways)
 Type: Package
-Version: 0.0.4
+Version: 1.0.0
 License: GPL-2
 Depends: R (>= 3.2.0)
 Authors@R: c(
