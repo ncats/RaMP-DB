@@ -1,6 +1,6 @@
 #' Do fisher test for only one pathway from search result
 #' clicked on highchart
-#' @param pathwaydf a data frame resulting from rampFastPathFromMeta
+#' @param pathwaydf a data frame resulting from getPathwayFromAnalyte
 #' @param total_metabolites number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param analyte_type "metabolites" or "genes" (default is "metabolites")
@@ -208,7 +208,7 @@ print(dim(out))
 
 #' Do fisher test for only one pathway from search result
 #' clicked on highchart
-#' @param pathwaydf a data frame resulting from rampFastPathFromMeta
+#' @param pathwaydf a data frame resulting from getPathwayFromAnalyte
 #' @param total_metabolites number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param min_analyte if the number of analytes (gene or metabolite) in a pathway is
@@ -220,7 +220,7 @@ print(dim(out))
 #' @return a dataframe with pathway enrichment (based on Fisher's test) results
 #'@examples
 #'\dontrun{
-#' pathwaydf<-rampFastPathFromMeta(c("MDM2","TP53","glutamate","creatinine"),
+#' pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
 #'                 NameOrIds="names", conpass=conpass)
 #' fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
 #'}
@@ -338,28 +338,6 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
     return(list(fishresults=out2,analyte_type=analyte_type))
 }
 
-
-#' Reformat the result of query (get pathways from analyte(s)) for input into barplot
-#' function
-#'
-#' each pathway contains all metabolites inside that pathway
-#' @param df A dataframe that has information for bar plot
-#' @return a list with the analyte names for each pathway that is represented in the list
-rampGenerateBarPlot <- function(df){
-  path_meta_list <- list()
-  for (i in 1:nrow(df)){
-    if (length(path_meta_list)==0){
-      path_meta_list[[df[i,]$pathwaysourceId]] <- data.frame(metabolite = df[i,]$rampId,stringsAsFactors = F)
-    } else {
-      path_meta_list[[df[i,]$pathwaysourceId]] <-
-		rbind(path_meta_list[[df[i,]$pathwaysourceId]],df[i,]$rampId)
-      path_meta_list[[df[i,]$pathwaysourceId]] <-
-	unique(path_meta_list[[df[i,]$pathwaysourceId]])
-    }
-  }
-  return(path_meta_list)
-}
-
 #' Function that search analytes (gene or compounds)  or a list of analytes and
 #' returns associated pathways
 #'
@@ -373,10 +351,10 @@ rampGenerateBarPlot <- function(df){
 #' @return a list contains all metabolites as name and pathway inside.
 #' @examples
 #' \dontrun{
-#' mypath <- rampFastPathFromMeta(analytes=c("2-hydroxyglutarate","glutamate"), conpass="mypassword")
+#' mypath <- getPathwayFromAnalyte(analytes=c("2-hydroxyglutarate","glutamate"), conpass="mypassword")
 #' }
 #' @export
-rampFastPathFromMeta<- function(analytes=NULL,
+getPathwayFromAnalyte<- function(analytes=NULL,
 	find_synonym = FALSE,
 	conpass=NULL,
 	host = "localhost",
@@ -472,102 +450,6 @@ rampFastPathFromMeta<- function(analytes=NULL,
   return(out[which(out$pathwaysource!="hmdb"),c("rampId","pathwayRampId","pathwayName",
 	"pathwaysourceId","pathwaysource","commonName")])
 }
-
-#' Generate data.frame from given files identifying the file type, then it returns table output to
-#' shiny renderTable function as preview of searching data
-#'
-#' @param infile a file object given from files
-#' @param NameOrIds whether to return "synonyms" or "ids" (default is "ids")
-#' @param conpass password for database access (string)
-#' @param dbname name of the mysql database (default is "ramp")
-#' @param username username for database access (default is "root")
-#' @param host host name for database access (default is "localhost")
-#' @return a data.frame either from multiple csv file
-#' or search through by a txt file.
-rampFileOfPathways <- function(infile,NameOrIds="ids",
-	conpass=NULL,
-	dbname="ramp",
-	username="root",
-	host = "localhost"){
-  name <- infile[[1,'name']]
-    summary <- data.frame(pathway  = character(0),id = character(0),
-                          source = character(0),metabolite = character(0))
-    rampOut <- list()
-    for (i in 1:length(infile[,1])){
-      if(infile[[i,'type']]!="text/plain"){
-        rampOut[[i]] <- utils::read.table(infile[[i,'datapath']])
-        name <- infile[[i,'name']]
-        #print(infile[[i,'type']])
-        rampOut[[i]]$new.col <- substr(name,1,nchar(name) - 4)
-        colnames(rampOut[[i]]) <- c("pathway","id","source","metabolite")
-        summary <- rbind(summary,rampOut[[i]])
-      } else {
-        rampOut <- readLines(infile[[i,'datapath']])
-        summary <- RaMP::rampFastPathFromMeta(rampOut,NameOrIds=NameOrIds,
-		conpass=conpass,username=username,dbname=dbname,
-		host = host
-		)
-      }
-    }
-    return(summary)
-}
-
-#' highchart output for RaMP and fisher test.
-#'
-#' Based on given x,y data, type and click event, it returns a highcharter object
-#' to highchartOutput function to display bar plot.
-#'
-#' @param x_data vector contains data for categorical x-axis
-#' @param y_data vector contains frequency of each pathway
-#' @param type plot's type of this highcharter object
-#' @param event_func Javascript code that define the click event
-#' @return highcharter object
-rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
-  fomatterFunc <- highcharter::JS("function(){
-                        html = '<strong> Pathway ' + this.x +' has frequency: ' + this.y +'. metabolites are :'
-                        '+this.y.detail+'</strong>;'
-                        return html;
-                     }")
-  hc<-highcharter::highchart() %>%
-    highcharter::hc_chart(type = type,
-             # options3d = list(enabled = TRUE, beta = 15, alpha = 15),
-             borderColor = '#ceddff',
-             borderRadius = 10,
-             borderWidth = 2,
-             zoomType = "x",
-             backgroundColor = list(
-               linearGradient = c(0, 0, 500, 500),
-               stops = list(
-                 list(0, 'rgb(255, 255, 255)'),
-                 list(1, 'rgb(219, 228, 252)')
-               ))) %>%
-    highcharter::hc_title(text = "<strong>Search result from given metabolites</strong>",
-             margin = 20,align = "left",
-             style = list(color = "black",useHTML = TRUE)) %>%
-    highcharter::hc_xAxis(categories = x_data) %>%
-    highcharter::hc_yAxis(allowDecimals = FALSE,
-             title = list(
-               text = "Frequency"
-             )) %>%
-    highcharter::hc_add_series(data = y_data,
-                  name = "pathway"
-                  ) %>%
-    highcharter::hc_plotOptions(
-      series = list(stacking = FALSE,
-                    events = list(
-                      click = event_func
-                    ))) %>%
-    highcharter::hc_tooltip(headerFormat = "<span>{point.key} has frequency {point.y}</span>
-               <div style ='margin:0px;ma-xwidth:300px;overflow-y:hidden;'>",
-               pointFormat = "<p class = 'tab3-tooltip-hc'>Metabolites: {point.detail}</p>",
-               footerFormat = "</div>",
-              # formatter = fomatterFunc,
-               shared = TRUE,
-               useHTML = TRUE) %>%
-    highcharter::hc_exporting(enabled = TRUE)
-  return(hc)
-}
-
 #' Perform fuzzy multiple linkage partitioning clustering on pathways identified by
 #' Fisher's test
 #'
@@ -578,20 +460,19 @@ rampHcOutput <- function(x_data,y_data,type = 'column',event_func){
 #' a cluster (medoid) (Default = 3)
 #' @param perc_pathway_overlap Minimum overlap for clusters to merge (Default = 0.5)
 #'
-#' @return a list of 3: First entry is fishers_df with cluster membership column appended
-#' to each pathway. Second entry is query type (metabolites, genes, or both). Third entry is
-#' a list of clusters identified by the algorithm. Each entry of the list is
-#' a cluster, containing a vector of pathways in the cluster
+#' @return list:[[1]] Pathway enrichment result dataframe with cluster assignment column added
+#' [[2]] analyte type
+#' [[3]] cluster assignment in the list form
 #'@examples
 #'\dontrun{
-#' pathwaydf<-rampFastPathFromMeta(c("MDM2","TP53","glutamate","creatinine"),
+#' pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
 #'                 NameOrIds="names", conpass=conpass)
 #' fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
 #' filtered.fisher.results <- FilterFishersResults(fisher.results,p_holmadj_cutoff=0.05)
-#' filteredclust.fisher.results <- find_clusters(filtered.fisher.results)
+#' filteredclust.fisher.results <- findCluster(filtered.fisher.results)
 #'}
 #' @export
-find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
+findCluster <- function(fishers_df,perc_analyte_overlap = 0.5,
                           min_pathway_tocluster = 2,perc_pathway_overlap = 0.5){
   if(perc_analyte_overlap <= 0 || perc_analyte_overlap >= 1 ||
      perc_pathway_overlap <= 0 || perc_pathway_overlap >= 1){
@@ -740,10 +621,11 @@ find_clusters <- function(fishers_df,perc_analyte_overlap = 0.5,
 #' @param fishers_df The data frame generated by runFisherTest
 #' @param p_holmadj_cutoff return pathways where Holm adjusted pvalues are < p_holmadj_cutoff
 #' @param p_fdradj_cutoff return pathways where FDR adjusted pvalues are < p_fdradj_cutoff
-#' @return dataframe of fishers results with only significant pathways
+#' @return list:[[1]]Dataframe with pathway enrichment results, only significant pathways
+#' [[2]]analyte type
 #'@examples
 #'\dontrun{
-#' pathwaydf<-rampFastPathFromMeta(c("MDM2","TP53","glutamate","creatinine"),
+#' pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
 #'                 NameOrIds="names", conpass=conpass)
 #' fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
 #' filtered.fisher.results <- FilterFishersResults(fisher.results,p_holmadj_cutoff=0.05)
