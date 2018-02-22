@@ -22,8 +22,6 @@ rampFastPathFromSource(sourceid, find_synonym = FALSE, conpass = NULL,
 }
 \value{
 a list contains all metabolits as name and pathway inside.
-
-Apply famil function...
 }
 \description{
 Fast search given a list of metabolites source Id
