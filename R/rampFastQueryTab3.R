@@ -8,8 +8,7 @@
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
-#' @return a dataframe with pathway enrichment (based on Fisher's test) results
-#' @export
+#' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
 runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
                               analyte_type="metabolites",conpass=NULL,
                               dbname="ramp",username="root",
@@ -217,7 +216,7 @@ print(dim(out))
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
-#' @return a dataframe with pathway enrichment (based on Fisher's test) results
+#' @return a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
 #'@examples
 #'\dontrun{
 #' pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
@@ -375,7 +374,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
     synonym <- RaMP:::rampFindSynonymFromSynonym(synonym=analytes,
 	  find_synonym=find_synonym,
 	  conpass=conpass)
-    
+
     colnames(synonym)[1]="commonName"
     synonym$commonName <- tolower(synonym$commonName)
     if(nrow(synonym)==0) {

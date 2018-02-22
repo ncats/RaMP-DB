@@ -15,7 +15,8 @@ FilterFishersResults(fishers_df, p_holmadj_cutoff = NULL,
 \item{p_fdradj_cutoff}{return pathways where FDR adjusted pvalues are < p_fdradj_cutoff}
 }
 \value{
-dataframe of fishers results with only significant pathways
+list:[[1]]Dataframe with pathway enrichment results, only significant pathways
+[[2]]analyte type
 }
 \description{
 Filter pathways by p-value cutoff for display and clustering
