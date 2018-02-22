@@ -6,6 +6,7 @@
 #' @param username username for the database
 #' @param conpass password for the database
 #' @param sourceOrName specify the type of given data
+#' @return dataframe that contains searched ontology from given analytes
 rampFastOntoFromMeta <- function(analytes,conpass = NULL,
                          dbname = 'ramp',
                          host = 'localhost',
@@ -101,6 +102,8 @@ rampFastOntoFromMeta <- function(analytes,conpass = NULL,
 #' @param conpass a database password
 #' @param host host name for the database
 #' @param username user name for the database
+#' 
+#' @return dataframe that  contains searched analytes from given ontology
 rampFastMetaFromOnto <- function(ontology,conpass = NULL,
                                  dbname = 'ramp',
                                  host = 'localhost',
