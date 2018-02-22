@@ -27,6 +27,9 @@ rampFindSynonymFromSynonym(synonym, full = FALSE, find_synonym = FALSE,
 \item{host}{host name for database access (default is "localhost")
 as input (there are some common synonyms that will mess up whole searching)}
 }
+\value{
+a data frame that contains synonym in the first column rampId in the second column
+}
 \description{
 Find all synonym from a given metabolite's name
 This function is used to filter out some super common synonyms like glyceride

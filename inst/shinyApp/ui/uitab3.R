@@ -44,10 +44,10 @@ tabItem3 <-  shinydashboard::tabItem(
                collapsed = F,
                title = strong("Query Result"),
 	       fluidRow(
-                   #div(style = "height:900px;overflow-x:auto;overflow-y:scroll",
+                   div(style = "width:80%;height:100%;align:center;margin-right:20px;margin-left:20px;",
                        helpText("Preview of output only display first 20 items."),
                        DT::dataTableOutput("result3")
-                   # )
+                   )
 		)
              )
          ), # end tabPanel
@@ -97,7 +97,9 @@ tabItem3 <-  shinydashboard::tabItem(
                  title = strong("Query Result"),
                  solidHeader = T,
                  status = "primary",
-                 DT::dataTableOutput("preview_multi_names")
+                 div(style = 'width:80%;height:100%;align:center;',
+                  DT::dataTableOutput("preview_multi_names")
+                 )
               ), # end box
              HTML("</div>")
            ), # end fluidRow

@@ -23,6 +23,6 @@ a data.frame either from multiple csv file
 or search through by a txt file.
 }
 \description{
-identifing the file type, then it returns table output to 
+identifing the file type, then it returns table output to
 shiny renderTable function as preview of searching data
 }

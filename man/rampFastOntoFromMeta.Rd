@@ -21,6 +21,9 @@ rampFastOntoFromMeta(analytes, conpass = NULL, dbname = "ramp",
 
 \item{sourceOrName}{specify the type of given data}
 }
+\value{
+dataframe that contains searched ontology from given analytes
+}
 \description{
 Function that query database to find ontology information based on 
 the given list of analytes
