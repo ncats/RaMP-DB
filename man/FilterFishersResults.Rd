@@ -22,7 +22,7 @@ Filter pathways by p-value cutoff for display and clustering
 }
 \examples{
 \dontrun{
-pathwaydf<-rampFastPathFromMeta(c("MDM2","TP53","glutamate","creatinine"),
+pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
                 NameOrIds="names", conpass=conpass)
 fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
 filtered.fisher.results <- FilterFishersResults(fisher.results,p_holmadj_cutoff=0.05)
