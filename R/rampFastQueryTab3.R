@@ -486,7 +486,7 @@ findCluster <- function(fishers_df,perc_analyte_overlap = 0.5,
     fishers_df$cluster_assignment="Did not cluster"
     fishers_df$rampids<-fishers_df$pathwayRampId
     fishers_df$pathwayRampId<-NULL
-    output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list=cluster_list)
+    output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list="Did not cluster")
     return(output)
   } else {
     similarity_matrix_list<-RaMP:::loadOverlapMatrices()
