@@ -2,7 +2,6 @@
 #'
 #' @return A list of pathway overlap matrices for clustering
 loadOverlapMatrices<- function() {
->>>>>>> d7aa59cb4785a7db4d5d9a639504d7e6aaa03bbb
   gene_result <- metabolite_result <- analyte_result <- c()
   load(system.file(package = "RaMP",... = "extdata/genes_overlap_matrix.RData"))
   load(system.file(package = "RaMP",... = "extdata/metabolites_overlap_matrix.RData"))
