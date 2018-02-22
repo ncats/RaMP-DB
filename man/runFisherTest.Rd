@@ -10,7 +10,7 @@ runFisherTest(pathwaydf, total_metabolites = NULL, total_genes = 20000,
   username = "root", host = "localhost")
 }
 \arguments{
-\item{pathwaydf}{a data frame resulting from rampFastPathFromMeta}
+\item{pathwaydf}{a data frame resulting from getPathwayFromAnalyte}
 
 \item{total_metabolites}{number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")}
 
@@ -27,7 +27,7 @@ runFisherTest(pathwaydf, total_metabolites = NULL, total_genes = 20000,
 \item{host}{host name for database access (default is "localhost")}
 }
 \value{
-a dataframe with pathway enrichment (based on Fisher's test) results
+a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
 }
 \description{
 Do fisher test for only one pathway from search result
