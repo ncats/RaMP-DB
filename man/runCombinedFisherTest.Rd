@@ -10,7 +10,7 @@ runCombinedFisherTest(pathwaydf, total_metabolites = NULL,
   username = "root", host = "localhost")
 }
 \arguments{
-\item{pathwaydf}{a data frame resulting from rampFastPathFromMeta}
+\item{pathwaydf}{a data frame resulting from getPathwayFromAnalyte}
 
 \item{total_metabolites}{number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")}
 
@@ -28,7 +28,7 @@ runCombinedFisherTest(pathwaydf, total_metabolites = NULL,
 \item{host}{host name for database access (default is "localhost")}
 }
 \value{
-a dataframe with pathway enrichment (based on Fisher's test) results
+a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
 }
 \description{
 Do fisher test for only one pathway from search result
@@ -36,7 +36,7 @@ clicked on highchart
 }
 \examples{
 \dontrun{
-pathwaydf<-rampFastPathFromMeta(c("MDM2","TP53","glutamate","creatinine"),
+pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
                 NameOrIds="names", conpass=conpass)
 fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
 }
