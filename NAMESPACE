@@ -2,12 +2,11 @@
 
 export(FilterFishersResults)
 export(connectToRaMP)
-export(find_clusters)
+export(findCluster)
 export(getPathwayFromAnalyte)
 export(plotCataNetwork)
 export(rampFastCata)
 export(rampFastMetaFromPath)
-export(rampImportDumpFile)
 export(runCombinedFisherTest)
 export(runFisherTest)
 export(runRaMPapp)

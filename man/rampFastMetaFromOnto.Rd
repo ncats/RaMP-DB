@@ -18,6 +18,9 @@ rampFastMetaFromOnto(ontology, conpass = NULL, dbname = "ramp",
 
 \item{username}{user name for the database}
 }
+\value{
+dataframe that  contains searched analytes from given ontology
+}
 \description{
 function that query database to find analytes in given ontologies
 }
