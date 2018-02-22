@@ -1,13 +1,13 @@
-# Function that runs rampFastMetaFromPath to return analytes from input pathway(s)
+# Function that runs getAnalyteFromPathway to return analytes from input pathway(s)
 dataInput_path <- eventReactive(input$subText2,{
   progress <- shiny::Progress$new()
-  
+
   on.exit(progress$close())
-  
+
   progress$set(message = "Querying databases to find metabolites ...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
-  
-  rampOut <- RaMP::rampFastMetaFromPath(input$KW_path,conpass=.conpass,host = .host)
+
+  rampOut <- RaMP::getAnalyteFromPathway(input$KW_path,conpass=.conpass,host = .host)
   print(dim(rampOut))
   print(input$KW_path)
   print(input$geneOrComp2)
@@ -15,8 +15,8 @@ dataInput_path <- eventReactive(input$subText2,{
     rampOut <- rampOut[rampOut$geneOrCompound == input$geneOrComp2,]
   }
   progress$inc(0.7,detail = paste("Down!"))
- 
-  print(dim(rampOut)) 
+
+  print(dim(rampOut))
   return(rampOut)
 })
 
@@ -28,7 +28,7 @@ path_text_out<- eventReactive(input$subText2,{
   } else{
     return ("Given pathway not found.")
   }
-  
+
 })
 
 output$summary_search <- renderText({
@@ -68,14 +68,14 @@ output$result_file <- downloadHandler(filename = function() {
 })
 
 ############################################
-# Second Panel 
+# Second Panel
 ###########################################
 
 detector_tab2 <- reactiveValues(num = NULL)
 
 observe({
   input$sub_mul_tab2
-  
+
   isolate({
     detector_tab2$num <- 1
   })
@@ -85,20 +85,20 @@ observe({
 data_mul_name_tab2 <- eventReactive(input$sub_mul_tab2,{
   if(is.null(input$sub_mul_tab2))
     return(NULL)
-  RaMP::rampFastMetaFromPath(input$input_mul_tab2,conpass=.conpass,host = .host)
+  RaMP::getAnalyteFromPathway(input$input_mul_tab2,conpass=.conpass,host = .host)
 })
 data_mul_file_tab2 <- eventReactive(input$sub_file_tab2,{
   infile <- input$inp_file_tab2
   if (is.null(infile))
     return(NULL)
-  
+
   RaMP:::rampFastMetaFromPath_InputFile(infile,conpass=.conpass,host = .host)
 })
 
 
 observe({
   input$sub_file_tab2
-  
+
   detector_tab2$num <- 2
 })
 
@@ -132,7 +132,7 @@ tb_data_tab2 <- reactive({
 output$preview_multi_names_tab2 <- DT::renderDataTable({
   if(is.null(detector_tab2$num))
     return("Waiting for input")
-  
+
   tb_data_tab2()
 },
 rownames = FALSE
