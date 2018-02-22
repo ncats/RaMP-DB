@@ -7,7 +7,7 @@ dataInput_name <- eventReactive(input$submit_compName,{
   progress$set(message = "Querying databases to find pathways ...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
 
-  rampOut <- RaMP::rampFastPathFromMeta(analytes=input$KW_synonym,
+  rampOut <- RaMP::getPathwayFromAnalyte(analytes=input$KW_synonym,
                                         NameOrIds=input$NameOrId,
                                         conpass=.conpass,
                                         host = .host)
@@ -65,7 +65,7 @@ observe({
 output$result3 <- DT::renderDataTable({
   out_stc <- dataInput_name()
   out_stc[,c("pathwayName","pathwaysourceId","pathwaysource")]
-})
+},rownames = FALSE)
 
 output$comp_report <- downloadHandler(filename = function() {
   paste0(input$KW_synonym, ".csv")
@@ -92,7 +92,7 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
   parsedinput <- paste(strsplit(input$input_mul_tab3,"\n")[[1]])
   print(parsedinput)
   if(length(parsedinput)==0) {metabsearch=NULL} else{
-  	metabsearch <- RaMP::rampFastPathFromMeta(analytes=parsedinput,
+  	metabsearch <- RaMP::getPathwayFromAnalyte(analytes=parsedinput,
                              NameOrIds=input$NameOrSourcemult,
                              conpass=.conpass,
                              host = .host)
@@ -102,7 +102,7 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
   parsedinputg <- paste(strsplit(input$input_mul_tab3_genes,"\n")[[1]])
   print(parsedinputg)
   if(length(parsedinputg)==0) {genesearch=NULL} else{
-	  genesearch <- RaMP::rampFastPathFromMeta(analytes=parsedinputg,
+	  genesearch <- RaMP::getPathwayFromAnalyte(analytes=parsedinputg,
                              NameOrIds=input$NameOrSourcemult_genes,
                              conpass=.conpass,
                              host = .host)
@@ -206,7 +206,7 @@ fisherTestResultSignificant<-eventReactive(input$runClustering,{
 
 cluster_output<-eventReactive(c(input$runFisher,input$runClustering),{
   data <- fisherTestResultSignificant()
-  out<-RaMP::find_clusters(fishers_df=data,perc_analyte_overlap=as.numeric(input$perc_analyte_overlap),
+  out<-RaMP::findCluster(fishers_df=data,perc_analyte_overlap=as.numeric(input$perc_analyte_overlap),
 	min_pathway_tocluster=as.numeric(input$min_pathway_tocluster),
                       perc_pathway_overlap=as.numeric(input$perc_pathway_overlap))
   cluster_list<-out$cluster_list
@@ -222,6 +222,8 @@ cluster_list<-reactive({
   out<-cluster_output()
   if(!is.null(out)){
     cluster_list<-out$cluster_list
+  } else {
+    return('Nothing found based on given filters.')
   }
 })
 
