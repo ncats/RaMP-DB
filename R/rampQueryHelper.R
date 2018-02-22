@@ -141,8 +141,6 @@ rampFindSourceFromId <- function(rampId=NULL,full = TRUE,
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
 #' @return a list contains all metabolits as name and pathway inside.
-#' 
-#' Apply famil function...
 rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
 	conpass=NULL,dbname="ramp",username="root",host = "localhost"){
   # progress<- shiny::Progress$new()
