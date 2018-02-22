@@ -10,7 +10,7 @@ runCombinedFisherTest(pathwaydf, total_metabolites = NULL,
   username = "root", host = "localhost")
 }
 \arguments{
-\item{pathwaydf}{a data frame resulting from rampFastPathFromMeta}
+\item{pathwaydf}{a data frame resulting from getPathwayFromAnalyte}
 
 \item{total_metabolites}{number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")}
 
@@ -36,7 +36,7 @@ clicked on highchart
 }
 \examples{
 \dontrun{
-pathwaydf<-rampFastPathFromMeta(c("MDM2","TP53","glutamate","creatinine"),
+pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
                 NameOrIds="names", conpass=conpass)
 fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
 }
