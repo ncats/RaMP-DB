@@ -76,17 +76,9 @@ content = function(file) {
   write.csv(rampOut, file, row.names = FALSE)
 })
 
-
+############
 # Second Tab
-#
-#
-# rea_detector <- reactiveValues(num = NULL)
-#
-# observe({
-#   input$sub_mul_tab3
-#   #isGeneMetabolites$content <- 'metabolites'
-# })
-
+#############
 data_mul_name <- eventReactive(input$sub_mul_tab3,{
   #print(input$input_mul_tab3)
   parsedinput <- paste(strsplit(input$input_mul_tab3,"\n")[[1]])
