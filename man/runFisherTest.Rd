@@ -27,7 +27,7 @@ runFisherTest(pathwaydf, total_metabolites = NULL, total_genes = 20000,
 \item{host}{host name for database access (default is "localhost")}
 }
 \value{
-a dataframe with pathway enrichment (based on Fisher's test) results
+a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
 }
 \description{
 Do fisher test for only one pathway from search result
