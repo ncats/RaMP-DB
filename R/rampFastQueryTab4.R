@@ -251,6 +251,7 @@ rampFileOfAnalytes_tab4 <- function(infile,conpass=NULL,
 }
 
 #' Plots a network based on gene-metabolite relationships
+#' @importFrom magrittr %>%
 #'
 #' @param catalyzedf a data.frame output by rampFastCata() that contains analytes that are in the same reaction
 #' @return a list of nodes and edges
