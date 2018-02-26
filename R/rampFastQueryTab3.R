@@ -88,10 +88,10 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
  	tot_out_pathway <- total_analytes - tot_in_pathway
 	  # fill the rest of the table out
-	  user_in_pathway <- nrow(pathwaydf[which(pathwaydf$pathwayRampId==i),])
+	  user_in_pathway <- length(unique(pathwaydf[which(pathwaydf$pathwayRampId==i),"rampId"]))
 	  user_out_pathway <- length(unique(pathwaydf$rampId)) - user_in_pathway
-	  contingencyTb[1,1] <- tot_in_pathway
-	  contingencyTb[1,2] <- tot_out_pathway
+	  contingencyTb[1,1] <- tot_in_pathway - user_in_pathway 
+	  contingencyTb[1,2] <- tot_out_pathway - user_out_pathway
 	  contingencyTb[2,1] <- user_in_pathway
 	  contingencyTb[2,2] <- user_out_pathway
 	  result <- stats::fisher.test(contingencyTb)
