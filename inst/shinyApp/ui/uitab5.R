@@ -1,7 +1,7 @@
 # Tab 5 Find the ontology relationship between compounds/gene and ontology location
-# 
-# 
-# 
+#
+#
+#
 tabItem5<- shinydashboard::tabItem(
   tabName = "geneCompOnto",
   shinydashboard::tabBox(width = 12,
@@ -21,7 +21,7 @@ tabItem5<- shinydashboard::tabItem(
                            radioButtons("metaOrOnto",
                                         "Define the type of given data",
                                         choices = c(
-                                          'Analyte Source ID' = 'source',
+                                          'Analyte Source ID' = 'ids',
                                           "Analyte Name" = "name",
                                           "Ontology Name" = "ontology")),
                            actionButton("subText_onto","Submit")
@@ -53,7 +53,7 @@ tabItem5<- shinydashboard::tabItem(
                                 placeholder = "Input list of metabolites"),
                   radioButtons('input_categories_tab5',label = 'Select from list',
                                choices = c(
-                                 'Analyte Source IDs' = 'source',
+                                 'Analyte Source IDs' = 'ids',
                                  "Analyte Names" = "name",
                                  "Ontology Names" = "ontology"
                                )),
