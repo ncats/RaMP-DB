@@ -5,17 +5,17 @@
 #' @param host host for this database
 #' @param username username for the database
 #' @param conpass password for the database
-#' @param sourceOrName specify the type of given data
+#' @param NameOrIds specify the type of given data
 #' @return dataframe that contains searched ontology from given analytes
 #'
 #' @export
-rampFastOntoFromMeta <- function(analytes,conpass = NULL,
+getOntoFromMeta <- function(analytes,conpass = NULL,
                          dbname = 'ramp',
                          host = 'localhost',
                          username = 'root',
-                         sourceOrName = 'source'){
-  if(!(sourceOrName %in% c('source','name')))
-    stop("Specifiy the type of given data to 'source' or 'name'")
+                         NameOrIds = 'ids'){
+  if(!(NameOrIds %in% c('ids','name')))
+    stop("Specifiy the type of given data to 'ids' or 'name'")
 
   if(is.null(conpass)) {
     stop("Please define the password for the mysql connection")
@@ -43,9 +43,9 @@ rampFastOntoFromMeta <- function(analytes,conpass = NULL,
                         username = username,
                         host = host,
                         password = conpass)
-  if(sourceOrName == 'source'){
+  if(NameOrIds == 'ids'){
     sql <- paste0('select * from source where sourceId in (',list_metabolite,');')
-  } else if (sourceOrName == 'name'){
+  } else if (NameOrIds == 'name'){
     sql <- paste0('select * from source where rampId in (select rampId from analytesynonym where Synonym in (',
                   list_metabolite,'));')
   }
@@ -108,7 +108,7 @@ rampFastOntoFromMeta <- function(analytes,conpass = NULL,
 #' @return dataframe that  contains searched analytes from given ontology
 #'
 #' @export
-rampFastMetaFromOnto <- function(ontology,conpass = NULL,
+getMetaFromOnto <- function(ontology,conpass = NULL,
                                  dbname = 'ramp',
                                  host = 'localhost',
                                  username = 'root'){
