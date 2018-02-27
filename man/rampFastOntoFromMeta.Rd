@@ -2,7 +2,7 @@
 % Please edit documentation in R/rampFastQueryTab5.R
 \name{rampFastOntoFromMeta}
 \alias{rampFastOntoFromMeta}
-\title{Function that query database to find ontology information based on 
+\title{Function that query database to find ontology information based on
 the given list of analytes}
 \usage{
 rampFastOntoFromMeta(analytes, conpass = NULL, dbname = "ramp",
@@ -25,6 +25,6 @@ rampFastOntoFromMeta(analytes, conpass = NULL, dbname = "ramp",
 dataframe that contains searched ontology from given analytes
 }
 \description{
-Function that query database to find ontology information based on 
+Function that query database to find ontology information based on
 the given list of analytes
 }

@@ -1,4 +1,4 @@
-#' Function that query database to find ontology information based on 
+#' Function that query database to find ontology information based on
 #' the given list of analytes
 #' @param analytes a vector of analytes or a analytes delimited by new line character
 #' @param dbname database name for this database
@@ -7,6 +7,8 @@
 #' @param conpass password for the database
 #' @param sourceOrName specify the type of given data
 #' @return dataframe that contains searched ontology from given analytes
+#'
+#' @export
 rampFastOntoFromMeta <- function(analytes,conpass = NULL,
                          dbname = 'ramp',
                          host = 'localhost',
@@ -14,7 +16,7 @@ rampFastOntoFromMeta <- function(analytes,conpass = NULL,
                          sourceOrName = 'source'){
   if(!(sourceOrName %in% c('source','name')))
     stop("Specifiy the type of given data to 'source' or 'name'")
-  
+
   if(is.null(conpass)) {
     stop("Please define the password for the mysql connection")
   }
@@ -35,7 +37,7 @@ rampFastOntoFromMeta <- function(analytes,conpass = NULL,
   list_metabolite <- unique(list_metabolite)
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
-  
+
   con <- DBI::dbConnect(RMySQL::MySQL(),
                         dbname = dbname,
                         username = username,
@@ -51,7 +53,7 @@ rampFastOntoFromMeta <- function(analytes,conpass = NULL,
   #print(colnames(df))
   DBI::dbDisconnect(con)
   if(nrow(df) == 0) {
-    message('No searching result since this source id 
+    message('No searching result since this source id
             is not existed in source table')
     return(NULL)
   }
@@ -63,7 +65,7 @@ rampFastOntoFromMeta <- function(analytes,conpass = NULL,
                         username = username,
                         host = host,
                         password = conpass)
-  
+
   sql <- paste0('select * from analytehasontology where rampCompoundId in (',
                 rampid,');')
   df2 <- DBI::dbGetQuery(con,sql)
@@ -90,20 +92,22 @@ rampFastOntoFromMeta <- function(analytes,conpass = NULL,
                       by.y= 'rampId'))
   colnames(mdf)[colnames(mdf) == 'commonName.x'] = 'Ontology'
   colnames(mdf)[colnames(mdf) == 'commonName.y'] = 'Metabolites'
-  
+
   mdf <- mdf[c('Metabolites','sourceId','IDtype','Ontology','biofluidORcellular')]
-  
+
   # colnames(mdf) <- c('Metabolites','Ontology','Ontology_Type')
   return(mdf)
 }
-#' function that query database to find analytes in given ontologies 
+#' function that query database to find analytes in given ontologies
 #' @param ontology a vector of ontology or ontologies delimited by new line character
 #' @param dbname a database name for the database connected
 #' @param conpass a database password
 #' @param host host name for the database
 #' @param username user name for the database
-#' 
+#'
 #' @return dataframe that  contains searched analytes from given ontology
+#'
+#' @export
 rampFastMetaFromOnto <- function(ontology,conpass = NULL,
                                  dbname = 'ramp',
                                  host = 'localhost',
@@ -128,7 +132,7 @@ rampFastMetaFromOnto <- function(ontology,conpass = NULL,
   list_ontology <- unique(list_ontology)
   list_ontology <- sapply(list_ontology,shQuote)
   list_ontology <- paste(list_ontology,collapse = ",")
-  
+
   con <- DBI::dbConnect(RMySQL::MySQL(),
                         dbname = dbname,
                         username = username,
@@ -136,7 +140,7 @@ rampFastMetaFromOnto <- function(ontology,conpass = NULL,
                         password = conpass)
   sql <- paste0('select * from ontology where commonName in (',
                 list_ontology,');')
-  
+
   df <- DBI::dbGetQuery(con,sql)
   DBI::dbDisconnect(con)
   print(colnames(df))
@@ -149,10 +153,10 @@ rampFastMetaFromOnto <- function(ontology,conpass = NULL,
                         password = conpass)
   sql <- paste0('select * from analytehasontology where rampOntologyIdLocation in (',
                 rampontoid,');')
-  
+
   df2 <- DBI::dbGetQuery(con,sql)
   DBI::dbDisconnect(con)
-  
+
   print(colnames(df2))
   rampid <- paste(sapply(unique(df2$rampCompoundId),shQuote),collapse = ',')
   con <- DBI::dbConnect(RMySQL::MySQL(),
@@ -166,7 +170,7 @@ rampFastMetaFromOnto <- function(ontology,conpass = NULL,
   print(colnames(df3))
   DBI::dbDisconnect(con)
   if(nrow(df3) == 0) {
-    message('No searching result since this ramp id 
+    message('No searching result since this ramp id
             is not existed in source table')
     return(NULL)
   }
@@ -180,8 +184,8 @@ rampFastMetaFromOnto <- function(ontology,conpass = NULL,
   # colnames(mdf) <- c('Metabolites','Ontology','Ontology_Type')
   colnames(mdf)[colnames(mdf) == 'commonName.x'] = 'Metabolites'
   colnames(mdf)[colnames(mdf) == 'commonName.y'] = 'Ontology'
-  
+
   mdf <- mdf[c('Metabolites','sourceId','IDtype','Ontology','biofluidORcellular')]
   return(mdf)
-  
+
 }

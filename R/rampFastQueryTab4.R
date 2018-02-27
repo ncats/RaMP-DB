@@ -1,12 +1,17 @@
 #' Retrieves analytes that involved in same reaction as input metabolite
-#' 
-#' @param analytes a vector of analytes (metabolites) that need to be searched
+#'
+#' @param analytes a vector of analytes that need to be searched
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
 #' @param NameOrIds whether input is "names" or "ids" (default is "ids")
-#' @return a dataframe that contains search results
+#' @return a dataframe containing query results. If the input is a metabolite, the function will output
+#' gene transcript common names and source IDs that are known to catalyze
+#' reactions in the same pathway as that metabolite. Conversely, if the input
+#' is a gene, the function will return the common name and source id of metabolites
+#' known to be catalyzed directly or indirectly by that gene.
+#'
 #' @examples
 #' \dontrun{
 #' rampFastCata(analytes="creatine",conpass="mypassword",NameOrIds="names")
@@ -16,8 +21,8 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
 	dbname="ramp",username="root",
 	host = "localhost",
 	NameOrIds="ids") {
-  
-  if(is.null(analytes)) 
+
+  if(is.null(analytes))
 	stop("Please provide input analytes")
   if (!(NameOrIds %in% c('names','ids')))
     stop('Please specify search by "names" or "ids"')
@@ -44,8 +49,8 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
 #  print(list_metabolite)
-   
-   # Retrieve RaMP analyte ids 
+
+   # Retrieve RaMP analyte ids
    con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
          password = conpass,
          dbname = dbname,
@@ -87,17 +92,17 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
          dbname = dbname,
          host = host)
 	 df_c2 <- DBI::dbGetQuery(con,query_c)
-    	DBI::dbDisconnect(con) 
+    	DBI::dbDisconnect(con)
     	if(nrow(df_c2) == 0){
       		message("No genes found in same reaction as input metabolite")
-      		mdf_cfin2 <- NULL 
+      		mdf_cfin2 <- NULL
     	} else {
     		print("Getting names from gene Id ...")
     		analyte2_list <- unique(df_c2$rampId2)
 	        analyte2_list <- sapply(analyte2_list,shQuote)
 	 	analyte2_list <- paste(analyte2_list,collapse = ",")
 		# Get names for metabolite ids
-    		query2 <- paste0("select * from source 
+    		query2 <- paste0("select * from source
              		where rampId in (",analyte2_list,");")
     		con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
 	        password = conpass,
@@ -105,7 +110,7 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
          	host = host)
     		df_c3 <- DBI::dbGetQuery(con,query2)
     		DBI::dbDisconnect(con)
- 
+
     		if(nrow(df_c3) == 0){
       			message("Cannot retrieve names for those metabolites")
 			mdf_cfin2 <- NULL
@@ -122,7 +127,7 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
 	    }
    	    		colnames(mdf_cfin) <- c("Input_Metabolite","Gene_sourceId","Gene_IDtype",
 				"Gene_CommonName")
-    
+
 	    		# Collapse source ids:
 	    		mdf_cfin$temp <- paste(mdf_cfin[,"Input_Metabolite"],mdf_cfin[,"Gene_CommonName"])
 	    		tempout <- data.frame(Input_Metabolite=NA,Gene_CommonName=NA,Gene_sourceIds=NA)
@@ -130,7 +135,7 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
 	    		for (i in unique(mdf_cfin$temp)) {
 				temp <- mdf_cfin[which(mdf_cfin$temp==i),]
 				tempout$Input_Metabolite=temp[1,"Input_Metabolite"]
-				tempout$Gene_sourceIds <- 
+				tempout$Gene_sourceIds <-
 					paste(paste(temp$Gene_IDtype,temp$Gene_sourceId,sep=": "),
 					collapse="; ")
 				tempout$Gene_CommonName=temp[1,"Gene_CommonName"]
@@ -142,8 +147,8 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
     	} # end else couldn't find metabolite ids
     } # no catalyzation information
   } # end if compound ids found
- 
-  # Do analagous for genes 
+
+  # Do analagous for genes
   if(length(grep("RAMP_G",df1$rampId))!=0){
     print("Also find gene inside")
     df_g <- df1[grep("RAMP_G",df1$rampId),]
@@ -197,7 +202,7 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
 
 	    # Collapse source ids:
 	    mdf_gfin$temp <- paste(mdf_gfin[,"Input_Gene"],mdf_gfin[,"Gene_CommonName"])
-	    tempout <- data.frame(Input_Analyte=NA,Input_CatalyzedBy_CommonName=NA, 
+	    tempout <- data.frame(Input_Analyte=NA,Input_CatalyzedBy_CommonName=NA,
 		Input_CatalyzedBy_SourceIds=NA)
 	    mdf_gfin2=c()
 	    for (i in unique(mdf_gfin$temp)) {
@@ -224,13 +229,13 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
 }
 
 #' Generate dataframe from given files for shiny app input list of metabolites
-#' 
+#'
 #' @param infile a file object given from files
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
-#' 
+#'
 #' @return a dataframe either from multiple csv file
 rampFileOfAnalytes_tab4 <- function(infile,conpass=NULL,
 	dbname="ramp",username="root",host = "localhost"){
@@ -254,7 +259,7 @@ rampFileOfAnalytes_tab4 <- function(infile,conpass=NULL,
 #' @importFrom magrittr %>%
 #'
 #' @param catalyzedf a data.frame output by rampFastCata() that contains analytes that are in the same reaction
-#' @return a list of nodes and edges
+#' @return  An interactive HTML plot that allows the user to pan/zoom into regions of interest. User genes/metabolites are highlighted in blue, whereas analytes found by the function are orange.
 #' @examples
 #' \dontrun{
 #' catalyzedf <- rampFastCata(analytes="creatine",conpass="mypassword",NamesOrIds="names")
@@ -290,8 +295,8 @@ plotCataNetwork <- function(catalyzedf = NULL) {
 
         # Now plot
         visNetwork::visNetwork(mynodes, myedges, width = "100%",height="1000px") %>%
-		visNetwork::visInteraction(dragNodes = FALSE, 
-                 dragView = TRUE,hideEdgesOnDrag=TRUE,hideNodesOnDrag=TRUE, 
+		visNetwork::visInteraction(dragNodes = FALSE,
+                 dragView = TRUE,hideEdgesOnDrag=TRUE,hideNodesOnDrag=TRUE,
                  navigationButtons=TRUE,zoomView = TRUE) %>%
   		visNetwork::visLayout(randomSeed = 123) %>%
 		visNetwork::visPhysics(
