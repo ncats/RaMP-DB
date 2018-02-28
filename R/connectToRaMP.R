@@ -4,16 +4,18 @@
 #' @param username a string that is username for database (default: root)
 #' @param conpass password for database (string)
 #' @param host a string that stand for host 
+#' 
 #' @examples
 #' \dontrun{
-#' con <- connectToRaMP(dbname="ramp",username="root",conpass="mypassword")
+#' con <- connectToRaMP(dbname="ramp",username="root",conpass="mypassword",host = "localhost")
 #' }
+#' @return MySQL connection based on given dbname,username,password, and host
 #' @export
 connectToRaMP <- function(dbname = "ramp",
                        username = "root",
                        conpass = NULL,
                        host ="localhost"){
-#                       update = FALSE){
+
   
   if(is.null(conpass)) {
 	stop("Please define the password for the mysql connection")
