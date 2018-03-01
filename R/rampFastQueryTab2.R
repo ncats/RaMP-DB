@@ -1,6 +1,6 @@
 #' Use fast search algorithm to find all pathways from given analytes
-#' 
-#' @param pathway a string or a data.fram that contains all pathways
+#'
+#' @param pathway a string or a vector of strings that contains pathways of interest
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
@@ -9,10 +9,10 @@
 #' @examples
 #' \dontrun{
 #' con <- connectToRaMP(dbname="ramp",username="root",conpass="mypassword")
-#' rampFastMetaFromPath <- pathway="sphingolipid metabolism",conpass="mypassword")
+#' getAnalyteFromPathway <- pathway="sphingolipid metabolism",conpass="mypassword")
 #' }
 #' @export
-rampFastMetaFromPath <- function(pathway,conpass=NULL,
+getAnalyteFromPathway <- function(pathway,conpass=NULL,
 	dbname="ramp",username="root",host = "localhost"){
 
   if(is.null(conpass)) {
@@ -43,7 +43,7 @@ rampFastMetaFromPath <- function(pathway,conpass=NULL,
                        host = host)
   query1 <- paste0("select * from pathway where pathwayName
                    in (",list_pathway,");")
-  
+
   df1 <- DBI::dbGetQuery(con,query1)
   DBI::dbDisconnect(con)
 
@@ -51,11 +51,11 @@ rampFastMetaFromPath <- function(pathway,conpass=NULL,
 	stop("None of the input pathway(s) could be found")}
 
   # Retrieve compound id from RaMP pathway id (query1)
-  query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where 
-                   pathwayRampId in (select pathwayRampId from pathway where 
+  query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where
+                   pathwayRampId in (select pathwayRampId from pathway where
                    pathwayName in (",list_pathway,"));")
   con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass,
-                       host = host) 
+                       host = host)
   df2 <- DBI::dbGetQuery(con,query2)
   DBI::dbDisconnect(con)
   cid_list <- unlist(df2[,2])
@@ -103,11 +103,11 @@ rampFastMetaFromPath <- function(pathway,conpass=NULL,
 
 
 #' Generate data.frame that has all search results from given files
-#' 
-#' identifing the file type, then it returns table output to 
+#'
+#' identifing the file type, then it returns table output to
 #' shiny renderTable function as preview of searching data
-#' 
-#' @param infile a file object given from files 
+#'
+#' @param infile a file object given from files
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
@@ -123,7 +123,7 @@ rampFastMetaFromPath_InputFile <- function(infile,conpass=NULL,
  for (i in 1:length(infile[,1])){
      rampOut <- readLines(infile[[i,'datapath']])
       rampOut <- readLines(infile)
-      summary <- rampFastMetaFromPath(rampOut,conpass=conpass,host = host)
+      summary <- getAnalyteFromPathway(rampOut,conpass=conpass,host = host)
   }
   return(summary)
 }

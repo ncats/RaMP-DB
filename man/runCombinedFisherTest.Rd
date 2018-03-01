@@ -28,7 +28,7 @@ runCombinedFisherTest(pathwaydf, total_metabolites = NULL,
 \item{host}{host name for database access (default is "localhost")}
 }
 \value{
-a dataframe with pathway enrichment (based on Fisher's test) results
+a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
 }
 \description{
 Do fisher test for only one pathway from search result

@@ -1,30 +1,35 @@
 #' Retrieves analytes that involved in same reaction as input metabolite
-#' 
-#' @param analytes a vector of analytes (metabolites) that need to be searched
+#'
+#' @param analytes a vector of analytes that need to be searched
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
 #' @param NameOrIds whether input is "names" or "ids" (default is "ids")
-#' @return a dataframe that contains search results
+#' @return a dataframe containing query results. If the input is a metabolite, the function will output
+#' gene transcript common names and source IDs that are known to catalyze
+#' reactions in the same pathway as that metabolite. Conversely, if the input
+#' is a gene, the function will return the common name and source id of metabolites
+#' known to be catalyzed directly or indirectly by that gene.
+#'
 #' @examples
 #' \dontrun{
 #' rampFastCata(analytes="creatine",conpass="mypassword",NameOrIds="names")
 #' }
 #' @export
 rampFastCata <- function(analytes=NULL,conpass=NULL,
-	dbname="ramp",username="root",
-	host = "localhost",
-	NameOrIds="ids") {
+                         dbname="ramp",username="root",
+                         host = "localhost",
+                         NameOrIds="ids") {
   
-  if(is.null(analytes)) 
-	stop("Please provide input analytes")
+  if(is.null(analytes))
+    stop("Please provide input analytes")
   if (!(NameOrIds %in% c('names','ids')))
     stop('Please specify search by "names" or "ids"')
   if(is.null(conpass)) {
     stop("Please define the password for the mysql connection")
   }
-
+  
   now <- proc.time()
   if(is.character(analytes)){
     if(grepl("\n",analytes)[1]){
@@ -43,8 +48,9 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
   list_metabolite <- unique(list_metabolite)
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
+  
   #  print(list_metabolite)
-   
+  
   # Retrieve RaMP analyte ids 
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
                         password = conpass,
@@ -224,13 +230,13 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
 }
 
 #' Generate dataframe from given files for shiny app input list of metabolites
-#' 
+#'
 #' @param infile a file object given from files
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
-#' 
+#'
 #' @return a dataframe either from multiple csv file
 rampFileOfAnalytes_tab4 <- function(infile,conpass=NULL,
 	dbname="ramp",username="root",host = "localhost"){
@@ -251,9 +257,10 @@ rampFileOfAnalytes_tab4 <- function(infile,conpass=NULL,
 }
 
 #' Plots a network based on gene-metabolite relationships
+#' @importFrom magrittr %>%
 #'
 #' @param catalyzedf a data.frame output by rampFastCata() that contains analytes that are in the same reaction
-#' @return a list of nodes and edges
+#' @return  An interactive HTML plot that allows the user to pan/zoom into regions of interest. User genes/metabolites are highlighted in blue, whereas analytes found by the function are orange.
 #' @examples
 #' \dontrun{
 #' catalyzedf <- rampFastCata(analytes="creatine",conpass="mypassword",NamesOrIds="names")
@@ -289,8 +296,8 @@ plotCataNetwork <- function(catalyzedf = NULL) {
 
         # Now plot
         visNetwork::visNetwork(mynodes, myedges, width = "100%",height="1000px") %>%
-		visNetwork::visInteraction(dragNodes = FALSE, 
-                 dragView = TRUE,hideEdgesOnDrag=TRUE,hideNodesOnDrag=TRUE, 
+		visNetwork::visInteraction(dragNodes = FALSE,
+                 dragView = TRUE,hideEdgesOnDrag=TRUE,hideNodesOnDrag=TRUE,
                  navigationButtons=TRUE,zoomView = TRUE) %>%
   		visNetwork::visLayout(randomSeed = 123) %>%
 		visNetwork::visPhysics(

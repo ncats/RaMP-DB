@@ -1,19 +1,19 @@
 dataInput_onto <- eventReactive(input$subText_onto,{
   progress <- shiny::Progress$new()
-  
+
   on.exit(progress$close())
-  
+
   progress$set(message = "Querying databases to find pathways ...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
-  
+
   # rampOut <- rampOntoOut(input$KW_onto, 99999)
-  if(input$metaOrOnto %in% c('source','name')){
-    rampOut <- RaMP:::rampFastOntoFromMeta(input$KW_onto,
+  if(input$metaOrOnto %in% c('ids','name')){
+    rampOut <- RaMP:::getOntoFromMeta(input$KW_onto,
                                           conpass =.conpass,
                                           host = .host,
-                                          sourceOrName = input$metaOrOnto)
+                                          NameOrIds = input$metaOrOnto)
   } else if(input$metaOrOnto == 'ontology'){
-    rampOut <- RaMP:::rampFastMetaFromOnto(input$KW_onto,
+    rampOut <- RaMP:::getMetaFromOnto(input$KW_onto,
                                           conpass = .conpass,
                                           host = .host)
   }
@@ -34,9 +34,9 @@ observe({
     choices <- choices[order(nchar(choices),choices)]
     choices <- c(choices,kw_biofluid[!(kw_biofluid %in% choices)])
     updateSelectInput(session,
-                      "KW_onto", 
-                      label = "Select from list", 
-                      choices = choices, 
+                      "KW_onto",
+                      label = "Select from list",
+                      choices = choices,
                       selected = head(choices,1))
   }
 })
@@ -45,18 +45,18 @@ observe({
     choices <- kw_biofluid[grepl(input$ontoInput,kw_biofluid,fixed = T)]
     choices <- choices[order(nchar(choices),choices)]
     choices <- c(choices,kw_biofluid[!(kw_biofluid %in% choices)])
-    
+
   }
   else if (input$metaOrOnto == 'name') {
     # x <- rampKWsearch(input$ontoInput, "analytesynonym")
     choices <- kw_analyte[grepl(input$ontoInput,kw_analyte,
                                 fixed = T)]
     choices <- choices[order(nchar(choices),choices)]
-  } else if (input$metaOrOnto == 'source'){
+  } else if (input$metaOrOnto == 'ids'){
     choices <- kw_source[grepl(input$ontoInput,kw_source,
                                fixed = T)]
     choices <- choices[order(nchar(choices),choices)]
-  } 
+  }
 
   isolate({
     if(is.null(choices))
@@ -64,11 +64,11 @@ observe({
     if(length(choices) >10 & input$metaOrOnto != 'ontology'){
       choices <- choices[1:10]
     }
-    
+
     updateSelectInput(session,
-                      "KW_onto", 
-                      label = "Select from list", 
-                      choices = choices, 
+                      "KW_onto",
+                      label = "Select from list",
+                      choices = choices,
                       selected = head(choices,1))
   })
 })
@@ -80,7 +80,7 @@ output$summary_onto <- renderText(
 )
 output$result_onto <- DT::renderDataTable({
   df <- dataInput_onto()
-  if(input$metaOrOnto %in% c('source','name')){
+  if(input$metaOrOnto %in% c('ids','name')){
     df <- transform(df,sourceId = paste(IDtype,sourceId,sep = ':'))
     print(colnames(df))
     df <- df[c('Metabolites','Ontology','biofluidORcellular','sourceId')]
@@ -98,7 +98,7 @@ output$result_onto <- DT::renderDataTable({
     colnames(df2) <- c('Metabolites','Ontology_type','Ontology','metabolites_source')
     return(df2)
   }
-  
+
 }, rownames = FALSE)
 
 output$report_onto <- downloadHandler(filename = function() {
@@ -115,33 +115,33 @@ clicked <- reactiveValues(content = NULL)
 # Identify which button user clicked
 observe({
   input$sub_mul_tab5
-  
+
   clicked$content <- 'name'
-  
+
 })
 observe({
   input$sub_mul_tab5_sourceid
-  
+
   clicked$content <- 'source'
-  
+
 })
 observe({
   input$sub_mul_tab5_biofluid
-  
+
   clicked$content <- 'ontology'
-  
+
 })
 
 data_mul_tab5 <- eventReactive(input$sub_mul_tab5,{
-  if(input$input_categories_tab5 %in% c('source','name')){
-    RaMP:::rampFastOntoFromMeta(input$input_mul_tab5,
+  if(input$input_categories_tab5 %in% c('ids','name')){
+    RaMP:::getOntoFromMeta(input$input_mul_tab5,
                                 conpass = .conpass,
                                 host =.host,
                                 username = .username,
                                 dbname = .dbname,
-                                sourceOrName =input$input_categories_tab5)
+                                NameOrIds =input$input_categories_tab5)
   } else if(input$input_categories_tab5 == 'ontology'){
-    RaMP:::rampFastMetaFromOnto(input$input_mul_tab5,
+    RaMP:::getMetaFromOnto(input$input_mul_tab5,
                                 conpass = .conpass,
                                 host = .host,
                                 username = .username,
@@ -170,6 +170,6 @@ output$tab5_mul_report <- downloadHandler(filename = function() {
   if(is.null(clicked$content))
     return(NULL)
   rampout <- data_mul_tab5()
-  
+
   write.csv(rampout, file, row.names = FALSE)
 })

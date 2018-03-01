@@ -8,7 +8,7 @@ rampFastCata(analytes = NULL, conpass = NULL, dbname = "ramp",
   username = "root", host = "localhost", NameOrIds = "ids")
 }
 \arguments{
-\item{analytes}{a vector of analytes (metabolites) that need to be searched}
+\item{analytes}{a vector of analytes that need to be searched}
 
 \item{conpass}{password for database access (string)}
 
@@ -21,7 +21,11 @@ rampFastCata(analytes = NULL, conpass = NULL, dbname = "ramp",
 \item{NameOrIds}{whether input is "names" or "ids" (default is "ids")}
 }
 \value{
-a dataframe that contains search results
+a dataframe containing query results. If the input is a metabolite, the function will output
+gene transcript common names and source IDs that are known to catalyze
+reactions in the same pathway as that metabolite. Conversely, if the input
+is a gene, the function will return the common name and source id of metabolites
+known to be catalyzed directly or indirectly by that gene.
 }
 \description{
 Retrieves analytes that involved in same reaction as input metabolite
