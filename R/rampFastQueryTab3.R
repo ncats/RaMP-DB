@@ -8,8 +8,7 @@
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
-#' @return a dataframe with pathway enrichment (based on Fisher's test) results
-#' @export
+#' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
 runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
                               analyte_type="metabolites",conpass=NULL,
                               dbname="ramp",username="root",
@@ -55,7 +54,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 	wiki_totanalytes <- react_totanalytes <- kegg_totanalytes <- total_genes
   }
 
-  print("Calculating p-values for pathways in input that have genes")
+  print("Calculating p-values for pathways in input")
   # Retrieve the Ramp compound ids associated with the ramp pathway id and count them:
 
    query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
@@ -79,27 +78,32 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
         }else {
                 tot_in_pathway <- length(grep("RAMP_G",curpathcids))
         }
-	if(allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "wiki") {
-		total_analytes <- wiki_totanalytes
-	} else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "reactome") {
-                total_analytes <- react_totanalytes
-        } else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "kegg") {
-                total_analytes <- kegg_totanalytes
-        } else {stop("Couldn't find pathway type for current pathway!")}
-
- 	tot_out_pathway <- total_analytes - tot_in_pathway
-	  # fill the rest of the table out
-	  user_in_pathway <- nrow(pathwaydf[which(pathwaydf$pathwayRampId==i),])
-	  user_out_pathway <- length(unique(pathwaydf$rampId)) - user_in_pathway
-	  contingencyTb[1,1] <- tot_in_pathway
-	  contingencyTb[1,2] <- tot_out_pathway
-	  contingencyTb[2,1] <- user_in_pathway
-	  contingencyTb[2,2] <- user_out_pathway
-	  result <- stats::fisher.test(contingencyTb)
-	  pval <- c(pval,result$p.value )
-	  userinpath<-c(userinpath,user_in_pathway)
-	  totinpath<-c(totinpath,tot_in_pathway)
-	  pidused <- c(pidused,i)
+	# Check that the pathway being considered has your analyte type, if not, move on
+	if(tot_in_pathway==0) {
+		next;
+	} else {
+		if(allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "wiki") {
+			total_analytes <- wiki_totanalytes
+		} else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "reactome") {
+	                total_analytes <- react_totanalytes
+	        } else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "kegg") {
+	                total_analytes <- kegg_totanalytes
+	        } else {stop("Couldn't find pathway type for current pathway!")}
+	
+	 	tot_out_pathway <- total_analytes - tot_in_pathway
+		  # fill the rest of the table out
+		  user_in_pathway <- length(unique(pathwaydf[which(pathwaydf$pathwayRampId==i),"rampId"]))
+		  user_out_pathway <- length(unique(pathwaydf$rampId)) - user_in_pathway
+		  contingencyTb[1,1] <- tot_in_pathway - user_in_pathway 
+		  contingencyTb[1,2] <- tot_out_pathway - user_out_pathway
+		  contingencyTb[2,1] <- user_in_pathway
+		  contingencyTb[2,2] <- user_out_pathway
+		  result <- stats::fisher.test(contingencyTb)
+		  pval <- c(pval,result$p.value )
+		  userinpath<-c(userinpath,user_in_pathway)
+		  totinpath<-c(totinpath,tot_in_pathway)
+		  pidused <- c(pidused,i)
+	}
   } # end for loop
 
   # Now run fisher's tests for all other pids
@@ -148,30 +152,34 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
         }else {
                 tot_in_pathway <- length(grep("RAMP_G",curpathcids))
         }
-        if(allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "wiki") {
-                total_analytes <- wiki_totanalytes
-        } else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "reactome") {
-                total_analytes <- react_totanalytes
-        } else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "kegg") {
-                total_analytes <- kegg_totanalytes
-        } else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "hmdb") {
-		total_analytes <- NULL
-	} else {stop("Couldn't find pathway type for current pathway!")}
+	# Check that the pathway being considered has your analyte type, if not, move on
+	if(tot_in_pathway==0) {next;
+	} else {
+        	if(allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "wiki") {
+        	        total_analytes <- wiki_totanalytes
+        	} else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "reactome") {
+        	        total_analytes <- react_totanalytes
+        	} else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "kegg") {
+        	        total_analytes <- kegg_totanalytes
+        		} else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "hmdb") {
+			total_analytes <- NULL
+		} else {stop("Couldn't find pathway type for current pathway!")}
 
-	if(is.null(total_analytes)) {next;}
-        tot_out_pathway <- total_analytes - tot_in_pathway
-          # fill the rest of the table out
-          user_out_pathway <- length(unique(pathwaydf$rampId))
-          #user_out_pathway <- total_analytes - user_in_pathway
-          contingencyTb[1,1] <- tot_in_pathway
-          contingencyTb[1,2] <- tot_out_pathway
-          contingencyTb[2,1] <- user_in_pathway
-          contingencyTb[2,2] <- user_out_pathway
-          result <- stats::fisher.test(contingencyTb)
-          pval2 <- c(pval2,result$p.value )
-          userinpath2<-c(userinpath2,user_in_pathway)
-          totinpath2<-c(totinpath2,tot_in_pathway)
-         # pidused <- c(pidused,i)
+		if(is.null(total_analytes)) {next;}
+        	tot_out_pathway <- total_analytes - tot_in_pathway
+        	  # fill the rest of the table out
+        	  user_out_pathway <- length(unique(pathwaydf$rampId))
+        	  #user_out_pathway <- total_analytes - user_in_pathway
+        	  contingencyTb[1,1] <- tot_in_pathway - user_in_pathway
+        	  contingencyTb[1,2] <- tot_out_pathway - user_out_pathway
+        	  contingencyTb[2,1] <- user_in_pathway
+        	  contingencyTb[2,2] <- user_out_pathway
+        	  result <- stats::fisher.test(contingencyTb)
+        	  pval2 <- c(pval2,result$p.value )
+        	  userinpath2<-c(userinpath2,user_in_pathway)
+        	  totinpath2<-c(totinpath2,tot_in_pathway)
+        	 # pidused <- c(pidused,i)
+	}
   } # end for loop
 
   # only keep pathways that have > 8 or < 100 compounds
@@ -217,7 +225,7 @@ print(dim(out))
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
-#' @return a dataframe with pathway enrichment (based on Fisher's test) results
+#' @return a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
 #'@examples
 #'\dontrun{
 #' pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
@@ -375,7 +383,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
     synonym <- RaMP:::rampFindSynonymFromSynonym(synonym=analytes,
 	  find_synonym=find_synonym,
 	  conpass=conpass)
-    
+
     colnames(synonym)[1]="commonName"
     synonym$commonName <- tolower(synonym$commonName)
     if(nrow(synonym)==0) {
@@ -487,7 +495,7 @@ findCluster <- function(fishers_df,perc_analyte_overlap = 0.5,
     fishers_df$cluster_assignment="Did not cluster"
     fishers_df$rampids<-fishers_df$pathwayRampId
     fishers_df$pathwayRampId<-NULL
-    output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list=cluster_list)
+    output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list="Did not cluster")
     return(output)
   } else {
     similarity_matrix_list<-RaMP:::loadOverlapMatrices()
