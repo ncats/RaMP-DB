@@ -16,11 +16,14 @@ connectToRaMP(dbname = "ramp", username = "root", conpass = NULL,
 
 \item{host}{a string that stand for host}
 }
+\value{
+MySQL connection based on given dbname,username,password, and host
+}
 \description{
 Connect to RaMP database (requires mysql password when running locally)
 }
 \examples{
 \dontrun{
-con <- connectToRaMP(dbname="ramp",username="root",conpass="mypassword")
+con <- connectToRaMP(dbname="ramp",username="root",conpass="mypassword",host = "localhost")
 }
 }
