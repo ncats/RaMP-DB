@@ -65,15 +65,19 @@ tabItem3 <-  shinydashboard::tabItem(
 		       h4(strong('Input a list of metabolites, one per line')),
                        textAreaInput("input_mul_tab3",label = "",
                                       placeholder = "Input list of metabolites, one per line"),
-    	               radioButtons("NameOrSourcemult","Search by names or source IDs?", 
+    	               radioButtons("NameOrSourcemult","Search by names or source IDs?",
 				choices = c("Names" = "names", "Source ID" = "ids"),selected = "ids"),
 		       h4(strong('Input a list of genes, one per line')),
 		       textAreaInput("input_mul_tab3_genes",label = "",
                                      placeholder = "Input list of genes, one per line"),
-                       radioButtons("NameOrSourcemult_genes","Search by names or source IDs?", 
+                       radioButtons("NameOrSourcemult_genes","Search by names or source IDs?",
 				choices = c("Names" = "names", "Source ID" = "ids"),selected = "ids"),
-                       actionButton("sub_mul_tab3",label = "Submit Query"),
-    		       br()
+                   actionButton("sub_mul_tab3",label = "Submit Query"),
+                   br(),
+                   br(),
+                   p("Note: when inputting source IDs, a common source of error is to input improperly formatted IDs. Two tips for formatting source IDs for RaMP:"),
+                   h6("1. HMDB IDs should start with 'HMDB' and end with 7 digits, e.g. HMDB0002111."),
+                   h6("2. Pubchem IDs should have the 'pubchem:' prefix string appended, e.g. pubchem:962.")
                   ) # mainPanel
              ), # end box
              shinydashboard::box(width = 6,
