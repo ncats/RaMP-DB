@@ -11,8 +11,13 @@ tabItem3 <-  shinydashboard::tabItem(
              status = "primary",
              fluidRow(
                column(12,
-                      helpText("Given compound's name,
-                               it returns pathways in which the compound get involved in."),
+                      h5("Given a gene/metabolite name or ID,
+                               retrieve pathways in which the compound is involved in."),
+	              h5(strong("IMPORTANT NOTE about inputting source IDs:")),
+		      h5("When inputting source IDs, it is important to add a prefix to denote the id type.  This is important because it is possible for two different metabolites to have the same IDs, although each ID may be from a different database source."),
+                      h5("Metabolites can be searched with the following ID types: CAS, chebi, chemspider, hmdb, kegg, LIPIDMAPS, and pubchem.  To search for a metabolite, the ID type must be added as a prefix.  For example, the compound 'HMDB0000562' must be searched by 'hmdb:HMDB0000562', the compound '16737' must be searched by 'chebi:16737'."),
+                      h5("Genes can be searched with the following ID types:  enzymeNomenclature, ensembl, entrez, hmdb, kegg, uniprot. Similar to metabolites, prefix ID types must be added to the ID for searching."),
+		      br(),
                       column(width = 6),
                       textInput("compName","",placeholder = "Input compound name or source id"),
                       radioButtons("NameOrId","Search by common names or source IDs?",
@@ -62,6 +67,11 @@ tabItem3 <-  shinydashboard::tabItem(
                  # h4(strong('Input a list of genes, one per line')),
                  shiny::mainPanel(
                    width = 12,
+		   h5(strong("IMPORTANT NOTE about inputting source IDs:")), 
+		   h5("When inputting source IDs, it is important to add a prefix to denote the id type.  This is important because it is possible for two different metabolites to have the same IDs, although each ID may be from a different database source."),
+		   h5("Metabolites can be searched with the following ID types: CAS, chebi, chemspider, hmdb, kegg, LIPIDMAPS, and pubchem.  To search for a metabolite, the ID type must be added as a prefix.  For example, the compound 'HMDB0000562' must be searched by 'hmdb:HMDB0000562', the compound '16737' must be searched by 'chebi:16737'."),
+		   h5("Genes can be searched with the following ID types:  enzymeNomenclature, ensembl, entrez, hmdb, kegg, uniprot. Similar to metabolites, prefix ID types must be added to the ID for searching."),
+		   br(),
 		       h4(strong('Input a list of metabolites, one per line')),
                        textAreaInput("input_mul_tab3",label = "",
                                       placeholder = "Input list of metabolites, one per line"),
@@ -73,11 +83,7 @@ tabItem3 <-  shinydashboard::tabItem(
                        radioButtons("NameOrSourcemult_genes","Search by names or source IDs?",
 				choices = c("Names" = "names", "Source ID" = "ids"),selected = "ids"),
                    actionButton("sub_mul_tab3",label = "Submit Query"),
-                   br(),
-                   br(),
-                   p("Note: when inputting source IDs, a common source of error is to input improperly formatted IDs. Two tips for formatting source IDs for RaMP:"),
-                   h6("1. HMDB IDs should start with 'HMDB' and end with 7 digits, e.g. HMDB0002111."),
-                   h6("2. Pubchem IDs should have the 'pubchem:' prefix string appended, e.g. pubchem:962.")
+                   br()
                   ) # mainPanel
              ), # end box
              shinydashboard::box(width = 6,
