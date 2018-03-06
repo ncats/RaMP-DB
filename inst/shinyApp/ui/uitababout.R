@@ -6,7 +6,6 @@ tabItem_about <- shinydashboard::tabItem(
       solidHeader = T,
       div(
         style ="margin:25px;",
-        hr(),
         p("To use this software on your local machine, you must have the RaMP SQL database installed locally.  For instructions on how to do so, please refer to the RaMP-DB GitHub repository ",
           tags$a(
             href = "https://github.com/Mathelab/RaMP-DB",
@@ -49,6 +48,7 @@ tabItem_about <- shinydashboard::tabItem(
 	  tags$li("Tab4: Given one or multiple metabolite(s), retrieve the ontology
 		(e.g. biofluid location, cellular location, etc.) they belong in.")
           ),
+	HTML("<p>More details can be found in <a href='http://www.mdpi.com/2218-1989/8/1/16' target='_blank'>our manuscript</a></p>"),
         p("The Venn diagram below shows the overlap in metabolites and genes from each database source (as of 01/24/2017). "), 
         HTML(
           "
