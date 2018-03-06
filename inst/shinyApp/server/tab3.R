@@ -314,7 +314,7 @@ output$results_fisher <- DT::renderDataTable({
   results_fisher<-results_fisher_total$fishresults
   if(nrow(results_fisher)==0){
     #return(data.frame(rep(NA, times = 9)))
-    stop("No significant pathways identified. Less stringent filters required")
+    stop("No significant pathways identified. Your input analytes may be too small (e.g. number of analytes in each pathway is < 2)")
   }else{
     if(results_fisher_total$analyte_type=="both"){
       results_fisher<-results_fisher[,c("pathwayName","Num_In_Path.Metab","Total_In_Path.Metab",

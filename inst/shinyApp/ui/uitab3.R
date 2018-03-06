@@ -147,6 +147,8 @@ tabItem3 <-  shinydashboard::tabItem(
            	status = "primary",
            	title = strong("3. Set parameters for signifance filtering and functional pathway clustering:"),
            	width = NULL,
+		br(),
+		br(),
            	numericInput("p_holmadj_cutoff",
                         "Select cutoff for Holm Adjusted p-values (will only return pathways with Holm adj p-values < cutoff)",
                         value = 0.01,
