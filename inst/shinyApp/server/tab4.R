@@ -28,10 +28,10 @@ output$summary_cata <- renderText({
 
 observe({
   if(input$CataInput_choices == 'names'){
-    choices <- kw_analyte[grepl(input$CataInput,kw_analyte,ignore.case=TRUE)]
+    choices <- kw_analyte[grepl(input$CataInput,kw_analyte,fixed = T)]
     choices <- choices[order(nchar(choices),choices)]
   } else if(input$CataInput_choices == 'ids'){
-    choices <- kw_source[grepl(input$CataInput,kw_source,ignore.case=TRUE)]
+    choices <- kw_source[grepl(input$CataInput,kw_source,fixed = T)]
     choices <- choices[order(nchar(choices),choices)]
   }
   if(is.null(choices))
