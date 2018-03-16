@@ -269,9 +269,9 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
 
     if(is.null(outgene) & !is.null(outmetab)) {
 	out <- outmetab
-	fdr <- p.adjust(out$Pval,method="fdr")
+	fdr <- stats::p.adjust(out$Pval,method="fdr")
 	out<-cbind(out,fdr);colnames(out)[ncol(out)]="Pval_FDR"
-	holm <- p.adjust(out$Pval,method="holm")
+	holm <- stats::p.adjust(out$Pval,method="holm")
         out<-cbind(out,holm);colnames(out)[ncol(out)]="Pval_Holm"
 	keepers <- which(out$Num_In_Path>=min_analyte)
 	out2 <- merge(out[keepers,],
@@ -279,9 +279,9 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
         	"pathwaysource")],by="pathwayRampId")
      } else if (!is.null(outgene) & is.null(outmetab)) {
         out <- outgene
-        fdr <- p.adjust(out$Pval,method="fdr")
+        fdr <- stats::p.adjust(out$Pval,method="fdr")
         out<-cbind(out,fdr);colnames(out)[ncol(out)]="Pval_FDR"
-        holm <- p.adjust(out$Pval,method="holm")
+        holm <- stats::p.adjust(out$Pval,method="holm")
         out<-cbind(out,holm);colnames(out)[ncol(out)]="Pval_Holm"
         keepers <- which(out$Num_In_Path>=min_analyte)
         out2 <- merge(out[keepers,],
@@ -301,7 +301,7 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
 
 	    # Calculate combined p-values for pathways that have both genes and metabolites
 	    gm <- intersect(which(!is.na(allfish$Pval.Metab)),which(!is.na(allfish$Pval.Gene)))
-	    combpval <- pchisq(-2 * (log(allfish$Pval.Metab[gm])+log(allfish$Pval.Gene[gm])),
+	    combpval <- stats::pchisq(-2 * (log(allfish$Pval.Metab[gm])+log(allfish$Pval.Gene[gm])),
 		df=2,lower.tail=FALSE)
 
 	    g <- which(is.na(allfish$Pval.Metab))
@@ -312,10 +312,10 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
 	    out <- rbind(allfish[gm,],allfish[g,],allfish[m,])
 	    out <- cbind(out,c(combpval,gpval,mpval))
 	    colnames(out)[ncol(out)]="Pval_combined"
-	    fdr <- p.adjust(out$Pval_combined,method="fdr")
+	    fdr <- stats::p.adjust(out$Pval_combined,method="fdr")
 	    out <- cbind(out,fdr)
 	    colnames(out)[ncol(out)]="Pval_combined_FDR"
-	    holm <- p.adjust(out$Pval_combined,method="holm")
+	    holm <- stats::p.adjust(out$Pval_combined,method="holm")
 	    out <- cbind(out,holm)
 	    colnames(out)[ncol(out)]="Pval_combined_Holm"
 
@@ -380,7 +380,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
 
   if(NameOrIds == "names"){
     print(analytes)
-    synonym <- RaMP:::rampFindSynonymFromSynonym(synonym=analytes,
+    synonym <- rampFindSynonymFromSynonym(synonym=analytes,
 	  find_synonym=find_synonym,
 	  conpass=conpass)
 
@@ -394,7 +394,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
     list_metabolite <- sapply(list_metabolite,shQuote)
     list_metabolite <- paste(list_metabolite,collapse = ",")
   } else if (NameOrIds == "ids"){
-    sourceramp <- RaMP:::rampFindSourceRampId(sourceId=analytes, conpass=conpass)
+    sourceramp <- rampFindSourceRampId(sourceId=analytes, conpass=conpass)
     if (nrow(sourceramp)==0) {
 	stop("Make sure you are actually inputting ids and not names (you have NameOrIds set to 'ids'. If you are, then no ids were matched in the RaMP database.")
 	}
@@ -417,7 +417,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
     query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where
                       rampId in (",
                      list_metabolite,");")
-    con <- RaMP:::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
+    con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
     #print(query2)
     df2 <- DBI::dbGetQuery(con,query2)
     DBI::dbDisconnect(con)
@@ -431,7 +431,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
   }
   query3 <- paste0("select pathwayName,sourceId as pathwaysourceId,type as pathwaysource,pathwayRampId from pathway where pathwayRampId in (",
                     pathid_list,");")
-  con <- RaMP:::connectToRaMP(dbname=dbname,username=username,conpass=conpass)
+  con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass)
   df3 <- DBI::dbGetQuery(con,query3)
   DBI::dbDisconnect(con)
   #Format output
@@ -442,7 +442,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
      list_analytes <- sapply(analytes,shQuote)
      list_analytes <- paste(list_analytes,collapse = ",")
   query4 <-paste0("select sourceId,commonName,rampId from source where sourceId in (",list_analytes,");")
-  con <- RaMP:::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
+  con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
   df4 <- DBI::dbGetQuery(con,query4)
   DBI::dbDisconnect(con)
   mdf <- merge(mdf,df4,all.x = T,by.y = "rampId")
@@ -498,7 +498,7 @@ findCluster <- function(fishers_df,perc_analyte_overlap = 0.5,
     output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list="Did not cluster")
     return(output)
   } else {
-    similarity_matrix_list<-RaMP:::loadOverlapMatrices()
+    similarity_matrix_list<-loadOverlapMatrices()
     if(analyte_type=="both"){
       similarity_matrix = similarity_matrix_list[["analyte"]]
     }else if(analyte_type=="metabolites"){
