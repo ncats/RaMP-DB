@@ -10,7 +10,7 @@ plotCataNetwork(catalyzedf = NULL)
 \item{catalyzedf}{a data.frame output by rampFastCata() that contains analytes that are in the same reaction}
 }
 \value{
-a list of nodes and edges
+An interactive HTML plot that allows the user to pan/zoom into regions of interest. User genes/metabolites are highlighted in blue, whereas analytes found by the function are orange.
 }
 \description{
 Plots a network based on gene-metabolite relationships
