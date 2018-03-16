@@ -6,7 +6,6 @@ tabItem_about <- shinydashboard::tabItem(
       solidHeader = T,
       div(
         style ="margin:25px;",
-        hr(),
         p("To use this software on your local machine, you must have the RaMP SQL database installed locally.  For instructions on how to do so, please refer to the RaMP-DB GitHub repository ",
           tags$a(
             href = "https://github.com/Mathelab/RaMP-DB",
@@ -43,10 +42,13 @@ tabItem_about <- shinydashboard::tabItem(
           tags$li("Tab2: Given a list of metabolite(s) or gene(s), retrieve all pathways
 		that they are involved in. This tab also support pathway 
 		overrepresentation analysis"),
-          tags$li("Tab3: Given one of multiple metabolite(s) or gene(s), retrieve all 
-		gene(s) or metabolite(s), respectively, that are involved in the sam
-		reaction")
+          tags$li("Tab3: Given one or multiple metabolite(s) or gene(s), retrieve all 
+		gene(s) or metabolite(s), respectively, that are involved in the same
+		reaction. A network of gene-metabolite relationships can be drawn."),
+	  tags$li("Tab4: Given one or multiple metabolite(s), retrieve the ontology
+		(e.g. biofluid location, cellular location, etc.) they belong in.")
           ),
+	HTML("<p>More details can be found in <a href='http://www.mdpi.com/2218-1989/8/1/16' target='_blank'>our manuscript</a></p>"),
         p("The Venn diagram below shows the overlap in metabolites and genes from each database source (as of 01/24/2017). "), 
         HTML(
           "
