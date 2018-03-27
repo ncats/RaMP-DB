@@ -21,5 +21,6 @@ Imports:
     dplyr,
     DT,
     xtable,
-    visNetwork
+    visNetwork,
+    properties
 RoxygenNote: 6.0.1.9000
