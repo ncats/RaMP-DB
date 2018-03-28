@@ -39,7 +39,7 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
     list_metabolite <- unique(list_metabolite)
     list_metabolite <- sapply(list_metabolite,shQuote)
     list_metabolite <- paste(list_metabolite,collapse = ",")
-    query <- paste0("select synonym as origins,rampId from analyteSynonym where Synonym in(",
+    query <- paste0("select Synonym as origins,rampId from analytesynonym where Synonym in(",
                     list_metabolite,
                     ");")
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
@@ -54,7 +54,7 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
   list_metabolite <- unique(list_metabolite)
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
-  query <- paste0("select synonym as origins,rampId from analyteSynonym where Synonym in(",
+  query <- paste0("select Synonym as origins,rampId from analytesynonym where Synonym in(",
                   list_metabolite,
                   ");")
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
@@ -63,11 +63,11 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
         host = host)
 
   df1 <- DBI::dbGetQuery(con,query)
-  DBI::dbDisconnect(con)  
+  DBI::dbDisconnect(con)
   rampid <- df1$rampId
   rampid <- sapply(rampid,shQuote)
   rampid <- paste(rampid,collapse = ",")
-  query <- paste0("select * from analyteSynonym where rampId in(",rampid,");")
+  query <- paste0("select * from analytesynonym where rampId in(",rampid,");")
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
 	      dbname = dbname,
@@ -83,7 +83,7 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
 }
 #' Find all source from given list of RaMP Ids
 #' @param rampId could be a data frame return by rampFindSynonymFromSynonym
-#' containing all information related to synonym. Or can be a list of 
+#' containing all information related to synonym. Or can be a list of
 #' rampId
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
@@ -152,9 +152,9 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
     if(is.null(conpass)) {
         stop("Please define the password for the mysql connection")
   }
-  
+
   #synonym <- rampFindSynonymFromSynonym(synonym,find_synonym=find_synonym)
-  
+
   list_metabolite <- unique(sourceid)
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
@@ -172,7 +172,7 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
   rampid <- df1$rampId
   rampid <- sapply(rampid,shQuote)
   rampid <- paste(rampid,collapse = ",")
-  query2 <- paste0("select * from analytehaspathway where 
+  query2 <- paste0("select * from analytehaspathway where
                    rampId in (",rampid,");")
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
@@ -203,7 +203,7 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
 }
 #' Find rampId from given source ID
 #' The rampId can be plugged in other functions to continue query
-#' @param sourceId a data frame or string separated by comma or string 
+#' @param sourceId a data frame or string separated by comma or string
 #' separated by new line
 #' @param conpass password for database access (string)
 #' @param dbname name of the mysql database (default is "ramp")
