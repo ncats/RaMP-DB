@@ -2,6 +2,3 @@
 .Rhistory
 .RData
 /inst/extdata/ramp.sql
-.DS_Store
-db.properties
-shinyApp.Rproj
