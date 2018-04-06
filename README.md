@@ -77,9 +77,10 @@ library(RaMP)
 
 Before running the RaMP app or RaMP functions, the database connection information should be configured. The file that contains this information is within the package installation and the directory can be found by typing the following:
 ```
-system.file("extdata", package="RaMP", mustWork=TRUE)
+system.file("shinyApp", package="RaMP", mustWork=TRUE)
 ```
 Go to that directory and find the "db.properties.template" file.  Edit this file based on your current environment as follows:
+
 ```
 host=<hostname of mysql server>
 dbname=<db name on mysql>
