@@ -87,7 +87,7 @@ dbname=<db name on mysql>
 username=<username to connect to mysql>
 conpass=<password for username to connect to mysql>
 ```
-*After editing, be sure to rename this file "db.properties".* 
+**After editing, be sure to rename this file "db.properties".** 
 
 Now, you're set to use the web application locally!  Just type:
 ```R
