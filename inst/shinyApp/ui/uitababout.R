@@ -1,7 +1,7 @@
 tabItem_about <- shinydashboard::tabItem(
   tabName = "About",
   shinydashboard::box(width = 12,
-      title = tags$h1(strong("RaMP: Relational Database of Metabolic Pathways!")),
+      title = tags$h1(strong("RaMP: Relational Database of Metabolic Pathways")),
       footer = p("For questions or issues, please submit an issue on our GitHub site at https://github.com/Mathelab/RaMP-DB"),
       solidHeader = T,
       div(
