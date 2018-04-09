@@ -10,7 +10,7 @@ dataInput_name <- eventReactive(input$submit_compName,{
   rampOut <- RaMP::getPathwayFromAnalyte(analytes=input$KW_synonym,
                                         NameOrIds=input$NameOrId,
                                         conpass=.conpass,
-                                        host = .host)
+                                        host = .host, dbname = .dbname, username = .username)
   progress$inc(0.7,detail = paste("Done!"))
   return (rampOut)
 })

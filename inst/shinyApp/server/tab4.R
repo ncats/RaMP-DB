@@ -8,7 +8,7 @@ dataInput_cata <- eventReactive(input$subText_cata,{
   
   # rampOut <- rampCataOut(input$KW_cata, 99999)
   rampOut <- RaMP:::rampFastCata(input$KW_cata,conpass=.conpass,host = .host,
-                                 NameOrIds = input$CataInput_choices)
+                                 NameOrIds = input$CataInput_choices, dbname = .dbname, username = .username)
   progress$inc(0.7,detail = paste("Done!"))
   return (rampOut)
 })
