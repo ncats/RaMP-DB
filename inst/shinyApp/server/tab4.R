@@ -72,7 +72,7 @@ observe({
 
 data_mul_name_tab4 <- eventReactive(input$sub_mul_tab4,{
   RaMP:::rampFastCata(input$input_mul_tab4,conpass=.conpass,
-                      host = .host,
+                      host = .host, dbname = .dbname, username = .username,
                       NameOrIds = input$input_mul_tab4_choices)
 })
 data_mul_file_tab4 <- eventReactive(input$sub_file_tab4,{
@@ -81,7 +81,7 @@ data_mul_file_tab4 <- eventReactive(input$sub_file_tab4,{
   if (is.null(infile))
     return(NULL)
   
-  rampOut <- RaMP:::rampFileOfAnalytes_tab4(infile,conpass=.conpass,host = .host)
+  rampOut <- RaMP:::rampFileOfAnalytes_tab4(infile,conpass=.conpass,host = .host, dbname = .dbname, username = .username)
   
 })
 
