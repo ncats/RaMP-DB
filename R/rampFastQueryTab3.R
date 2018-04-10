@@ -431,7 +431,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
   }
   query3 <- paste0("select pathwayName,sourceId as pathwaysourceId,type as pathwaysource,pathwayRampId from pathway where pathwayRampId in (",
                     pathid_list,");")
-  con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass)
+  con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
   df3 <- DBI::dbGetQuery(con,query3)
   DBI::dbDisconnect(con)
   #Format output
