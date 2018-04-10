@@ -79,7 +79,7 @@ Before running the RaMP app or RaMP functions, the database connection informati
 ```
 system.file("shinyApp", package="RaMP", mustWork=TRUE)
 ```
-Go to that directory and find the "db.properties.template" file.  Edit this file based on your current environment as follows:
+Go to that directory and find the "db.properties.template" file, copy it to a new file db.properties.  Edit db.properties file based on your current environment as follows:
 
 ```
 host=<hostname of mysql server>
@@ -87,7 +87,7 @@ dbname=<db name on mysql>
 username=<username to connect to mysql>
 conpass=<password for username to connect to mysql>
 ```
-**After editing, be sure to rename this file "db.properties".** 
+**Be sure not to edit/delete the file "db.properties.template".** 
 
 Now, you're set to use the web application locally!  Just type:
 ```R
