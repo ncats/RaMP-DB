@@ -16,7 +16,7 @@ dataInput_onto <- eventReactive(input$subText_onto,{
   } else if(input$metaOrOnto == 'ontology'){
     rampOut <- RaMP:::getMetaFromOnto(input$KW_onto,
                                           conpass = .conpass,
-                                          host = .host)
+                                          host = .host, dbname = .dbname, username = .username)
   }
   progress$inc(0.7,detail = paste("Done!"))
   return (rampOut)

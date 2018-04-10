@@ -87,7 +87,8 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
   	metabsearch <- RaMP::getPathwayFromAnalyte(analytes=parsedinput,
                              NameOrIds=input$NameOrSourcemult,
                              conpass=.conpass,
-                             host = .host)
+                             host = .host,
+                             dbname = .dbname, username = .username)
 	  print(input$input_mul_tab3_genes)
   }
 
@@ -97,7 +98,8 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
 	  genesearch <- RaMP::getPathwayFromAnalyte(analytes=parsedinputg,
                              NameOrIds=input$NameOrSourcemult_genes,
                              conpass=.conpass,
-                             host = .host)
+                             host = .host,
+                             dbname = .dbname, username = .username)
   }
   print(paste("metabsearch: ",ncol(metabsearch)))
   print(paste("genesearch: ",ncol(genesearch)))
@@ -142,7 +144,8 @@ output$preview_multi_names <- DT::renderDataTable({
 fisherTestResult <- eventReactive(input$runFisher,{
 
     out <- RaMP::runCombinedFisherTest(req(data_mul_name()),
-                               conpass=.conpass)
+                               conpass=.conpass,
+                               dbname = .dbname, username = .username, host = .host)
     print("Results generated")
     print(paste0("Fisher results size:",nrow(out[[1]])))
   out
