@@ -251,7 +251,7 @@ rampFileOfAnalytes_tab4 <- function(infile,conpass=NULL,
   for (i in 1:length(infile[,1])){
     rampOut <- readLines(infile[[i,'datapath']])
     summary <- rampFastCata(analytes=rampOut,conpass=conpass,
-                            host = host)
+                            host = host, dbname=dbname, username = username)
   }
   return(summary)
 }
