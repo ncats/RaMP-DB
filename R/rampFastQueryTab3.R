@@ -382,7 +382,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
     print(analytes)
     synonym <- rampFindSynonymFromSynonym(synonym=analytes,
 	  find_synonym=find_synonym,
-	  conpass=conpass)
+	  conpass=conpass, host=host, dbname=dbname,username=username)
 
     colnames(synonym)[1]="commonName"
     synonym$commonName <- tolower(synonym$commonName)
@@ -394,7 +394,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
     list_metabolite <- sapply(list_metabolite,shQuote)
     list_metabolite <- paste(list_metabolite,collapse = ",")
   } else if (NameOrIds == "ids"){
-    sourceramp <- rampFindSourceRampId(sourceId=analytes, conpass=conpass)
+    sourceramp <- rampFindSourceRampId(sourceId=analytes, conpass=conpass, host=host, dbname=dbname,username=username)
     if (nrow(sourceramp)==0) {
 	stop("Make sure you are actually inputting ids and not names (you have NameOrIds set to 'ids'. If you are, then no ids were matched in the RaMP database.")
 	}
