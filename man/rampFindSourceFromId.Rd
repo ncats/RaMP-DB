@@ -9,7 +9,7 @@ rampFindSourceFromId(rampId = NULL, full = TRUE, conpass = NULL,
 }
 \arguments{
 \item{rampId}{could be a data frame return by rampFindSynonymFromSynonym
-containing all information related to synonym. Or can be a list of 
+containing all information related to synonym. Or can be a list of
 rampId}
 
 \item{full}{return whole searching result or not (TRUE/FALSE)}
