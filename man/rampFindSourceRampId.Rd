@@ -9,7 +9,7 @@ rampFindSourceRampId(sourceId, conpass = NULL, dbname = "ramp",
   username = "root", host = "localhost")
 }
 \arguments{
-\item{sourceId}{a data frame or string separated by comma or string 
+\item{sourceId}{a data frame or string separated by comma or string
 separated by new line}
 
 \item{conpass}{password for database access (string)}
