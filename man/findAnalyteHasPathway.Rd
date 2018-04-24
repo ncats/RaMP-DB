@@ -3,10 +3,11 @@
 \name{findAnalyteHasPathway}
 \alias{findAnalyteHasPathway}
 \title{Find table of analyte has pathway from given pathway IDs
-Aggregate ramp Id to ramp pathway Id 
+Aggregate ramp Id to ramp pathway Id
 GC is C or G}
 \usage{
-findAnalyteHasPathway(pathwayRampId, GC = "C", n = 10)
+findAnalyteHasPathway(pathwayRampId, GC = "C", n = 10, username = "root",
+  dbname = "ramp", conpass, host = "localhost")
 }
 \arguments{
 \item{pathwayRampId}{a vector of ramp Pathway ID}
@@ -14,12 +15,20 @@ findAnalyteHasPathway(pathwayRampId, GC = "C", n = 10)
 \item{GC}{the analytes type that is either "C" for compound or "G" for gene}
 
 \item{n}{minimum analytes of which pathway to considered computing overlap}
+
+\item{username}{a string that specifies name of MySQL database}
+
+\item{dbname}{a string that specifies database name of MySQL database}
+
+\item{conpass}{a string that specifies password for database connection}
+
+\item{host}{a string that specifes host for database connection}
 }
 \value{
 A list with pathway rampID as name, a vector of analytes from this pathway as content.
 }
 \description{
 Find table of analyte has pathway from given pathway IDs
-Aggregate ramp Id to ramp pathway Id 
+Aggregate ramp Id to ramp pathway Id
 GC is C or G
 }
