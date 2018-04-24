@@ -109,7 +109,7 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
 output$tab3_mul_report <- downloadHandler(filename = function(){
       paste0("pathwayFromMetabolitesOutput.csv")
 }, content = function(file) {
-      rampOut <- data_mul_name()[,c("pathwayName","pathwaysourceId",
+  rampOut <- data_mul_name()[,c("pathwayName","pathwaysourceId",
                                     "pathwaysource","commonName")]
   write.csv(rampOut,file,row.names = FALSE)
 }
@@ -141,10 +141,10 @@ output$preview_multi_names <- DT::renderDataTable({
 
 fisherTestResult <- eventReactive(input$runFisher,{
 
-    out <- RaMP::runCombinedFisherTest(req(data_mul_name()),
-                               conpass=.conpass)
-    print("Results generated")
-    print(paste0("Fisher results size:",nrow(out[[1]])))
+  out <- RaMP::runCombinedFisherTest(req(data_mul_name()),
+                                     conpass=.conpass)
+  print("Results generated")
+  print(paste0("Fisher results size:",nrow(out[[1]])))
   out
 })
 
