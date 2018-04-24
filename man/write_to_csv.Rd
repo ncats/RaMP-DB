@@ -4,12 +4,21 @@
 \alias{write_to_csv}
 \title{The function write a data.frame to a csv files.}
 \usage{
-write_to_csv(df, f.name)
+write_to_csv(df, f.name, write.from, perc_analyte_overlap,
+  min_pathway_tocluster, perc_pathway_overlap)
 }
 \arguments{
 \item{df}{a data frame returned by functions that queires database.}
 
 \item{f.name}{a string that represents output file name.}
+
+\item{write.from}{a string that specifies what type of tables you want to write}
+
+\item{perc_analyte_overlap}{parameter for pathway enrichment analysis}
+
+\item{min_pathway_tocluster}{parameter for pathway enrichment analysis}
+
+\item{perc_pathway_overlap}{parameter for pathway enrichment analysis}
 }
 \description{
 The function write a data.frame to a csv files.

@@ -67,6 +67,5 @@ write_to_csv <- function(df,f.name,write.from,
     }else{
       write.csv(c("No significant results"),f.name,row.names = FALSE)
     }
-    }
   }
 }
