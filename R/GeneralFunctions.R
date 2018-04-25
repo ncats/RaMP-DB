@@ -33,11 +33,11 @@ updateOverlapMatrices <- function(method,all,
   }
   
   if(all == 'all'){
-    result <- RaMP:::updateOverlapMatrix(min_analyte = 5,methods = 'balanced',together = T)
+    result <- updateOverlapMatrix(min_analyte = 5,methods = 'balanced',together = T)
     save(result[[1]],system.file(package = "RaMP",... = "extdata/metabolites_overlap_matrix.RData"))
     save(result[[2]],system.file(package = "RaMP",... = "extdata/genes_overlap_matrix.RData"))
   } else if(all == 'analyte'){
-    result <- RaMP:::updateOverlapMatrix(min_analyte = 5,methods = 'balanced',together = F)
+    result <- updateOverlapMatrix(min_analyte = 5,methods = 'balanced',together = F)
     save(result,system.file(package = "RaMP",... = "extdata/analytes_overlap_matrix.RData"))
    
   }
