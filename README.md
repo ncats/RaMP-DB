@@ -38,7 +38,7 @@ mysql> create database ramp;
 mysql> exit;
 ```
 
-Here, we're calling the database ramp but you can use any name you'd like.  Realize though that R package assumes that the name of the database is RaMP by default.  So if you change the name, remember to pass that name as arguments in the R package functions.
+Here, we are naming the database RaMP but you can use any name you'd like.  It is worth noting though that the R package assumes that the name of the database is 'ramp' by default.  So if you change the name, remember to pass that name as arguments in the R package functions.
 
 Second, populate the named database with the mysql dump file (which you can get from  inst/extdata/ramp.sql):
 ```
@@ -47,15 +47,15 @@ Second, populate the named database with the mysql dump file (which you can get 
 
 You're done!
 
-Note that your "ramp" database should contain the following 8 tables:
+Your "ramp" database should contain the following 8 tables:
 1. analyte
-1. analyehasontology
-1. analytehaspathway
-1. analytesynonym
-1. catalyzed
-1. ontology
-1. pathway
-1. source
+2. analyehasontology
+3. analytehaspathway
+4. analytesynonym
+5. catalyzed
+6. ontology
+7. pathway
+8. source
 
 If you want to explore this in MySQL, you can try:
 ```
@@ -82,9 +82,12 @@ RaMP::runRaMPapp(conpass="mysql_password")
 
 If the username is different then root, then specify the username in the "username" parameter.  Similarly, if the name of the database is different than "ramp", then specify the "dbname" parameter.
 
-### Note
+### Important Notes
 
 If you reinstall the latest version of the RaMP package, be sure to also install the latest version of the mysql RaMP dump file.  
+
+Also, when gene or metabolite ids are input for queries, IDs should be prepended with their database of origin, e.g. kegg:C02712, hmdb:HMDB04824, or CAS:2566-39-4. The list of IDs that are currently included in RaMP are: CAS, chebi, chemspider, enzymeNomenclature, ensembl, entrez, hmdb, keg, LIPIDMAPS, pubchem, uniprot.
+
 
 ## Reporting Issues
 If you encounter any problems, or find installation problems or bugs, please start an issue on the Issues tab or email Ewy.Mathe@osumc.edu directly. Thanks!
