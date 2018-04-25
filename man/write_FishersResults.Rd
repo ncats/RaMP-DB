@@ -4,15 +4,12 @@
 \alias{write_FishersResults}
 \title{Function that writes Fishers Test results to a CSV file}
 \usage{
-write_FishersResults(fishResults = NULL, outputfile = NULL,
-  clusters = NULL)
+write_FishersResults(fishResults = NULL, outputfile = NULL)
 }
 \arguments{
 \item{fishResults}{a data frame returned by function runCombinedFisherTest()}
 
 \item{outputfile}{name of output file}
-
-\item{clusters}{optinal clusteres as returned from the function findCluster()}
 }
 \description{
 Function that writes Fishers Test results to a CSV file
