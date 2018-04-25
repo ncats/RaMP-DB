@@ -61,18 +61,18 @@ findAnalyteHasPathway <- function(pathwayRampId,GC = "C",n = 10,
 #'@param pathwayid a vector that has all ramp pathway id in the pathwaysWithAnalytes
 #'@param pathwaysWithAnalytes a list that has pathways ramp Id as name, analytes (ramp compound id only
 #' or gene id only or both) as content. Return by findAnalyteHasPathway
-#' @param methods must be in c('balanced','weighted') to determine which way to calculate this matrix
+#' @param overlapmethod must be in c('balanced','weighted') to determine which way to calculate this matrix
 #' @return the overlap matrix that has the overlap
 compute_overlap_matrix <- function(pathwayid,
                                    pathwaysWithAnalytes,
-                                   methods){
-  if(!(methods %in% c('balanced','weighted')))
+                                   overlapmethod){
+  if(!(overlapmethod %in% c('balanced','weighted')))
     stop('Wrong option for the input')
   analyte_result <- matrix(NA,nrow = length(pathwayid),ncol = length(pathwayid))
   colnames(analyte_result) <- pathwayid
   rownames(analyte_result) <- pathwayid
   # First method compute intersection over the union
-  if(methods == 'balanced'){
+  if(overlapmethod == 'balanced'){
     for(i in 1:length(pathwayid)){
       id <- pathwayid[i]
       cid <- pathwaysWithAnalytes[[i]]
@@ -94,7 +94,7 @@ compute_overlap_matrix <- function(pathwayid,
         print(paste("Compute for ",i,",",j))
       }
     }
-  }else if (methods == 'weighted'){
+  }else if (overlapmethod == 'weighted'){
     # second method
     for(i in 1:length(pathwayid)){
       id <- pathwayid[i]
@@ -125,7 +125,7 @@ compute_overlap_matrix <- function(pathwayid,
 #'
 #' @param min_analyte a int that specifies the minimum of analytes the
 #' pathway should have to be considered compute for overlap matrix
-#' @param method a string that specifies the way to compute overlap matrix,
+#' @param overlapmethod a string that specifies the way to compute overlap matrix,
 #' must be 'balanced' or 'weighted'
 #' @param together a boolean value to compute overlap matrix for
 #' gene/metabolites separatly or together
@@ -133,7 +133,7 @@ compute_overlap_matrix <- function(pathwayid,
 #' @param dbname a string that specifies database name of MySQL database
 #' @param conpass a string that specifies password for database connection
 #' @param host a string that specifes host for database connection
-updateOverlapMatrix <- function(min_analyte,method,together,conpass,
+updateOverlapMatrix <- function(min_analyte,overlapmethod,together,conpass,
                                 host = 'localhost',dbname = 'ramp',
                                 username = 'root'){
   if(!together){
@@ -163,16 +163,16 @@ updateOverlapMatrix <- function(min_analyte,method,together,conpass,
                                          conpass = conpass, dbname = dbname,host = host)
                                          
     listOfWikiC <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,n = min_analyte,host = host,
-                                         conpass = conpass, dbname = dbname,host = host)
-    listOfReacC <- findAnalyteHasPathway(pathwayInReac$pathwayRampId,n = min_analyte,host = host,
+                                         conpass = conpass, dbname = dbname)
+    listOfReacC <- findAnalyteHasPathway(pathwayInReac$pathwayRampId,n = min_analyte,
                                          conpass = conpass, dbname = dbname,host = host)
     # Store Gene Ids in List
     # listOfHmdbG <- findAnalyteHasPathway(pathwayInHmdb$pathwayRampId,GC="G")
-    listOfKeggG <- findAnalyteHasPathway(pathwayInKegg$pathwayRampId,GC="G",n = min_analyte,host = host,
+    listOfKeggG <- findAnalyteHasPathway(pathwayInKegg$pathwayRampId,GC="G",n = min_analyte,
                                          conpass = conpass, dbname = dbname,host = host)
-    listOfWikiG <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,GC="G",n = min_analyte,host = host,
+    listOfWikiG <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,GC="G",n = min_analyte,
                                         conpass = conpass, dbname = dbname,host = host)
-    listOfReacG <- findAnalyteHasPathway(pathwayInReac$pathwayRampId,GC="G",n = min_analyte,host = host,
+    listOfReacG <- findAnalyteHasPathway(pathwayInReac$pathwayRampId,GC="G",n = min_analyte,
                                          conpass = conpass, dbname = dbname,host = host)
     # Setup minimum number of analytes that will be considered
 
@@ -189,14 +189,14 @@ updateOverlapMatrix <- function(min_analyte,method,together,conpass,
       listOfKeggC,
       listOfWikiC,
       listOfReacC))
-    if(methods == 'balanced' ){
+    if(overlapmethod == 'balanced' ){
       metabolite_result <- compute_overlap_matrix(pathwayid = pathwayid,
                                                   pathwaysWithAnalytes =  pathToanalC,
-                                                  methods = 'balanced')
-    }else if(methods == 'weighted'){
+                                                  overlapmethod = 'balanced')
+    }else if(overlapmethod == 'weighted'){
       metabolite_result <- compute_overlap_matrix(pathwayid = pathwayid,
                                                    pathwaysWithAnalytes = pathToanalC,
-                                                   methods = 'weighted')
+                                                   overlapmethod = 'weighted')
     }
 
     # Output to a matrix
@@ -213,10 +213,10 @@ updateOverlapMatrix <- function(min_analyte,method,together,conpass,
       listOfWikiG,
       listOfReacG))
     # compute for matrix
-    if(methods == 'balanced' ){
-      gene_result <- compute_overlap_matrix(pathwayid = pathwayidG,pathToanalG,methods = 'balanced')
-    } else if(methods == 'weighted' ){
-      gene_result <- compute_overlap_matrix(pathwayid = pathwayidG,pathToanalG,methods = 'weighted')
+    if(overlapmethod == 'balanced' ){
+      gene_result <- compute_overlap_matrix(pathwayid = pathwayidG,pathToanalG,overlapmethod = 'balanced')
+    } else if(overlapmethod == 'weighted' ){
+      gene_result <- compute_overlap_matrix(pathwayid = pathwayidG,pathToanalG,overlapmethod = 'weighted')
     }
     return(list(
       metabolite = metabolite_result,
@@ -260,14 +260,14 @@ updateOverlapMatrix <- function(min_analyte,method,together,conpass,
       listOfKegg,
       listOfWiki,
       listOfReac))
-    if(methods == 'balanced'){
+    if(overlapmethod == 'balanced'){
       analyte_result <- compute_overlap_matrix(pathwayid = pathwayid,
                                                pathwaysWithAnalytes =  pathToanal,
-                                               methods = 'balanced')
-    } else if(methods == 'weighted'){
+                                               overlapmethod = 'balanced')
+    } else if(overlapmethod == 'weighted'){
       analyte_result <- compute_overlap_matrix(pathwayid = pathwayid,
                                                pathwaysWithAnalytes =  pathToanal,
-                                               methods = 'weighted')
+                                               overlapmethod = 'weighted')
     }
     return(analyte_result)
   }

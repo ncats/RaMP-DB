@@ -4,7 +4,7 @@
 \alias{compute_overlap_matrix}
 \title{Compute overlaping matrix based on given list return by findAnalyteHasPathway()}
 \usage{
-compute_overlap_matrix(pathwayid, pathwaysWithAnalytes, methods)
+compute_overlap_matrix(pathwayid, pathwaysWithAnalytes, overlapmethod)
 }
 \arguments{
 \item{pathwayid}{a vector that has all ramp pathway id in the pathwaysWithAnalytes}
@@ -12,7 +12,7 @@ compute_overlap_matrix(pathwayid, pathwaysWithAnalytes, methods)
 \item{pathwaysWithAnalytes}{a list that has pathways ramp Id as name, analytes (ramp compound id only
 or gene id only or both) as content. Return by findAnalyteHasPathway}
 
-\item{methods}{must be in c('balanced','weighted') to determine which way to calculate this matrix}
+\item{overlapmethod}{must be in c('balanced','weighted') to determine which way to calculate this matrix}
 }
 \value{
 the overlap matrix that has the overlap
