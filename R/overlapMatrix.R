@@ -29,7 +29,7 @@ findAnalyteHasPathway <- function(pathwayRampId,GC = "C",n = 10,
   df <- DBI::dbGetQuery(con,
                    query)
   if(GC == 'both'){
-    df2 <- aggregate(df$rampId,list(df$pathwayRampId),FUN = function(x){
+    df2 <- stats::aggregate(df$rampId,list(df$pathwayRampId),FUN = function(x){
       if(length(x) >= n){
         paste(x,collapse = ',')
       } else{
@@ -38,7 +38,7 @@ findAnalyteHasPathway <- function(pathwayRampId,GC = "C",n = 10,
     })
   }
   else if (GC %in% c('G','C')){
-    df2 <- aggregate(df$rampId,list(df$pathwayRampId),FUN = function(x){
+    df2 <- stats::aggregate(df$rampId,list(df$pathwayRampId),FUN = function(x){
       x <- x[grepl(paste0("RAMP_",GC,"_"),x)]
       if(length(x) >= n ){
         paste(x,collapse = ",")
@@ -49,7 +49,7 @@ findAnalyteHasPathway <- function(pathwayRampId,GC = "C",n = 10,
   }
   fdf <- df2[df2$x!=0,]
   fdf2 <- data.frame(fdf[,-1],row.names = fdf[,1],stringsAsFactors = F)
-  df.list <- setNames(split(fdf2, seq(nrow(fdf2))), rownames(fdf2))
+  df.list <- stats::setNames(split(fdf2, seq(nrow(fdf2))), rownames(fdf2))
   df.list <- lapply(df.list,FUN = function(x){
     text <- x[[1]]
     text <- strsplit(text,split = ",")
@@ -223,7 +223,7 @@ updateOverlapMatrix <- function(min_analyte,method,together,conpass,
       gene = gene_result
     ))
   } else if(together){
-    con <- DBI::dbConnect(MySQL(),
+    con <- DBI::dbConnect(RMySQL::MySQL(),
                      user = username,
                      dbname=dbname,
                      password = conpass,
@@ -246,6 +246,7 @@ updateOverlapMatrix <- function(min_analyte,method,together,conpass,
     # Store Compound Ids in List
     # listOfHmdbC <- findAnalyteHasPathway(pathwayInHmdb$pathwayRampId)
     # use both to save metabolites/genes in the list
+
     listOfKegg <- RaMP:::findAnalyteHasPathway(pathwayInKegg$pathwayRampId,GC = 'both',n = min_analyte,
                                                host = host,
                                                conpass = conpass, dbname = dbname)
