@@ -7,7 +7,7 @@ dataInput_cata <- eventReactive(input$subText_cata,{
   progress$inc(0.3,detail = paste("Send Query ..."))
   
   # rampOut <- rampCataOut(input$KW_cata, 99999)
-  rampOut <- RaMP:::rampFastCata(input$KW_cata,conpass=.conpass,host = .host,
+  rampOut <- rampFastCata(input$KW_cata,conpass=.conpass,host = .host,
                                  NameOrIds = input$CataInput_choices)
   progress$inc(0.7,detail = paste("Done!"))
   return (rampOut)
@@ -71,7 +71,7 @@ observe({
 })
 
 data_mul_name_tab4 <- eventReactive(input$sub_mul_tab4,{
-  RaMP:::rampFastCata(input$input_mul_tab4,conpass=.conpass,
+  rampFastCata(input$input_mul_tab4,conpass=.conpass,
                       host = .host,
                       NameOrIds = input$input_mul_tab4_choices)
 })
@@ -81,7 +81,7 @@ data_mul_file_tab4 <- eventReactive(input$sub_file_tab4,{
   if (is.null(infile))
     return(NULL)
   
-  rampOut <- RaMP:::rampFileOfAnalytes_tab4(infile,conpass=.conpass,host = .host)
+  rampOut <- rampFileOfAnalytes_tab4(infile,conpass=.conpass,host = .host)
   
 })
 
