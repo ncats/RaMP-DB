@@ -1,5 +1,13 @@
 # The global variables that are important to keywords search and fisher test.
 
+# read db connection from db.properties file and store them in GlobalEnv
+dbProp <- properties::read.properties('db.properties')
+
+.GlobalEnv$.host <- dbProp$host
+.GlobalEnv$.dbname <- dbProp$dbname
+.GlobalEnv$.username <- dbProp$username
+.GlobalEnv$.conpass <- dbProp$conpass
+
 FisherTestData <- list(
   metabolites = read.csv("FisherTestDataMetabolites.csv"),
   genes = read.csv("FisherTestDataGenes.csv")

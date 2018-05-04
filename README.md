@@ -65,7 +65,6 @@ view tables;
 select * from analytesynonym where synonym = "glucose";
 ```
 
-
 ### Install and load the RaMP package 
 You can install this package directly from GitHub using the install_github() function available through the devtools package. In the R Console, type the following:
 ```R
@@ -75,7 +74,23 @@ install_github("mathelab/RAMP-DB")
 # Load the package
 library(RaMP)
 ```
-Now, you're set to use the web application locally.  Just type:
+
+Before running the RaMP app or RaMP functions, the database connection information should be configured. The file that contains this information is within the package installation and the directory can be found by typing the following:
+```
+system.file("shinyApp", package="RaMP", mustWork=TRUE)
+```
+Go to that directory and find the "db.properties.template" file, copy it to a new file db.properties.  Edit db.properties file based on your current environment as follows:
+
+```
+host=<hostname of mysql server>
+dbname=<db name on mysql>
+username=<username to connect to mysql>
+conpass=<password for username to connect to mysql>
+```
+*After editing, be sure to rename this file "db.properties".*
+
+
+Now, you're set to use the web application locally!  Just type:
 ```R
 RaMP::runRaMPapp(conpass="mysql_password")
 ```

@@ -7,7 +7,8 @@ dataInput_path <- eventReactive(input$subText2,{
   progress$set(message = "Querying databases to find metabolites ...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
 
-  rampOut <- RaMP::getAnalyteFromPathway(input$KW_path,conpass=.conpass,host = .host)
+  rampOut <- RaMP::getAnalyteFromPathway(input$KW_path,conpass=.conpass,host = .host, 
+                                         dbname = .dbname, username = .username)
   if(input$geneOrComp2 != "both"){
     rampOut <- rampOut[rampOut$geneOrCompound == input$geneOrComp2,]
   }
