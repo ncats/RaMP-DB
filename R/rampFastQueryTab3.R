@@ -381,9 +381,9 @@ getPathwayFromAnalyte<- function(analytes=NULL,
   if(NameOrIds == "names"){
     print(analytes)
     synonym <- rampFindSynonymFromSynonym(synonym=analytes,
-                                          find_synonym=find_synonym,
-                                          conpass=conpass)
-    
+	  find_synonym=find_synonym,
+	  conpass=conpass, host=host, dbname=dbname,username=username)
+
     colnames(synonym)[1]="commonName"
     synonym$commonName <- tolower(synonym$commonName)
     if(nrow(synonym)==0) {
@@ -394,7 +394,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
     list_metabolite <- sapply(list_metabolite,shQuote)
     list_metabolite <- paste(list_metabolite,collapse = ",")
   } else if (NameOrIds == "ids"){
-    sourceramp <- rampFindSourceRampId(sourceId=analytes, conpass=conpass)
+    sourceramp <- rampFindSourceRampId(sourceId=analytes, conpass=conpass, host=host, dbname=dbname,username=username)
     if (nrow(sourceramp)==0) {
       stop("Make sure you are actually inputting ids and not names (you have NameOrIds set to 'ids'. If you are, then no ids were matched in the RaMP database.")
     }
@@ -430,8 +430,8 @@ getPathwayFromAnalyte<- function(analytes=NULL,
     return(NULL)
   }
   query3 <- paste0("select pathwayName,sourceId as pathwaysourceId,type as pathwaysource,pathwayRampId from pathway where pathwayRampId in (",
-                   pathid_list,");")
-  con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass)
+                    pathid_list,");")
+  con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
   df3 <- DBI::dbGetQuery(con,query3)
   DBI::dbDisconnect(con)
   #Format output
