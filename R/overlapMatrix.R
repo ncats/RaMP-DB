@@ -159,7 +159,7 @@ updateOverlapMatrix <- function(min_analyte,overlapmethod,together,conpass,
 
     # Store Compound Ids in List
     # listOfHmdbC <- findAnalyteHasPathway(pathwayInHmdb$pathwayRampId)
-    listOfKeggC <- RaMP:::findAnalyteHasPathway(pathwayInKegg$pathwayRampId,n = min_analyte,host = host,
+    listOfKeggC <- findAnalyteHasPathway(pathwayInKegg$pathwayRampId,n = min_analyte,host = host,
                                          conpass = conpass, dbname = dbname)
                                          
     listOfWikiC <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,n = min_analyte,host = host,
@@ -248,13 +248,13 @@ updateOverlapMatrix <- function(min_analyte,overlapmethod,together,conpass,
     # listOfHmdbC <- findAnalyteHasPathway(pathwayInHmdb$pathwayRampId)
     # use both to save metabolites/genes in the list
 
-    listOfKegg <- RaMP:::findAnalyteHasPathway(pathwayInKegg$pathwayRampId,GC = 'both',n = min_analyte,
+    listOfKegg <- findAnalyteHasPathway(pathwayInKegg$pathwayRampId,GC = 'both',n = min_analyte,
                                                host = host,
                                                conpass = conpass, dbname = dbname)
-    listOfWiki <- RaMP:::findAnalyteHasPathway(pathwayInWiki$pathwayRampId,GC = 'both',n = min_analyte,
+    listOfWiki <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,GC = 'both',n = min_analyte,
                                                host = host,
                                                conpass = conpass, dbname = dbname)
-    listOfReac <- RaMP:::findAnalyteHasPathway(pathwayInReac$pathwayRampId,GC = 'both',n = min_analyte,
+    listOfReac <- findAnalyteHasPathway(pathwayInReac$pathwayRampId,GC = 'both',n = min_analyte,
                                                host = host,
                                                conpass = conpass, dbname = dbname)
     # Append all pathways id together
