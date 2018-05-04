@@ -147,7 +147,7 @@ updateOverlapMatrix <- function(min_analyte,overlapmethod,together,conpass,
     source <- DBI::dbGetQuery(con,'select * from source;')
 
 
-    dbname <- unique(pathways$type)
+    # dbname <- unique(pathways$type)
 
     # pathwayInHmdb <- pathways[pathways$type == 'hmdb',]
     pathwayInKegg <- pathways[pathways$type == 'kegg',]
@@ -159,8 +159,8 @@ updateOverlapMatrix <- function(min_analyte,overlapmethod,together,conpass,
 
     # Store Compound Ids in List
     # listOfHmdbC <- findAnalyteHasPathway(pathwayInHmdb$pathwayRampId)
-    listOfKeggC <- findAnalyteHasPathway(pathwayInKegg$pathwayRampId,n = min_analyte,
-                                         conpass = conpass, dbname = dbname,host = host)
+    listOfKeggC <- RaMP:::findAnalyteHasPathway(pathwayInKegg$pathwayRampId,n = min_analyte,host = host,
+                                         conpass = conpass, dbname = dbname)
                                          
     listOfWikiC <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,n = min_analyte,host = host,
                                          conpass = conpass, dbname = dbname)
@@ -189,6 +189,7 @@ updateOverlapMatrix <- function(min_analyte,overlapmethod,together,conpass,
       listOfKeggC,
       listOfWikiC,
       listOfReacC))
+
     if(overlapmethod == 'balanced' ){
       metabolite_result <- compute_overlap_matrix(pathwayid = pathwayid,
                                                   pathwaysWithAnalytes =  pathToanalC,
@@ -233,7 +234,7 @@ updateOverlapMatrix <- function(min_analyte,overlapmethod,together,conpass,
 
 
 
-    dbname <- unique(pathways$type)
+    # dbname <- unique(pathways$type)
 
     # pathwayInHmdb <- pathways[pathways$type == 'hmdb',]
     pathwayInKegg <- pathways[pathways$type == 'kegg',]
@@ -246,9 +247,16 @@ updateOverlapMatrix <- function(min_analyte,overlapmethod,together,conpass,
     # Store Compound Ids in List
     # listOfHmdbC <- findAnalyteHasPathway(pathwayInHmdb$pathwayRampId)
     # use both to save metabolites/genes in the list
-    listOfKegg <- findAnalyteHasPathway(pathwayInKegg$pathwayRampId,GC = 'both',n = min_analyte)
-    listOfWiki <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,GC = 'both',n = min_analyte)
-    listOfReac <- findAnalyteHasPathway(pathwayInReac$pathwayRampId,GC = 'both',n = min_analyte)
+
+    listOfKegg <- RaMP:::findAnalyteHasPathway(pathwayInKegg$pathwayRampId,GC = 'both',n = min_analyte,
+                                               host = host,
+                                               conpass = conpass, dbname = dbname)
+    listOfWiki <- RaMP:::findAnalyteHasPathway(pathwayInWiki$pathwayRampId,GC = 'both',n = min_analyte,
+                                               host = host,
+                                               conpass = conpass, dbname = dbname)
+    listOfReac <- RaMP:::findAnalyteHasPathway(pathwayInReac$pathwayRampId,GC = 'both',n = min_analyte,
+                                               host = host,
+                                               conpass = conpass, dbname = dbname)
     # Append all pathways id together
 
     pathwayid <- c(#names(listOfHmdbC),
