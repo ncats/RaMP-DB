@@ -15,7 +15,6 @@
 runRaMPapp <- function(conpass = NULL,host = 'localhost',
                        username = 'root',dbname = 'ramp') {
   .conpass <- .host <-.username <- .dbname <- con <- c()
-  print(getwd())
   if(is.null(conpass)) {
         stop("Please define the password for the mysql connection")
   }
