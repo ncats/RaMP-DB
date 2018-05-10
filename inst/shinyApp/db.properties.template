@@ -1,0 +1,4 @@
+host=<hostname of mysql server>
+dbname=<db name on mysql>
+username=<username to connect to mysql>
+conpass=<password for username to connect to mysql>
