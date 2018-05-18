@@ -7,7 +7,7 @@ dataInput_cata <- eventReactive(input$subText_cata,{
   progress$inc(0.3,detail = paste("Send Query ..."))
   
   # rampOut <- rampCataOut(input$KW_cata, 99999)
-  rampOut <- rampFastCata(input$KW_cata,conpass=.conpass,host = .host,
+  rampOut <- RaMP::rampFastCata(input$KW_cata,conpass=.conpass,host = .host,
 				 dbname = .dbname, username = .username,
                                  NameOrIds = input$CataInput_choices)
   progress$inc(0.7,detail = paste("Done!"))
@@ -72,7 +72,7 @@ observe({
 })
 
 data_mul_name_tab4 <- eventReactive(input$sub_mul_tab4,{
-  rampFastCata(input$input_mul_tab4,conpass=.conpass,
+  RaMP::rampFastCata(input$input_mul_tab4,conpass=.conpass,
 			dbname = .dbname, username = .username,
                       host = .host,
                       NameOrIds = input$input_mul_tab4_choices)
