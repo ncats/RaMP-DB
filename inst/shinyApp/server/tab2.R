@@ -7,8 +7,9 @@ dataInput_path <- eventReactive(input$subText2,{
   progress$set(message = "Querying databases to find metabolites ...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
 
-  rampOut <- RaMP::getAnalyteFromPathway(input$KW_path,conpass=.conpass,host = .host, 
-                                         dbname = .dbname, username = .username)
+  rampOut <- RaMP::getAnalyteFromPathway(input$KW_path,
+	conpass=.conpass,host = .host, 	
+        dbname = .dbname, username = .username)
   if(input$geneOrComp2 != "both"){
     rampOut <- rampOut[rampOut$geneOrCompound == input$geneOrComp2,]
   }
@@ -88,7 +89,8 @@ observe({
 data_mul_name_tab2 <- eventReactive(input$sub_mul_tab2,{
   if(is.null(input$sub_mul_tab2))
     return(NULL)
-  RaMP::getAnalyteFromPathway(input$input_mul_tab2,conpass=.conpass,host = .host)
+  RaMP::getAnalyteFromPathway(input$input_mul_tab2,
+	conpass=.conpass,host = .host,dbname=.dname,username=.username)
 })
 # Download table in a csv file.
 output$tab2_mul_report <- downloadHandler(filename = function(){

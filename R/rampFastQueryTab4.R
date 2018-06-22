@@ -183,7 +183,7 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
         query2 <- paste0("select * from source where rampId in (",analyte2_list,");")
         con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
                               password = conpass,
-                              dbname = dbname)
+                              dbname = dbname,host=host)
         df_g3 <-DBI::dbGetQuery(con,query2)
         DBI::dbDisconnect(con)
         if(nrow(df_g3) == 0){
