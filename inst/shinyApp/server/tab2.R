@@ -43,7 +43,12 @@ output$result <- DT::renderDataTable({
 
 
 observe({
-  choices <- kw_pathway[grepl(input$singleInput2,kw_pathway,ignore.case=TRUE)]
+  #choices <- kw_pathway[grepl(input$singleInput2,kw_pathway,ignore.case=TRUE)]
+    if(input$singleInput2=="") {
+        choices <- kw_pathway
+    } else {
+	choices <- agrep(input$singleInput2,kw_pathway,ignore.case=TRUE,value=TRUE)
+    }
   choices <- choices[order(nchar(choices),choices)]
   if(is.null(choices))
     return(NULL)

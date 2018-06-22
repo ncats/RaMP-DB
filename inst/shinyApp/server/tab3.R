@@ -30,13 +30,18 @@ output$summary_path <- renderText({
 
 observe({
   if(input$NameOrId == "names"){
-    choices <- kw_analyte[grepl(input$compName,kw_analyte,ignore.case=TRUE)]
-    choices <- choices[order(nchar(choices),choices)]
+    #choices <- kw_analyte[grepl(input$compName,kw_analyte,ignore.case=TRUE)]
+    if(input$compName=="") {
+	choices <- ""
+    } else {
+    	choices <- agrep(input$compName,kw_analyte,value=TRUE,ignore.case=TRUE)
+	choices <- choices[order(nchar(choices),choices)]
+    }
     if(is.null(choices))
       return(NULL)
-    if(length(choices) >10 ){
-      choices <- choices[1:10]
-    }
+    #if(length(choices) >10 ){
+    #  choices <- choices[1:10]
+    #}
     isolate({
       updateSelectInput(session, "KW_synonym",
                         label = "Select from the list",
