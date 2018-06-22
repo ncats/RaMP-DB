@@ -53,11 +53,11 @@ observe({
     #choices <- kw_analyte[grepl(input$ontoInput,kw_analyte,
     #                            fixed = T)]
     if(input$ontoInput=="") {
-        choices <- kw_analyte
+        choices <- "" #kw_analyte
     } else {
     	choices <- agrep(input$ontoInput,kw_analyte,ignore.case=T,value=T)
+	choices <- choices[order(nchar(choices),choices)]
     }
-    choices <- choices[order(nchar(choices),choices)]
   } else if (input$metaOrOnto == 'ids'){
     choices <- kw_source[grepl(input$ontoInput,kw_source,
                                fixed = T)]
