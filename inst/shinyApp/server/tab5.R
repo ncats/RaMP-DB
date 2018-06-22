@@ -50,8 +50,13 @@ observe({
   }
   else if (input$metaOrOnto == 'name') {
     # x <- rampKWsearch(input$ontoInput, "analytesynonym")
-    choices <- kw_analyte[grepl(input$ontoInput,kw_analyte,
-                                fixed = T)]
+    #choices <- kw_analyte[grepl(input$ontoInput,kw_analyte,
+    #                            fixed = T)]
+    if(input$ontoInput=="") {
+        choices <- kw_analyte
+    } else {
+    	choices <- agrep(input$ontoInput,kw_analyte,ignore.case=T,value=T)
+    }
     choices <- choices[order(nchar(choices),choices)]
   } else if (input$metaOrOnto == 'ids'){
     choices <- kw_source[grepl(input$ontoInput,kw_source,
