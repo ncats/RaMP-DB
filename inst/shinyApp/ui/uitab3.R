@@ -71,6 +71,7 @@ tabItem3 <-  shinydashboard::tabItem(
                                                    h5("When inputting source IDs, it is important to add a prefix to denote the id type.  This is important because it is possible for two different metabolites to have the same IDs, although each ID may be from a different database source."),
                                                    h5("Metabolites can be searched with the following ID types: CAS, chebi, chemspider, hmdb, kegg, LIPIDMAPS, and pubchem.  To search for a metabolite, the ID type must be added as a prefix.  For example, the compound 'HMDB0000562' must be searched by 'hmdb:HMDB0000562', the compound '16737' must be searched by 'chebi:16737'."),
                                                    h5("Genes can be searched with the following ID types:  enzymeNomenclature, ensembl, entrez, hmdb, kegg, uniprot. Similar to metabolites, prefix ID types must be added to the ID for searching."),
+						   h5(strong("Only one type of ID can be input: either source ID or name, not both")),
                                                    br(),
                                                    h4(strong('Input a list of metabolites, one per line')),
                                                    textAreaInput("input_mul_tab3",label = "",
