@@ -6,12 +6,15 @@ dataInput_onto <- eventReactive(input$subText_onto,{
   progress$set(message = "Querying databases to find pathways ...", value = 0)
   progress$inc(0.3,detail = paste("Send Query ..."))
 
+  ## app log to debug mysql connection
+  cat(file=stderr(), "db connection host:dbname:username:conpass-- ", .host, .dbname, .username, .conpass, "\n")
+  
   # rampOut <- rampOntoOut(input$KW_onto, 99999)
   if(input$metaOrOnto %in% c('ids','name')){
     rampOut <- RaMP:::getOntoFromMeta(input$KW_onto,
                                           conpass =.conpass,
                                           host = .host,
-					  dbname = .dbname, username = .username,
+					                                dbname = .dbname, username = .username,
                                           NameOrIds = input$metaOrOnto)
   } else if(input$metaOrOnto == 'ontology'){
     rampOut <- RaMP:::getMetaFromOnto(input$KW_onto,
