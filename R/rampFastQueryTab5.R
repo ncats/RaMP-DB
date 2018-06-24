@@ -49,6 +49,7 @@ getOntoFromMeta <- function(analytes,conpass = NULL,
   } else if (NameOrIds == 'name'){
     sql <- paste0('select * from source where rampId in (select rampId from analytesynonym where Synonym in (',
                   list_metabolite,'));')
+    cat(file=stderr(), "query sql in Package call with meta name -- ", sql, "\n")
   }
   df <- DBI::dbGetQuery(con,sql)
   #print(colnames(df))
