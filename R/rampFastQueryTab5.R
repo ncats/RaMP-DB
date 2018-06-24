@@ -14,6 +14,7 @@ getOntoFromMeta <- function(analytes,conpass = NULL,
                          host = 'localhost',
                          username = 'root',
                          NameOrIds = 'ids'){
+  cat(file=stderr(), "db connection in Package call host:dbname:username:conpass-- ", host, dbname, username, conpass, "\n")
   if(!(NameOrIds %in% c('ids','name')))
     stop("Specifiy the type of given data to 'ids' or 'name'")
 
