@@ -47,15 +47,7 @@ getOntoFromMeta <- function(analytes,conpass = NULL,
   if(NameOrIds == 'ids'){
     sql <- paste0('select * from source where sourceId in (',list_metabolite,');')
   } else if (NameOrIds == 'name'){
-    #sql <- paste0('select * from source where rampId in (select rampId from analytesynonym where Synonym in (', list_metabolite,'));')
-    # Shunchao separate subquery into separated queries
-    ## query all rampId from analytesynonym
-    analytesynonymQuery <- paste0('select rampId from analytesynonym where Synonym in (', list_metabolite, ');')
-    rampIdList <- DBI::dbGetQuery(con, analytesynonymQuery)
-    ## formulate source query into string
-    rampIdQueryStr <- paste(rampIdList$rampId, collapse = ",")
-    ## query source using rampId
-    sql <- paste0('select * from source where rampId in (', rampIdQueryStr, ');')
+    sql <- paste0('select * from source where rampId in (select * from (select rampId from analytesynonym where Synonym in (', list_metabolite,')) as subquery);')
     cat(file=stderr(), "query sql in Package call with -- ", sql, "\n")
   }
   df <- DBI::dbGetQuery(con,sql)
