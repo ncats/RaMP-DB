@@ -114,4 +114,6 @@ If you encounter any problems, or find installation problems or bugs, please sta
 * **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
 * **Ewy Mathé** - [Mathelab](https://github.com/MatheLab)
 * **Andrew Patt** - andrew.patt@osumc.edu
+* **Shunchao Wang** - shunchao.wang@osumc.edu
+* **Rohith Vanam** - rohith.vanam@osumc.edu
 
