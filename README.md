@@ -1,6 +1,9 @@
 [![Build Status](https://travis-ci.org/Mathelab/RaMP-DB.svg?branch=master)](https://travis-ci.org/Mathelab/RaMP-DB)
 [![Build status](https://ci.appveyor.com/api/projects/status/cg0md9vd8njancij?svg=true)](https://ci.appveyor.com/project/Mathelab/ramp-db)
 
+# New!  RaMP app is accessible via a server (no installation needed!).
+Please [click here](https://ramp-db.bmi.osumc.edu/).  And let us know if additional functionalities would be useful (see contact info below).
+
 # RaMP - Relational Database of Metabolomic Pathways
 
 The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene biological pathways from multiple sources. Currently, we have integrated information from HMDB, KEGG, Reactome, and WikiPathways. The relational structure of RaMP enables complex and batch queries.  To facilitate its usage, we have created this R shiny web application that includes a user-friendly R Shiny web application.  Please note that this project is in continuous development and we certainly appreciate your feedback (through [our](https://github.com/Mathelab/RaMP-DB) GitHub site). More details can be found in <a href="http://www.mdpi.com/2218-1989/8/1/16" target="_blank">our manuscript</a>.
