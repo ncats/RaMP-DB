@@ -90,7 +90,7 @@ data_mul_name_tab2 <- eventReactive(input$sub_mul_tab2,{
   if(is.null(input$sub_mul_tab2))
     return(NULL)
   RaMP::getAnalyteFromPathway(input$input_mul_tab2,
-	conpass=.conpass,host = .host,dbname=.dname,username=.username)
+	conpass=.conpass,host = .host,dbname=.dbname,username=.username)
 })
 # Download table in a csv file.
 output$tab2_mul_report <- downloadHandler(filename = function(){
