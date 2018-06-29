@@ -98,7 +98,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
       contingencyTb[1,2] <- tot_out_pathway - user_out_pathway
       contingencyTb[2,1] <- user_in_pathway
       contingencyTb[2,2] <- user_out_pathway
-      result <- stats::fisher.test(contingencyTb)
+      result <- stats::fisher.test(contingencyTb,alternative="greater")
       pval <- c(pval,result$p.value )
       userinpath<-c(userinpath,user_in_pathway)
       totinpath<-c(totinpath,tot_in_pathway)
@@ -174,7 +174,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
       contingencyTb[1,2] <- tot_out_pathway - user_out_pathway
       contingencyTb[2,1] <- user_in_pathway
       contingencyTb[2,2] <- user_out_pathway
-      result <- stats::fisher.test(contingencyTb)
+      result <- stats::fisher.test(contingencyTb,alternative="greater")
       pval2 <- c(pval2,result$p.value )
       userinpath2<-c(userinpath2,user_in_pathway)
       totinpath2<-c(totinpath2,tot_in_pathway)
