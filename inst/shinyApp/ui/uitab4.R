@@ -1,6 +1,6 @@
 # Tab 4
-# 
-# 
+#
+#
 tabItem4<-  shinydashboard::tabItem(
   tabName = "geneCataComp",
   shinydashboard::tabBox(width = 12,id = "tabset4",height = "100%",
@@ -13,9 +13,12 @@ tabItem4<-  shinydashboard::tabItem(
                       status = "primary",
                       fluidRow(
                         column(12,
-                               helpText("If a compound is input, 
+                               helpText("If a compound is input,
 		all genes that catalyze reactions involving the compound are returned."),
-			       helpText("Conversely,if a gene is input, all compounds in reactions that are catalyzed by that gene are returned"),
+			       helpText("Conversely, if a gene is input, all compounds in reactions that are catalyzed by that gene are returned"),
+			       h5(strong("IMPORTANT NOTE about inputting source IDs:")),
+			       h5("When inputting source IDs, it is important to add a prefix to denote the id type.  This is important because it is possible for two different metabolites to have the same IDs, although each ID may be from a different database source."),
+			       h5("Metabolites can be searched with the following ID types: CAS, chebi, chemspider, hmdb, kegg, LIPIDMAPS, and pubchem.  To search for a metabolite, the ID type must be added as a prefix.  For example, the compound 'HMDB0000562' must be searched by 'hmdb:HMDB0000562', the compound '16737' must be searched by 'chebi:16737'."),
                                textInput("CataInput","", placeholder = "Input compound name or id"),
                                radioButtons('CataInput_choices',label = 'Search by name or source id',
                                             choices = c('Names' = 'names','Source ID' = 'ids')),
@@ -136,4 +139,4 @@ h5(strong("IMPORTANT NOTE about inputting source IDs:")),
 
 
 
-  
+
