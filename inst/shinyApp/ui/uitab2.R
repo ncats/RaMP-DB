@@ -16,6 +16,11 @@ tabItem2<-  shinydashboard::tabItem(
                                textInput("singleInput2","",placeholder ="Input one pathway name"),
                                selectInput("KW_path", "Select from list", choices = NULL),
                                actionButton("subText2","Submit"),
+                               br(),
+                               br(),
+                               textOutput("summary_search"),
+                               br(),
+                               shinydashboard::infoBoxOutput("statusbox_tab2_subtab1", width = NULL),
                                hr())
                         ),
                       fluidRow(
@@ -38,8 +43,8 @@ tabItem2<-  shinydashboard::tabItem(
                           div(
                             style = "margin:25px",
                             downloadButton("result_file","Generate Report"),
-                            hr(),
-                            textOutput("summary_search")
+                            hr()
+                            #textOutput("summary_search")
                             #div(style = "height:300px;overflow-y:auto;overflow-x:auto;",
                             #    helpText("Preview of output only display first 20 items."),
                             #    DT::dataTableOutput("result2",width = "80%",height = "100%")
@@ -69,7 +74,12 @@ tabItem2<-  shinydashboard::tabItem(
                         title = strong("Input a list of pathways, one per line:"),
                         textAreaInput("input_mul_tab2",label = "",
                                       placeholder = "Input list of pathways, one per line"),
-                        actionButton("sub_mul_tab2",label = "Submit")
+                        actionButton("sub_mul_tab2",label = "Submit"),
+			                  br(),
+			                  br(),
+			                  textOutput("summary_search_tab2"),
+			                  br(),
+			                  shinydashboard::infoBoxOutput("statusbox_tab2_subtab2", width = NULL)
                     )
 #                    shinydashboard::box(
 #                      width = 6,
