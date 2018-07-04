@@ -1,31 +1,73 @@
 # First tab panel
 dataInput_name <- eventReactive(input$submit_compName,{
-  progress <- shiny::Progress$new()
-
-  on.exit(progress$close())
-
-  progress$set(message = "Querying databases to find pathways ...", value = 0)
-  progress$inc(0.3,detail = paste("Send Query ..."))
-
-  rampOut <- RaMP::getPathwayFromAnalyte(analytes=input$KW_synonym,
-                                        NameOrIds=input$NameOrId,
-                                        conpass=.conpass,
-                                        host = .host, dbname = .dbname, username = .username)
-  progress$inc(0.7,detail = paste("Done!"))
-  return (rampOut)
+  tryCatch({
+    progress <- shiny::Progress$new()
+    
+    on.exit(progress$close())
+    
+    progress$set(message = "Querying databases to find pathways ...", value = 0)
+    progress$inc(0.3,detail = paste("Send Query ..."))
+    
+    rampOut <- RaMP::getPathwayFromAnalyte(analytes=input$KW_synonym,
+                                           NameOrIds=input$NameOrId,
+                                           conpass=.conpass,
+                                           host = .host, dbname = .dbname, username = .username)
+    progress$inc(0.7,detail = paste("Done!"))
+    return (rampOut)
+  }, error = function(e) return())
 })
 
+# summary_path_out<- eventReactive(input$submit_compName,{
+#   if (!is.null(nrow(dataInput_name()))){
+#     return (paste0("There are ",nrow(dataInput_name())," pathways returned for ",
+#                    input$KW_synonym))
+#   } else{
+#     return ("Given metabolites have no search result.")
+#   }
+# })
+# 
+# output$summary_path <- renderText({
+#   summary_path_out()
+# })
+
+#Summary
 summary_path_out<- eventReactive(input$submit_compName,{
   if (!is.null(nrow(dataInput_name()))){
     return (paste0("There are ",nrow(dataInput_name())," pathways returned for ",
                    input$KW_synonym))
-  } else{
+  } 
+})
+
+summary_path_out_empty<- eventReactive(input$submit_compName,{
+  if (is.null(nrow(dataInput_name()))){
     return ("Given metabolites have no search result.")
   }
 })
 
 output$summary_path <- renderText({
-  summary_path_out()
+  if (!is.null(summary_path_out())) {
+    return(summary_path_out())
+  } else {
+    summary_path_out_empty()
+  }
+})
+
+#Status box
+
+output$statusbox_tab3_subtab1 <- shinydashboard::renderInfoBox({
+  if (!is.null(summary_path_out())) {
+    shinydashboard::infoBox(
+      "Status",
+      HTML(paste("Successful")),
+      icon = icon("thumbs-up", lib = "glyphicon"),
+      color = "green", fill = TRUE)
+  } else if(!is.null(summary_path_out_empty())){
+    shinydashboard::infoBox(
+      "Status",
+      HTML(paste("Not-Found")),
+      icon = icon("thumbs-down", lib = "glyphicon"),
+      color = "yellow", fill = TRUE)
+  }
 })
 
 observe({
@@ -65,8 +107,6 @@ observe({
   }
 })
 
-
-
 output$result3 <- DT::renderDataTable({
   out_stc <- dataInput_name()
   out_stc[,c("pathwayName","pathwaysourceId","pathwaysource")]
@@ -85,32 +125,72 @@ content = function(file) {
 # Second Tab
 #############
 data_mul_name <- eventReactive(input$sub_mul_tab3,{
-  #print(input$input_mul_tab3)
-  parsedinput <- paste(strsplit(input$input_mul_tab3,"\n")[[1]])
-  print(parsedinput)
-  if(length(parsedinput)==0) {metabsearch=NULL} else{
-  	metabsearch <- RaMP::getPathwayFromAnalyte(analytes=parsedinput,
-                             NameOrIds=input$NameOrSourcemult,
-                             conpass=.conpass,
-                             host = .host,
-                             dbname = .dbname, username = .username)
-	  print(input$input_mul_tab3_genes)
-  }
-
-  parsedinputg <- paste(strsplit(input$input_mul_tab3_genes,"\n")[[1]])
-  print(parsedinputg)
-  if(length(parsedinputg)==0) {genesearch=NULL} else{
-	  genesearch <- RaMP::getPathwayFromAnalyte(analytes=parsedinputg,
-                             NameOrIds=input$NameOrSourcemult_genes,
-                             conpass=.conpass,
-                             host = .host,
-                             dbname = .dbname, username = .username)
-  }
-  print(paste("metabsearch: ",ncol(metabsearch)))
-  print(paste("genesearch: ",ncol(genesearch)))
-  print(paste0("DIM of data_mul_name",nrow(rbind(metabsearch,genesearch))))
-  rbind(metabsearch,genesearch)
+  tryCatch({
+    #print(input$input_mul_tab3)
+    parsedinput <- paste(strsplit(input$input_mul_tab3,"\n")[[1]])
+    print(parsedinput)
+    if(length(parsedinput)==0) {metabsearch=NULL} else{
+      metabsearch <- RaMP::getPathwayFromAnalyte(analytes=parsedinput,
+                                                 NameOrIds=input$NameOrSourcemult,
+                                                 conpass=.conpass,
+                                                 host = .host,
+                                                 dbname = .dbname, username = .username)
+      print(input$input_mul_tab3_genes)
+    }
+    
+    parsedinputg <- paste(strsplit(input$input_mul_tab3_genes,"\n")[[1]])
+    print(parsedinputg)
+    if(length(parsedinputg)==0) {genesearch=NULL} else{
+      genesearch <- RaMP::getPathwayFromAnalyte(analytes=parsedinputg,
+                                                NameOrIds=input$NameOrSourcemult_genes,
+                                                conpass=.conpass,
+                                                host = .host,
+                                                dbname = .dbname, username = .username)
+    }
+    print(paste("metabsearch: ",ncol(metabsearch)))
+    print(paste("genesearch: ",ncol(genesearch)))
+    print(paste0("DIM of data_mul_name",nrow(rbind(metabsearch,genesearch))))
+    rbind(metabsearch,genesearch)
+  }, error = function(e) return() )
 })
+
+summary_path_out_tab2<- eventReactive(input$sub_mul_tab3,{
+  if (!is.null(nrow(data_mul_name()))){
+    return ("result-found")
+  } 
+})
+
+summary_path_out_tab2_empty<- eventReactive(input$sub_mul_tab3,{
+  if (is.null(nrow(data_mul_name()))){
+    return ("Given metabolites have no search result.")
+  }
+})
+
+output$summary_path_tab2 <- renderText({
+  if(!is.null(summary_path_out_tab2())) {
+    return(summary_path_out_tab2())
+  } else {
+    return(summary_path_out_tab2_empty())
+  }
+})
+
+
+output$statusbox_tab3_subtab2 <- shinydashboard::renderInfoBox({
+  if(!is.null(summary_path_out_tab2())) {
+    shinydashboard::infoBox(
+      "Status",
+      HTML(paste("Successful")),
+      icon = icon("thumbs-up", lib = "glyphicon"),
+      color = "green", fill = TRUE)
+  } else if(!is.null(summary_path_out_tab2_empty())){
+    shinydashboard::infoBox(
+      "Status",
+      HTML(paste("Not-Found")),
+      icon = icon("thumbs-down", lib = "glyphicon"),
+      color = "yellow", fill = TRUE)
+  }
+})
+
 
 # Download table in a csv file.
 output$tab3_mul_report <- downloadHandler(filename = function(){
