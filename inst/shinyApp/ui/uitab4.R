@@ -1,6 +1,6 @@
 # Tab 4
-# 
-# 
+#
+#
 tabItem4<-  shinydashboard::tabItem(
   tabName = "geneCataComp",
   shinydashboard::tabBox(width = 12,id = "tabset4",height = "100%",
@@ -13,14 +13,22 @@ tabItem4<-  shinydashboard::tabItem(
                       status = "primary",
                       fluidRow(
                         column(12,
-                               helpText("If a compound is input, 
+                               helpText("If a compound is input,
 		all genes that catalyze reactions involving the compound are returned."),
-			       helpText("Conversely,if a gene is input, all compounds in reactions that are catalyzed by that gene are returned"),
+			       helpText("Conversely, if a gene is input, all compounds in reactions that are catalyzed by that gene are returned"),
+			       h5(strong("IMPORTANT NOTE about inputting source IDs:")),
+			       h5("When inputting source IDs, it is important to add a prefix to denote the id type.  This is important because it is possible for two different metabolites to have the same IDs, although each ID may be from a different database source."),
+			       h5("Metabolites can be searched with the following ID types: CAS, chebi, chemspider, hmdb, kegg, LIPIDMAPS, and pubchem.  To search for a metabolite, the ID type must be added as a prefix.  For example, the compound 'HMDB0000562' must be searched by 'hmdb:HMDB0000562', the compound '16737' must be searched by 'chebi:16737'."),
                                textInput("CataInput","", placeholder = "Input compound name or id"),
                                radioButtons('CataInput_choices',label = 'Search by name or source id',
                                             choices = c('Names' = 'names','Source ID' = 'ids')),
                                selectInput("KW_cata", "Select from list", choices = NULL),
-                               actionButton("subText_cata","Submit")
+                               actionButton("subText_cata","Submit"),
+			                         br(),
+			                         br(),
+			                         textOutput("summary_cata"),
+			                         br(),
+			                         shinydashboard::infoBoxOutput("statusbox_tab4_subtab1", width = NULL)
                         ) # end column
                       ) # end fluidRow
                     ),# end box
@@ -30,7 +38,6 @@ tabItem4<-  shinydashboard::tabItem(
                         div(style = "margin:25px;",
                             downloadButton("report_cata","Download Results"),
                             hr(),
-                            textOutput("summary_cata"),
                             DT::dataTableOutput("result_cata")
                         )
                       ) #end fluidRow
@@ -79,7 +86,12 @@ h5(strong("IMPORTANT NOTE about inputting source IDs:")),
                                placeholder = "Input list of genes or metabolites, one per line"),
                  radioButtons('input_mul_tab4_choices',label = 'Search by source id or name?',
                               choices = c('Name' = 'names','Source ID' = 'ids')),
-                 actionButton("sub_mul_tab4",label = "Submit")
+                 actionButton("sub_mul_tab4",label = "Submit"),
+                 br(),
+                 br(),
+                 textOutput("summary_cata_tab2"),
+                 br(),
+                 shinydashboard::infoBoxOutput("statusbox_tab4_subtab2", width = NULL)
              ), # end box
              shinydashboard::box(width = 6,
                  solidHeader = T,
@@ -136,4 +148,4 @@ h5(strong("IMPORTANT NOTE about inputting source IDs:")),
 
 
 
-  
+
