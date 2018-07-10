@@ -23,7 +23,12 @@ tabItem4<-  shinydashboard::tabItem(
                                radioButtons('CataInput_choices',label = 'Search by name or source id',
                                             choices = c('Names' = 'names','Source ID' = 'ids')),
                                selectInput("KW_cata", "Select from list", choices = NULL),
-                               actionButton("subText_cata","Submit")
+                               actionButton("subText_cata","Submit"),
+			                         br(),
+			                         br(),
+			                         textOutput("summary_cata"),
+			                         br(),
+			                         shinydashboard::infoBoxOutput("statusbox_tab4_subtab1", width = NULL)
                         ) # end column
                       ) # end fluidRow
                     ),# end box
@@ -33,7 +38,6 @@ tabItem4<-  shinydashboard::tabItem(
                         div(style = "margin:25px;",
                             downloadButton("report_cata","Download Results"),
                             hr(),
-                            textOutput("summary_cata"),
                             DT::dataTableOutput("result_cata")
                         )
                       ) #end fluidRow
@@ -82,7 +86,12 @@ h5(strong("IMPORTANT NOTE about inputting source IDs:")),
                                placeholder = "Input list of genes or metabolites, one per line"),
                  radioButtons('input_mul_tab4_choices',label = 'Search by source id or name?',
                               choices = c('Name' = 'names','Source ID' = 'ids')),
-                 actionButton("sub_mul_tab4",label = "Submit")
+                 actionButton("sub_mul_tab4",label = "Submit"),
+                 br(),
+                 br(),
+                 textOutput("summary_cata_tab2"),
+                 br(),
+                 shinydashboard::infoBoxOutput("statusbox_tab4_subtab2", width = NULL)
              ), # end box
              shinydashboard::box(width = 6,
                  solidHeader = T,

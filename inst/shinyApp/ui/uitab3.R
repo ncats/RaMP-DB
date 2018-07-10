@@ -23,7 +23,12 @@ tabItem3 <-  shinydashboard::tabItem(
                                       radioButtons("NameOrId","Search by common names or source IDs?",
                                                    choices = c("Names" = "names", "Source ID" = "ids"),selected = "ids"),
                                       selectInput("KW_synonym", "Select from list", choices = NULL),
-                                      actionButton("submit_compName","Submit")
+                                      actionButton("submit_compName","Submit"),
+                                      br(),
+                                      br(),
+                                      textOutput("summary_path"),
+                                      br(),
+                                      shinydashboard::infoBoxOutput("statusbox_tab3_subtab1", width = NULL)
                                ) # end column
                              )# end fluidRow
                            ),# end box
@@ -35,8 +40,7 @@ tabItem3 <-  shinydashboard::tabItem(
                                                  div(
                                                    style = "margin:25px",
                                                    downloadButton("comp_report","Download Results"),
-                                                   hr(),
-                                                   textOutput("summary_path")
+                                                   hr()
                                                  )
                                                )
                            ), # end box
@@ -84,7 +88,11 @@ tabItem3 <-  shinydashboard::tabItem(
                                                    radioButtons("NameOrSourcemult_genes","Search by names or source IDs?",
                                                                 choices = c("Names" = "names", "Source ID" = "ids"),selected = "ids"),
                                                    actionButton("sub_mul_tab3",label = "Submit Query"),
-                                                   br()
+						                                       br(),
+						                                       br(),
+						                                       textOutput("summary_path_tab2"),
+						                                       br(),
+						                                       shinydashboard::infoBoxOutput("statusbox_tab3_subtab2", width = NULL)
                                                  ) # mainPanel
                              ), # end box
                              shinydashboard::box(width = 6,
