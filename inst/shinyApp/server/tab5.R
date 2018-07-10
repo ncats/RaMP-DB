@@ -1,36 +1,53 @@
 dataInput_onto <- eventReactive(input$subText_onto,{
-  progress <- shiny::Progress$new()
-
-  on.exit(progress$close())
-
-  progress$set(message = "Querying databases to find pathways ...", value = 0)
-  progress$inc(0.3,detail = paste("Send Query ..."))
-
-  ## app log to debug mysql connection
-  cat(file=stderr(), "db connection host:dbname:username:conpass-- ", .host, .dbname, .username, .conpass, "\n")
+  tryCatch({
+    progress <- shiny::Progress$new()
+    
+    on.exit(progress$close())
+    
+    progress$set(message = "Querying databases to find pathways ...", value = 0)
+    progress$inc(0.3,detail = paste("Send Query ..."))
+    
+    ## app log to debug mysql connection
+    cat(file=stderr(), "db connection host:dbname:username:conpass-- ", .host, .dbname, .username, .conpass, "\n")
+    
+    # rampOut <- rampOntoOut(input$KW_onto, 99999)
+    if(input$metaOrOnto %in% c('ids','name')){
+      rampOut <- RaMP:::getOntoFromMeta(input$KW_onto,
+                                        conpass =.conpass,
+                                        host = .host,
+                                        dbname = .dbname, username = .username,
+                                        NameOrIds = input$metaOrOnto)
+    } else if(input$metaOrOnto == 'ontology'){
+      rampOut <- RaMP:::getMetaFromOnto(input$KW_onto,
+                                        conpass = .conpass,
+                                        host = .host, dbname = .dbname, username = .username)
+    }
+    progress$inc(0.7,detail = paste("Done!"))
+    return (rampOut)
+  }, error = function(e) return())
   
-  # rampOut <- rampOntoOut(input$KW_onto, 99999)
-  if(input$metaOrOnto %in% c('ids','name')){
-    rampOut <- RaMP:::getOntoFromMeta(input$KW_onto,
-                                          conpass =.conpass,
-                                          host = .host,
-					                                dbname = .dbname, username = .username,
-                                          NameOrIds = input$metaOrOnto)
-  } else if(input$metaOrOnto == 'ontology'){
-    rampOut <- RaMP:::getMetaFromOnto(input$KW_onto,
-                                          conpass = .conpass,
-                                          host = .host, dbname = .dbname, username = .username)
-  }
-  progress$inc(0.7,detail = paste("Done!"))
-  return (rampOut)
 })
+# summary_onto_out<- eventReactive(input$subText_onto,{
+#   if (!is.null(nrow(dataInput_onto()))){
+#     return (paste0("There are(is) ",nrow(dataInput_onto())," relevent items in databases."))
+#   } else{
+#     return ("Given metabolites have no search result.")
+#   }
+# })
+
+#data frame SUMMARY
 summary_onto_out<- eventReactive(input$subText_onto,{
   if (!is.null(nrow(dataInput_onto()))){
     return (paste0("There are(is) ",nrow(dataInput_onto())," relevent items in databases."))
-  } else{
-    return ("Given metabolites have no search result.")
   }
 })
+
+summary_onto_out_empty <- eventReactive(input$subText_onto,{
+  if (is.null(nrow(dataInput_onto()))) {
+    return (paste0("Given metabolites have no search result."))
+  }
+})
+
 
 observe({
   if(input$metaOrOnto == 'ontology'){
@@ -82,11 +99,38 @@ observe({
   })
 })
 
+# output$summary_onto <- renderText(
+#   {
+#     summary_onto_out()
+#   }
+# )
+
 output$summary_onto <- renderText(
-  {
+  if (!is.null(summary_onto_out())) {
     summary_onto_out()
+  } else {
+    summary_onto_out_empty()
   }
 )
+
+#Status box
+output$statusbox_tab5_subtab1 <- shinydashboard::renderInfoBox({
+  if (!is.null(summary_onto_out())) {
+    shinydashboard::infoBox(
+      "Status",
+      HTML(paste("Successful")),
+      icon = icon("thumbs-up", lib = "glyphicon"),
+      color = "green", fill = TRUE)
+  } else if (!is.null(summary_onto_out_empty())) {
+    shinydashboard::infoBox(
+      "Status",
+      HTML(paste("Not-Found")),
+      icon = icon("thumbs-down", lib = "glyphicon"),
+      color = "yellow", fill = TRUE)
+  } 
+})
+
+
 output$result_onto <- DT::renderDataTable({
   df <- dataInput_onto()
   if(input$metaOrOnto %in% c('ids','name')){
@@ -142,20 +186,60 @@ observe({
 })
 
 data_mul_tab5 <- eventReactive(input$sub_mul_tab5,{
-  if(input$input_categories_tab5 %in% c('ids','name')){
-    RaMP:::getOntoFromMeta(input$input_mul_tab5,
-                                conpass = .conpass,
-                                host =.host,
-                                username = .username,
-                                dbname = .dbname,
-                                NameOrIds =input$input_categories_tab5)
-  } else if(input$input_categories_tab5 == 'ontology'){
-    RaMP:::getMetaFromOnto(input$input_mul_tab5,
-                                conpass = .conpass,
-                                host = .host,
-                                username = .username,
-                                dbname = .dbname)
+  tryCatch({
+    if(input$input_categories_tab5 %in% c('ids','name')){
+      RaMP:::getOntoFromMeta(input$input_mul_tab5,
+                             conpass = .conpass,
+                             host =.host,
+                             username = .username,
+                             dbname = .dbname,
+                             NameOrIds =input$input_categories_tab5)
+    } else if(input$input_categories_tab5 == 'ontology'){
+      RaMP:::getMetaFromOnto(input$input_mul_tab5,
+                             conpass = .conpass,
+                             host = .host,
+                             username = .username,
+                             dbname = .dbname)
+    }
+  },error = function(e) return())
+})
+
+#Summary
+summary_onto_out_tab2<- eventReactive(input$sub_mul_tab5,{
+  if (!is.null(nrow(data_mul_tab5()))){
+    return (paste0("Result Found"))
   }
+})
+
+summary_onto_out_tab2_empty <- eventReactive(input$sub_mul_tab5,{
+  if (is.null(nrow(data_mul_tab5()))) {
+    return (paste0("Given metabolites have no search result."))
+  }
+})
+
+output$summary_onto_tab2 <- renderText(
+  if (!is.null(summary_onto_out_tab2())) {
+    summary_onto_out_tab2()
+  } else {
+    summary_onto_out_tab2_empty()
+  }
+)
+
+#Status box
+output$statusbox_tab5_subtab2 <- shinydashboard::renderInfoBox({
+  if (!is.null(summary_onto_out_tab2())) {
+    shinydashboard::infoBox(
+      "Status",
+      HTML(paste("Successful")),
+      icon = icon("thumbs-up", lib = "glyphicon"),
+      color = "green", fill = TRUE)
+  } else if (!is.null(summary_onto_out_tab2_empty())) {
+    shinydashboard::infoBox(
+      "Status",
+      HTML(paste("Not-Found")),
+      icon = icon("thumbs-down", lib = "glyphicon"),
+      color = "yellow", fill = TRUE)
+  } 
 })
 
 output$preview_multi_names_tab5 <- DT::renderDataTable({

@@ -27,7 +27,10 @@ tabItem5<- shinydashboard::tabItem(
                                           'Analyte Source ID' = 'ids',
                                           "Analyte Name" = "name",
                                           "Ontology Name" = "ontology")),
-                           actionButton("subText_onto","Submit")
+                           actionButton("subText_onto","Submit"),
+                           br(),
+                           br(),
+                           shinydashboard::infoBoxOutput("statusbox_tab5_subtab1", width = NULL)
                            )
                   )
               ),
@@ -62,7 +65,12 @@ tabItem5<- shinydashboard::tabItem(
                                  "Analyte Names" = "name",
                                  "Ontology Names" = "ontology"
                                )),
-                  actionButton("sub_mul_tab5",label = "Submit")
+                  actionButton("sub_mul_tab5",label = "Submit"),
+                  br(),
+                  br(),
+                  textOutput("summary_onto_tab2"),
+                  br(),
+                  shinydashboard::infoBoxOutput("statusbox_tab5_subtab2", width = NULL)
                   )
             ),
             hr(),
