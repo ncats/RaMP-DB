@@ -52,6 +52,8 @@ tabItem5<- shinydashboard::tabItem(
                   solidHeader = T,
                   status = "primary",
                   title = strong("Input a list of metabolites or ontologies"),
+                  h5(strong("IMPORTANT NOTE about inputting source IDs:")),
+                  h5("When inputting source IDs, it is important to add a prefix to denote the id type.  This is important because it is possible for two different metabolites to have the same IDs, although each ID may be from a different database source."),
                   textAreaInput("input_mul_tab5",label = "",
                                 placeholder = "Input list of metabolites"),
                   radioButtons('input_categories_tab5',label = 'Select from list',
