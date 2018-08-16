@@ -64,7 +64,7 @@ If you want to explore this in MySQL, you can try:
 ```
 mysql -u root -p
 use ramp;
-view tables;
+show tables;
 select * from analytesynonym where synonym = "glucose";
 ```
 
