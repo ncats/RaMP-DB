@@ -18,6 +18,7 @@ source(file.path("ui","uitab5.R"),local = T)$value
 #source(file.path("ui","uitab6.R"),local = T)$value
 body <- shinydashboard::dashboardBody(
   tags$head(
+    includeHTML("www/google_analytics.html"),
     tags$link(
       rel = "stylesheet", type = "text/css", href ="rampstyle.css"
     )
