@@ -1,7 +1,7 @@
 server <- function(input, output, session) {
-  session$onSessionEnded(function(){
-    shiny::stopApp()
-  }) # close shiny app when close browser.
+  # session$onSessionEnded(function(){
+  #   shiny::stopApp()
+  # }) # close shiny app when close browser.
   
   # Tab 1 for convert synonym to synonyms that have connection to it.
   #source(file.path("server","tab1.R"), local = TRUE)$value
