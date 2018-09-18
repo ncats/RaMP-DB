@@ -23,6 +23,8 @@ In order to use the web application, you will need the following:
 If you would like to know how to build RaMP database from scratch, please check another GitHub site at [RaMP-BackEnd](https://github.com/Mathelab/RaMP-BackEnd)
 
 ### MySQL set-up
+**Warning** RaMP will not readily work with the new MySQL version (8.X.X), but is fully functional with MySQL version 5.7. We will be working toward updating RaMP to work with the newest MySQL version.
+
 RaMP requires that MySQL and the RaMP database be set up on the machine that you will be running the app from.
 To download MySQL, you can go to the [MySQL Downloads page](https://www.mysql.com/downloads/)
 
