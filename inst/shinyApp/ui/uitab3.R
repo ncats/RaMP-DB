@@ -4,62 +4,59 @@ tabItem3 <-  shinydashboard::tabItem(
                          shiny::tabPanel(
                            title = strong("Input analyte one by one"),
                            label ="sub_tab_1_TAB3",
-                           shinydashboard::box(
-                             width = 6,
-                             title = strong("Input analyte"),
-                             solidHeader = T,
-                             status = "primary",
-                             fluidRow(
-                               column(12,
-                                      h5("Given a gene/metabolite name or ID,
-                               retrieve pathways in which the compound is involved in."),
-                                      h5(strong("IMPORTANT NOTE about inputting source IDs:")),
-                                      h5("When inputting source IDs, it is important to add a prefix to denote the id type.  This is important because it is possible for two different metabolites to have the same IDs, although each ID may be from a different database source."),
-                                      h5("Metabolites can be searched with the following ID types: CAS, chebi, chemspider, hmdb, kegg, LIPIDMAPS, and pubchem.  To search for a metabolite, the ID type must be added as a prefix.  For example, the compound 'HMDB0000562' must be searched by 'hmdb:HMDB0000562', the compound '16737' must be searched by 'chebi:16737'."),
-                                      h5("Genes can be searched with the following ID types:  enzymeNomenclature, ensembl, entrez, hmdb, kegg, uniprot. Similar to metabolites, prefix ID types must be added to the ID for searching."),
-                                      br(),
-                                      column(width = 6),
-                                      textInput("compName","",placeholder = "Input compound name or source id"),
-                                      radioButtons("NameOrId","Search by common names or source IDs?",
-                                                   choices = c("Names" = "names", "Source ID" = "ids"),selected = "ids"),
-                                      selectInput("KW_synonym", "Select from list", choices = NULL),
-                                      actionButton("submit_compName","Submit"),
-                                      br(),
-                                      br(),
-                                      textOutput("summary_path"),
-                                      br(),
-                                      shinydashboard::infoBoxOutput("statusbox_tab3_subtab1", width = NULL)
-                               ) # end column
-                             )# end fluidRow
-                           ),# end box
-                           shinydashboard::box(width = 6,
-                                               title = strong("Summary"),
+                           #Box for Important note
+                           shinydashboard::box(width = 12,
                                                solidHeader = T,
+                                               collapsible = TRUE,
+                                               collapsed = TRUE,
                                                status = "primary",
-                                               fluidRow(
-                                                 div(
-                                                   style = "margin:25px",
-                                                   downloadButton("comp_report","Download Results"),
-                                                   hr()
+                                               title = strong("IMPORTANT NOTE/INSTRUCTIONS"),
+                                               shiny::mainPanel(
+                                                 width = 12,
+                                                 h5("When inputting source IDs, it is important to add a prefix to denote the id type.  This is important because it is possible for two different metabolites to have the same IDs, although each ID may be from a different database source."),
+                                                 h5("Metabolites can be searched with the following ID types: CAS, chebi, chemspider, hmdb, kegg, LIPIDMAPS, and pubchem.  To search for a metabolite, the ID type must be added as a prefix.  For example, the compound 'HMDB0000562' must be searched by 'hmdb:HMDB0000562', the compound '16737' must be searched by 'chebi:16737'."),
+                                                 h5("Genes can be searched with the following ID types:  enzymeNomenclature, ensembl, entrez, hmdb, kegg, uniprot. Similar to metabolites, prefix ID types must be added to the ID for searching.")
+                                               )),
+                           #box for Query Analytes,Summary and Results
+                           shinydashboard::box(width = 12,
+                                               solidHeader = T,
+                                               collapsible = TRUE,
+                                               collapsed = FALSE,
+                                               status = "primary",
+                                               title = strong("Query Analytes"),
+                                               shiny::mainPanel(
+                                                 width = 6,
+                                                 h4(strong('Input compound name or source id')),
+                                                 helpText("Given a gene/metabolite name or ID,retrieve pathways in which the compound is involved in."),
+                                                 textInput("compName","",placeholder = "Input compound name or source id"),
+                                                 radioButtons("NameOrId","Search by common names or source IDs?",
+                                                              choices = c("Names" = "names", "Source ID" = "ids"),selected = "ids"),
+                                                 selectInput("KW_synonym", "Select from list", choices = NULL),
+                                                 actionButton("submit_compName","Submit"),
+                                                 br(),
+                                                 br(),
+                                                 shinydashboard::infoBoxOutput("statusbox_tab3_subtab1", width = NULL)
+                                               ),
+                                               shiny::mainPanel(
+                                                 width = 6,
+                                                 h4(strong('Summary')),
+                                                 textOutput("summary_path"),
+                                                 br(),
+                                                 downloadButton("comp_report","Download Results")
+                                               ),
+                                               shiny::mainPanel(
+                                                 width=12,
+                                                 h4(strong('Query Result')),
+                                                 fluidRow(
+                                                   div(style = "width:100%;height:100%;align:center;",
+                                                       helpText("Preview of output only display first 20 items."),
+                                                       DT::dataTableOutput("result3")
+                                                   )
                                                  )
-                                               )
-                           ), # end box
-                           hr(),
-                           shinydashboard::box(
-                             width = 12,
-                             solidHeader = T,
-                             status = "primary",
-                             collapsible = T,
-                             collapsed = F,
-                             title = strong("Query Result"),
-                             fluidRow(
-                               div(style = "width:80%;height:100%;align:center;margin-right:20px;margin-left:20px;",
-                                   helpText("Preview of output only display first 20 items."),
-                                   DT::dataTableOutput("result3")
-                               )
-                             )
-                           )
-                         ), # end tabPanel
+                                                 
+                                               ))
+                         ),
+                        # end tabPanel
                          shiny::tabPanel(
                            title = strong("Input multiple analytes (batch query)"),
                            label = "sub_tab_2_TAB3",
@@ -71,7 +68,7 @@ tabItem3 <-  shinydashboard::tabItem(
                                                collapsible = TRUE,
                                                collapsed = TRUE,
                                                status = "primary",
-                                               title = strong("IMPORTANT NOTE on Inputting source IDs"),
+                                               title = strong("IMPORTANT NOTE/INSTRUCTIONS"),
                                                shiny::mainPanel(
                                                  width = 12,
                                                  h5("When inputting source IDs, it is important to add a prefix to denote the id type.  This is important because it is possible for two different metabolites to have the same IDs, although each ID may be from a different database source."),
@@ -79,11 +76,12 @@ tabItem3 <-  shinydashboard::tabItem(
                                                  h5("Genes can be searched with the following ID types:  enzymeNomenclature, ensembl, entrez, hmdb, kegg, uniprot. Similar to metabolites, prefix ID types must be added to the ID for searching."),
                                                  h5(strong("Only one type of ID can be input: either source ID or name, not both"))
                                                )),
-                           #Box for Query Analyte
+                           #box for Query Analytes,Summary and Results
                            
                            shinydashboard::box(width = 12,
                                                solidHeader = T,
                                                collapsible = TRUE,
+                                               collapsed = FALSE,
                                                status = "primary",
                                                title = strong("1.Query Analytes"),
                                                shiny::mainPanel(
@@ -101,13 +99,12 @@ tabItem3 <-  shinydashboard::tabItem(
                                                  actionButton("sub_mul_tab3",label = "Submit Query"),
                                                  br(),
                                                  br(),
-                                                 textOutput("summary_path_tab2"),
-                                                 br(),
                                                  shinydashboard::infoBoxOutput("statusbox_tab3_subtab2", width = NULL)
                                                ),
                                                shiny::mainPanel(
                                                  width=6,
                                                  h4(strong("Summary")),
+                                                 textOutput("summary_path_tab2"),
                                                  p("The following number of names/ids were mapped:"),
                                                  textOutput("num_mapped_namesids"),
                                                  p("The query returned the following number of pathways per query gene/metabolite:"),
@@ -121,6 +118,7 @@ tabItem3 <-  shinydashboard::tabItem(
                                                  width = 12,
                                                  HTML("<div id='database-group-output'>"),
                                                  h4(strong("Query Result")),
+                                                 helpText("Table output display"),
                                                  div(style = 'width:100%;height:100%;align:center;',
                                                      DT::dataTableOutput("preview_multi_names")),
                                                  HTML("</div>")
@@ -131,7 +129,7 @@ tabItem3 <-  shinydashboard::tabItem(
                            shinydashboard::box(width = 12,
                                                solidHeader = T,
                                                collapsible = TRUE,
-                                               collapsed = TRUE,
+                                               collapsed = FALSE,
                                                status = "primary",
                                                title = strong("2.Run Pathway Enrichment Analysis"),
                                                shiny::mainPanel(
@@ -175,7 +173,7 @@ tabItem3 <-  shinydashboard::tabItem(
                            shinydashboard::box(width = 12,
                                                solidHeader = T,
                                                collapsible = TRUE,
-                                               collapsed = TRUE,
+                                               collapsed = FALSE,
                                                status = "primary",
                                                title = strong("3.Filter and cluster Pathways"),
                                                shiny::mainPanel(
@@ -198,7 +196,7 @@ tabItem3 <-  shinydashboard::tabItem(
                            shinydashboard::box(width = 12,
                                                solidHeader = T,
                                                collapsible = TRUE,
-                                               collapsed = TRUE,
+                                               collapsed = FALSE,
                                                status = "primary",
                                                title = strong("4.Download Results"),
                                                shiny::mainPanel(
@@ -211,6 +209,6 @@ tabItem3 <-  shinydashboard::tabItem(
                                                ))
                            
                            
-                         )
+                         )#end tabpanel
   ) # end Tab Box
 ) # end Tabitem
