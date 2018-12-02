@@ -29,4 +29,6 @@ kw_pathway <- unname(unlist(unique(as.vector(DBI::dbGetQuery(con,'select pathway
 kw_analyte <- unname(unlist(unique(as.vector(DBI::dbGetQuery(con,'select Synonym from analytesynonym;')))))
 kw_source <- unname(unlist(unique(as.vector(DBI::dbGetQuery(con,'select sourceId from source;')))))
 
+load("/inst/extdata/FT_data.Rdata")
+
 DBI::dbDisconnect(con)
