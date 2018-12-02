@@ -143,44 +143,72 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   count=1;
   pval2=userinpath2=totinpath2=c()
   for (i in pidstorun) {
-    if(( count %% 100) ==0) {print(paste0("Processed ",count))}
-    count=count+1
-    user_in_pathway=0
-    curpathcids <- unique(allcids[which(allcids[,"pathwayRampId"]==i),"rampId"])
-    if(analyte_type=="metabolites") {
-      tot_in_pathway <- length(grep("RAMP_C",curpathcids))
-    }else {
-      tot_in_pathway <- length(grep("RAMP_G",curpathcids))
-    }
-    # Check that the pathway being considered has your analyte type, if not, move on
-    if(tot_in_pathway==0) {next;
+  if(( count %% 100) ==0) {print(paste0("Processed ",count))}
+  count=count+1
+  user_in_pathway=0
+  kegg_metab <- kegg_metab
+  kegg_gene <- kegg_gene
+  wiki_metab <- wiki_metab
+  wiki_gene <- wiki_gene
+  reactome_metab <- reactome_metab
+  reactome_gene <- reactome_gene
+  hmdb_metab <- hmdb_metab
+  hmdb_gene <- hmdb_gene
+  if(analyte_type=="metabolites") {
+    
+    if (i %in% kegg_metab$pathwayRampId) {
+      tot_in_pathway <- kegg_metab[which(kegg_metab[,"pathwayRampId"]==i),"Freq"]
+      total_analytes <- kegg_totanalytes
+    } else if (i %in% wiki_metab$pathwayRampId) {
+      tot_in_pathway <- wiki_metab[which(wiki_metab[,"pathwayRampId"]==i),"Freq"]
+      total_analytes <- wiki_totanalytes
+    } else if (i %in% reactome_metab$pathwayRampId) {
+      tot_in_pathway <- reactome_metab[which(reactome_metab[,"pathwayRampId"]==i),"Freq"]
+      total_analytes <- react_totanalytes
+    } else if (i %in% hmdb_metab$pathwayRampId) {
+      tot_in_pathway <- hmdb_metab[which(hmdb_metab[,"pathwayRampId"]==i),"Freq"]
+      total_analytes <- NULL
     } else {
-      if(allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "wiki") {
-        total_analytes <- wiki_totanalytes
-      } else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "reactome") {
-        total_analytes <- react_totanalytes
-      } else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "kegg") {
-        total_analytes <- kegg_totanalytes
-      } else if (allids$pathwaySource[which(allids$pathwayRampId==i)[1]] == "hmdb") {
-        total_analytes <- NULL
-      } else {stop("Couldn't find pathway type for current pathway!")}
-      
-      if(is.null(total_analytes)) {next;}
-      tot_out_pathway <- total_analytes - tot_in_pathway
-      # fill the rest of the table out
-      user_out_pathway <- length(unique(pathwaydf$rampId))
-      #user_out_pathway <- total_analytes - user_in_pathway
-      contingencyTb[1,1] <- tot_in_pathway - user_in_pathway
-      contingencyTb[1,2] <- tot_out_pathway - user_out_pathway
-      contingencyTb[2,1] <- user_in_pathway
-      contingencyTb[2,2] <- user_out_pathway
-      result <- stats::fisher.test(contingencyTb)
-      pval2 <- c(pval2,result$p.value )
-      userinpath2<-c(userinpath2,user_in_pathway)
-      totinpath2<-c(totinpath2,tot_in_pathway)
-      # pidused <- c(pidused,i)
+      tot_in_pathway=0
+      total_analytes <- NULL
     }
-  } # end for loop
+    
+  } else {
+    
+    if (i %in% kegg_gene$pathwayRampId) {
+      tot_in_pathway <- kegg_gene[which(kegg_gene[,"pathwayRampId"]==i),"Freq"]
+      total_analytes <- kegg_totanalytes
+    } else if (i %in% wiki_gene$pathwayRampId) {
+      tot_in_pathway <- wiki_gene[which(wiki_gene[,"pathwayRampId"]==i),"Freq"]
+      total_analytes <- wiki_totanalytes
+    } else if (i %in% reactome_gene$pathwayRampId) {
+      tot_in_pathway <- reactome_gene[which(reactome_gene[,"pathwayRampId"]==i),"Freq"]
+      total_analytes <- react_totanalytes
+    } else if (i %in% hmdb_gene$pathwayRampId) {
+      tot_in_pathway <- hmdb_gene[which(hmdb_gene[,"pathwayRampId"]==i),"Freq"]
+      total_analytes <- NULL
+    } else {
+      tot_in_pathway=0
+      total_analytes <- NULL
+    }
+  }
+  # Check that the pathway being considered has your analyte type, if not, move on
+    
+    if(is.null(total_analytes)) {next;}
+    tot_out_pathway <- total_analytes - tot_in_pathway
+    # fill the rest of the table out
+    user_out_pathway <- length(unique(pathwaydf$rampId))
+    #user_out_pathway <- total_analytes - user_in_pathway
+    contingencyTb[1,1] <- tot_in_pathway - user_in_pathway
+    contingencyTb[1,2] <- tot_out_pathway - user_out_pathway
+    contingencyTb[2,1] <- user_in_pathway
+    contingencyTb[2,2] <- user_out_pathway
+    result <- stats::fisher.test(contingencyTb)
+    pval2 <- c(pval2,result$p.value )
+    userinpath2<-c(userinpath2,user_in_pathway)
+    totinpath2<-c(totinpath2,tot_in_pathway)
+    # pidused <- c(pidused,i)
+} # end for loop
   
   # only keep pathways that have > 8 or < 100 compounds
   keepers <- intersect(which(c(totinpath,totinpath2)>=8),
