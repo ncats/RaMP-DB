@@ -57,13 +57,18 @@ tabItem4<-  shinydashboard::tabItem(
                                                )),
                            #box for interaction network display
                            shinydashboard::box(width = 12,
-                                               height= "1000px",
                                                solidHeader = T,
                                                status = "primary",
                                                collapsible = T,
                                                collapsed = F,
                                                title = strong("Visuazlize gene-metabolite interaction network"),
-                                               visNetwork::visNetworkOutput("network",height = '1000px')) # end box
+                                               shiny::mainPanel(
+                                                 width=12,
+                                                 fluidRow(
+                                                   visNetwork::visNetworkOutput("network",height = '1000px')
+                                                 ) # end box
+                                               )
+                           )
                          ),#end tabpanel
                          shiny::tabPanel(
                            title = strong("Input a list of genes or metabolites"),
@@ -118,16 +123,20 @@ tabItem4<-  shinydashboard::tabItem(
                                                )),
                            #box for interaction network display
                            shinydashboard::box(width = 12,
-                                               height="1000px",
                                                solidHeader = T,
                                                status = "primary",
                                                collapsible = T,
                                                collapsed = F,
                                                title = strong("Visuazlize gene-metabolite interaction network"),
-                                               visNetwork::visNetworkOutput("networkmulti",height = '1000px')
+                                               shiny::mainPanel(
+                                                 width = 12,
+                                                 fluidRow(
+                                                   visNetwork::visNetworkOutput("networkmulti",height = '1000px')
+                                                 )
+                                               )
                            )
                          )#end tabpanel
-                         
+
      )# end tabBox
   )# end tabItem
 
