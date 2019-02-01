@@ -2,12 +2,12 @@
 dataInput_name <- eventReactive(input$submit_compName,{
   tryCatch({
     progress <- shiny::Progress$new()
-    
+
     on.exit(progress$close())
-    
+
     progress$set(message = "Querying databases to find pathways ...", value = 0)
     progress$inc(0.3,detail = paste("Send Query ..."))
-    
+
     rampOut <- RaMP::getPathwayFromAnalyte(analytes=input$KW_synonym,
                                            NameOrIds=input$NameOrId,
                                            conpass=.conpass,
@@ -25,7 +25,7 @@ dataInput_name <- eventReactive(input$submit_compName,{
 #     return ("Given metabolites have no search result.")
 #   }
 # })
-# 
+#
 # output$summary_path <- renderText({
 #   summary_path_out()
 # })
@@ -35,7 +35,7 @@ summary_path_out<- eventReactive(input$submit_compName,{
   if (!is.null(nrow(dataInput_name()))){
     return (paste0("There are ",nrow(dataInput_name())," pathways returned for ",
                    input$KW_synonym))
-  } 
+  }
 })
 
 summary_path_out_empty<- eventReactive(input$submit_compName,{
@@ -137,7 +137,7 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
                                                  dbname = .dbname, username = .username)
       print(input$input_mul_tab3_genes)
     }
-    
+
     parsedinputg <- paste(strsplit(input$input_mul_tab3_genes,"\n")[[1]])
     print(parsedinputg)
     if(length(parsedinputg)==0) {genesearch=NULL} else{
@@ -157,7 +157,7 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
 summary_path_out_tab2<- eventReactive(input$sub_mul_tab3,{
   if (!is.null(nrow(data_mul_name()))){
     return ("result-found")
-  } 
+  }
 })
 
 summary_path_out_tab2_empty<- eventReactive(input$sub_mul_tab3,{
@@ -284,18 +284,22 @@ fisherTestResultSignificant<-eventReactive(input$runClustering,{
   }
 })
 
-cluster_output<-eventReactive(c(input$runFisher,input$runClustering),{
-  data <- fisherTestResultSignificant()
-  out<-RaMP::findCluster(fishers_df=data,perc_analyte_overlap=as.numeric(input$perc_analyte_overlap),
-	min_pathway_tocluster=as.numeric(input$min_pathway_tocluster),
-                      perc_pathway_overlap=as.numeric(input$perc_pathway_overlap))
-  cluster_list<-out$cluster_list
-  if(length(unique(cluster_list))>1){
-    print(paste0(length(cluster_list)," clusters found"))
-  }else{
-    print("Clustering failed")
+cluster_output<-eventReactive(input$runClustering,{
+  if (!is.null(fisherTestResult())) {
+    if (!is.null(fisherTestResultSignificant())) {
+      data <- fisherTestResultSignificant()
+      out<-RaMP::findCluster(fishers_df=data,perc_analyte_overlap=as.numeric(input$perc_analyte_overlap),
+                             min_pathway_tocluster=as.numeric(input$min_pathway_tocluster),
+                             perc_pathway_overlap=as.numeric(input$perc_pathway_overlap))
+      cluster_list<-out$cluster_list
+      if(length(unique(cluster_list))>1){
+        print(paste0(length(cluster_list)," clusters found"))
+      }else{
+        print("Clustering failed")
+      }
+      return(out)
+    }
   }
-  return(out)
 })
 
 cluster_list<-reactive({
