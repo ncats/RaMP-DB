@@ -594,13 +594,19 @@ findCluster <- function(fishers_df,perc_analyte_overlap = 0.5,
     output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list="Did not cluster")
     return(output)
   } else {
-    similarity_matrix_list<-loadOverlapMatrices()
+    #similarity_matrix_list<-loadOverlapMatrices()
+    similarity_matrix_gene <- genes_result
+    similarity_matrix_analyte <- analyte_result
+    similarity_matrix_metab <- metabolites_result
     if(analyte_type=="both"){
-      similarity_matrix = similarity_matrix_list[["analyte"]]
+      #similarity_matrix = similarity_matrix_list[["analyte"]]
+      similarity_matrix = similarity_matrix_analyte
     }else if(analyte_type=="metabolites"){
-      similarity_matrix = similarity_matrix_list[["metab"]]
+      #similarity_matrix = similarity_matrix_list[["metab"]]
+      similarity_matrix = similarity_matrix_metab
     } else if(analyte_type=="genes"){
-      similarity_matrix = similarity_matrix_list[["gene"]]
+      #similarity_matrix = similarity_matrix_list[["gene"]]
+      similarity_matrix = similarity_matrix_gene
     } else {
       stop("analyte_type should be 'genes' or metabolites'")
     }
