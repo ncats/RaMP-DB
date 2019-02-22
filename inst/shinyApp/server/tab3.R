@@ -285,21 +285,23 @@ fisherTestResultSignificant<-eventReactive(input$runClustering,{
 })
 
 cluster_output<-eventReactive(input$runClustering,{
-  if (!is.null(fisherTestResult())) {
-    if (!is.null(fisherTestResultSignificant())) {
-      data <- fisherTestResultSignificant()
-      out<-RaMP::findCluster(fishers_df=data,perc_analyte_overlap=as.numeric(input$perc_analyte_overlap),
-                             min_pathway_tocluster=as.numeric(input$min_pathway_tocluster),
-                             perc_pathway_overlap=as.numeric(input$perc_pathway_overlap))
-      cluster_list<-out$cluster_list
-      if(length(unique(cluster_list))>1){
-        print(paste0(length(cluster_list)," clusters found"))
-      }else{
-        print("Clustering failed")
+  tryCatch({
+    if (!is.null(fisherTestResult())) {
+      if (!is.null(fisherTestResultSignificant())) {
+        data <- fisherTestResultSignificant()
+        out<-RaMP::findCluster(fishers_df=data,perc_analyte_overlap=as.numeric(input$perc_analyte_overlap),
+                               min_pathway_tocluster=as.numeric(input$min_pathway_tocluster),
+                               perc_pathway_overlap=as.numeric(input$perc_pathway_overlap))
+        cluster_list<-out$cluster_list
+        if(length(unique(cluster_list))>1){
+          print(paste0(length(cluster_list)," clusters found"))
+        }else{
+          print("Clustering failed")
+        }
+        return(out)
       }
-      return(out)
     }
-  }
+  }, error = function(e) return())
 })
 
 cluster_list<-reactive({

@@ -541,6 +541,8 @@ getPathwayFromAnalyte<- function(analytes=NULL,
     con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
     df4 <- DBI::dbGetQuery(con,query4)
     DBI::dbDisconnect(con)
+    #convert latin1 encoding to UTF-8
+    df4$commonName <- sapply(as.character(df4$commonName), function(x) if (stringi::stri_enc_mark(x)=="native") { x <- iconv(x,"latin1","UTF-8") } else {x})
     mdf <- merge(mdf,df4,all.x = T,by.y = "rampId")
     mdf$commonName=tolower(mdf$commonName)
   } else{ # Just take on the name
@@ -594,13 +596,19 @@ findCluster <- function(fishers_df,perc_analyte_overlap = 0.5,
     output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list="Did not cluster")
     return(output)
   } else {
-    similarity_matrix_list<-loadOverlapMatrices()
+    #similarity_matrix_list<-loadOverlapMatrices()
+    similarity_matrix_gene <- genes_result
+    similarity_matrix_analyte <- analyte_result
+    similarity_matrix_metab <- metabolites_result
     if(analyte_type=="both"){
-      similarity_matrix = similarity_matrix_list[["analyte"]]
+      #similarity_matrix = similarity_matrix_list[["analyte"]]
+      similarity_matrix = similarity_matrix_analyte
     }else if(analyte_type=="metabolites"){
-      similarity_matrix = similarity_matrix_list[["metab"]]
+      #similarity_matrix = similarity_matrix_list[["metab"]]
+      similarity_matrix = similarity_matrix_metab
     } else if(analyte_type=="genes"){
-      similarity_matrix = similarity_matrix_list[["gene"]]
+      #similarity_matrix = similarity_matrix_list[["gene"]]
+      similarity_matrix = similarity_matrix_gene
     } else {
       stop("analyte_type should be 'genes' or metabolites'")
     }
