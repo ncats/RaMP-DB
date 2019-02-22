@@ -22,5 +22,6 @@ Imports:
     DT,
     xtable,
     visNetwork,
-    properties
+    properties,
+    stringi
 RoxygenNote: 6.1.1

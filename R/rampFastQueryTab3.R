@@ -541,6 +541,8 @@ getPathwayFromAnalyte<- function(analytes=NULL,
     con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
     df4 <- DBI::dbGetQuery(con,query4)
     DBI::dbDisconnect(con)
+    #convert latin1 encoding to UTF-8
+    df4$commonName <- sapply(as.character(df4$commonName), function(x) if (stringi::stri_enc_mark(x)=="native") { x <- iconv(x,"latin1","UTF-8") } else {x})
     mdf <- merge(mdf,df4,all.x = T,by.y = "rampId")
     mdf$commonName=tolower(mdf$commonName)
   } else{ # Just take on the name
