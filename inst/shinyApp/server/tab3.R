@@ -227,13 +227,36 @@ output$preview_multi_names <- DT::renderDataTable({
 
 
 fisherTestResult <- eventReactive(input$runFisher,{
-
-    out <- RaMP::runCombinedFisherTest(req(data_mul_name()),
+  progress <- shiny::Progress$new()
+  on.exit(progress$close())
+  progress$set(message = "Fisher Testing ...", value = 0)
+  progress$inc(0.3)
+  out <- RaMP::runCombinedFisherTest(req(data_mul_name()),
                                conpass=.conpass,
                                dbname = .dbname, username = .username, host = .host)
+  progress$inc(0.7,detail = paste("Done!"))
     print("Results generated")
     print(paste0("Fisher results size:",nrow(out[[1]])))
   out
+})
+
+output$FisherTestResultWithoutFilter_AnalyteType <- renderText({
+  if (!is.null(fisherTestResult())) {
+    out <- fisherTestResult()
+    if (out[[2]] == "both") {
+      out <- c("Analyte-Type:"," ","Gene",",","Metabolite")
+    } else {
+      out <- c("Analyte-Type:"," ",out[[2]])
+      out
+    }
+  }
+})
+
+output$FisherTestResultWithoutFilter_fishresults <- renderDataTable({
+  if (!is.null(fisherTestResult())) {
+    out <- fisherTestResult()
+    out[[1]]
+  }
 })
 
 output$summary_fisher <- DT::renderDataTable({
@@ -295,8 +318,8 @@ cluster_output<-eventReactive(input$runClustering,{
         cluster_list<-out$cluster_list
         if(length(unique(cluster_list))>1){
           print(paste0(length(cluster_list)," clusters found"))
-        }else{
-          print("Clustering failed")
+        } else {
+          print("Clustering Failed")
         }
         return(out)
       }
@@ -313,19 +336,32 @@ cluster_list<-reactive({
   }
 })
 
-output$cluster_summary_text<-renderText(
-  #out<-cluster_output()
+cluster_text_summary_test <- reactive({
   if(as.numeric(input$perc_analyte_overlap) <= 0 || as.numeric(input$perc_analyte_overlap) >= 1 || as.numeric(input$perc_pathway_overlap) <= 0 || as.numeric(input$perc_pathway_overlap) >= 1){
-   print("Clustering warning: overlap thresholds must be a percentage greater than 0 and less than 1!")
+    print("Clustering warning: overlap thresholds must be a percentage greater than 0 and less than 1!")
   }else if(!is.null(cluster_output())){
     #cluster_list<-out$cluster_list
     if(length(unique(cluster_list()))>1){
-    paste0("Fuzzy clustering identified ",length(cluster_list()), " distinct cluster(s) of pathways")
+      paste0("Fuzzy clustering identified ",length(cluster_list()), " distinct cluster(s) of pathways")
     }else{
       print("Fuzzy clustering algorithm did not identify any clusters. Less stringent thresholds may help in identification, or there may not be enough pathways to cluster.")
     }
   }
-)
+})
+
+# output$cluster_summary_text<-renderText(
+#   #out<-cluster_output()
+#   if(as.numeric(input$perc_analyte_overlap) <= 0 || as.numeric(input$perc_analyte_overlap) >= 1 || as.numeric(input$perc_pathway_overlap) <= 0 || as.numeric(input$perc_pathway_overlap) >= 1){
+#    print("Clustering warning: overlap thresholds must be a percentage greater than 0 and less than 1!")
+#   }else if(!is.null(cluster_output())){
+#     #cluster_list<-out$cluster_list
+#     if(length(unique(cluster_list()))>1){
+#     paste0("Fuzzy clustering identified ",length(cluster_list()), " distinct cluster(s) of pathways")
+#     }else{
+#       print("Fuzzy clustering algorithm did not identify any clusters. Less stringent thresholds may help in identification, or there may not be enough pathways to cluster.")
+#     }
+#   }
+# )
 
 output$cluster_summary_plot<-renderPlot({
   out<-cluster_output()
@@ -395,48 +431,69 @@ results_fisher_clust <- reactive({
   }
 })
 
-output$results_fisher <- DT::renderDataTable({
+output$results_status <- shinydashboard::renderInfoBox({
   results_fisher_total<-results_fisher_clust()
   results_fisher<-results_fisher_total$fishresults
-  if(nrow(results_fisher)==0){
-    #return(data.frame(rep(NA, times = 9)))
-    stop("No significant pathways identified. Your input analytes may be too small (e.g. number of analytes in each pathway is < 2)")
-  }else{
-    if(results_fisher_total$analyte_type=="both"){
-      results_fisher<-results_fisher[,c("pathwayName","Num_In_Path.Metab","Total_In_Path.Metab",
-                                        "Num_In_Path.Gene","Total_In_Path.Gene", "Pval_combined",
-                                        "Pval_combined_FDR","Pval_combined_Holm","pathwaysourceId","pathwaysource",
-                                        "cluster_assignment","rampids")]
-      # Filtered:
-      #"Pval.Metab","Pval.Gene",
-
-      colnames(results_fisher)<-c("Pathway Name", "User Metabolites in Pathway",
-                                  "Total Metabolites in Pathway","User Genes in Pathway",
-                                  "Total Genes in Pathway","Raw Fisher's P Value (Combined)","FDR Adjusted P Value (Combined)",
-                                  "Holm Adjusted P Value (Combined)","Source ID","Source DB","In Cluster","rampids")
-      # Filtered:
-      # "Raw Fisher's P Value (Metabolites)","Raw Fisher's P Value (Genes)",
-    }else{
-      #print(colnames(results_fisher))
-      results_fisher<-results_fisher[,c("pathwayName","Pval","Pval_FDR","Pval_Holm","pathwaysourceId","pathwaysource",
-                                        "Num_In_Path","Total_In_Path","cluster_assignment","rampids")]
-      colnames(results_fisher)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
-                                  "Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway",
-                                  "In Cluster","rampids")
-    }
-    rampids <- results_fisher$rampids
-    rampids <- rampids[order(results_fisher[,"In Cluster"])]
-    results_fisher$rampids <- NULL
-    results_fisher <- results_fisher[order(results_fisher[,"In Cluster"]),]
-    cluster_output<-cluster_list()
-    if(input$show_cluster=="All"){
-      results_fisher
-    }else if(input$show_cluster=="Did not cluster"){
-      results_fisher[which(results_fisher[,"In Cluster"]=="Did not cluster"),]
-    }else{
-      results_fisher[which(rampids %in% cluster_output[[as.numeric(input$show_cluster)]]),]
-    }
+  if (nrow(results_fisher)==0) {
+    shinydashboard::infoBox(
+      "Status",
+      HTML(paste("Your input analytes might too small")),
+      color = "yellow", fill = TRUE)
+  } else {
+    shinydashboard::infoBox(
+      "Status",
+      cluster_text_summary_test(),
+      color = "green", fill = TRUE)
   }
+})
+
+
+
+output$results_fisher <- DT::renderDataTable({
+  tryCatch({
+      results_fisher_total<-results_fisher_clust()
+      results_fisher<-results_fisher_total$fishresults
+      if (nrow(results_fisher)==0) {
+        #results_fisher
+        #return(data.frame(rep(NA, times = 9)))
+        stop("No significant pathways identified. Your input analytes may be too small (e.g. number of analytes in each pathway is < 2)")
+      }else {
+        if(results_fisher_total$analyte_type=="both"){
+          results_fisher<-results_fisher[,c("pathwayName","Num_In_Path.Metab","Total_In_Path.Metab",
+                                            "Num_In_Path.Gene","Total_In_Path.Gene", "Pval_combined",
+                                            "Pval_combined_FDR","Pval_combined_Holm","pathwaysourceId","pathwaysource",
+                                            "cluster_assignment","rampids")]
+          # Filtered:
+          #"Pval.Metab","Pval.Gene",
+
+          colnames(results_fisher)<-c("Pathway Name", "User Metabolites in Pathway",
+                                      "Total Metabolites in Pathway","User Genes in Pathway",
+                                      "Total Genes in Pathway","Raw Fisher's P Value (Combined)","FDR Adjusted P Value (Combined)",
+                                      "Holm Adjusted P Value (Combined)","Source ID","Source DB","In Cluster","rampids")
+          # Filtered:
+          # "Raw Fisher's P Value (Metabolites)","Raw Fisher's P Value (Genes)",
+        }else{
+          #print(colnames(results_fisher))
+          results_fisher<-results_fisher[,c("pathwayName","Pval","Pval_FDR","Pval_Holm","pathwaysourceId","pathwaysource",
+                                            "Num_In_Path","Total_In_Path","cluster_assignment","rampids")]
+          colnames(results_fisher)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
+                                      "Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway",
+                                      "In Cluster","rampids")
+        }
+        rampids <- results_fisher$rampids
+        rampids <- rampids[order(results_fisher[,"In Cluster"])]
+        results_fisher$rampids <- NULL
+        results_fisher <- results_fisher[order(results_fisher[,"In Cluster"]),]
+        cluster_output<-cluster_list()
+        if(input$show_cluster=="All"){
+          results_fisher
+        }else if(input$show_cluster=="Did not cluster"){
+          results_fisher[which(results_fisher[,"In Cluster"]=="Did not cluster"),]
+        }else{
+          results_fisher[which(rampids %in% cluster_output[[as.numeric(input$show_cluster)]]),]
+        }
+      }
+  }, error = function(e) return())
 },rownames = FALSE,filter = "top")
 
 output$fisher_stats_report <- downloadHandler(filename = function(){

@@ -53,16 +53,16 @@ tabItem3 <-  shinydashboard::tabItem(
                                                        DT::dataTableOutput("result3")
                                                    )
                                                  )
-                                                 
+
                                                ))
                          ),
                         # end tabPanel
                          shiny::tabPanel(
                            title = strong("Input multiple analytes (batch query)"),
                            label = "sub_tab_2_TAB3",
-                           
+
                            #Box for Important note
-                           
+
                            shinydashboard::box(width = 12,
                                                solidHeader = T,
                                                collapsible = TRUE,
@@ -77,7 +77,7 @@ tabItem3 <-  shinydashboard::tabItem(
                                                  h5(strong("Only one type of ID can be input: either source ID or name, not both"))
                                                )),
                            #box for Query Analytes,Summary and Results
-                           
+
                            shinydashboard::box(width = 12,
                                                solidHeader = T,
                                                collapsible = TRUE,
@@ -123,9 +123,9 @@ tabItem3 <-  shinydashboard::tabItem(
                                                      DT::dataTableOutput("preview_multi_names")),
                                                  HTML("</div>")
                                                )),
-                           
+
                            #Box for Pathway Enrichment Analysis
-                           
+
                            shinydashboard::box(width = 12,
                                                solidHeader = T,
                                                collapsible = TRUE,
@@ -153,23 +153,28 @@ tabItem3 <-  shinydashboard::tabItem(
                                                  conditionalPanel(condition="$('html').hasClass('shiny-busy')",
                                                                   tags$div("Processing request...",id="loadmessage")),
                                                  actionButton("runFisher","Run Pathway Enrichment (please be patient!)"),
+                                                 HTML("<br>"),
+                                                 HTML("<br>"),
+                                                 textOutput("FisherTestResultWithoutFilter_AnalyteType"),
+                                                 HTML("<br>"),
+                                                 dataTableOutput("FisherTestResultWithoutFilter_fishresults"),
                                                  textOutput("fishersProgress")
                                                ),
                                                shiny::mainPanel(
-                                                 width = 12,
-                                                 h4(strong("Results of Pathway Enrichment Analysis")),
-                                                 column(width = 6,
-                                                        selectInput("show_cluster","Display pathways in cluster:",choices = 1),
-                                                        textOutput("cluster_summary_text")
-                                                 ), # end columnb
-                                                 column(width = 6,
-                                                        plotOutput("cluster_summary_plot",height = "300px")
-                                                 ), # end column
-                                                 DT::dataTableOutput("results_fisher",width = '100%')
+                                                 width = 12
+                                                 # h4(strong("Results of Pathway Enrichment Analysis")),
+                                                 # column(width = 6,
+                                                 #        selectInput("show_cluster","Display pathways in cluster:",choices = 1),
+                                                 #        textOutput("cluster_summary_text")
+                                                 # ), # end columnb
+                                                 # column(width = 6,
+                                                 #        plotOutput("cluster_summary_plot",height = "300px")
+                                                 # ), # end column
+                                                 # DT::dataTableOutput("results_fisher",width = '100%')
                                                )),
-                           
+
                            #Box for Filter and Cluster pathways
-                           
+
                            shinydashboard::box(width = 12,
                                                solidHeader = T,
                                                collapsible = TRUE,
@@ -188,11 +193,27 @@ tabItem3 <-  shinydashboard::tabItem(
                                                  numericInput("perc_analyte_overlap", "Overlap threshold (0-1) for pathways to be considered similar (for medoid establishment):",min = 0.01, max = 1, value = 0.2, step = 0.01),
                                                  numericInput("min_pathway_tocluster", "Number of similar neighbors required (for medoid establishment):",min = 1, max = 100, value = 2, step = 1),
                                                  numericInput("perc_pathway_overlap", "Overlap threshold (0-1) for pathways to be clustered:",min = 0.01, max = 1, value = 0.75, step = 0.01),
-                                                 actionButton("runClustering","Filter and Cluster Results")
+                                                 actionButton("runClustering","Filter and Cluster Results"),
+                                                 h4(strong("Results of Pathway Enrichment Analysis")),
+                                                 column(width = 12,
+                                                        selectInput("show_cluster","Display pathways in cluster:",choices = 1),
+                                                        textOutput("cluster_summary_text")
+                                                 ), # end columnb
+                                                 br(),
+                                                 br(),
+                                                 column(width = 12,
+                                                 shinydashboard::infoBoxOutput("results_status", width = NULL)
+                                                 ),
+                                                 # end column
+                                                 textOutput("filterStatus"),
+                                                 DT::dataTableOutput("results_fisher",width = '100%'),
+                                                 column(width = 6,
+                                                        plotOutput("cluster_summary_plot",height = "300px")
+                                                 )
                                                )),
-                          
+
                             #Box for Download Results.
-                           
+
                            shinydashboard::box(width = 12,
                                                solidHeader = T,
                                                collapsible = TRUE,
@@ -207,8 +228,8 @@ tabItem3 <-  shinydashboard::tabItem(
                                                  DT::dataTableOutput("summary_fisher",width = '80%'),
                                                  downloadButton("fisher_stats_report",label = "Download Results")
                                                ))
-                           
-                           
+
+
                          )#end tabpanel
   ) # end Tab Box
 ) # end Tabitem
