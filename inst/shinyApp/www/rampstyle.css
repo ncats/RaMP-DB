@@ -125,3 +125,20 @@ table.data:hover {
   margin:0 3px 3px 0;
   padding:1px 3px;
 }
+
+#results_status .info-box-content {
+    padding: 5px 10px;
+    margin-left: 0px !important;
+}
+
+#results_fisher {
+  overflow: scroll !important;
+}
+
+#FisherTestResultWithoutFilter_fishresults {
+  overflow: scroll !important;
+}
+
+#FisherTestResultWithoutFilter_AnalyteType {
+  overflow: scroll !important;
+}
