@@ -112,6 +112,12 @@ Also, when gene or metabolite ids are input for queries, IDs should be prepended
 ## Reporting Issues
 If you encounter any problems, or find installation problems or bugs, please start an issue on the Issues tab or email Ewy.Mathe@osumc.edu directly. Thanks!
 
+## Citation
+If you use RaMP, please cite the following work:
+Zhang, B., et al., RaMP: A Comprehensive Relational Database of Metabolomics Pathways for Pathway Enrichment Analysis of Genes and Metabolites. Metabolites, 2018. 8(1).
+PMID: 29470400; PMCID: PMC5876005; DOI: 10.3390/metabo8010016 
+To access, [click here](https://www.mdpi.com/2218-1989/8/1/16)
+
 ## Authors
 * **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
 * **Ewy Mathé** - [Mathelab](https://github.com/MatheLab)
