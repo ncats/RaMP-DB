@@ -13,7 +13,16 @@ Also note that we are working on a server version of RaMP so that users do not h
 ## Basic Features:
 The app performs some complex queries (e.g. retrieve all metabolites and/or genes that belong to a user input pathway or list of pathways).  It also performs pathway enrichment analysis given a list of metabolites and/or genes. Run the app to get further details.
 
-Last date of dump file update: 12/17/2017
+Last date of dump file update: 03/02/2018
+
+## Citation
+If you use RaMP, please cite the following work:
+
+Zhang, B., et al., RaMP: A Comprehensive Relational Database of Metabolomics Pathways for Pathway Enrichment Analysis of Genes and Metabolites. Metabolites, 2018. 8(1).
+
+PMID: 29470400; PMCID: PMC5876005; DOI: 10.3390/metabo8010016
+
+To access, [click here](https://www.mdpi.com/2218-1989/8/1/16)
 
 ## Installation Instructions
 In order to use the web application, you will need the following:
@@ -107,19 +116,6 @@ If the username is different then root, then specify the username in the "userna
 If you reinstall the latest version of the RaMP package, be sure to also install the latest version of the mysql RaMP dump file.  
 
 Also, when gene or metabolite ids are input for queries, IDs should be prepended with their database of origin, e.g. kegg:C02712, hmdb:HMDB04824, or CAS:2566-39-4. The list of IDs that are currently included in RaMP are: CAS, chebi, chemspider, enzymeNomenclature, ensembl, entrez, hmdb, keg, LIPIDMAPS, pubchem, uniprot.
-
-
-## Reporting Issues
-If you encounter any problems, or find installation problems or bugs, please start an issue on the Issues tab or email Ewy.Mathe@osumc.edu directly. Thanks!
-
-## Citation
-If you use RaMP, please cite the following work:
-
-Zhang, B., et al., RaMP: A Comprehensive Relational Database of Metabolomics Pathways for Pathway Enrichment Analysis of Genes and Metabolites. Metabolites, 2018. 8(1).
-
-PMID: 29470400; PMCID: PMC5876005; DOI: 10.3390/metabo8010016 
-
-To access, [click here](https://www.mdpi.com/2218-1989/8/1/16)
 
 ## Authors
 * **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
