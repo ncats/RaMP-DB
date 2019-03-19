@@ -515,7 +515,7 @@ output$fisher_stats_report <- downloadHandler(filename = function(){
                                   "Holm Adjusted P Value (Combined)","Source ID","Source DB","In Cluster","rampids")
       rampOut<-rampOut[order(rampOut[,"Holm Adjusted P Value (Combined)"]),]
     }else{
-      results_fisher<-rampOut[,c("pathwayName","Pval","Pval_FDR","Pval_Holm","pathwaysourceId","pathwaysource",
+      rampOut<-rampOut[,c("pathwayName","Pval","Pval_FDR","Pval_Holm","pathwaysourceId","pathwaysource",
                                         "Num_In_Path","Total_In_Path","cluster_assignment","rampids")]
       colnames(rampOut)<-c("Pathway Name", "Raw Fisher's P Value","FDR Adjusted P Value","Holm Adjusted P Value",
                                   "Source ID","Source DB", "User Analytes in Pathway", "Total Analytes in Pathway",
