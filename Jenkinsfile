@@ -18,7 +18,7 @@ pipeline {
                 cleanWs()
                 configFileProvider([
                     configFile(fileId: 'ramp-db-properties', targetLocation: 'db.properties'),
-                    configFile(fileId: 'ramp-db-install-script', targetLocation: 'install.R')
+                    configFile(fileId: 'ramp-db-install-script', targetLocation: 'install.R'),
                     configFile(fileId: 'ramp-db-start-script', targetLocation: 'startup.R')
                 ]) {	
                     sh("""
