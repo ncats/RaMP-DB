@@ -24,7 +24,7 @@ pipeline {
                     sh("""
                         Rscript install.R
                         cp db.properties /usr/local/lib/R/site-library/RaMP/shinyApp/db.properties
-                        Rscript startup.R
+                        Rscript startup.R &
                     """)
                 }
             }
