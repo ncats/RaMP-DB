@@ -18,11 +18,13 @@ pipeline {
                 cleanWs()
                 configFileProvider([
                     configFile(fileId: 'ramp-db-properties', targetLocation: 'db.properties'),
-                    configFile(fileId: 'ramp-db-start-script', targetLocation: 'start.R')
+                    configFile(fileId: 'ramp-db-install-script', targetLocation: 'install.R')
+                    configFile(fileId: 'ramp-db-start-script', targetLocation: 'startup.R')
                 ]) {	
                     sh("""
+                        Rscript install.R
                         cp db.properties /usr/local/lib/R/site-library/RaMP/shinyApp/db.properties
-                        Rscript start.R &
+                        Rscript startup.R
                     """)
                 }
             }
