@@ -12,6 +12,9 @@ pipeline {
     triggers {
         pollSCM('H/5 * * * *')
     }
+    environment {
+        PROJECT_NAME = "rampdb"
+    }
     stages {
         stage('Build Version') {
             when {
