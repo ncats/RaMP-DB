@@ -79,6 +79,7 @@ pipeline {
                         "DOCKER_REPO_NAME=ncats/rampdb",
                         "BUILD_VERSION=" + (params.BUILD_VERSION ?: env.BUILD_VERSION)
                     ]) {
+                        sh 'chmod 755 db.properties'
                         script {
                             def docker = new org.labshare.Docker()
                             docker.deployDockerUI()
