@@ -157,7 +157,7 @@ tabItem3 <-  shinydashboard::tabItem(
                                                  HTML("<br>"),
                                                  textOutput("FisherTestResultWithoutFilter_AnalyteType"),
                                                  HTML("<br>"),
-                                                 dataTableOutput("FisherTestResultWithoutFilter_fishresults"),
+                                                 DT::dataTableOutput("FisherTestResultWithoutFilter_fishresults",width = '100%'),
                                                  textOutput("fishersProgress")
                                                ),
                                                shiny::mainPanel(
