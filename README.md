@@ -2,7 +2,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/cg0md9vd8njancij?svg=true)](https://ci.appveyor.com/project/Mathelab/ramp-db)
 
 # New!  RaMP app is accessible via a server (no installation needed!).
-Please [click here](https://ramp-db.bmi.osumc.edu/).  And let us know if additional functionalities would be useful (see contact info below).
+Please [click here](https://rampdb.ncats.io/).  And let us know if additional functionalities would be useful (see contact info below).
 
 # RaMP - Relational Database of Metabolomic Pathways
 
