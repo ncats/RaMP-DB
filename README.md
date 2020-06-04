@@ -117,10 +117,11 @@ If you reinstall the latest version of the RaMP package, be sure to also install
 
 Also, when gene or metabolite ids are input for queries, IDs should be prepended with their database of origin, e.g. kegg:C02712, hmdb:HMDB04824, or CAS:2566-39-4. The list of IDs that are currently included in RaMP are: CAS, chebi, chemspider, enzymeNomenclature, ensembl, entrez, hmdb, keg, LIPIDMAPS, pubchem, uniprot.
 
-## Authors
-* **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
+## Current Authors
 * **Ewy Mathé** - [Mathelab](https://github.com/MatheLab)
-* **Andrew Patt** - andrew.patt@osumc.edu
+* **Andrew Patt** - patt.14@buckeyemail.osu.edu
+
+## Previous Authors
+* **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
 * **Shunchao Wang** - shunchao.wang@osumc.edu
 * **Rohith Vanam** - rohith.vanam@osumc.edu
-
