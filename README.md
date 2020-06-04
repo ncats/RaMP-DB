@@ -29,7 +29,7 @@ In order to use the web application, you will need the following:
 * The R code under this repo
 * The mysql dump file that contains the RaMP database (in the folder inst/extdata/)
 
-If you would like to know how to build RaMP database from scratch, please check another GitHub site at [RaMP-BackEnd](https://github.com/Mathelab/RaMP-BackEnd)
+If you would like to know how to build RaMP database from scratch, please check another GitHub site at [RaMP-BackEnd](https://github.com/ncats/RaMP-BackEnd)
 
 ### MySQL set-up
 **Warning:** RaMP will not readily work with the new MySQL version (8.X.X), but is fully functional with MySQL version 5.7. We will be working toward updating RaMP to work with the newest MySQL version.
@@ -84,7 +84,7 @@ You can install this package directly from GitHub using the install_github() fun
 ```R
 install.packages(“devtools”)
 library(devtools)
-install_github("mathelab/RAMP-DB")
+install_github("ncats/RAMP-DB")
 # Load the package
 library(RaMP)
 ```
