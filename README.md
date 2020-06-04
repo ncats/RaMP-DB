@@ -120,6 +120,7 @@ Also, when gene or metabolite ids are input for queries, IDs should be prepended
 ## Current Authors
 * **Ewy Mathé** - [Mathelab](https://github.com/MatheLab)
 * **Andrew Patt** - patt.14@buckeyemail.osu.edu
+* **John Braisted** - john.braisted@nih.gov
 
 ## Previous Authors
 * **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
