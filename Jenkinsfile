@@ -67,7 +67,7 @@ pipeline {
         }
         stage('Deploy Application') {
             agent {
-                node { label 'rampdb.ncats.io'}
+                node { label 'rampdb-ci-ec2-01'}
             }
             steps {
                 cleanWs()
