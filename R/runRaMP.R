@@ -32,7 +32,18 @@ runRaMPapp <- function(conpass = NULL,host = 'localhost',
    on.exit(rm(.host,envir = .GlobalEnv))
    on.exit(rm(.username,envir = .GlobalEnv))
    on.exit(rm(.dbname,envir = .GlobalEnv))
-  shiny::runApp(appDir,display.mode = "normal")
+}
 
+runShinyApp <- function(conpass = NULL,host = 'localhost',
+                        username = 'root',dbname = 'ramp') {
+  runRaMPapp(conpass = conpass, host = host, username = username, dbname = dbname)
+  shiny::runApp(appDir,display.mode = "normal")
+}
+
+runPlumberApp <- function(conpass = NULL,host = 'localhost',
+                        username = 'root',dbname = 'ramp') {
+  runRaMPapp(conpass = conpass, host = host, username = username, dbname = dbname)
+  ramp_api <- plumber::plumb("./R/api/restAPI.R")
+  ramp_api$run(host = "127.0.0.1", port = 5762)
 }
 

@@ -5,9 +5,13 @@
 \title{Do fisher test for only one pathway from search result
 clicked on highchart}
 \usage{
-runFisherTest(pathwaydf, total_metabolites = NULL, total_genes = 20000,
-  analyte_type = "metabolites", conpass = NULL, dbname = "ramp",
-  username = "root", host = "localhost")
+runFisherTest(
+  pathwaydf,
+  total_metabolites = NULL,
+  total_genes = 20000,
+  analyte_type = "metabolites",
+  con = NULL
+)
 }
 \arguments{
 \item{pathwaydf}{a data frame resulting from getPathwayFromAnalyte}
@@ -18,13 +22,7 @@ runFisherTest(pathwaydf, total_metabolites = NULL, total_genes = 20000,
 
 \item{analyte_type}{"metabolites" or "genes" (default is "metabolites")}
 
-\item{conpass}{password for database access (string)}
-
-\item{dbname}{name of the mysql database (default is "ramp")}
-
-\item{username}{username for database access (default is "root")}
-
-\item{host}{host name for database access (default is "localhost")}
+\item{con}{MySQL connection (MySQLConnection)}
 }
 \value{
 a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
