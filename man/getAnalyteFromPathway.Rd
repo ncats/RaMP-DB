@@ -4,8 +4,13 @@
 \alias{getAnalyteFromPathway}
 \title{Use fast search algorithm to find all pathways from given analytes}
 \usage{
-getAnalyteFromPathway(pathway, conpass = NULL, dbname = "ramp",
-  username = "root", host = "localhost")
+getAnalyteFromPathway(
+  pathway,
+  conpass = NULL,
+  dbname = "ramp",
+  username = "root",
+  host = "localhost"
+)
 }
 \arguments{
 \item{pathway}{a string or a vector of strings that contains pathways of interest}

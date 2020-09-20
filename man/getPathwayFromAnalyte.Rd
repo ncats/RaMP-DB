@@ -5,22 +5,19 @@
 \title{Function that search analytes (gene or compounds)  or a list of analytes and
 returns associated pathways}
 \usage{
-getPathwayFromAnalyte(analytes = NULL, find_synonym = FALSE,
-  conpass = NULL, host = "localhost", dbname = "ramp",
-  username = "root", NameOrIds = "ids")
+getPathwayFromAnalyte(
+  analytes = NULL,
+  find_synonym = FALSE,
+  con = NULL,
+  NameOrIds = "ids"
+)
 }
 \arguments{
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
 \item{find_synonym}{find all synonyms or just return same synonym (T/F)}
 
-\item{conpass}{password for database access (string)}
-
-\item{host}{host name for database access (default is "localhost")}
-
-\item{dbname}{name of the mysql database (default is "ramp")}
-
-\item{username}{username for database access (default is "root")}
+\item{con}{MySQL connection (MySQLConnection)}
 
 \item{NameOrIds}{whether input is "names" or "ids" (default is "ids")}
 }

@@ -23,5 +23,6 @@ Imports:
     xtable,
     visNetwork,
     properties,
-    stringi
-RoxygenNote: 6.1.1
+    stringi,
+    plumber
+RoxygenNote: 7.1.1

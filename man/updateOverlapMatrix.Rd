@@ -4,8 +4,15 @@
 \alias{updateOverlapMatrix}
 \title{Update the overlap matrix for store in the shiny app directory}
 \usage{
-updateOverlapMatrix(min_analyte, overlapmethod, together, conpass,
-  host = "localhost", dbname = "ramp", username = "root")
+updateOverlapMatrix(
+  min_analyte,
+  overlapmethod,
+  together,
+  conpass,
+  host = "localhost",
+  dbname = "ramp",
+  username = "root"
+)
 }
 \arguments{
 \item{min_analyte}{a int that specifies the minimum of analytes the

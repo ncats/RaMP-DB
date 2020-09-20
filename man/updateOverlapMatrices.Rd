@@ -4,8 +4,14 @@
 \alias{updateOverlapMatrices}
 \title{Update and save the overlap matrices based on current version of RaMP}
 \usage{
-updateOverlapMatrices(method, all, conpass, host = "localhost",
-  dbname = "ramp", username = "root")
+updateOverlapMatrices(
+  method,
+  all,
+  conpass,
+  host = "localhost",
+  dbname = "ramp",
+  username = "root"
+)
 }
 \arguments{
 \item{method}{a string that specifies algorithm to compute overlap matrix
