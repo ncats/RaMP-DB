@@ -523,8 +523,8 @@ getPathwayFromAnalyte<- function(analytes=NULL,
 #' filteredclust.fisher.results <- findCluster(filtered.fisher.results)
 #'}
 #' @export
-findCluster <- function(fishers_df,perc_analyte_overlap = 0.5,
-                        min_pathway_tocluster = 2,perc_pathway_overlap = 0.5){
+findCluster <- function(fishers_df,perc_analyte_overlap = 0.2,
+                        min_pathway_tocluster = 2,perc_pathway_overlap = 0.2){
   if(perc_analyte_overlap <= 0 || perc_analyte_overlap >= 1 ||
      perc_pathway_overlap <= 0 || perc_pathway_overlap >= 1){
     return(NULL)

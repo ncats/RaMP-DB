@@ -45,7 +45,7 @@ function(
                         password = conpass,
                         host = host)
     on.exit(DBI::dbDisconnect(con))
-
+    print(analyte)
     pathways <- getPathwayFromAnalyte(
         analytes = c(analyte),
         con = con,
@@ -60,12 +60,13 @@ function(
         p_holmadj_cutoff = p_holmadj_cutoff,
         p_fdradj_cutoff = p_fdradj_cutoff
     )
-    filtered_results
+    clustering_results <- findCluster(filtered_results,perc_analyte_overlap=0.2,perc_pathway_overlap=0.2)
 }
 
 #' Serve the default HTML file
 #' @get /
 #' @get /pathway-enrichment-analysis
+#' @get /about
 function(res) {
     plumber::include_html("../../client/index.html", res)
 }
