@@ -26,6 +26,9 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
     stop("Please define the analyte_type variable as 'metabolites' or 'genes'")
   }
 
+  print(paste("early in fisher... total analytes =",toString(total_analytes),sep=" "))
+  print(paste("early in fisher... total mets=",toString(total_metabolites),sep=" "))
+
   contingencyTb <- matrix(0,nrow = 2,ncol = 2)
   colnames(contingencyTb) <- c("In Pathway","Not In Pathway")
   rownames(contingencyTb) <- c("All Metabolites","User's Metabolites")
@@ -42,19 +45,42 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
                         dbname = dbname,
                         host = host)
   allids <- DBI::dbGetQuery(con,query)
+
+  # Close connection, then deduplicate id list
   DBI::dbDisconnect(con)
   allids <- allids[!duplicated(allids),]
 
   if((analyte_type == "metabolites") && (is.null(total_metabolites))) {
-    wiki_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="wiki"),"rampId"])]))
-    react_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="reactome"),"rampId"])]))
-    kegg_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="kegg"),"rampId"])]))
+
+    # JCB replaced these lines. Reducing to a source, extracting compound indices, then applying to the full set of rampIds
+    # caused an error in the tally of analytes
+    #
+    # wiki_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="wiki"),"rampId"])]))
+    # react_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="reactome"),"rampId"])]))
+    # kegg_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="kegg"),"rampId"])]))
+    
+    # first extract source-specific ids, then select for compound ids from the source-specific ids
+    sourceIds <- allids[which(allids$pathwaySource=="wiki"),"rampId"]
+    wiki_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
+
+    sourceIds <- allids[which(allids$pathwaySource=="reactome"),"rampId"]
+    react_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
+    
+    sourceIds <- allids[which(allids$pathwaySource=="kegg"),"rampId"]
+    kegg_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
+
+  } else {
+    print("either not metabolites or total_metabolites is not null")
   }
+
   if(analyte_type=="genes") {
+    
+    # for now we're using a fixed population size for genes
+    # this can be enhanced to take a list of all measured genes
+    # or use a subset of genes having pathway annotations within each source
     wiki_totanalytes <- react_totanalytes <- kegg_totanalytes <- total_genes
   }
 
-  print("Calculating p-values for pathways in input")
   # Retrieve the Ramp compound ids associated with the ramp pathway id and count them:
 
   query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
@@ -167,12 +193,22 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
       contingencyTb[1,2] <- tot_out_pathway - user_out_pathway
       contingencyTb[2,1] <- user_in_pathway
       contingencyTb[2,2] <- user_out_pathway
-      result <- stats::fisher.test(contingencyTb)
+
+      # Put the test into a try catch in case there's an issue, we'll have some details on the contingency matrix
+      tryCatch({
+        result <- stats::fisher.test(contingencyTb)
+      }, error = function(e) {
+        print(toString(e))
+        print(i)
+        print(contingencyTb)
+      })
+
       pval <- c(pval,result$p.value )
       userinpath<-c(userinpath,user_in_pathway)
       totinpath<-c(totinpath,tot_in_pathway)
       pidused <- c(pidused,i)
   } # end for loop
+
 
   # Now run fisher's tests for all other pids
   query <- "select distinct(pathwayRampId) from analytehaspathway where pathwaySource != 'hmdb';"
@@ -205,8 +241,10 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   allcids <- DBI::dbGetQuery(con,query1)#[[1]]
   DBI::dbDisconnect(con)
 
-  print("Calculating p-values for all other pathways")
   #print(paste0(length(pidstorun),"pathways"))
+
+  # We're collecting p-values for all pathways, now those with no analyte support at all - JCB:? 
+
   # calculating p-values for all other pathways
   kegg_metab <- kegg_metab
   kegg_gene <- kegg_gene
@@ -218,6 +256,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   hmdb_gene <- hmdb_gene
   count=1;
   pval2=userinpath2=totinpath2=c()
+
   for (i in pidstorun) {
   if(( count %% 100) ==0) {print(paste0("Processed ",count))}
   count=count+1
@@ -227,12 +266,15 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
     if (i %in% kegg_metab$pathwayRampId) {
       tot_in_pathway <- kegg_metab[which(kegg_metab[,"pathwayRampId"]==i),"Freq"]
       total_analytes <- kegg_totanalytes
+      
     } else if (i %in% wiki_metab$pathwayRampId) {
       tot_in_pathway <- wiki_metab[which(wiki_metab[,"pathwayRampId"]==i),"Freq"]
       total_analytes <- wiki_totanalytes
+      
     } else if (i %in% reactome_metab$pathwayRampId) {
       tot_in_pathway <- reactome_metab[which(reactome_metab[,"pathwayRampId"]==i),"Freq"]
       total_analytes <- react_totanalytes
+ 
     } else if (i %in% hmdb_metab$pathwayRampId) {
       tot_in_pathway <- hmdb_metab[which(hmdb_metab[,"pathwayRampId"]==i),"Freq"]
       total_analytes <- NULL
@@ -260,18 +302,36 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
       total_analytes <- NULL
     }
   }
+
   # Check that the pathway being considered has your analyte type, if not, move on
 
     if(is.null(total_analytes)) {next;}
     tot_out_pathway <- total_analytes - tot_in_pathway
     # fill the rest of the table out
+
+    # JCB: Another issue 10/7/2020
+    # This line was used for user_out_pathway
+    # This section of code is for all pathways that have no analyte support.
     user_out_pathway <- length(unique(pathwaydf$rampId))
-    #user_out_pathway <- total_analytes - user_in_pathway
+
+    # This line was commented out in production *but* now we have total_analytes set properly
+    # not sure why this line was changed. 
+    # user_out_pathway <- total_analytes - user_in_pathway
+   
     contingencyTb[1,1] <- tot_in_pathway - user_in_pathway
     contingencyTb[1,2] <- tot_out_pathway - user_out_pathway
     contingencyTb[2,1] <- user_in_pathway
     contingencyTb[2,2] <- user_out_pathway
-    result <- stats::fisher.test(contingencyTb)
+
+    # Added try catch 
+    tryCatch({
+      result <- stats::fisher.test(contingencyTb)
+    }, error = function(e) {
+      print(toString(e))
+      print(i)
+      print(contingencyTb)
+    })
+    
     pval2 <- c(pval2,result$p.value )
     userinpath2<-c(userinpath2,user_in_pathway)
     totinpath2<-c(totinpath2,tot_in_pathway)
@@ -308,6 +368,16 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   # foruser is the output needed, based on what user input
   return(out)
 }
+
+
+
+
+
+
+
+
+
+
 
 
 #' Do fisher test for only one pathway from search result
@@ -442,6 +512,19 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
   return(list(fishresults=out2,analyte_type=analyte_type))
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 #' Function that search analytes (gene or compounds)  or a list of analytes and
 #' returns associated pathways
 #'
@@ -475,7 +558,6 @@ getPathwayFromAnalyte<- function(analytes=NULL,
 
 
   if(NameOrIds == "names"){
-    print(analytes)
     synonym <- rampFindSynonymFromSynonym(synonym=analytes,
 	  find_synonym=find_synonym,
 	  conpass=conpass, host=host, dbname=dbname,username=username)
