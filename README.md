@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ncats/RaMP-DB.svg?branch=master)](https://travis-ci.org/Mathelab/RaMP-DB)
+[![Build Status](https://travis-ci.org/ncats/RaMP-DB.svg?branch=master)](https://travis-ci.org/ncats/RaMP-DB)
 [![Build status](https://ci.appveyor.com/api/projects/status/cg0md9vd8njancij?svg=true)](https://ci.appveyor.com/project/ncats/ramp-db)
 
 # New!  RaMP app is accessible via a server (no installation needed!).
