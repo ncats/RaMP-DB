@@ -566,6 +566,7 @@ findCluster <- function(fishers_df,perc_analyte_overlap = 0.2,
     }
 
     pathway_matrix<-similarity_matrix[pathway_indices,pathway_indices]
+
     unmerged_clusters<-apply(pathway_matrix, 1, function(x){
       # if(length(which(x>=perc_analyte_overlap))>(min_pathway_tocluster+1)){
       if(length(which(x>=perc_analyte_overlap))>(min_pathway_tocluster-1)){
@@ -646,7 +647,7 @@ findCluster <- function(fishers_df,perc_analyte_overlap = 0.2,
 
     # Reformat cluster list to embed into results file
     rampids<-as.vector(fishers_df$pathwayRampId)
-    fishers_df$pathwayRampId<-NULL
+    # fishers_df$pathwayRampId<-NULL
 
     if(length(cluster_list)>1){
       cluster_assignment<-sapply(rampids,function(x){
@@ -669,7 +670,7 @@ findCluster <- function(fishers_df,perc_analyte_overlap = 0.2,
       fishers_df<-cbind(fishers_df,rep("Did not cluster",times=nrow(fishers_df)))
     }
     fishers_df$rampids<-rampids
-    output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list=cluster_list)
+    output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list=cluster_list,pathway_matrix=pathway_matrix)
     return(output)
   }
 }

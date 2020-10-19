@@ -24,5 +24,6 @@ Imports:
     visNetwork,
     properties,
     stringi,
-    plumber
+    plumber,
+    sqldf
 RoxygenNote: 7.1.1
