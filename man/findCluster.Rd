@@ -7,9 +7,9 @@ Fisher's test}
 \usage{
 findCluster(
   fishers_df,
-  perc_analyte_overlap = 0.5,
+  perc_analyte_overlap = 0.2,
   min_pathway_tocluster = 2,
-  perc_pathway_overlap = 0.5
+  perc_pathway_overlap = 0.2
 )
 }
 \arguments{
