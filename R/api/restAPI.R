@@ -26,8 +26,6 @@ function(pathwaySourceId="") {
     source_ids <- sapply(pathwaySourceId,shQuote)
     source_ids <- paste(source_ids,collapse = ",")
 
-    print(source_ids)
-
     query <- paste0(
         "select p.sourceId, p.pathwayName, GROUP_CONCAT(s.sourceId) as analytes ",
         "from pathway as p ",
@@ -115,7 +113,28 @@ function(
                     left join fishresults on cluster_coordinates.pathwayRampId = fishresults.pathwayRampId
                    ")
 
-    response <- list(fishresults=clustering_results$fishresults, clusterCoordinates=cluster_coordinates)
+    analyte_ids <- sapply(analyte,shQuote)
+    analyte_ids <- paste(analyte_ids,collapse = ",")
+
+    where_clause = "where s.sourceId in"
+
+    if (identifier_type == "names") {
+        where_clause = "where s.commonName in"
+    }
+
+    query <- paste0(
+        "select s.sourceId, commonName, GROUP_CONCAT(p.sourceId) as pathways ",
+        "from source as s ",
+        "left join analyte as a on s.rampId = a.rampId ",
+        "left join analytehaspathway as ap on a.rampId = ap.rampId ",
+        "left join pathway as p on ap.pathwayRampId = p.pathwayRampId ",
+        where_clause, " (", analyte_ids, ") ",
+        "group by s.sourceId, s.commonName"
+    )
+
+    cids <- DBI::dbGetQuery(con,query)
+
+    response <- list(fishresults=clustering_results$fishresults, clusterCoordinates=cluster_coordinates, analytes=cids)
 
     return(response)
 }
