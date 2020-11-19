@@ -115,7 +115,13 @@ If the username is different then root, then specify the username in the "userna
 
 If you reinstall the latest version of the RaMP package, be sure to also install the latest version of the mysql RaMP dump file.  
 
-Also, when gene or metabolite ids are input for queries, IDs should be prepended with their database of origin, e.g. kegg:C02712, hmdb:HMDB04824, or CAS:2566-39-4. The list of IDs that are currently included in RaMP are: CAS, chebi, chemspider, enzymeNomenclature, ensembl, entrez, hmdb, keg, LIPIDMAPS, pubchem, uniprot.
+Also, when gene or metabolite ids are input for queries, IDs should be prepended with their database of origin, e.g. kegg:C02712, hmdb:HMDB04824, or CAS:2566-39-4. The list of metabolite or gene/protien IDs may be of mixed source. Remember to include the colon in the prefix. The id prefixes that are currently included in RaMP are: 
+
+| Analyte Type | ID Prefix Types |
+|--------------|-----------------|
+| Metabolites | CAS, chebi, chemspider, enzymeNomenclature, hmdb, kegg, LIPIDMAPS, pubchem |
+| Genes/Proteins |ensembl, entrez, uniprot |
+
 
 ## Current Authors
 * **Ewy Mathé** - [Mathelab](https://github.com/MatheLab)
