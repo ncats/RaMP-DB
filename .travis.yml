@@ -17,8 +17,8 @@ r_build_args: --no-build-vignettes --no-manual
 r_check_args: --no-build-vignettes --no-manual --as-cran
 
 before_install:
-  mkdir ~/R/Library
-  Rscript -e '.libPaths("~/R/Library")'
+  mkdir ~/R/Library &&
+  Rscript -e '.libPaths("~/R/Library")' &&
   Rscript -e 'update.packages(ask = FALSE)'
 
 os:
