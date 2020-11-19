@@ -16,6 +16,7 @@ writePathwaysToCSV <- function(mypathways=NULL,outputfile=NULL) {
     	utils::write.csv(out,file = outputfile,row.names = F)
 }
 
+
 #' Function that writes Fishers Test results to a CSV file
 #' 
 #' @param fishResults a data frame returned by function runCombinedFisherTest()
@@ -61,5 +62,5 @@ write_FishersResults <- function(fishResults=NULL,outputfile=NULL){
     		}else{
       			utils::write.csv(c("No significant results"),outputfile,row.names = FALSE)
     		}
-  	}
+	}
 }
