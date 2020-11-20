@@ -1,19 +1,19 @@
-#' Run Shiny App
-#'
-#' This function launches the RShiny app.  It requires a connection to the RaMP database as input, which requires running the function connectoToRaMP() and providing the MySQL password.
-#'
-#' @param conpass password for database access (string)
-#' @param host host name for database access (default is "localhost")
-#' @param username username for database access
-#' @param dbname database name for database access
-#' @examples
-#' \dontrun{
-#' con <- connectToRaMP(dbname="ramp",username="root",password="mypassword")
-#' runRaMPapp(con=con)
-#' }
-#' @export
-runRaMPapp <- function(conpass = NULL,host = 'localhost',
-                       username = 'root',dbname = 'ramp') {
+#" Run Shiny App
+#"
+#" This function launches the RShiny app.  It requires a connection to the RaMP database as input, which requires running the function connectoToRaMP() and providing the MySQL password.
+#"
+#" @param conpass password for database access (string)
+#" @param host host name for database access (default is "localhost")
+#" @param username username for database access
+#" @param dbname database name for database access
+#" @examples
+#" \dontrun{
+#" con <- connectToRaMP(dbname="ramp",username="root",password="mypassword")
+#" runRaMPapp(con=con)
+#" }
+#" @export
+runRaMPapp <- function(conpass = NULL,host = "localhost",
+                       username = "root",dbname = "ramp") {
   .conpass <- .host <-.username <- .dbname <- con <- c()
   if(is.null(conpass)) {
         stop("Please define the password for the mysql connection")
@@ -34,16 +34,34 @@ runRaMPapp <- function(conpass = NULL,host = 'localhost',
    on.exit(rm(.dbname,envir = .GlobalEnv))
 }
 
-runShinyApp <- function(conpass = NULL,host = 'localhost',
-                        username = 'root',dbname = 'ramp') {
+runShinyApp <- function(conpass = NULL,host = "localhost",
+                        username = "root",dbname = "ramp") {
   runRaMPapp(conpass = conpass, host = host, username = username, dbname = dbname)
   shiny::runApp(appDir,display.mode = "normal")
 }
 
-runPlumberApp <- function(conpass = NULL,host = 'localhost',
-                        username = 'root',dbname = 'ramp') {
-  runRaMPapp(conpass = conpass, host = host, username = username, dbname = dbname)
-  ramp_api <- plumber::plumb("./R/api/restAPI.R")
-  ramp_api$run(host = "127.0.0.1", port = 5762)
-}
+run_plumber_app <- function(
+  db_password = NULL,
+  db_host = "localhost",
+  db_username = "root",
+  db_dbname = "ramp",
+  api_host = "127.0.0.1",
+  api_port = 5762
+  ) {
+    ramp_api <- plumber::plumb("./R/api/restAPI.R")
+    if (
+      is.null(db_password)
+      || is.null(db_host)
+      || is.null(db_username)
+      || is.null(db_dbname)
+    ) {
+        stop("Please define the password for the mysql connection")
+    }
 
+    .GlobalEnv$db_password <- db_password
+    .GlobalEnv$db_host <- db_host
+    .GlobalEnv$db_username <- db_username
+    .GlobalEnv$db_dbname <- db_dbname
+
+    ramp_api$run(host = api_host, port = api_port)
+  }

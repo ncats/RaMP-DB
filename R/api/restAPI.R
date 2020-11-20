@@ -155,8 +155,8 @@ function(pathwaySourceId="") {
                           password = conpass,
                           host = host)
     on.exit(DBI::dbDisconnect(con))
-    source_ids <- sapply(pathwaySourceId,shQuote)
-    source_ids <- paste(source_ids,collapse = ",")
+    source_ids <- sapply(pathwaySourceId, shQuote)
+    source_ids <- paste(source_ids, collapse = ",")
 
     query <- paste0(
         "select p.sourceId, p.pathwayName, GROUP_CONCAT(s.sourceId) as analytes ",
@@ -194,7 +194,8 @@ function(
     if (typeof(min_pathway_tocluster) == "character") {
         min_pathway_tocluster = strtoi(min_pathway_tocluster, base = 0L)
     }
-
+    db_connection <- DBConnection()
+    on.exit(db_connection$disconnect())
     con <- DBI::dbConnect(RMySQL::MySQL(),
                         user = username,
                         dbname=dbname,
@@ -206,15 +207,18 @@ function(
         con = con,
         NameOrIds = identifier_type
     )
-    fishers_results <- runCombinedFisherTest(
-        pathways,
-        con = con
-    )
-    filtered_results <- FilterFishersResults(
-        fishers_results,
-        p_holmadj_cutoff = p_holmadj_cutoff,
-        p_fdradj_cutoff = p_fdradj_cutoff
-    )
+    fisher_test <- FisherTest(db_connection)
+    fisher_test$run_combined_fisherTest(pathways)
+    filtered_results <- fisher_test$filter_fishers_results(p_holmadj_cutoff = p_holmadj_cutoff, p_fdradj_cutoff = p_fdradj_cutoff)
+    # fishers_results <- runCombinedFisherTest(
+    #     pathways,
+    #     con = con
+    # )
+    # filtered_results <- FilterFishersResults(
+    #     fishers_results,
+    #     p_holmadj_cutoff = p_holmadj_cutoff,
+    #     p_fdradj_cutoff = p_fdradj_cutoff
+    # )
     clustering_results <- findCluster(
         filtered_results,
         perc_analyte_overlap=perc_analyte_overlap,
