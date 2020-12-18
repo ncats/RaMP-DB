@@ -172,108 +172,16 @@ function(pathwaySourceId="") {
 }
 
 
-#* Return pathway enrichment analysis results
-#* @param analyte
-#* @param identifier_type names or ids
-#* @param p_holmadj_cutoff
-#* @param p_fdradj_cutoff
-#* @perc_analyte_overlap
-#* @perc_pathway_overlap
-#* @min_pathway_tocluster
-#* @get /api/pathway_enrichment_analysis
-function(
-    analyte="",
-    identifier_type="names",
-    p_holmadj_cutoff=0.05,
-    p_fdradj_cutoff=NULL,
-    perc_analyte_overlap=0.2,
-    perc_pathway_overlap=0.2,
-    min_pathway_tocluster=2
-) {
-
-    if (typeof(min_pathway_tocluster) == "character") {
-        min_pathway_tocluster = strtoi(min_pathway_tocluster, base = 0L)
-    }
-    db_connection <- DBConnection()
-    on.exit(db_connection$disconnect())
-    con <- DBI::dbConnect(RMySQL::MySQL(),
-                        user = username,
-                        dbname=dbname,
-                        password = conpass,
-                        host = host)
-    on.exit(DBI::dbDisconnect(con))
-    pathways <- getPathwayFromAnalyte(
-        analytes = c(analyte),
-        con = con,
-        NameOrIds = identifier_type
-    )
-    fisher_test <- FisherTest(db_connection)
-    fisher_test$run_combined_fisherTest(pathways)
-    filtered_results <- fisher_test$filter_fishers_results(p_holmadj_cutoff = p_holmadj_cutoff, p_fdradj_cutoff = p_fdradj_cutoff)
-    # fishers_results <- runCombinedFisherTest(
-    #     pathways,
-    #     con = con
-    # )
-    # filtered_results <- FilterFishersResults(
-    #     fishers_results,
-    #     p_holmadj_cutoff = p_holmadj_cutoff,
-    #     p_fdradj_cutoff = p_fdradj_cutoff
-    # )
-    clustering_results <- findCluster(
-        filtered_results,
-        perc_analyte_overlap=perc_analyte_overlap,
-        min_pathway_tocluster=min_pathway_tocluster,
-        perc_pathway_overlap=perc_pathway_overlap
-    )
-    fishresults <- clustering_results$fishresults
-    ids_no_cluster <- fishresults[fishresults$cluster_assignment != 'Did not cluster', 'pathwayRampId']
-    pathway_matrix <- clustering_results$pathway_matrix[ids_no_cluster,ids_no_cluster]
-    distance_matrix <- dist(1 - pathway_matrix)
-
-    fit <- cmdscale(distance_matrix,eig=TRUE, k=2)
-
-    cluster_coordinates <- data.frame(fit$points)
-    cluster_coordinates <- cbind(pathwayRampId = rownames(cluster_coordinates), cluster_coordinates)
-    rownames(cluster_coordinates) <- NULL
-
-    names(cluster_coordinates)[2] <- "x"
-    names(cluster_coordinates)[3] <- "y"
-
-    cluster_coordinates <- sqldf("
-                    select
-                        cluster_coordinates.pathwayRampId,
-                        cluster_coordinates.x,
-                        cluster_coordinates.y,
-                        fishresults.cluster_assignment
-                    from cluster_coordinates
-                    left join fishresults on cluster_coordinates.pathwayRampId = fishresults.pathwayRampId
-                   ")
-
-    analyte_ids <- sapply(analyte,shQuote)
-    analyte_ids <- paste(analyte_ids,collapse = ",")
-
-    where_clause = "where s.sourceId in"
-
-    if (identifier_type == "names") {
-        where_clause = "where s.commonName in"
-    }
-
-    query <- paste0(
-        "select s.sourceId, commonName, GROUP_CONCAT(p.sourceId) as pathways ",
-        "from source as s ",
-        "left join analyte as a on s.rampId = a.rampId ",
-        "left join analytehaspathway as ap on a.rampId = ap.rampId ",
-        "left join pathway as p on ap.pathwayRampId = p.pathwayRampId ",
-        where_clause, " (", analyte_ids, ") ",
-        "group by s.sourceId, s.commonName"
-    )
-
-    cids <- DBI::dbGetQuery(con,query)
-
-    response <- list(fishresults=clustering_results$fishresults, clusterCoordinates=cluster_coordinates, analytes=cids)
-
-    return(response)
-}
+#' Return pathway enrichment analysis results
+#' @param analyte
+#' @param identifier_type names or ids
+#' @param p_holmadj_cutoff
+#' @param p_fdradj_cutoff
+#' @param perc_analyte_overlap
+#' @param perc_pathway_overlap
+#' @param min_pathway_tocluster
+#' @get /api/pathway_enrichment_analysis
+pathway_enrichment_analysis
 
 #' Serve the default HTML file
 #' @get /
