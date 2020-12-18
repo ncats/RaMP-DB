@@ -4,8 +4,14 @@
 \alias{rampFindSourceFromId}
 \title{Find all source from given list of RaMP Ids}
 \usage{
-rampFindSourceFromId(rampId = NULL, full = TRUE, conpass = NULL,
-  dbname = "ramp", username = "root", host = "localhost")
+rampFindSourceFromId(
+  rampId = NULL,
+  full = TRUE,
+  conpass = NULL,
+  dbname = "ramp",
+  username = "root",
+  host = "localhost"
+)
 }
 \arguments{
 \item{rampId}{could be a data frame return by rampFindSynonymFromSynonym

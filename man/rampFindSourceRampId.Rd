@@ -5,8 +5,13 @@
 \title{Find rampId from given source ID
 The rampId can be plugged in other functions to continue query}
 \usage{
-rampFindSourceRampId(sourceId, conpass = NULL, dbname = "ramp",
-  username = "root", host = "localhost")
+rampFindSourceRampId(
+  sourceId,
+  conpass = NULL,
+  dbname = "ramp",
+  username = "root",
+  host = "localhost"
+)
 }
 \arguments{
 \item{sourceId}{a data frame or string separated by comma or string

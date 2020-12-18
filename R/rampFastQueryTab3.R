@@ -37,7 +37,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
   # Get the total number of metabolites that are mapped to pathways in RaMP (that's the default background)
   query <- "select * from analytehaspathway"
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                         password = conpass,
                         dbname = dbname,
                         host = host)
@@ -60,7 +60,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
                    list_pid,")")
 
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                         password = conpass,
                         dbname = dbname,
                         host = host)
@@ -73,7 +73,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   query2 <- paste0("select * from analytehaspathway where pathwayRampId in (",
                    list_pid,")")
 
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                         password = conpass,
                         dbname = dbname,
                         host = host)
@@ -176,7 +176,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
   # Now run fisher's tests for all other pids
   query <- "select distinct(pathwayRampId) from analytehaspathway where pathwaySource != 'hmdb';"
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                         password = conpass,
                         dbname = dbname,
                         host = host)
@@ -189,7 +189,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   query2 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
                    pidstorunlist,")")
 
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                         password = conpass,
                         dbname = dbname,
                         host = host)
@@ -198,7 +198,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
   query1 <- paste0("select rampId,pathwayRampId from analytehaspathway;")
 
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                         password = conpass,
                         dbname = dbname,
                         host = host)
