@@ -5,9 +5,16 @@
 \title{Do fisher test for only one pathway from search result
 clicked on highchart}
 \usage{
-runCombinedFisherTest(pathwaydf, total_metabolites = NULL,
-  total_genes = 20000, min_analyte = 2, conpass = NULL,
-  dbname = "ramp", username = "root", host = "localhost")
+runCombinedFisherTest(
+  pathwaydf,
+  total_metabolites = NULL,
+  total_genes = 20000,
+  min_analyte = 2,
+  conpass = NULL,
+  dbname = "ramp",
+  username = "root",
+  host = "localhost"
+)
 }
 \arguments{
 \item{pathwaydf}{a data frame resulting from getPathwayFromAnalyte}

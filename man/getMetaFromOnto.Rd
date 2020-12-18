@@ -4,8 +4,13 @@
 \alias{getMetaFromOnto}
 \title{function that query database to find analytes in given ontologies}
 \usage{
-getMetaFromOnto(ontology, conpass = NULL, dbname = "ramp",
-  host = "localhost", username = "root")
+getMetaFromOnto(
+  ontology,
+  conpass = NULL,
+  dbname = "ramp",
+  host = "localhost",
+  username = "root"
+)
 }
 \arguments{
 \item{ontology}{a vector of ontology or ontologies delimited by new line character}

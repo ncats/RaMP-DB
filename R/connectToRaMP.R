@@ -22,7 +22,7 @@ connectToRaMP <- function(dbname = "ramp",
   }
 
   con <- DBI::dbConnect(
-    drv = RMySQL::MySQL(),
+    drv = RMariaDB::MariaDB(),
     dbname = dbname,
     username = username,
     password = conpass,
