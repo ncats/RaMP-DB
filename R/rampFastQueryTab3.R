@@ -537,7 +537,7 @@ findCluster <- function(fishers_df,perc_analyte_overlap = 0.2,
   }else if(nrow(fishers_df)==1){
     fishers_df$cluster_assignment="Did not cluster"
     fishers_df$rampids<-fishers_df$pathwayRampId
-    fishers_df$pathwayRampId<-NULL
+    # fishers_df$pathwayRampId<-NULL
     output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list="Did not cluster")
     return(output)
   } else {
