@@ -181,7 +181,38 @@ function(pathwaySourceId="") {
 #' @param perc_pathway_overlap
 #' @param min_pathway_tocluster
 #' @get /api/pathway_enrichment_analysis
-pathway_enrichment_analysis
+function(
+    analyte="",
+    identifier_type="names",
+    p_holmadj_cutoff=0.05,
+    p_fdradj_cutoff=NULL,
+    perc_analyte_overlap=0.2,
+    perc_pathway_overlap=0.2,
+    min_pathway_tocluster=2
+) {
+    if (typeof(min_pathway_tocluster) == "character") {
+        min_pathway_tocluster <- strtoi(min_pathway_tocluster, base = 0L)
+    }
+    
+    analytes <- c(analyte)
+
+    analysisResults <- pathway_enrichment_analysis(
+        analytes,
+        identifier_type,
+        p_holmadj_cutoff,
+        p_fdradj_cutoff,
+        perc_analyte_overlap,
+        perc_pathway_overlap,
+        min_pathway_tocluster
+    )
+
+    return(list(
+        fishresults = analysisResults$fishresults,
+        clusterCoordinates = analysisResults$cluster_coordinates,
+        analytes = analysisResults$cids
+    ))
+}
+
 
 #' Serve the default HTML file
 #' @get /

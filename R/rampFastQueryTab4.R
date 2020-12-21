@@ -52,7 +52,7 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
   #  print(list_metabolite)
   
   # Retrieve RaMP analyte ids 
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                         password = conpass,
                         dbname = dbname,
                         host = host)
@@ -88,7 +88,7 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
       # Retrieve rampid of genes that are in same reaction
       query_c <- paste0("select rampCompoundId as rampId,rampGeneId as rampId2 from catalyzed where rampCompoundId in (",c_id,");")
       print("Geting gene Id from Compound Id ...")
-      con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+      con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                             password = conpass,
                             dbname = dbname,
                             host = host)
@@ -105,7 +105,7 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
         # Get names for metabolite ids
         query2 <- paste0("select * from source 
              		where rampId in (",analyte2_list,");")
-        con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+        con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                               password = conpass,
                               dbname = dbname,
                               host = host)
@@ -165,7 +165,7 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
       # Get rampID for genes and catalyzed metabolites
       query_g <- paste0("select * from catalyzed where rampGeneId in (",g_id,");")
       
-      con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+      con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                             password = conpass,
                             dbname = dbname,
                             host = host)
@@ -181,7 +181,7 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
         
         # Get names for metabolite IDs
         query2 <- paste0("select * from source where rampId in (",analyte2_list,");")
-        con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+        con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                               password = conpass,
                               dbname = dbname,host=host)
         df_g3 <-DBI::dbGetQuery(con,query2)
