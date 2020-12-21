@@ -5,13 +5,19 @@
 \title{Find rampId from given source ID
 The rampId can be plugged in other functions to continue query}
 \usage{
-rampFindSourceRampId(sourceId, con = NULL)
+rampFindSourceRampId(
+  sourceId,
+  conpass = NULL,
+  dbname = "ramp",
+  username = "root",
+  host = "localhost"
+)
 }
 \arguments{
 \item{sourceId}{a data frame or string separated by comma or string
 separated by new line}
 
-\item{con}{MySQL connection (MySQLConnection)}
+\item{conpass}{password for database access (string)}
 
 \item{dbname}{name of the mysql database (default is "ramp")}
 

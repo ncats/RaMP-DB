@@ -11,49 +11,64 @@
 #' @param min_pathway_tocluster min_pathway_tocluster
 #' @return list with pathway enrichment analysis results
 pathway_enrichment_analysis <- function(
-    analyte="",
+    analytes="",
     identifier_type="names",
     p_holmadj_cutoff=0.05,
     p_fdradj_cutoff=NULL,
     perc_analyte_overlap=0.2,
     perc_pathway_overlap=0.2,
-    min_pathway_tocluster=2
+    min_pathway_tocluster=2,
+    host=NULL,
+    dbname=NULL,
+    username=NULL,
+    conpass=NULL
 ) {
-    host <- "ramp-db.ncats.io"
-    dbname <- "ramp"
-    username <- "ramp_query_user"
-    conpass <- "ramp_query_user"
 
-    if (typeof(min_pathway_tocluster) == "character") {
-        min_pathway_tocluster <- strtoi(min_pathway_tocluster, base = 0L)
+    if (is.null(host)) {
+        host <- .GlobalEnv$db_host
     }
-    db_connection <- DBConnection()
-    on.exit(db_connection$disconnect())
-    analytes <- c(analyte)
-    pathways <- getPathwayFromAnalyte(
+    if (is.null(dbname)) {
+        dbname <- .GlobalEnv$db_dbname
+    }
+    if (is.null(username)) {
+        username <- .GlobalEnv$db_username
+    }
+    if (is.null(conpass)) {
+        conpass <- .GlobalEnv$db_password
+    }
+    
+
+    pathways_df <- getPathwayFromAnalyte(
         analytes = analytes,
-        con = db_connection$connection,
+        conpass=conpass,
+        host=host,
+        dbname=dbname,
+        username=username,
         NameOrIds = identifier_type
     )
-    fisher_test <- FisherTest(db_connection=db_connection)
-    fisher_test$run_combined_fisherTest(pathways)
-    filtered_results <- fisher_test$filter_fishers_results(
+    fishers_results_df <- runCombinedFisherTest(
+        pathwaydf = pathways_df,
+        conpass=conpass,
+        host=host,
+        dbname=dbname,
+        username=username
+    )
+    filtered_results <- FilterFishersResults(
+        fishers_df=fishers_results_df,
         p_holmadj_cutoff = p_holmadj_cutoff,
         p_fdradj_cutoff = p_fdradj_cutoff
     )
-    fisher_results_clustering <- FisherResultsClustering(fishers_results=filtered_results)
-    fisher_results_clustering$find_cluster(
+    clustering_results <- findCluster(
+        filtered_results,
         perc_analyte_overlap=perc_analyte_overlap,
         min_pathway_tocluster=min_pathway_tocluster,
         perc_pathway_overlap=perc_pathway_overlap
     )
-    fishresults <- fisher_results_clustering$fishers_results_df
+    fishresults <- clustering_results$fishresults
     ids_no_cluster <- fishresults[
-        fishresults$cluster_assignment != "Did not cluster", "pathwayRampId"
+        fishresults$cluster_assignment != 'Did not cluster', 'pathwayRampId'
     ]
-    pathway_matrix <- fisher_results_clustering$pathway_matrix[
-        ids_no_cluster, ids_no_cluster
-    ]
+    pathway_matrix <- clustering_results$pathway_matrix[ids_no_cluster,ids_no_cluster]
 
     cluster_coordinates <- c()
 
@@ -85,22 +100,32 @@ pathway_enrichment_analysis <- function(
         )
     }
 
-    analyte_repository = AnalyteRepository(db_connection=db_connection)
+    analyte_ids <- sapply(analytes,shQuote)
+    analyte_ids <- paste(analyte_ids,collapse = ",")
 
-    analyte_names <- NULL
-    analyte_ids <- NULL
+    where_clause = "where s.sourceId in"
 
     if (identifier_type == "names") {
-        analyte_names <- analytes
-    } else {
-        analyte_ids <- analytes
+        where_clause = "where s.commonName in"
     }
 
-    cids <- analyte_repository$get_analytes(analyte_ids=analyte_ids, analyte_names=analyte_names)
+    query <- paste0(
+        "select s.sourceId, commonName, GROUP_CONCAT(p.sourceId) as pathways ",
+        "from source as s ",
+        "left join analyte as a on s.rampId = a.rampId ",
+        "left join analytehaspathway as ap on a.rampId = ap.rampId ",
+        "left join pathway as p on ap.pathwayRampId = p.pathwayRampId ",
+        where_clause, " (", analyte_ids, ") ",
+        "group by s.sourceId, s.commonName"
+    )
+    
+    con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
+    cids <- DBI::dbGetQuery(con,query)
+    DBI::dbDisconnect(con)
 
     response <- list(
-        fishresults = fisher_results_clustering$fishers_results_df,
-        clusterCoordinates = cluster_coordinates,
+        fishresults = clustering_results$fishresults,
+        cluster_coordinates = cluster_coordinates,
         analytes = cids
     )
 

@@ -11,7 +11,10 @@ rampFindSynonymFromSynonym(
   synonym,
   full = FALSE,
   find_synonym = FALSE,
-  con = NULL
+  conpass = NULL,
+  dbname = "ramp",
+  username = "root",
+  host = "localhost"
 )
 }
 \arguments{
@@ -21,7 +24,14 @@ rampFindSynonymFromSynonym(
 
 \item{find_synonym}{bool if find all synonyms or just return same synonym}
 
-\item{con}{MySQL connection (MySQLConnection)}
+\item{conpass}{password for database access (string)}
+
+\item{dbname}{name of the mysql database (default is "ramp")}
+
+\item{username}{username for database access (default is "root")}
+
+\item{host}{host name for database access (default is "localhost")
+as input (there are some common synonyms that will mess up whole searching)}
 }
 \value{
 a data frame that contains synonym in the first column rampId in the second column

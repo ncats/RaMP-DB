@@ -5,18 +5,20 @@
 \title{Pathway enrichment analysis}
 \usage{
 pathway_enrichment_analysis(
-  analyte = "",
+  analytes = "",
   identifier_type = "names",
   p_holmadj_cutoff = 0.05,
   p_fdradj_cutoff = NULL,
   perc_analyte_overlap = 0.2,
   perc_pathway_overlap = 0.2,
-  min_pathway_tocluster = 2
+  min_pathway_tocluster = 2,
+  host = NULL,
+  dbname = NULL,
+  username = NULL,
+  conpass = NULL
 )
 }
 \arguments{
-\item{analyte}{vector of analyte names or Id's}
-
 \item{identifier_type}{names or ids}
 
 \item{p_holmadj_cutoff}{p_holmadj_cutoff}
@@ -28,6 +30,8 @@ pathway_enrichment_analysis(
 \item{perc_pathway_overlap}{perc_pathway_overlap}
 
 \item{min_pathway_tocluster}{min_pathway_tocluster}
+
+\item{analyte}{vector of analyte names or Id's}
 }
 \value{
 list with pathway enrichment analysis results
