@@ -79,7 +79,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
                         host = host)
 
   input_RampIds <- DBI::dbGetQuery(con,query2)
-
+  DBI::dbDisconnect(con)
   if(is.null(input_RampIds)) {
 
     stop("Data doesn't exist")
