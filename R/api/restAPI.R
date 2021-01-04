@@ -7,9 +7,16 @@ username <- "ramp_query_user"
 conpass <- "ramp_query_user"
 
 #* @filter cors
-cors <- function(res) {
+cors <- function(req, res) {
     res$setHeader("Access-Control-Allow-Origin", "*")
+    if (req$REQUEST_METHOD == "OPTIONS") {
+    res$setHeader("Access-Control-Allow-Methods","*")
+    res$setHeader("Access-Control-Allow-Headers", req$HTTP_ACCESS_CONTROL_REQUEST_HEADERS)
+    res$status <- 200 
+    return(list())
+  } else {
     plumber::forward()
+  }
 }
 
 #* Return analyte source intersects
@@ -213,6 +220,185 @@ function(
     ))
 }
 
+#' Return pathways from given list of analytes
+#' @param analyte
+#' @get /api/pathways
+function(analyte="") {
+    analytes <- c(analyte)
+    host <- .GlobalEnv$db_host
+    dbname <- .GlobalEnv$db_dbname
+    username <- .GlobalEnv$db_username
+    conpass <- .GlobalEnv$db_password
+    pathways_df_ids <- tryCatch(
+        {
+            pathways_df <- getPathwayFromAnalyte(
+                analytes = analytes,
+                conpass=conpass,
+                host=host,
+                dbname=dbname,
+                username=username,
+                NameOrIds = 'ids'
+            ) 
+        },
+        error=function(cond) {
+            print(cond)
+            return(data.frame(stringsAsFactors=FALSE))
+        }
+    )
+    print(pathways_df_ids)
+    pathways_df_names <- tryCatch(
+        {
+            pathways_df <- getPathwayFromAnalyte(
+                analytes = analytes,
+                conpass=conpass,
+                host=host,
+                dbname=dbname,
+                username=username,
+                NameOrIds = 'names'
+            ) 
+        },
+        error=function(cond) {
+            print(cond)
+            return(data.frame(stringsAsFactors=FALSE))
+        }
+    )
+    print(pathways_df_names)
+    pathways_df <- rbind(pathways_df_ids, pathways_df_names)
+    print(pathways_df)
+    return(unique(pathways_df))
+}
+
+#' Return combined Fisher's test results from given list of analytes query results
+#' @parser json
+#' @post /api/combined-fisher-test
+function(req) {
+    host <- .GlobalEnv$db_host
+    dbname <- .GlobalEnv$db_dbname
+    username <- .GlobalEnv$db_username
+    conpass <- .GlobalEnv$db_password
+    pathways_df <- as.data.frame(req$body)
+    fishers_results_df <- runCombinedFisherTest(
+        pathwaydf = pathways_df,
+        conpass=conpass,
+        host=host,
+        dbname=dbname,
+        username=username
+    )
+    return(fishers_results_df)
+}
+
+#' Return filtered Fisher's test results from given list of Fisher's test results
+#' @param p_holmadj_cutoff
+#' @param p_fdradj_cutoff
+#' @parser json
+#' @post /api/filter-fisher-test-results
+function(req, p_holmadj_cutoff=0.05, p_fdradj_cutoff=NULL) {
+    host <- .GlobalEnv$db_host
+    dbname <- .GlobalEnv$db_dbname
+    username <- .GlobalEnv$db_username
+    conpass <- .GlobalEnv$db_password
+    fishers_results <- req$body
+    fishers_results$fishresults <- as.data.frame(fishers_results$fishresults)
+    filtered_results <- FilterFishersResults(
+        fishers_df=fishers_results,
+        p_holmadj_cutoff = p_holmadj_cutoff,
+        p_fdradj_cutoff = p_fdradj_cutoff
+    )
+    return(filtered_results)
+}
+
+#' Return filtered Fisher's test results from given list of Fisher's test results
+#' @param perc_analyte_overlap
+#' @param perc_pathway_overlap
+#' @param min_pathway_tocluster
+#' @parser json
+#' @post /api/cluster-fisher-test-results
+function(req, perc_analyte_overlap=0.2, perc_pathway_overlap=0.2, min_pathway_tocluster=2) {
+    if (typeof(min_pathway_tocluster) == "character") {
+        min_pathway_tocluster <- strtoi(min_pathway_tocluster, base = 0L)
+    }
+    host <- .GlobalEnv$db_host
+    dbname <- .GlobalEnv$db_dbname
+    username <- .GlobalEnv$db_username
+    conpass <- .GlobalEnv$db_password
+    fishers_results <- req$body
+    fishers_results$fishresults <- as.data.frame(fishers_results$fishresults)
+    clustering_results <- findCluster(
+        fishers_results,
+        perc_analyte_overlap=perc_analyte_overlap,
+        min_pathway_tocluster=min_pathway_tocluster,
+        perc_pathway_overlap=perc_pathway_overlap
+    )
+
+    return(clustering_results)
+    # fishresults <- clustering_results$fishresults
+
+    # ids_no_cluster <- fishresults[
+    #     fishresults$cluster_assignment != 'Did not cluster', 'pathwayRampId'
+    # ]
+    # pathway_matrix <- clustering_results$pathway_matrix[ids_no_cluster,ids_no_cluster]
+
+    # cluster_coordinates <- c()
+
+    # if (!is.null(pathway_matrix)) {
+    #     distance_matrix <- dist(1 - pathway_matrix)
+
+    #     fit <- cmdscale(distance_matrix, eig=TRUE, k=2)
+
+    #     cluster_coordinates <- data.frame(fit$points)
+    #     cluster_coordinates <- cbind(
+    #         pathwayRampId = rownames(cluster_coordinates),
+    #         cluster_coordinates
+    #     )
+    #     rownames(cluster_coordinates) <- NULL
+
+    #     names(cluster_coordinates)[2] <- "x"
+    #     names(cluster_coordinates)[3] <- "y"
+
+    #     options(sqldf.driver = "SQLite")
+    #     cluster_coordinates <- sqldf(
+    #         "select
+    #             cluster_coordinates.pathwayRampId,
+    #             cluster_coordinates.x,
+    #             cluster_coordinates.y,
+    #             fishresults.cluster_assignment
+    #         from cluster_coordinates
+    #         left join fishresults on
+    #             cluster_coordinates.pathwayRampId = fishresults.pathwayRampId"
+    #     )
+    # }
+
+    # analyte_ids <- sapply(analytes,shQuote)
+    # analyte_ids <- paste(analyte_ids,collapse = ",")
+
+    # where_clause = "where s.sourceId in"
+
+    # if (identifier_type == "names") {
+    #     where_clause = "where s.commonName in"
+    # }
+
+    # query <- paste0(
+    #     "select s.sourceId, commonName, GROUP_CONCAT(p.sourceId) as pathways ",
+    #     "from source as s ",
+    #     "left join analyte as a on s.rampId = a.rampId ",
+    #     "left join analytehaspathway as ap on a.rampId = ap.rampId ",
+    #     "left join pathway as p on ap.pathwayRampId = p.pathwayRampId ",
+    #     where_clause, " (", analyte_ids, ") ",
+    #     "group by s.sourceId, s.commonName"
+    # )
+    
+    # con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
+    # cids <- DBI::dbGetQuery(con,query)
+    # DBI::dbDisconnect(con)
+
+    # response <- list(
+    #     fishresults = clustering_results$fishresults,
+    #     clusterCoordinates = cluster_coordinates,
+    #     analytes = cids
+    # )
+
+    # return(response)
+}
 
 #' Serve the default HTML file
 #' @get /
