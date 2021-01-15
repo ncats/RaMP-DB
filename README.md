@@ -1,12 +1,17 @@
+<<<<<<< HEAD
 [![Build Status](https://travis-ci.org/ncats/RaMP-DB.svg?branch=master)](https://travis-ci.org/ncats/RaMP-DB)
 [![Build status](https://ci.appveyor.com/api/projects/status/cg0md9vd8njancij?svg=true)](https://ci.appveyor.com/project/ncats/ramp-db)
+=======
+[![Build Status](https://travis-ci.com/ncats/RaMP-DB.svg?branch=master)](https://travis-ci.com/github/ncats/RaMP-DB)
+[![Build status](https://ci.appveyor.com/api/projects/status/cg0md9vd8njancij?svg=true)](https://ci.appveyor.com/project/Mathelab/ramp-db)
+>>>>>>> johnbraisted-patch-2
 
 # New!  RaMP app is accessible via a server (no installation needed!).
-Please [click here](https://ramp-db.bmi.osumc.edu/).  And let us know if additional functionalities would be useful (see contact info below).
+Please [click here](https://rampdb.ncats.io/).  And let us know if additional functionalities would be useful (see contact info below).
 
 # RaMP - Relational Database of Metabolomic Pathways
 
-The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene biological pathways from multiple sources. Currently, we have integrated information from HMDB, KEGG, Reactome, and WikiPathways. The relational structure of RaMP enables complex and batch queries.  To facilitate its usage, we have created this R shiny web application that includes a user-friendly R Shiny web application.  Please note that this project is in continuous development and we certainly appreciate your feedback (through [our](https://github.com/Mathelab/RaMP-DB) GitHub site). More details can be found in <a href="http://www.mdpi.com/2218-1989/8/1/16" target="_blank">our manuscript</a>.
+The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene biological pathways from multiple sources. Currently, we have integrated information from HMDB, KEGG, Reactome, and WikiPathways. The relational structure of RaMP enables complex and batch queries.  To facilitate its usage, we have created this R shiny web application that includes a user-friendly R Shiny web application.  Please note that this project is in continuous development and we certainly appreciate your feedback (through [our](https://github.com/ncats/RaMP-DB) GitHub site). More details can be found in <a href="http://www.mdpi.com/2218-1989/8/1/16" target="_blank">our manuscript</a>.
 
 Also note that we are working on a server version of RaMP so that users do not have to install anything on their local machines.  Stay tuned!
 
@@ -29,7 +34,7 @@ In order to use the web application, you will need the following:
 * The R code under this repo
 * The mysql dump file that contains the RaMP database (in the folder inst/extdata/)
 
-If you would like to know how to build RaMP database from scratch, please check another GitHub site at [RaMP-BackEnd](https://github.com/Mathelab/RaMP-BackEnd)
+If you would like to know how to build RaMP database from scratch, please check another GitHub site at [RaMP-BackEnd](https://github.com/ncats/RaMP-BackEnd)
 
 ### MySQL set-up
 **Warning:** RaMP will not readily work with the new MySQL version (8.X.X), but is fully functional with MySQL version 5.7. We will be working toward updating RaMP to work with the newest MySQL version.
@@ -84,7 +89,7 @@ You can install this package directly from GitHub using the install_github() fun
 ```R
 install.packages(“devtools”)
 library(devtools)
-install_github("mathelab/RAMP-DB")
+install_github("ncats/RAMP-DB")
 # Load the package
 library(RaMP)
 ```
@@ -117,10 +122,12 @@ If you reinstall the latest version of the RaMP package, be sure to also install
 
 Also, when gene or metabolite ids are input for queries, IDs should be prepended with their database of origin, e.g. kegg:C02712, hmdb:HMDB04824, or CAS:2566-39-4. The list of IDs that are currently included in RaMP are: CAS, chebi, chemspider, enzymeNomenclature, ensembl, entrez, hmdb, keg, LIPIDMAPS, pubchem, uniprot.
 
-## Authors
-* **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
+## Current Authors
 * **Ewy Mathé** - [Mathelab](https://github.com/MatheLab)
-* **Andrew Patt** - andrew.patt@osumc.edu
+* **Andrew Patt** - patt.14@buckeyemail.osu.edu
+* **John Braisted** - john.braisted@nih.gov
+
+## Previous Authors
+* **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
 * **Shunchao Wang** - shunchao.wang@osumc.edu
 * **Rohith Vanam** - rohith.vanam@osumc.edu
-
