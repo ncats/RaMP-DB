@@ -440,19 +440,19 @@ sysdataObject <- function() {
             is.data.frame(wiki_metab))
 
   # uncomment devtools::use_data function to create sysdata.Rda object
-  # devtools::use_data(genes_result,
-  #                    metabolites_result,
-  #                    analyte_result,
-  #                    hmdb_gene,
-  #                    hmdb_metab,
-  #                    kegg_gene,
-  #                    kegg_metab,
-  #                    reactome_gene,
-  #                    reactome_metab,
-  #                    wiki_gene,
-  #                    wiki_metab,
-  #                    overwrite = TRUE,
-  #                    internal = TRUE)
+  devtools::use_data(genes_result,
+                     metabolites_result,
+                     analyte_result,
+                     hmdb_gene,
+                     hmdb_metab,
+                     kegg_gene,
+                     kegg_metab,
+                     reactome_gene,
+                     reactome_metab,
+                     wiki_gene,
+                     wiki_metab,
+                     overwrite = TRUE,
+                     internal = TRUE)
 
 }
 
@@ -466,7 +466,7 @@ sysdataObject <- function() {
 # step2: go to RaMP-DB dir
 # step3: open R console at RaMP-DB dir to build RaMP package
 # In R console:
-# >library(devtools)
+#>library(devtools)
 # >devtools::install()
 # >library(RaMP)
 # step5: Access RaMP library sysdata.rda object data
