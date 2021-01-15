@@ -252,7 +252,7 @@ output$FisherTestResultWithoutFilter_AnalyteType <- renderText({
   }
 })
 
-output$FisherTestResultWithoutFilter_fishresults <- renderDataTable({
+output$FisherTestResultWithoutFilter_fishresults <- DT::renderDataTable({
   if (!is.null(fisherTestResult())) {
     out <- fisherTestResult()
     out[[1]]

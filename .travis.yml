@@ -4,14 +4,19 @@ language: r
 bioc_required: true
 r:
   - bioc-release
-  - bioc-devel
+
+# Note: 11/19/2020 travis is not installing R 4.1 which is required for bioc-dev 3.13
+# not building on bioc-devel until there's a patch in travis
+#  - bioc-devel
 
 sudo: false
 cache: packages
 r_build_args: --no-build-vignettes --no-manual
 r_check_args: --no-build-vignettes --no-manual --as-cran
+
 before_install:
-  Rscript -e 'update.packages(ask = FALSE)'
+- Rscript -e '.libPaths("/home/travis/R/Library")'
+#- Rscript -e 'update.packages(ask = FALSE)'
 
 os:
   - linux
