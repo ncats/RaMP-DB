@@ -263,7 +263,6 @@ function(
     if (typeof(min_pathway_tocluster) == "character") {
         min_pathway_tocluster <- strtoi(min_pathway_tocluster, base = 0L)
     }
-
     analytes <- c(analyte)
 
     analysisResults <- pathway_enrichment_analysis(
