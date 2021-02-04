@@ -549,11 +549,6 @@ getPathwayFromAnalyte<- function(analytes=NULL,
     mdf <- merge(mdf,synonym,all.x = T,by.y = "rampId")
   }
   out<-mdf[!duplicated(mdf),]
-<<<<<<< HEAD
-  print(colnames(out))
-=======
-
->>>>>>> 5bbcf48c6a6c79ac31210b1de92fa5d701eea90c
   # For now, not returning HMDB pathways because they include the 30K
   # new pathways that are mainly drug and lipid pathways (need more proper
   # structural resolution matching)
