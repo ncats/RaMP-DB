@@ -25,5 +25,6 @@ Imports:
     properties,
     stringi,
     plumber,
-    sqldf
+    sqldf,
+    config
 RoxygenNote: 7.1.1

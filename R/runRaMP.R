@@ -41,27 +41,9 @@ runShinyApp <- function(conpass = NULL,host = "localhost",
 }
 
 run_plumber_app <- function(
-  db_password = NULL,
-  db_host = "localhost",
-  db_username = "root",
-  db_dbname = "ramp",
   api_host = "127.0.0.1",
   api_port = 5762
   ) {
     ramp_api <- plumber::plumb("./R/api/restAPI.R")
-    if (
-      is.null(db_password)
-      || is.null(db_host)
-      || is.null(db_username)
-      || is.null(db_dbname)
-    ) {
-        stop("Please define the password for the mysql connection")
-    }
-
-    .GlobalEnv$db_password <- db_password
-    .GlobalEnv$db_host <- db_host
-    .GlobalEnv$db_username <- db_username
-    .GlobalEnv$db_dbname <- db_dbname
-
     ramp_api$run(host = api_host, port = api_port)
   }

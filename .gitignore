@@ -2,3 +2,4 @@
 .Rhistory
 .RData
 inst/shinyApp/db.properties.template
+config.yml
