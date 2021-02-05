@@ -8,7 +8,7 @@ dataInput_name <- eventReactive(input$submit_compName,{
     progress$set(message = "Querying databases to find pathways ...", value = 0)
     progress$inc(0.3,detail = paste("Send Query ..."))
 
-    con <- DBI::dbConnect(RMySQL::MySQL(),
+    con <- DBI::dbConnect(RMariaDB::MariaDB(),
                         user = .username,
                         dbname = .dbname,
                         password = .conpass,
@@ -131,7 +131,7 @@ content = function(file) {
 # Second Tab
 #############
 data_mul_name <- eventReactive(input$sub_mul_tab3,{
-  con <- DBI::dbConnect(RMySQL::MySQL(),
+  con <- DBI::dbConnect(RMariaDB::MariaDB(),
                         user = .username,
                         dbname = .dbname,
                         password = .conpass,
@@ -239,7 +239,7 @@ output$preview_multi_names <- DT::renderDataTable({
 
 fisherTestResult <- eventReactive(input$runFisher,{
 
-  con <- DBI::dbConnect(RMySQL::MySQL(),
+  con <- DBI::dbConnect(RMariaDB::MariaDB(),
                         user = .username,
                         dbname = .dbname,
                         password = .conpass,
