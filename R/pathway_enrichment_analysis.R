@@ -10,6 +10,7 @@
 #' @param perc_pathway_overlap perc_pathway_overlap
 #' @param min_pathway_tocluster min_pathway_tocluster
 #' @return list with pathway enrichment analysis results
+#' @export 
 pathway_enrichment_analysis <- function(
     analytes="",
     identifier_type="names",
