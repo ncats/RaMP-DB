@@ -37,13 +37,13 @@ runRaMPapp <- function(conpass = NULL,host = "localhost",
 
 #' Run plumber API
 #'
-#' @api_host host
-#' @api_port port
-#' @export
+#' @param api_host host
+#' @param api_port port
+#' @param export
 run_plumber_app <- function(
   api_host = "127.0.0.1",
   api_port = 5762
   ) {
-    ramp_api <- plumber::plumb("./R/api/restAPI.R")
+    ramp_api <- plumber::plumb("./inst/api/plumber.R")
     ramp_api$run(host = api_host, port = api_port)
   }
