@@ -165,7 +165,7 @@ function(identifier) {
     dbname <- config$db_dbname
     username <- config$db_username
     conpass <- config$db_password
-    con <- DBI::dbConnect(RMySQL::MySQL(),
+    con <- DBI::dbConnect(RMariaDB::MariaDB(),
                           user = username,
                           dbname = dbname,
                           password = conpass,
@@ -197,7 +197,7 @@ function(pathwaySourceId="") {
     dbname <- config$db_dbname
     username <- config$db_username
     conpass <- config$db_password
-    con <- DBI::dbConnect(RMySQL::MySQL(),
+    con <- DBI::dbConnect(RMariaDB::MariaDB(),
                           user = username,
                           dbname=dbname,
                           password = conpass,
@@ -304,7 +304,6 @@ function(analyte="") {
             )
         },
         error=function(cond) {
-            print(cond)
             return(data.frame(stringsAsFactors=FALSE))
         }
     )
@@ -320,7 +319,6 @@ function(analyte="") {
             )
         },
         error=function(cond) {
-            print(cond)
             return(data.frame(stringsAsFactors=FALSE))
         }
     )
@@ -414,6 +412,7 @@ function(req, analyte_source_id, perc_analyte_overlap=0.2, perc_pathway_overlap=
     dbname <- config$db_dbname
     username <- config$db_username
     conpass <- config$db_password
+    fishers_results <- req$body
     fishers_results$fishresults <- as.data.frame(fishers_results$fishresults)
     clustering_results <- RaMP::findCluster(
         fishers_results,
