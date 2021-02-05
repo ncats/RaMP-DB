@@ -6,6 +6,11 @@
 \usage{
 run_plumber_app(api_host = "127.0.0.1", api_port = 5762)
 }
+\arguments{
+\item{api_host}{host}
+
+\item{api_port}{port}
+}
 \description{
 Run plumber API
 }

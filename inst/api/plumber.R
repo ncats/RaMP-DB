@@ -492,11 +492,11 @@ function(req, analyte_source_id, perc_analyte_overlap=0.2, perc_pathway_overlap=
 #' @get /pathway-enrichment-analysis
 #' @get /about
 function(res) {
-    plumber::include_html("../../client/index.html", res)
+    plumber::include_html("../client/index.html", res)
 }
 
-#' @assets ../../client /client
+#' @assets ../client /client
 list()
 
-#' @assets ../../client/assets /assets
+#' @assets ../client/assets /assets
 list()
