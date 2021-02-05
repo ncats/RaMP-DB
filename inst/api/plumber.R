@@ -231,7 +231,7 @@ function(analyte="") {
 
     analytes <- c(analyte)
 
-    analytes_df <- getOntoFromMeta(
+    analytes_df <- RaMP::getOntoFromMeta(
         analytes = analytes,
         conpass = conpass,
         host = host,
@@ -265,7 +265,7 @@ function(
     }
     analytes <- c(analyte)
 
-    analysisResults <- pathway_enrichment_analysis(
+    analysisResults <- RaMP::pathway_enrichment_analysis(
         analytes,
         identifier_type,
         p_holmadj_cutoff,
@@ -294,7 +294,7 @@ function(analyte="") {
     conpass <- config$db_password
     pathways_df_ids <- tryCatch(
         {
-            pathways_df <- getPathwayFromAnalyte(
+            pathways_df <- RaMP::getPathwayFromAnalyte(
                 analytes = analytes,
                 conpass=conpass,
                 host=host,
@@ -310,7 +310,7 @@ function(analyte="") {
     )
     pathways_df_names <- tryCatch(
         {
-            pathways_df <- getPathwayFromAnalyte(
+            pathways_df <- RaMP::getPathwayFromAnalyte(
                 analytes = analytes,
                 conpass=conpass,
                 host=host,
@@ -338,7 +338,7 @@ function(req) {
     username <- config$db_username
     conpass <- config$db_password
     pathways_df <- as.data.frame(req$body)
-    fishers_results_df <- runCombinedFisherTest(
+    fishers_results_df <- RaMP::runCombinedFisherTest(
         pathwaydf = pathways_df,
         conpass=conpass,
         host=host,
@@ -361,7 +361,7 @@ function(req, p_holmadj_cutoff=0.05, p_fdradj_cutoff=NULL) {
     conpass <- config$db_password
     fishers_results <- req$body
     fishers_results$fishresults <- as.data.frame(fishers_results$fishresults)
-    filtered_results <- FilterFishersResults(
+    filtered_results <- RaMP::FilterFishersResults(
         fishers_df=fishers_results,
         p_holmadj_cutoff = p_holmadj_cutoff,
         p_fdradj_cutoff = p_fdradj_cutoff
@@ -387,7 +387,7 @@ function(req, analyte_source_id, perc_analyte_overlap=0.2, perc_pathway_overlap=
     conpass <- config$db_password
     fishers_results <- req$body
     fishers_results$fishresults <- as.data.frame(fishers_results$fishresults)
-    clustering_results <- findCluster(
+    clustering_results <- RaMP::findCluster(
         fishers_results,
         perc_analyte_overlap=perc_analyte_overlap,
         min_pathway_tocluster=min_pathway_tocluster,
@@ -415,7 +415,7 @@ function(req, analyte_source_id, perc_analyte_overlap=0.2, perc_pathway_overlap=
     username <- config$db_username
     conpass <- config$db_password
     fishers_results$fishresults <- as.data.frame(fishers_results$fishresults)
-    clustering_results <- findCluster(
+    clustering_results <- RaMP::findCluster(
         fishers_results,
         perc_analyte_overlap=perc_analyte_overlap,
         min_pathway_tocluster=min_pathway_tocluster,
