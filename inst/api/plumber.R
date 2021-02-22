@@ -221,23 +221,98 @@ function(pathwaySourceId="") {
 
 #* Return analytes from pathway
 #* @param analyte
-#* @get /api/analytes
-function(analyte="") {
+#* @serializer unboxedJSON
+#* @get /api/ontologies
+function(metabolite="") {
     config <- config::get()
     host <- config$db_host
     dbname <- config$db_dbname
     username <- config$db_username
     conpass <- config$db_password
 
-    analytes <- c(analyte)
+    metabolites_ids <- c(metabolite)
+    numSubmittedIds <- length(metabolites_ids)
+    metabolites_ids <- sapply(metabolites_ids, shQuote)
+    metabolites_ids <- paste(metabolites_ids, collapse = ",")
 
-    analytes_df <- RaMP::getOntoFromMeta(
-        analytes = analytes,
-        conpass = conpass,
-        host = host,
-        dbname = dbname,
-        username = username
+    con <- DBI::dbConnect(RMariaDB::MariaDB(),
+                          user = username,
+                          dbname = dbname,
+                          password = conpass,
+                          host = host)
+    query <- paste0(
+        "select s.sourceId ",
+        "from source as s ",
+        "inner join analyte as a on s.rampId = a.rampId ",
+        "where s.sourceId in (", metabolites_ids, ") "
     )
+
+    metabolites <- DBI::dbGetQuery(con,query)
+
+    DBI::dbDisconnect(con)
+
+    if (nrow(metabolites) > 0) {
+
+        ontologies_df <- RaMP::getOntoFromMeta(
+            analytes = metabolites,
+            conpass = conpass,
+            host = host,
+            dbname = dbname,
+            username = username
+        )
+
+        return(list(numSubmittedIds=numSubmittedIds, numFoundIds=nrow(metabolites), data=ontologies_df))
+    } else {
+        return(list(numSubmittedIds=numSubmittedIds, numFoundIds=0, data=vector()))
+    }
+}
+
+#* Return metabolites from ontology
+#* @param analyte
+#* @serializer unboxedJSON
+#* @get /api/metabolites
+function(ontology="") {
+    config <- config::get()
+    host <- config$db_host
+    dbname <- config$db_dbname
+    username <- config$db_username
+    conpass <- config$db_password
+
+    ontologies_names <- c(ontology)
+    numSubmittedNames <- length(ontologies_names)
+    ontologies_names <- sapply(ontologies_names, shQuote)
+    ontologies_names <- paste(ontologies_names, collapse = ",")
+
+    con <- DBI::dbConnect(RMariaDB::MariaDB(),
+                          user = username,
+                          dbname = dbname,
+                          password = conpass,
+                          host = host)
+
+    query <- paste0(
+        "select o.commonName ",
+        "from ontology as o ",
+        "where o.commonName in (", ontologies_names, ") "
+    )
+
+    ontologies <- DBI::dbGetQuery(con,query)
+
+    DBI::dbDisconnect(con)
+
+    if (nrow(ontologies) > 0) {
+
+        metabolites_df <- RaMP::getMetaFromOnto(
+            ontology = ontologies,
+            conpass = conpass,
+            host = host,
+            dbname = dbname,
+            username = username
+        )
+
+        return(list(numSubmittedIds=numSubmittedNames, numFoundIds=nrow(ontologies), data=metabolites_df))
+    } else {
+        return(list(numSubmittedIds=numSubmittedNames, numFoundIds=0, data=vector()))
+    }
 
     return(analytes_df)
 }
