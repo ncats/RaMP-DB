@@ -133,7 +133,6 @@ getMetaFromOnto <- function(ontology,conpass = NULL,
   list_ontology <- unique(list_ontology)
   list_ontology <- sapply(list_ontology,shQuote)
   list_ontology <- paste(list_ontology,collapse = ",")
-
   con <- DBI::dbConnect(RMariaDB::MariaDB(),
                         dbname = dbname,
                         username = username,
