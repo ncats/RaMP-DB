@@ -439,20 +439,20 @@ sysdataObject <- function() {
             is.data.frame(wiki_gene),
             is.data.frame(wiki_metab))
 
-  uncomment devtools::use_data function to create sysdata.Rda object
-  devtools::use_data(genes_result,
-                     metabolites_result,
-                     analyte_result,
-                     hmdb_gene,
-                     hmdb_metab,
-                     kegg_gene,
-                     kegg_metab,
-                     reactome_gene,
-                     reactome_metab,
-                     wiki_gene,
-                     wiki_metab,
-                     overwrite = TRUE,
-                     internal = TRUE)
+  # uncomment devtools::use_data function to create sysdata.Rda object
+  # devtools::use_data(genes_result,
+  #                    metabolites_result,
+  #                    analyte_result,
+  #                    hmdb_gene,
+  #                    hmdb_metab,
+  #                    kegg_gene,
+  #                    kegg_metab,
+  #                    reactome_gene,
+  #                    reactome_metab,
+  #                    wiki_gene,
+  #                    wiki_metab,
+  #                    overwrite = TRUE,
+  #                    internal = TRUE)
 
 }
 
@@ -484,12 +484,12 @@ sysdataObject <- function() {
 # RaMP:::sysdataObject()
 
 # To generate new Rdata based on a new RaMP DB instance:
-RaMP:::updateOverlapMatrices(method="balanced" ,all="all", dbname='ramp2', conpass='ramptest', username = 'ramp', host='ramp-db.ncats.io')
-RaMP:::updateOverlapMatrices(method="balanced" ,all="analyte", dbname='ramp2', conpass='ramptest', username = 'ramp', host='ramp-db.ncats.io')
-RaMP:::processData(conpass='ramptest', dbname='ramp2', username='ramp', host='ramp-db.ncats.io')
-
-setwd("C:\\Tools\\R\\R-4.0.0\\library\\RaMP")
+# RaMP:::updateOverlapMatrices(method="balanced" ,all="all", dbname='ramp2', conpass='ramptest', username = 'ramp', host='ramp-db.ncats.io')
+# RaMP:::updateOverlapMatrices(method="balanced" ,all="analyte", dbname='ramp2', conpass='ramptest', username = 'ramp', host='ramp-db.ncats.io')
+# RaMP:::processData(conpass='ramptest', dbname='ramp2', username='ramp', host='ramp-db.ncats.io')
+# 
+# setwd("C:\\Tools\\R\\R-4.0.0\\library\\RaMP")
 
 #uncomment devtools::use_data just above and run this:
-RaMP:::sysdataObject()
+# RaMP:::sysdataObject()
 
