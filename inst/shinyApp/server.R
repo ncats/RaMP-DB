@@ -21,4 +21,6 @@ server <- function(input, output, session) {
   # Tab 6 Customize query to database 
   # source(file.path("server","tab6.R"),local = TRUE)$value
   
+  # Don't use the Cairo package for rendering images in shiny
+  options(shiny.usecairo=FALSE)
 }
