@@ -58,14 +58,14 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
     # wiki_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="wiki"),"rampId"])]))
     # react_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="reactome"),"rampId"])]))
     # kegg_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="kegg"),"rampId"])]))
-    
+
     # first extract source-specific ids, then select for compound ids from the source-specific ids
     sourceIds <- allids[which(allids$pathwaySource=="wiki"),"rampId"]
     wiki_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
 
     sourceIds <- allids[which(allids$pathwaySource=="reactome"),"rampId"]
     react_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
-    
+
     sourceIds <- allids[which(allids$pathwaySource=="kegg"),"rampId"]
     kegg_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
 
@@ -74,7 +74,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   }
 
   if(analyte_type=="genes") {
-    
+
     # for now we're using a fixed population size for genes
     # this can be enhanced to take a list of all measured genes
     # or use a subset of genes having pathway annotations within each source
@@ -243,7 +243,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
   #print(paste0(length(pidstorun),"pathways"))
 
-  # We're collecting p-values for all pathways, now those with no analyte support at all - JCB:? 
+  # We're collecting p-values for all pathways, now those with no analyte support at all - JCB:?
 
   # calculating p-values for all other pathways
   kegg_metab <- kegg_metab
@@ -266,15 +266,15 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
     if (i %in% kegg_metab$pathwayRampId) {
       tot_in_pathway <- kegg_metab[which(kegg_metab[,"pathwayRampId"]==i),"Freq"]
       total_analytes <- kegg_totanalytes
-      
+
     } else if (i %in% wiki_metab$pathwayRampId) {
       tot_in_pathway <- wiki_metab[which(wiki_metab[,"pathwayRampId"]==i),"Freq"]
       total_analytes <- wiki_totanalytes
-      
+
     } else if (i %in% reactome_metab$pathwayRampId) {
       tot_in_pathway <- reactome_metab[which(reactome_metab[,"pathwayRampId"]==i),"Freq"]
       total_analytes <- react_totanalytes
- 
+
     } else if (i %in% hmdb_metab$pathwayRampId) {
       tot_in_pathway <- hmdb_metab[which(hmdb_metab[,"pathwayRampId"]==i),"Freq"]
       total_analytes <- NULL
@@ -315,15 +315,15 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
     user_out_pathway <- length(unique(pathwaydf$rampId))
 
     # This line was commented out in production *but* now we have total_analytes set properly
-    # not sure why this line was changed. 
+    # not sure why this line was changed.
     # user_out_pathway <- total_analytes - user_in_pathway
-   
+
     contingencyTb[1,1] <- tot_in_pathway - user_in_pathway
     contingencyTb[1,2] <- tot_out_pathway - user_out_pathway
     contingencyTb[2,1] <- user_in_pathway
     contingencyTb[2,2] <- user_out_pathway
 
-    # Added try catch 
+    # Added try catch
     tryCatch({
       result <- stats::fisher.test(contingencyTb)
     }, error = function(e) {
@@ -331,7 +331,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
       print(i)
       print(contingencyTb)
     })
-    
+
     pval2 <- c(pval2,result$p.value )
     userinpath2<-c(userinpath2,user_in_pathway)
     totinpath2<-c(totinpath2,tot_in_pathway)
@@ -368,16 +368,6 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   # foruser is the output needed, based on what user input
   return(out)
 }
-
-
-
-
-
-
-
-
-
-
 
 
 #' Do fisher test for only one pathway from search result
@@ -511,18 +501,6 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
 
   return(list(fishresults=out2,analyte_type=analyte_type))
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #' Function that search analytes (gene or compounds)  or a list of analytes and
