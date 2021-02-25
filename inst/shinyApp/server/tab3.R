@@ -8,16 +8,10 @@ dataInput_name <- eventReactive(input$submit_compName,{
     progress$set(message = "Querying databases to find pathways ...", value = 0)
     progress$inc(0.3,detail = paste("Send Query ..."))
 
-    con <- DBI::dbConnect(RMariaDB::MariaDB(),
-                        user = .username,
-                        dbname = .dbname,
-                        password = .conpass,
-                        host = .host)
-    on.exit(DBI::dbDisconnect(con))
-
     rampOut <- RaMP::getPathwayFromAnalyte(analytes=input$KW_synonym,
                                            NameOrIds=input$NameOrId,
-                                           con = con)
+                                           conpass=.conpass,
+                                           host = .host, dbname = .dbname, username = .username)
     progress$inc(0.7,detail = paste("Done!"))
     return (rampOut)
   }, error = function(e) return())
@@ -131,11 +125,6 @@ content = function(file) {
 # Second Tab
 #############
 data_mul_name <- eventReactive(input$sub_mul_tab3,{
-  con <- DBI::dbConnect(RMariaDB::MariaDB(),
-                        user = .username,
-                        dbname = .dbname,
-                        password = .conpass,
-                        host = .host)
   tryCatch({
     #print(input$input_mul_tab3)
     parsedinput <- paste(strsplit(input$input_mul_tab3,"\n")[[1]])
@@ -143,7 +132,9 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
     if(length(parsedinput)==0) {metabsearch=NULL} else{
       metabsearch <- RaMP::getPathwayFromAnalyte(analytes=parsedinput,
                                                  NameOrIds=input$NameOrSourcemult,
-                                                 con = con)
+                                                 conpass=.conpass,
+                                                 host = .host,
+                                                 dbname = .dbname, username = .username)
       print(input$input_mul_tab3_genes)
     }
 
@@ -152,17 +143,15 @@ data_mul_name <- eventReactive(input$sub_mul_tab3,{
     if(length(parsedinputg)==0) {genesearch=NULL} else{
       genesearch <- RaMP::getPathwayFromAnalyte(analytes=parsedinputg,
                                                 NameOrIds=input$NameOrSourcemult_genes,
-                                                con = con)
+                                                conpass=.conpass,
+                                                host = .host,
+                                                dbname = .dbname, username = .username)
     }
     print(paste("metabsearch: ",ncol(metabsearch)))
     print(paste("genesearch: ",ncol(genesearch)))
     print(paste0("DIM of data_mul_name",nrow(rbind(metabsearch,genesearch))))
     rbind(metabsearch,genesearch)
-  }, error = function(e) return(),
-  finally = {
-    print("DB disconnected")
-    DBI::dbDisconnect(con)
-  })
+  }, error = function(e) return() )
 })
 
 summary_path_out_tab2<- eventReactive(input$sub_mul_tab3,{
@@ -238,29 +227,17 @@ output$preview_multi_names <- DT::renderDataTable({
 
 
 fisherTestResult <- eventReactive(input$runFisher,{
-
-  con <- DBI::dbConnect(RMariaDB::MariaDB(),
-                        user = .username,
-                        dbname = .dbname,
-                        password = .conpass,
-                        host = .host)
-                      
-  tryCatch({
-    progress <- shiny::Progress$new()
-    on.exit(progress$close())
-    progress$set(message = "Fisher Testing ...", value = 0)
-    progress$inc(0.3)
-    out <- RaMP::runCombinedFisherTest(req(data_mul_name()),
-                                con=con)
-    progress$inc(0.7,detail = paste("Done!"))
-      print("Results generated")
-      print(paste0("Fisher results size:",nrow(out[[1]])))
-    out
-  }, error = function(e) return(),
-  finally = {
-    print("DB disconnected")
-    DBI::dbDisconnect(con)
-  })
+  progress <- shiny::Progress$new()
+  on.exit(progress$close())
+  progress$set(message = "Fisher Testing ...", value = 0)
+  progress$inc(0.3)
+  out <- RaMP::runCombinedFisherTest(req(data_mul_name()),
+                               conpass=.conpass,
+                               dbname = .dbname, username = .username, host = .host)
+  progress$inc(0.7,detail = paste("Done!"))
+    print("Results generated")
+    print(paste0("Fisher results size:",nrow(out[[1]])))
+  out
 })
 
 output$FisherTestResultWithoutFilter_AnalyteType <- renderText({
