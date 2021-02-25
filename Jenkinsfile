@@ -13,8 +13,7 @@ pipeline {
         pollSCM('H/5 * * * *')
     }
     environment {
-        PROJECT_NAME = "rampdb-api"
-        DOCKER_REPO_NAME = "684150170045.dkr.ecr.us-east-1.amazonaws.com/rampdb-api"
+        PROJECT_NAME = "rampdb"
     }
     stages {
         stage('Build Version') {
@@ -44,17 +43,21 @@ pipeline {
             steps {
                 sshagent (credentials: ['871f96b5-9d34-449d-b6c3-3a04bbd4c0e4']) {
                     withEnv([
-                        "IMAGE_NAME=rampdb-api",
+                        "IMAGE_NAME=rampdb",
                         "BUILD_VERSION=" + (params.BUILD_VERSION ?: env.BUILD_VERSION)
                     ]) {
                         checkout scm
                         configFileProvider([
-                            configFile(fileId: 'ramp-api-install.R', targetLocation: 'install.R')
+                            configFile(fileId: 'ramp-db-install-script', targetLocation: 'install.R'),
+                            configFile(fileId: 'shiny-server.conf', targetLocation: 'shiny-server.conf')
                         ]) {
                             script {
-                                def image = docker.build("${env.IMAGE_NAME}","--no-cache .")
-                                docker.withRegistry("https://684150170045.dkr.ecr.us-east-1.amazonaws.com", "ecr:us-east-1:aws-jenkins-build") {
-                                    docker.image("${env.IMAGE_NAME}").push("${env.BUILD_VERSION}")
+                                def image = docker.build(
+                                    "ncats/rampdb:${env.BUILD_VERSION}",
+                                    "--no-cache ."
+                                )
+                                docker.withRegistry("https://registry-1.docker.io/v2/","f16c74f9-0a60-4882-b6fd-bec3b0136b84") {
+                                    image.push("${env.BUILD_VERSION}")
                                 }
                             }
                         }
@@ -64,29 +67,22 @@ pipeline {
         }
         stage('Deploy Application') {
             agent {
-                node { label 'rampdb-ci-ec2-02'}
+                node { label 'rampdb-ci-ec2-01'}
             }
             steps {
                 cleanWs()
                 configFileProvider([
-                    configFile(fileId: 'ramp-api-config.yml', targetLocation: 'config.yml'),
-                    configFile(fileId: 'ramp-api-docker-compose.yml', targetLocation: 'docker-compose.yml')
-                ]) {
+                    configFile(fileId: 'ramp-db-properties', targetLocation: 'db.properties'),
+                    configFile(fileId: 'rampdb-docker-compose.yml', targetLocation: 'docker-compose.yml')
+                ]) {	
                     withEnv([
-                            "IMAGE_NAME=rampdb-api",
-                            "BUILD_VERSION=" + (params.BUILD_VERSION ?: env.BUILD_VERSION)
-                        ]) {
-                        withAWS(credentials:'aws-jenkins-build') {
-                            sh '''
-                            chmod 755 config.yml
-                            export DOCKER_LOGIN="`aws ecr get-login --no-include-email --region us-east-1`"
-                            $DOCKER_LOGIN
-                            '''
-                            ecrLogin()
-                            script {
-                                def docker = new org.labshare.Docker()
-                                docker.deployDockerAPI()
-                            }
+                        "DOCKER_REPO_NAME=ncats/rampdb",
+                        "BUILD_VERSION=" + (params.BUILD_VERSION ?: env.BUILD_VERSION)
+                    ]) {
+                        sh 'chmod 755 db.properties'
+                        script {
+                            def docker = new org.labshare.Docker()
+                            docker.deployDockerUI()
                         }
                     }
                 }

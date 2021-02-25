@@ -23,8 +23,5 @@ Imports:
     xtable,
     visNetwork,
     properties,
-    stringi,
-    plumber,
-    sqldf,
-    config
+    stringi
 RoxygenNote: 7.1.1
