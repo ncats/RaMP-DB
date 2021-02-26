@@ -9,8 +9,7 @@ Authors@R: c(
     person("Ewy", "Mathe", email = "Ewy.Mathe@nih.gov", role = c("aut", "cre")),
     person("Ivan", "Grishagin", email = "ivan.grishagin@nih.gov", role = "aut"),
     person("Jorge", "Neyra", email = "jorge.neyra@nih.gov", role = "aut"),
-    person("John", "Braisted", email = "john.braisted@nih.gov", role = "aut")
-)
+    person("John", "Braisted", email = "john.braisted@nih.gov", role = "aut"))
 
 
 
