@@ -2,6 +2,7 @@
 ^\.travis\.yml$
 ^\.appveyor\.yml$
 ^\.Rproj\.user$
+
 ^img/.*$
 ^runtime\.txt$
 ^install\.R$
