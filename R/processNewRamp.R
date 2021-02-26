@@ -466,10 +466,30 @@ sysdataObject <- function() {
 # step2: go to RaMP-DB dir
 # step3: open R console at RaMP-DB dir to build RaMP package
 # In R console:
-# >library(devtools)
+#>library(devtools)
 # >devtools::install()
 # >library(RaMP)
 # step5: Access RaMP library sysdata.rda object data
 # In R console:
 # >library(RaMP)
-# >RaMP:::
+
+# To generate new Rdata based on a new RaMP DB instance:
+# RaMP:::updateOverlapMatrices(method="balanced" ,all="all", dbname=<dbname>, conpass=<password>, username = <username>, host=<hostname>)
+# RaMP:::updateOverlapMatrices(method="balanced" ,all="analyte", dbname=<dbname>, conpass=<password>, username = <username>, host=<hostname>)
+# RaMP:::processData(conpass=<password>, dbname=<dbname>, username=<username>, host=<hostname>)
+
+#setwd(<local_ramp_library_root>)
+
+# uncomment devtools::use_data just above and run this:
+# RaMP:::sysdataObject()
+
+# To generate new Rdata based on a new RaMP DB instance:
+# RaMP:::updateOverlapMatrices(method="balanced" ,all="all", dbname='ramp2', conpass='ramptest', username = 'ramp', host='ramp-db.ncats.io')
+# RaMP:::updateOverlapMatrices(method="balanced" ,all="analyte", dbname='ramp2', conpass='ramptest', username = 'ramp', host='ramp-db.ncats.io')
+# RaMP:::processData(conpass='ramptest', dbname='ramp2', username='ramp', host='ramp-db.ncats.io')
+# 
+# setwd("C:\\Tools\\R\\R-4.0.0\\library\\RaMP")
+
+#uncomment devtools::use_data just above and run this:
+# RaMP:::sysdataObject()
+
