@@ -40,7 +40,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
   # Get the total number of metabolites that are mapped to pathways in RaMP (that's the default background)
   query <- "select * from analytehaspathway"
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                         password = conpass,
                         dbname = dbname,
                         host = host)
@@ -86,7 +86,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
                    list_pid,")")
 
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                         password = conpass,
                         dbname = dbname,
                         host = host)
@@ -99,13 +99,13 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   query2 <- paste0("select * from analytehaspathway where pathwayRampId in (",
                    list_pid,")")
 
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                         password = conpass,
                         dbname = dbname,
                         host = host)
 
   input_RampIds <- DBI::dbGetQuery(con,query2)
-
+  DBI::dbDisconnect(con)
   if(is.null(input_RampIds)) {
 
     stop("Data doesn't exist")
@@ -212,7 +212,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
   # Now run fisher's tests for all other pids
   query <- "select distinct(pathwayRampId) from analytehaspathway where pathwaySource != 'hmdb';"
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                         password = conpass,
                         dbname = dbname,
                         host = host)
@@ -225,7 +225,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   query2 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
                    pidstorunlist,")")
 
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                         password = conpass,
                         dbname = dbname,
                         host = host)
@@ -234,7 +234,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
   query1 <- paste0("select rampId,pathwayRampId from analytehaspathway;")
 
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                         password = conpass,
                         dbname = dbname,
                         host = host)
@@ -609,7 +609,6 @@ getPathwayFromAnalyte<- function(analytes=NULL,
     mdf <- merge(mdf,synonym,all.x = T,by.y = "rampId")
   }
   out<-mdf[!duplicated(mdf),]
-
   # For now, not returning HMDB pathways because they include the 30K
   # new pathways that are mainly drug and lipid pathways (need more proper
   # structural resolution matching)
@@ -761,7 +760,7 @@ findCluster <- function(fishers_df,perc_analyte_overlap = 0.5,
 
     # Reformat cluster list to embed into results file
     rampids<-as.vector(fishers_df$pathwayRampId)
-    fishers_df$pathwayRampId<-NULL
+    # fishers_df$pathwayRampId<-NULL
 
     if(length(cluster_list)>1){
       cluster_assignment<-sapply(rampids,function(x){
@@ -784,7 +783,7 @@ findCluster <- function(fishers_df,perc_analyte_overlap = 0.5,
       fishers_df<-cbind(fishers_df,rep("Did not cluster",times=nrow(fishers_df)))
     }
     fishers_df$rampids<-rampids
-    output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list=cluster_list)
+    output<-list(fishresults=fishers_df,analyte_type=analyte_type,cluster_list=cluster_list,pathway_matrix=pathway_matrix)
     return(output)
   }
 }

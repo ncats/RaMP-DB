@@ -6,8 +6,15 @@
 Aggregate ramp Id to ramp pathway Id
 GC is C or G}
 \usage{
-findAnalyteHasPathway(pathwayRampId, GC = "C", n = 10,
-  username = "root", dbname = "ramp", conpass, host = "localhost")
+findAnalyteHasPathway(
+  pathwayRampId,
+  GC = "C",
+  n = 10,
+  username = "root",
+  dbname = "ramp",
+  conpass,
+  host = "localhost"
+)
 }
 \arguments{
 \item{pathwayRampId}{a vector of ramp Pathway ID}

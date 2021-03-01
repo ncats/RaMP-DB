@@ -4,8 +4,13 @@
 \alias{rampFileOfAnalytes_tab4}
 \title{Generate dataframe from given files for shiny app input list of metabolites}
 \usage{
-rampFileOfAnalytes_tab4(infile, conpass = NULL, dbname = "ramp",
-  username = "root", host = "localhost")
+rampFileOfAnalytes_tab4(
+  infile,
+  conpass = NULL,
+  dbname = "ramp",
+  username = "root",
+  host = "localhost"
+)
 }
 \arguments{
 \item{infile}{a file object given from files}
