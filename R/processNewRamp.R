@@ -17,7 +17,7 @@ findAnalyteHasPathway <- function(pathwayRampId,GC = "C",n = 10,
                                   dbname = 'ramp',
                                   conpass,
                                   host = 'localhost'){
-  con <- DBI::dbConnect(RMySQL::MySQL(),
+  con <- DBI::dbConnect(RMariaDB::MariaDB(),
                         user = username,
                         dbname=dbname,
                         password = conpass,
@@ -140,7 +140,7 @@ updateOverlapMatrix <- function(min_analyte,overlapmethod,together,conpass,
                                 host = 'localhost',dbname = 'ramp',
                                 username = 'root'){
   if(!together){
-    con <- DBI::dbConnect(RMySQL::MySQL(),
+    con <- DBI::dbConnect(RMariaDB::MariaDB(),
                           user = username,
                           dbname= dbname,
                           password = conpass,
@@ -227,7 +227,7 @@ updateOverlapMatrix <- function(min_analyte,overlapmethod,together,conpass,
       gene = gene_result
     ))
   } else if(together){
-    con <- DBI::dbConnect(RMySQL::MySQL(),
+    con <- DBI::dbConnect(RMariaDB::MariaDB(),
                           user = username,
                           dbname=dbname,
                           password = conpass,
@@ -333,7 +333,7 @@ processData <- function(conpass,
 
   # get all rows form analytehaspathway
   query <- "select * from analytehaspathway"
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
                         password = conpass,
                         dbname = dbname,
                         host = host)

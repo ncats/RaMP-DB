@@ -15,7 +15,7 @@ FisherTestData <- list(
 
 # Unlist automatically select first column, the first column should
 # be the data containing keywords
-con <- DBI::dbConnect(RMySQL::MySQL(),
+con <- DBI::dbConnect(RMariaDB::MariaDB(),
                       username = .username,
                       dbname = .dbname,
                       password = .conpass,

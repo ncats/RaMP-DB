@@ -14,7 +14,7 @@ getOntoFromMeta <- function(analytes,conpass = NULL,
                          host = 'localhost',
                          username = 'root',
                          NameOrIds = 'ids'){
-  cat(file=stderr(), "db connection in Package call host:dbname:username:conpass-- ", host, dbname, username, conpass, "\n")
+  # cat(file=stderr(), "db connection in Package call host:dbname:username:conpass-- ", host, dbname, username, conpass, "\n")
   if(!(NameOrIds %in% c('ids','name')))
     stop("Specifiy the type of given data to 'ids' or 'name'")
 
@@ -39,7 +39,7 @@ getOntoFromMeta <- function(analytes,conpass = NULL,
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
 
-  con <- DBI::dbConnect(RMySQL::MySQL(),
+  con <- DBI::dbConnect(RMariaDB::MariaDB(),
                         dbname = dbname,
                         username = username,
                         host = host,
@@ -61,7 +61,7 @@ getOntoFromMeta <- function(analytes,conpass = NULL,
   rampid <- unique(df$rampId)
   rampid <- sapply(rampid,shQuote)
   rampid <- paste(rampid,collapse = ',')
-  con <- DBI::dbConnect(RMySQL::MySQL(),
+  con <- DBI::dbConnect(RMariaDB::MariaDB(),
                         dbname = dbname,
                         username = username,
                         host = host,
@@ -80,7 +80,7 @@ getOntoFromMeta <- function(analytes,conpass = NULL,
   rampontoid <- paste(rampontoid,collapse = ',')
   sql <- paste0('select * from ontology where rampOntologyIdLocation in (',
                 rampontoid,');')
-  con <- DBI::dbConnect(RMySQL::MySQL(),
+  con <- DBI::dbConnect(RMariaDB::MariaDB(),
                         dbname = dbname,
                         username = username,
                         host = host,
@@ -133,8 +133,7 @@ getMetaFromOnto <- function(ontology,conpass = NULL,
   list_ontology <- unique(list_ontology)
   list_ontology <- sapply(list_ontology,shQuote)
   list_ontology <- paste(list_ontology,collapse = ",")
-
-  con <- DBI::dbConnect(RMySQL::MySQL(),
+  con <- DBI::dbConnect(RMariaDB::MariaDB(),
                         dbname = dbname,
                         username = username,
                         host = host,
@@ -147,7 +146,7 @@ getMetaFromOnto <- function(ontology,conpass = NULL,
   print(colnames(df))
   rampontoid <- paste(sapply(unique(df$rampOntologyIdLocation),shQuote),
                       collapse = ',')
-  con <- DBI::dbConnect(RMySQL::MySQL(),
+  con <- DBI::dbConnect(RMariaDB::MariaDB(),
                         dbname = dbname,
                         username = username,
                         host = host,
@@ -160,7 +159,7 @@ getMetaFromOnto <- function(ontology,conpass = NULL,
 
   print(colnames(df2))
   rampid <- paste(sapply(unique(df2$rampCompoundId),shQuote),collapse = ',')
-  con <- DBI::dbConnect(RMySQL::MySQL(),
+  con <- DBI::dbConnect(RMariaDB::MariaDB(),
                         dbname = dbname,
                         username = username,
                         host = host,

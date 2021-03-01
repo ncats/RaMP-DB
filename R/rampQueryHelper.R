@@ -42,7 +42,7 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
     query <- paste0("select Synonym as origins,rampId from analytesynonym where Synonym in(",
                     list_metabolite,
                     ");")
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
         password = conpass,
         dbname = dbname,
         host = host)
@@ -57,7 +57,7 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
   query <- paste0("select Synonym as origins,rampId from analytesynonym where Synonym in(",
                   list_metabolite,
                   ");")
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
         password = conpass,
         dbname = dbname,
         host = host)
@@ -68,7 +68,7 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
   rampid <- sapply(rampid,shQuote)
   rampid <- paste(rampid,collapse = ",")
   query <- paste0("select * from analytesynonym where rampId in(",rampid,");")
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
         password = conpass,
 	      dbname = dbname,
         host = host)
@@ -119,7 +119,7 @@ rampFindSourceFromId <- function(rampId=NULL,full = TRUE,
   list_id <- paste(list_id,collapse = ",")
   query <- paste0("select * from source where rampId in (",list_id,");")
 
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
         password = conpass,
         dbname = dbname,
         host = host)
@@ -160,7 +160,7 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
   list_metabolite <- paste(list_metabolite,collapse = ",")
   query1 <- paste0("select * from source where sourceid in (",
                    list_metabolite,");")
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
         password = conpass,
         dbname = dbname,
         host = host)
@@ -174,7 +174,7 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
   rampid <- paste(rampid,collapse = ",")
   query2 <- paste0("select * from analytehaspathway where
                    rampId in (",rampid,");")
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
         password = conpass,
         dbname = dbname,
         host = host)
@@ -187,7 +187,7 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
   print(id_list)
   query3 <- paste0("select * from pathway where pathwayRampId in (",
                    id_list,");")
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
         password = conpass,
         dbname = dbname,
         host = host)
@@ -235,7 +235,7 @@ rampFindSourceRampId <- function(sourceId, conpass=NULL,
   }
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
-  con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
         password = conpass,
         dbname = dbname,
         host = host)
@@ -244,3 +244,4 @@ rampFindSourceRampId <- function(sourceId, conpass=NULL,
   DBI::dbDisconnect(con)
   return(df)
 }
+

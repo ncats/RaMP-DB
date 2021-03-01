@@ -4,8 +4,7 @@
 \alias{processData}
 \title{processData function generates pathway RampId frequency (gene or metabolite) based on pathway source (hmdb,kegg,reactome,wiki)}
 \usage{
-processData(conpass, dbname = "ramp", username = "root",
-  host = "localhost")
+processData(conpass, dbname = "ramp", username = "root", host = "localhost")
 }
 \arguments{
 \item{conpass}{a string that specifies password for database connection}

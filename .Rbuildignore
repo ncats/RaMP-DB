@@ -6,4 +6,4 @@
 ^img/.*$
 ^runtime\.txt$
 ^install\.R$
-
+^\.vscode/.*$
