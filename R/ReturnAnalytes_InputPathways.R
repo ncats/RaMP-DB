@@ -8,8 +8,7 @@
 #' @return a data.frame that contains all search results
 #' @examples
 #' \dontrun{
-#' con <- connectToRaMP(dbname="ramp",username="root",conpass="mypassword")
-#' getAnalyteFromPathway <- pathway="sphingolipid metabolism",conpass="mypassword")
+#' myanalytes <- getAnalyteFromPathway(pathway="sphingolipid metabolism",conpass="mypassword")
 #' }
 #' @export
 getAnalyteFromPathway <- function(pathway,conpass=NULL,
@@ -73,11 +72,11 @@ getAnalyteFromPathway <- function(pathway,conpass=NULL,
   mdf1 <- merge(df3,df2,all.x=T)
   mdf1 <- merge(mdf1,df1,all.x=T,by="pathwayRampId")
   mdf1 <- mdf1[!duplicated(mdf1),]
-  mdf1[,-which(colnames(mdf1) %in% "sourceId.y")]
+  #mdf1[,-which(colnames(mdf1) %in% "sourceId.y")]
   colnames(mdf1)[which(colnames(mdf1)=="sourceId.x")]="sourceId"
   mdf1$temp<-paste(mdf1$pathwayRampId,mdf1$rampId,sep=";")
   # use regular expression to remove substring before ':'
-  mdf1$sourceId <- gsub('.*:','',mdf1$sourceId)
+  #mdf1$sourceId <- gsub('.*:','',mdf1$sourceId)
   out=data.frame(pathwayName=NA,pathwayCategory=NA,pathwayType=NA,compoundName=NA,
                  sourceCompoundIDs=NA,geneOrCompound=NA)
   # Reformat so that you have one metabolite, with all synonyms, in one line:
@@ -87,7 +86,7 @@ getAnalyteFromPathway <- function(pathway,conpass=NULL,
     temp <- mdf1[which(mdf1$temp==i),]
     out$sourceCompoundIDs <- paste(paste(temp$IDtype,temp$sourceId,sep=": "),collapse="; ")
     out$pathwayName <- temp[1,"pathwayName"]
-    out$pathwayCategory <- temp[1,"pathwayCategory"]
+    #out$pathwayCategory <- temp[1,"pathwayCategory"]
     out$pathwayType <- temp[1,"type"]
     out$compoundName <- temp[1,"commonName"]
     out$geneOrCompound <- temp[1,"geneOrCompound"]
