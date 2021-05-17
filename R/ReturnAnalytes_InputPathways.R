@@ -8,7 +8,11 @@
 #' @return a data.frame that contains all search results
 #' @examples
 #' \dontrun{
+#' # To query one pathway:
 #' myanalytes <- getAnalyteFromPathway(pathway="sphingolipid metabolism",conpass="mypassword")
+#'
+#' # To query multiple pathways:
+#' myanalytes <- getAnalyteFromPathway(pathway=c("De Novo Triacylglycerol Biosynthesis", "sphingolipid metabolism"),conpass="")
 #' }
 #' @export
 getAnalyteFromPathway <- function(pathway,conpass=NULL,
