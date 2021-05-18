@@ -4,14 +4,7 @@
 \alias{chemicalClassSurvey}
 \title{Returns chemical class information comparing a metabolite subset to a metabolite population}
 \usage{
-chemicalClassSurvey(
-  mets,
-  pop = NULL,
-  conpass = "ramptest",
-  dbname = "ramp2",
-  host = "ramp-db.ncats.io",
-  username = "ramp"
-)
+chemicalClassSurvey(mets, pop = NULL, conpass, dbname, host, username)
 }
 \arguments{
 \item{mets}{a list object of source prepended metaboite ids, representing a metabolite set of interest}
@@ -55,4 +48,33 @@ There are two sections, one for the metabolite list and a second when an optiona
 }
 \description{
 Returns chemical class information comparing a metabolite subset to a metabolite population
+}
+\examples{
+\dontrun{
+# metabolite list of interest
+metList = c('hmdb:HMDB0000056',
+            'hmdb:HMDB0000439',
+            'hmdb:HMDB0000479',
+            'hmdb:HMDB0000532',
+            'hmdb:HMDB0001015',
+            'hmdb:HMDB0001138',
+            'hmdb:HMDB0029159',
+            'hmdb:HMDB0029412',
+            'hmdb:HMDB0034365',
+            'hmdb:HMDB0035227',
+            'hmdb:HMDB0007973',
+            'hmdb:HMDB0008057',
+            'hmdb:HMDB0011211')
+
+# the background population can be a separate ID list (preferred) or all database entries (skip pop parameter).
+metClassResult <- chemicalClassSurvey(mets = mets, conpass, dbname, host, username)
+
+# show structure
+str(metClassResult)
+
+# show a count summary, metabolite class mappings and query report
+metClassResult$count_summary$class
+metClassResult$met_classes
+metClassResult$query_report
+}
 }
