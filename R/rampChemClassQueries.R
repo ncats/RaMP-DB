@@ -33,12 +33,40 @@
 #' \strong{return_obj$query_report} this reports on the query list size, the number of input ids
 #' that were found in the database and a list of metabolite ids that were not found in the database.
 #' There are two sections, one for the metabolite list and a second when an optional population list is provided.
+#'#'@examples
+#'\dontrun{
+#' # metabolites list of interest
+#' metList = c('hmdb:HMDB0000056',
+#'             'hmdb:HMDB0000439',
+#'             'hmdb:HMDB0000479',
+#'             'hmdb:HMDB0000532',
+#'             'hmdb:HMDB0001015',
+#'             'hmdb:HMDB0001138',
+#'             'hmdb:HMDB0029159',
+#'             'hmdb:HMDB0029412',
+#'             'hmdb:HMDB0034365',
+#'             'hmdb:HMDB0035227',
+#'             'hmdb:HMDB0007973',
+#'             'hmdb:HMDB0008057',
+#'             'hmdb:HMDB0011211')
 #'
+#' # the background population can be a separate ID list (preferred) or all database entries (skip pop parameter).
+#' metClassResult <- chemicalClassSurvey(mets = mets, conpass, dbname, host, username)
+#'
+#' # show structure
+#' str(metClassResult)
+#'
+#' # show a count summary, metabolite class mappings and query report
+#' metClassResult$count_summary$class
+#' metClassResult$met_classes
+#' metClassResult$query_report
+#'}
 #' @export
-chemicalClassSurvey <- function(mets, pop = NULL, conpass = 'ramptest',
-                                dbname = 'ramp2',
-                                host = 'ramp-db.ncats.io',
-                                username = 'ramp') {
+chemicalClassSurvey <- function(mets, pop = NULL,
+                                conpass,
+                                dbname,
+                                host,
+                                username) {
 
   conn <- connectToRaMP(conpass=conpass, dbname = dbname, host=host, username=username)
 
@@ -61,6 +89,28 @@ chemicalClassSurvey <- function(mets, pop = NULL, conpass = 'ramptest',
 #' @param classData a chemical class result object from chemicalClassSurvey
 #' @return a data frame containing chemical class enrichment statistics
 #'
+#'#'#'@examples
+#'\dontrun{
+#' # metabolites list of interest
+#' metList = c('hmdb:HMDB0000056',
+#'             'hmdb:HMDB0000439',
+#'             'hmdb:HMDB0000479',
+#'             'hmdb:HMDB0000532',
+#'             'hmdb:HMDB0001015',
+#'             'hmdb:HMDB0001138',
+#'             'hmdb:HMDB0029159',
+#'             'hmdb:HMDB0029412',
+#'             'hmdb:HMDB0034365',
+#'             'hmdb:HMDB0035227',
+#'             'hmdb:HMDB0007973',
+#'             'hmdb:HMDB0008057',
+#'             'hmdb:HMDB0011211')
+#'
+#' # the background population can be a separate ID list (preferred) or all database entries (skip pop parameter).
+#' metClassResult <- chemicalClassSurvey(mets = mets, conpass, dbname, host, username)
+#'
+#' enrichedClassStats <- chemicalClassEnrichment(metClassResult)
+#'}
 #' @export
 chemicalClassEnrichment <- function(classData) {
   print("Starting Chemical Class Enrichement")
@@ -110,7 +160,25 @@ chemicalClassEnrichment <- function(classData) {
 ###########
 #
 # Supporting functions
+#
 ###########
+
+
+# check for id prefixes
+checkIdPrefixes <- function(idList) {
+  idCount <- length(idList)
+  prefixCount <- 0
+  for(id in idList) {
+    if(grepl(";",id, fixed = TRUE)) {
+      prefixCount <- prefixCount + 1
+    }
+  }
+  if(prefixCount/idCount < 0.9) {
+    warn <- paste("RaMP expects ids to be prefixed with the source database." + (idCount-prefixCount) + " of " + idCount + " ids lack prefixes.\n", sep="")
+    warnObj <- Warning(warn, call=TRUE, immediate=TRUE)
+    print(warnObj)
+  }
+}
 
 
 # runs and tallies chemical class information *when there is a user defined population
@@ -316,21 +384,5 @@ bhCorrect <- function(resultMat) {
   return(resultMat)
 }
 
-
-
-# conn <- connectToRaMP(conpass = 'ramptest',
-#                                  dbname = 'ramp2',
-#                                  host = 'ramp-db.ncats.io',
-#                               username = 'ramp')
-#
-# res <- chemicalClassSurvey(mets=mets, pop=pop)
-#
-# res2 <- chemicalClassSurvey(mets = mets)
-#
-# DBI::dbDisconnect(conn)
-# library(DBI)
-#
-# fT2 <- chemicalClassEnrichment(res)
-# fT3 <- chemicalClassEnrichment(res2)
 
 
