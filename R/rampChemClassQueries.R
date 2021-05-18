@@ -33,9 +33,9 @@
 #' \strong{return_obj$query_report} this reports on the query list size, the number of input ids
 #' that were found in the database and a list of metabolite ids that were not found in the database.
 #' There are two sections, one for the metabolite list and a second when an optional population list is provided.
-#'#'@examples
+#'@examples
 #'\dontrun{
-#' # metabolites list of interest
+#' # metabolite list of interest
 #' metList = c('hmdb:HMDB0000056',
 #'             'hmdb:HMDB0000439',
 #'             'hmdb:HMDB0000479',
@@ -89,9 +89,9 @@ chemicalClassSurvey <- function(mets, pop = NULL,
 #' @param classData a chemical class result object from chemicalClassSurvey
 #' @return a data frame containing chemical class enrichment statistics
 #'
-#'#'#'@examples
+#'@examples
 #'\dontrun{
-#' # metabolites list of interest
+#' # metabolite list of interest
 #' metList = c('hmdb:HMDB0000056',
 #'             'hmdb:HMDB0000439',
 #'             'hmdb:HMDB0000479',
