@@ -12,7 +12,8 @@
 #' myanalytes <- getAnalyteFromPathway(pathway="sphingolipid metabolism",conpass="mypassword")
 #'
 #' # To query multiple pathways:
-#' myanalytes <- getAnalyteFromPathway(pathway=c("De Novo Triacylglycerol Biosynthesis", "sphingolipid metabolism"),conpass="")
+#' myanalytes <- getAnalyteFromPathway(pathway=c("De Novo Triacylglycerol Biosynthesis", 
+#'	"sphingolipid metabolism"),conpass="")
 #' }
 #' @export
 getAnalyteFromPathway <- function(pathway,conpass=NULL,
