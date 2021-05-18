@@ -7,3 +7,5 @@
 ^runtime\.txt$
 ^install\.R$
 ^\.vscode/.*$
+^Dockerfile$
+^Jenkinsfile$
