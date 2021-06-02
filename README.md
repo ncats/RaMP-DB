@@ -81,7 +81,7 @@ select * from analytesynonym where synonym = "glucose";
 ### Install and load the RaMP package 
 You can install this package directly from GitHub using the install_github() function available through the devtools package. In the R Console, type the following:
 ```R
-install.packages(“devtools”)
+install.packages("devtools")
 library(devtools)
 install_github("ncats/RAMP-DB")
 # Load the package
