@@ -17,14 +17,14 @@ writePathwaysToCSV <- function(mypathways=NULL,outputfile=NULL) {
 }
 
 
-#' Function that writes Fishers Test results to a CSV file
+#' Function that writes Fishers Test results, after clustering to a CSV file
 #' 
 #' @param fishResults a data frame returned by function runCombinedFisherTest()
 #' @param outputfile name of output file
 #' @export
 write_FishersResults <- function(fishResults=NULL,outputfile=NULL){
-        if(is.null(fishResults) || is.null(outputfile)) {
-                stop("Be sure to specify the output of the function findCluster() and an output file")
+        if(is.null(fishResults)) {
+                stop("Be sure to specify the output of the function findCluster()")
         }
 	clusters <- fishResults$cluster_list
 	if(is.null(clusters)) {
@@ -58,9 +58,16 @@ write_FishersResults <- function(fishResults=NULL,outputfile=NULL){
                              "In Cluster","rampids")
         		  rampOut<-rampOut[order(rampOut[,"Holm Adjusted P Value"]),]
       			}
-	      utils::write.csv(rampOut,outputfile,row.names = FALSE)
+#	      utils::write.csv(rampOut,outputfile,row.names = FALSE)
     		}else{
-      			utils::write.csv(c("No significant results"),outputfile,row.names = FALSE)
+      			rampOut <- "No significant results"		
+#	utils::write.csv(c("No significant results"),outputfile,row.names = FALSE)
     		}
 	}
+	if(is.null(outputfile)) {
+		return(rampOut)
+	} else {
+		utils::write.csv(rampOut,outputfile,row.names = FALSE)
+	}
+
 }
