@@ -2,7 +2,7 @@
 % Please edit documentation in R/writingFunctions.R
 \name{write_FishersResults}
 \alias{write_FishersResults}
-\title{Function that writes Fishers Test results to a CSV file}
+\title{Function that writes Fishers Test results, after clustering to a CSV file}
 \usage{
 write_FishersResults(fishResults = NULL, outputfile = NULL)
 }
@@ -12,5 +12,5 @@ write_FishersResults(fishResults = NULL, outputfile = NULL)
 \item{outputfile}{name of output file}
 }
 \description{
-Function that writes Fishers Test results to a CSV file
+Function that writes Fishers Test results, after clustering to a CSV file
 }
