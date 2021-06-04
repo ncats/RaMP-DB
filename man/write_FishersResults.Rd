@@ -2,15 +2,17 @@
 % Please edit documentation in R/writingFunctions.R
 \name{write_FishersResults}
 \alias{write_FishersResults}
-\title{Function that writes Fishers Test results to a CSV file}
+\title{Function that writes Fishers Test results, after clustering to a CSV file}
 \usage{
-write_FishersResults(fishResults = NULL, outputfile = NULL)
+write_FishersResults(fishResults = NULL, outputfile = NULL, rampid = F)
 }
 \arguments{
 \item{fishResults}{a data frame returned by function runCombinedFisherTest()}
 
 \item{outputfile}{name of output file}
+
+\item{rampid}{whether or not to include rampId (default is FALSE)}
 }
 \description{
-Function that writes Fishers Test results to a CSV file
+Function that writes Fishers Test results, after clustering to a CSV file
 }

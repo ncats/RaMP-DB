@@ -10,9 +10,13 @@ The purpose of RaMP is to provide a publicly available database that integrates 
 Also note that we are working on a server version of RaMP so that users do not have to install anything on their local machines.  Stay tuned!
 
 ## Basic Features:
-The app performs some complex queries (e.g. retrieve all metabolites and/or genes that belong to a user input pathway or list of pathways).  It also performs pathway enrichment analysis given a list of metabolites and/or genes. Run the app to get further details.
+The R packages and associated app performs some complex queries (e.g. retrieve all metabolites and/or genes that belong to a user input pathway or list of pathways).  It also performs pathway enrichment analysis given a list of metabolites and/or genes. Run the app to get further details.
 
 Last date of dump file update: 03/02/2018
+
+## Vignette
+Detailed instructions for installing RaMP locally are below.  We've also put together a vignette to get you started on the analyses.  Click here for [vignette](https://ncats.github.io/RaMP-DB/RaMP_Vignette.html).
+
 
 ## Citation
 If you use RaMP, please cite the following work:
@@ -53,9 +57,9 @@ mysql> exit;
 
 Here, we are naming the database RaMP but you can use any name you'd like.  It is worth noting though that the R package assumes that the name of the database is 'ramp' by default.  So if you change the name, remember to pass that name as arguments in the R package functions.
 
-Second, populate the named database with the mysql dump file (which you can get from  inst/extdata/ramp.sql):
+Second, populate the named database with the mysql dump file (which you can get from  inst/extdata/ramp180302.sql):
 ```
-> mysql -u root -p ramp < ramp.sql
+> mysql -u root -p ramp < ramp180302.sql
 ```
 
 You're done!
@@ -81,7 +85,7 @@ select * from analytesynonym where synonym = "glucose";
 ### Install and load the RaMP package 
 You can install this package directly from GitHub using the install_github() function available through the devtools package. In the R Console, type the following:
 ```R
-install.packages(“devtools”)
+install.packages("devtools")
 library(devtools)
 install_github("ncats/RAMP-DB")
 # Load the package
@@ -123,9 +127,11 @@ Also, when gene or metabolite ids are input for queries, IDs should be prepended
 
 
 ## Current Authors
-* **Ewy Mathé** - [Mathelab](https://github.com/MatheLab)
-* **Andrew Patt** - patt.14@buckeyemail.osu.edu
 * **John Braisted** - john.braisted@nih.gov
+* **Ewy Mathé** - ewy.mathe@nih.gov
+* **Jorge Neyra** -jorge.neyra@nih.gov
+* **Andrew Patt** - andy.patt@nih.gov
+* **Kyle Spencer** - kyle.spencer@nih.gov
 
 ## Previous Authors
 * **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
