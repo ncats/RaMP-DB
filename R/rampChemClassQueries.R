@@ -169,14 +169,15 @@ checkIdPrefixes <- function(idList) {
   idCount <- length(idList)
   prefixCount <- 0
   for(id in idList) {
-    if(grepl(";",id, fixed = TRUE)) {
+    if(grepl(":",id, fixed = TRUE)) {
       prefixCount <- prefixCount + 1
     }
   }
   if(prefixCount/idCount < 0.9) {
     warn <- paste("RaMP expects ids to be prefixed with the source database." + (idCount-prefixCount) + " of " + idCount + " ids lack prefixes.\n", sep="")
     warnObj <- Warning(warn, call=TRUE, immediate=TRUE)
-    print(warnObj)
+    print("Common metabolite prefixes: CAS:, chebi:, chemspider:, hmdb:, kegg:, LIPIDMAPS:, pubchem:")
+    print("Examples: kegg:C02712, hmdb:HMDB04824, CAS:2566-39-4. The input list may contain a variety of id types.")
   }
 }
 
