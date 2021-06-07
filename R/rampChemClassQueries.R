@@ -185,7 +185,12 @@ checkIdPrefixes <- function(idList) {
 chemicalClassSurveyRampIdsConn <- function(mets, pop, conn) {
 
   mets <- unique(mets)
+
+  checkIdPrefixes(mets)
+
   pop <- unique(pop)
+
+  checkIdPrefixes(pop)
 
   result <- list()
 
@@ -268,6 +273,9 @@ chemicalClassSurveyRampIdsConn <- function(mets, pop, conn) {
 chemicalClassSurveyRampIdsFullPopConn <- function(mets, conn) {
 
   mets <- unique(mets)
+
+  checkIdPrefixes(mets)
+
   result <- list()
 
   # first handle metabolites of interest
