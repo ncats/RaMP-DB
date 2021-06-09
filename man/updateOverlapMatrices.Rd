@@ -7,7 +7,7 @@
 updateOverlapMatrices(
   method,
   all,
-  conpass,
+  conpass = NULL,
   host = "localhost",
   dbname = "ramp",
   username = "root"
