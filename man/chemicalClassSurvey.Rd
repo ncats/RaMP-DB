@@ -29,14 +29,14 @@ The returned object (return_obj below) contains three or four main result areas.
 
 \strong{return_obj$count_summary} contains a dataframe for each category of class annotations (e.g. class, sub_class)
 This count summary contains:
-\describe
+\describe{
   \item{category or level name}{The chemical class category, e.g. class, sub_class, super_class}
   \item{class name}{The chemical class name, e.g. Organooxygen compounds}
   \item{pop_counts and met_counts}{Population and metabolite list counts for each class}
   \item{fract_of_pop}{The fraction of the met list's metabolites compared to the population class hits}
   \item{fract_within_pop}{The fraction of population metabolites within the class describing how common the class is within the population.}
   \item{fract_within_mets}{The fraction of met list metabolites witin the class describing how common the class is within the metabolite list.}
-
+}
 
 \strong{return_obj$met_classes} metabolite classes for each input metabolite list id
 

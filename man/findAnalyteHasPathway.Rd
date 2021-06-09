@@ -12,7 +12,7 @@ findAnalyteHasPathway(
   n = 10,
   username = "root",
   dbname = "ramp",
-  conpass,
+  conpass = NULL,
   host = "localhost"
 )
 }
