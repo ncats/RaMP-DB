@@ -16,13 +16,12 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
 ## Introduction
 
 This vignette will provide basic steps for interacting with [RaMP](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5876005/) (Relational database of Metabolomic Pathways).  
 The codebase for RaMP is available on [our GitHub site](https://github.com/ncats/RaMP-DB).  Details on RaMP installation are also avaialble through GitHub, and questions can be asked through the Issues tab.
 
-This vignette provides the basic steps after RaMP has been installed locally and includes four functionalities:
+This vignette provides the basic steps after RaMP has been installed locally and includes various functionalities:
 
 1) Retrieve Analytes From Input Pathway(s)
 2) Retrieve Pathways From Input Analyte(s)
@@ -37,7 +36,11 @@ library(formattable) # this is to make some of the outputs look nicer
 ```
 
 Then set your password for accessing the RaMP DB through MySQL to conpass:
-```{r}
+```{r, eval=FALSE}
+conpass="password"
+```
+
+```{r, echo=FALSE}
 conpass=""
 ```
 
@@ -50,7 +53,7 @@ formattable(myanalytes[1:4,])
 
 To retrieve information from multiple pathways, input a vector of pathway names:
 ```{r}
-myanalytes <- getAnalyteFromPathway(pathway=c("De Novo Triacylglycerol Biosynthesis", "sphingolipid metabolism"),conpass="")
+myanalytes <- getAnalyteFromPathway(pathway=c("De Novo Triacylglycerol Biosynthesis", "sphingolipid metabolism"),conpass=conpass)
 ```
 
 ## Retrieve Pathways From Input Analyte(s)
@@ -93,7 +96,7 @@ lapply(unique(pathwaydfids$commonName), function(x) {
 Using the pathways that our analytes map to, captured in the pathwaydfids data frame in the previous step, we can now run Fisher's Exact test to identify pathways that are enriched for our analytes of interest:
 
 ```{r}
-fisher.results <- RaMP::runCombinedFisherTest(pathwaydf = pathwaydfids, conpass="") 
+fisher.results <- RaMP::runCombinedFisherTest(pathwaydf = pathwaydfids, conpass=conpass)
 ```
 
 Once we have our fisher results we can format them into a new dataframe and filter the pathways for significance.
@@ -102,7 +105,7 @@ For this example we will be using an FDR p-value cutoff of 0.20.
 #Returning Fisher Pathways and P-Values
 filtered.fisher.results <- FilterFishersResults(fisher.results, p_holmadj_cutoff=0.05)
 
-print("Pathways with Holm-adjusted Pval < 0.05")
+print("Pathways with Holm-adjusted Pval < 0.2")
 print(filtered.fisher.results$fishresults[,c("pathwayName","Pval_combined_Holm")])
 ```
 
@@ -117,7 +120,125 @@ clusters <- RaMP::findCluster(filtered.fisher.results, perc_analyte_overlap = 0.
 formattable(RaMP:::write_FishersResults(fishResults=clusters))
 ```
 
+## Retrieve Ontologies from Input Metabolites
+RaMP incorporates various types of ontologies as they related to analytes. Here are the ontologies currently found in RaMP: 
+
+```{r echo - FALSE}
+con <- RaMP:::connectToRaMP(conpass=conpass)
+query1 <- "select * from ontology;"
+df1 <- DBI::dbGetQuery(con,query1)
+```
+
+```{r echo = FALSE}
+#Formatting Output
+df1 <- dplyr::select(df1, c("commonName", "biofluidORcellular"))
+
+ontology.table <- matrix(nrow = length(unique(df1$biofluidORcellular)), ncol = ncol(df1))
+ontology.table <- as.data.frame(ontology.table)
+
+colnames(ontology.table) <- c("Ontology_Type", "Individual_Ontologies")
+ontology.table$Ontology_Type <- unique(df1$biofluidORcellular)
+
+biofluid.vec <- c()
+cell.vec <- c()
+origins.vec <- c()
+tissue.vec <- c()
+
+for(i in 1:nrow(df1)) {
+  if(df1$biofluidORcellular[i] == "biofluid") {
+    biofluid.vec <- c(biofluid.vec, df1$commonName[i])
+  }
+  if(df1$biofluidORcellular[i] == "cellular location") {
+    cell.vec <- c(cell.vec, df1$commonName[i])
+  }
+  if(df1$biofluidORcellular[i] == "origins") {
+    origins.vec <- c(origins.vec, df1$commonName[i])
+  }
+  if(df1$biofluidORcellular[i] == "tissue location") {
+    tissue.vec <- c(tissue.vec, df1$commonName[i])
+  }
+}
+
+biofluid.vec <- paste(biofluid.vec, sep = "", collapse = ", ")
+cell.vec <- paste(cell.vec, sep = "", collapse = ", ")
+origins.vec <- paste(origins.vec, sep = "", collapse = ", ")
+tissue.vec <- paste(tissue.vec, sep = "", collapse = ", ")
+
+for(i in 1:nrow(ontology.table)) {
+  if(ontology.table$Ontology_Type[i] == "biofluid") {
+    ontology.table$Individual_Ontologies[i] <- biofluid.vec
+  }
+  if(ontology.table$Ontology_Type[i] == "cellular location") {
+    ontology.table$Individual_Ontologies[i] <- cell.vec
+  }
+  if(ontology.table$Ontology_Type[i] == "origins") {
+    ontology.table$Individual_Ontologies[i] <- origins.vec
+  }
+  if(ontology.table$Ontology_Type[i] == "tissue location") {
+    ontology.table$Individual_Ontologies[i] <- tissue.vec
+  }
+}
+```
+
+```{r echo=FALSE}
+formattable(ontology.table)
+```
+
+The function getOntoFromMeta() retrieves ontologies that are associated with a user input list of metabolites. This function takes in a vector of metabolites as an input and the connection information (e.g. password) for access to the RaMP MySQL, and returns a data frame comprised of the ontologies from the user's defined metabolites.
+
+```{r}
+metabolites.of.interest <- c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
+        "hmdb:HMDB0000148", "ensembl:ENSG00000141510")
+
+new.ontologies <- RaMP::getOntoFromMeta(analytes = metabolites.of.interest, conpass = conpass)
+
+formattable(head(new.ontologies))
+```
+
+## Retrieve Metabolites from Input Ontologies
+Conversely, the user can retrieve the metabolites that are associated with a specific ontology or vector of ontologies using the function getMetaFromOnto(). The function input should also include the connection information (e.g. password) for access to the RaMP MySQL. The function will return all metabolites associated with user input ontology(ies).
+
+```{r}
+ontologies.of.interest <- c("Colon", "Liver", "Lung")
+
+new.metabolites <- RaMP::getMetaFromOnto(ontology = ontologies.of.interest, conpass = conpass)
+
+formattable(head(new.metabolites))
+```
+
+## Retrieve Analytes Involved in the Same Reaction
+RaMP tracks metabolites and proteins/genes that are involved in the same reaction. Users can thus retrieve gene transcripts that encode enzymes catalyzing reactions involving metabolites of interest (e.g. altered in a given experiment). 
+
+The function rampFastCata() can be used to this effect. The function input is a vector of metabolites of interest and the connection information (e.g. password) for access to the RaMP MySQL. The user can also input a vector of protein IDs or gene transcripts to return the metabolites involved in chemical reactions with the input proteins or gene transcript encoded proteins.
+
+```{r}
+#Input Metabolites
+metabolites.of.interest <- c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
+        "hmdb:HMDB0000148", "ensembl:ENSG00000141510")
+
+new.transcripts <- rampFastCata(analytes = metabolites.of.interest, conpass = conpass)
+
+formattable(head(new.transcripts))
+
+#Input Proteins
+proteins.of.interest <- c("hmdb:HMDBP00214", "hmdb:HMDBP00703", "kegg:2346")
+
+new.metabolites <- rampFastCata(analytes = proteins.of.interest, conpass = conpass)
+
+formattable(head(new.metabolites))
+```
+
+To visualize the output when retrieving analytes involved in the same reaction, RaMP has a built in function, plotCataNetwork(), that generates networks where nodes are analytes and edges denote a "reaction relationship"  This function uses the dataframe created by rampFastCata() as an input. The network plots returned are completely interactive.
+
+```{r}
+plotCataNetwork(new.transcripts)
+```
+
+## Questions
+If you have any questions/suggestions on the functionality of RaMP, please email them at .  For issues/bugs with the code, please create an issue in our GitHub repo (https://github.com/ncats/RaMP-DB). You can also contact us at ncatsramp@mail.nih.gov.
+
+
+
 ```{r}
 sessionInfo()
 ```
-
