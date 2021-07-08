@@ -529,19 +529,19 @@ sysdataObject <- function() {
             is.data.frame(wiki_metab))
 
   # uncomment usethis::use_data function to create sysdata.rda object
-  # usethis::use_data(genes_result,
-  #                    metabolites_result,
-  #                    analyte_result,
-  #                    hmdb_gene,
-  #                    hmdb_metab,
-  #                    kegg_gene,
-  #                    kegg_metab,
-  #                    reactome_gene,
-  #                    reactome_metab,
-  #                    wiki_gene,
-  #                    wiki_metab,
-  #                    overwrite = TRUE,
-  #                    internal = TRUE)
+  usethis::use_data(genes_result,
+                     metabolites_result,
+                     analyte_result,
+                     hmdb_gene,
+                     hmdb_metab,
+                     kegg_gene,
+                     kegg_metab,
+                     reactome_gene,
+                     reactome_metab,
+                     wiki_gene,
+                     wiki_metab,
+                     overwrite = TRUE,
+                     internal = TRUE)
 
 }
 
@@ -569,7 +569,5 @@ sysdataObject <- function() {
 # This will set up the sysdata.rda to be committed and pushed to the remote git repo.
 # This updated sysdata.rda will be pushed to users when they install.
 #
-
-
 
 
