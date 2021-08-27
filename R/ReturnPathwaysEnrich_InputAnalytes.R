@@ -1,6 +1,7 @@
 #' Do fisher test for only one pathway from search result
 #' clicked on highchart
 #' @param pathwaydf a data frame resulting from getPathwayFromAnalyte
+#' @param backgrounddf optional dataframe resulting from getPathwayFromAnalyte run on all analytes detected in study. This will be used as the background for the Fisher's contingency table. If left NULL, all analytes in RaMP are used as background
 #' @param total_metabolites number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param analyte_type "metabolites" or "genes" (default is "metabolites")
@@ -8,13 +9,16 @@
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
+#' @param socket (optional) location of mysql.sock file
 #' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
 #' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
-runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
+runFisherTest <- function(pathwaydf,backgrounddf=NULL,
+                          total_metabolites=NULL,total_genes=20000,
                           analyte_type="metabolites",conpass=NULL,
                           dbname="ramp",username="root",
-                          host = "localhost", MCall=T,alternative="less"){
+                          host = "localhost", socket=NULL,
+                          MCall=T,alternative="less"){
   now <- proc.time()
   print("Fisher Testing ......")
   if(is.null(conpass)) {
@@ -31,21 +35,21 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   #print(paste("early in fisher... total analytes =",toString(total_analytes),sep=" "))
   #print(paste("early in fisher... total mets=",toString(total_metabolites),sep=" "))
 
+  ## Initialize empty contingency table for later
   contingencyTb <- matrix(0,nrow = 2,ncol = 2)
   colnames(contingencyTb) <- c("In Pathway","Not In Pathway")
   rownames(contingencyTb) <- c("All Metabolites","User's Metabolites")
 
-  # Get pathway ids that contain the user analytes
+  ## Get pathway ids that contain the user analytes
   pid <- unique(pathwaydf$pathwayRampId);
   list_pid <- sapply(pid,shQuote)
   list_pid <- paste(list_pid,collapse = ",")
-
   # Get the total number of metabolites that are mapped to pathways in RaMP (that's the default background)
   query <- "select * from analytehaspathway"
-  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                        password = conpass,
+  con <- connectToRaMP( username = username,
+                        conpass = conpass,
                         dbname = dbname,
-                        host = host)
+                        host = host,socket = socket)
   allids <- DBI::dbGetQuery(con,query)
 
   # Close connection, then deduplicate id list
@@ -83,89 +87,53 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
     wiki_totanalytes <- react_totanalytes <- kegg_totanalytes <- total_genes
   }
 
-  # Retrieve the Ramp compound ids associated with the ramp pathway id and count them:
+  ## Input_RampIds is a table of all analytes included in pathways represented in the user set
+  ## "User" refers to significant analytes
+  input_RampIds<-buildFrequencyTables(pathwaydf,
+                             password=conpass, unix.socket=socket)
 
-  query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
-                   list_pid,")")
-
-  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                        password = conpass,
-                        dbname = dbname,
-                        host = host)
-  cids <- DBI::dbGetQuery(con,query1)#[[1]]
-
-  DBI::dbDisconnect(con)
-
-  # Generate freq table based on input pathwayRampIds.
-
-  query2 <- paste0("select * from analytehaspathway where pathwayRampId in (",
-                   list_pid,")")
-
-  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                        password = conpass,
-                        dbname = dbname,
-                        host = host)
-
-  input_RampIds <- DBI::dbGetQuery(con,query2)
-  DBI::dbDisconnect(con)
   if(is.null(input_RampIds)) {
 
-    stop("Data doesn't exist")
+      stop("Data doesn't exist")
 
   } else {
+      segregated_id_list<-segregateDataBySource(input_RampIds)
+      ## if(!is.null(backgrounddf)){
+      ##     input_RampIds_bg<-buildFrequencyTables(backgrounddf,
+      ##                                            password=conpass, unix.socket=socket)
+      ##     segregated_id_list_bg<-segregateDataBySource(input_RampIds_bg)
+      ## }
 
-# data frames for metabolites with pathawayRampID, Freq based  on Source(kegg, reactome, wiki)
-
-    input_RampId_C <- input_RampIds[grep("RAMP_C", input_RampIds$rampId), ]
-    unique_input_RampId_C <- unique(input_RampId_C[,c("rampId", "pathwayRampId")])
-    unique_pathwayRampId_source <- unique(input_RampId_C[,c("pathwayRampId", "pathwaySource")])
-
-    freq_unique_input_RampId_C <- as.data.frame(table(unique_input_RampId_C[,"pathwayRampId"]))
-
-    names(freq_unique_input_RampId_C)[1] = 'pathwayRampId'
-    merge_Pathwayfreq_source <- merge(freq_unique_input_RampId_C, unique_pathwayRampId_source, by="pathwayRampId")
-
-    # subset metabolite data based on source -  kegg, reactome, wiki
-
-    input_kegg_metab <- subset(merge_Pathwayfreq_source, merge_Pathwayfreq_source$pathwaySource == "kegg")
-    input_reactome_metab <- subset(merge_Pathwayfreq_source, merge_Pathwayfreq_source$pathwaySource == "reactome")
-    input_wiki_metab <- subset(merge_Pathwayfreq_source, merge_Pathwayfreq_source$pathwaySource == "wiki")
-
-# data frames for Genes with pathawayRampID, Freq based  on Source(kegg, reactome, wiki, hmdb)
-
-    input_RampId_G <- input_RampIds[grep("RAMP_G", input_RampIds$rampId), ]
-    unique_input_RampId_G <- unique(input_RampId_G[,c("rampId", "pathwayRampId")])
-    unique_pathwayG_source <- unique(input_RampId_G[,c("pathwayRampId", "pathwaySource")])
-
-    freq_unique_input_RampId_G <- as.data.frame(table(unique_input_RampId_G[,"pathwayRampId"]))
-
-    names(freq_unique_input_RampId_G)[1] = 'pathwayRampId'
-    merge_PathwayG_source <- merge(freq_unique_input_RampId_G, unique_pathwayG_source, by="pathwayRampId")
-
-   # subset gene data based on source -  kegg, reactome, wiki
-
-    input_kegg_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "kegg")
-    input_reactome_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "reactome")
-    input_wiki_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "wiki")
   }
 
   # Loop through each pathway, build the contingency table, and calculate Fisher's Exact
   # test p-value
   pval=totinpath=userinpath=pidused=c()
   for (i in pid) {
-    ids_inpath <- pathwaydf[which(pathwaydf$pathwayRampId==i),"rampId"]
+      ids_inpath <- pathwaydf[which(pathwaydf$pathwayRampId==i),"rampId"]
+      
 
     if(analyte_type=="metabolites") {
 	# Check to make sure that this pathway does have metabolites
 	if(length(grep("RAMP_C",ids_inpath)) == 0) {
 		user_in_pathway <- 0	
 	} else {
-		user_in_pathway <- length(unique(grep("RAMP_C",ids_inpath, value=TRUE)))
+            user_in_pathway <- length(unique(grep("RAMP_C",ids_inpath, value=TRUE)))
+            if(!is.null(backgrounddf)){
+                ids_inpath_bg <- backgrounddf[which(backgrounddf$pathwayRampId==i),"rampId"]
+                bg_in_pathway <- length(unique(grep("RAMP_C",ids_inpath_bg, value=TRUE)))
+            }
 	}
-	inputkegg <- input_kegg_metab
-	inputwiki <- input_wiki_metab
-	inputreact <- input_reactome_metab
-	tot_input_analytes <- length(grep("RAMP_C",unique(pathwaydf$rampId)))
+	inputkegg <- segregated_id_list[[1]][1][[1]]
+        inputreact <- segregated_id_list[[1]][2][[1]]
+	inputwiki <- segregated_id_list[[1]][3][[1]]
+	tot_user_analytes <- length(grep("RAMP_C",unique(pathwaydf$rampId)))
+        tot_bg_analytes <- length(grep("RAMP_C",unique(backgrounddf$rampId)))
+        ## if(!is.null(backgrounddf)){
+        ##     inputkegg_bg <- segregated_id_list_bg[[1]][1][[1]]
+        ##     inputreact_bg <- segregated_id_list_bg[[1]][2][[1]]
+        ##     inputwiki_bg <- segregated_id_list_bg[[1]][3][[1]]
+        ## }
     } else {
 	# Check to make sure that this pathway does have genes
 	 if(length(grep("RAMP_G",ids_inpath)) == 0) {
@@ -173,40 +141,72 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
         } else {
 		user_in_pathway <- length(unique(grep("RAMP_G",ids_inpath, value=TRUE)))
 	}
-        inputkegg <- input_kegg_gene
-        inputwiki <- input_wiki_gene
-        inputreact <- input_reactome_gene
-	tot_input_analytes <- length(grep("RAMP_G",unique(pathwaydf$rampId)))
+	inputkegg <- segregated_id_list[[2]][1][[1]]
+        inputreact <- segregated_id_list[[2]][2][[1]]
+	inputwiki <- segregated_id_list[[2]][3][[1]]
+	tot_user_analytes <- length(grep("RAMP_G",unique(pathwaydf$rampId)))
+        tot_bg_analytes <- length(grep("RAMP_G",unique(backgrounddf$rampId)))
+        ## if(!is.null(backgrounddf)){
+        ##     inputkegg_bg <- segregated_id_list_bg[[2]][1][[1]]
+        ##     inputreact_bg <- segregated_id_list_bg[[2]][2][[1]]
+        ##     inputwiki_bg <- segregated_id_list_bg[[2]][3][[1]]
+        ## }
     }
 
-      if ((!is.na(inputkegg$pathwayRampId[1])) && i %in% inputkegg$pathwayRampId) {
+    if ((!is.na(inputkegg$pathwayRampId[1])) && i %in% inputkegg$pathwayRampId) {
         tot_in_pathway <- inputkegg[which(inputkegg[,"pathwayRampId"]==i),"Freq"]
-        total_analytes <- kegg_totanalytes
-      } else if ((!is.na(inputwiki$pathwayRampId[1])) && i %in% inputwiki$pathwayRampId) {
+        ## if(is.null(backgrounddf)){
+            total_pathway_analytes <- kegg_totanalytes
+        ## }else{
+        ##     total_pathway_analytes <- inputkegg_bg[which(inputkegg_bg[,"pathwayRampId"]==i),"Freq"]
+        ## }
+    } else if ((!is.na(inputwiki$pathwayRampId[1])) && i %in% inputwiki$pathwayRampId) {
         tot_in_pathway <- inputwiki[which(inputwiki[,"pathwayRampId"]==i),"Freq"]
-        total_analytes <- wiki_totanalytes
-      } else if ((!is.na(inputreact$pathwayRampId[1])) && i %in% inputreact$pathwayRampId) {
+        ## if(is.null(backgrounddf)){
+            total_pathway_analytes <- wiki_totanalytes
+        ## }else{
+        ##     total_pathway_analytes <- inputwiki_bg[which(inputwiki_bg[,"pathwayRampId"]==i),"Freq"]
+        ## }
+    } else if ((!is.na(inputreact$pathwayRampId[1])) && i %in% inputreact$pathwayRampId) {
         tot_in_pathway <- inputreact[which(inputreact[,"pathwayRampId"]==i),"Freq"]
-        total_analytes <- react_totanalytes
-      } else {
+        ## if(is.null(backgrounddf)){
+            total_pathway_analytes <- react_totanalytes
+        ## }else{
+        ##     total_pathway_analytes <- inputreact_bg[which(inputreact_bg[,"pathwayRampId"]==i),"Freq"]
+        ## }
+    } else {
         tot_in_pathway = 0
-      }
+    }
 
     if(tot_in_pathway==0 || user_in_pathway==0) {
 	pval <- c(pval, NA)
     } else {
-      tot_out_pathway <- total_analytes - tot_in_pathway
+      tot_out_pathway <- total_pathway_analytes - tot_in_pathway
       # fill the rest of the table out
       
-      user_in_pathway <- length(unique(pathwaydf[which(pathwaydf$pathwayRampId==i),"rampId"]))
+      ## user_in_pathway <- length(unique(pathwaydf[which(pathwaydf$pathwayRampId==i),"rampId"]))
+      bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId==i),"rampId"]))
       # EM - Corrected the following line that initially counted all input analytes without regard as to whether
       # whether they were genes or metabolites.
       #user_out_pathway <- length(unique(pathwaydf$rampId)) - user_in_pathway
-      user_out_pathway <- tot_input_analytes - user_in_pathway
-      contingencyTb[1,1] <- tot_in_pathway - user_in_pathway
-      contingencyTb[1,2] <- tot_out_pathway - user_out_pathway
+      user_out_pathway <- tot_user_analytes - user_in_pathway
+
+      if(!is.null(backgrounddf)){
+          bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId==i),"rampId"]))
+          bg_out_pathway <- tot_bg_analytes - bg_in_pathway 
+      }
+      
+      contingencyTb[1,1] <- ifelse(is.null(backgrounddf),
+                                   tot_in_pathway - user_in_pathway,
+                                   bg_in_pathway)
+      contingencyTb[1,2] <- ifelse(is.null(backgrounddf),
+                                   tot_out_pathway - user_out_pathway,
+                                   bg_out_pathway)
       contingencyTb[2,1] <- user_in_pathway
       contingencyTb[2,2] <- user_out_pathway
+
+      print(i)
+      print(contingencyTb)
 
       # Put the test into a try catch in case there's an issue, we'll have some details on the contingency matrix
       tryCatch({
@@ -225,14 +225,14 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
       pidused <- c(pidused,i)
   } # end for loop
 
-  # Now run fisher's tests for all other pids
+  # Now run fisher's tests for all other pids (all pathways not covered in dataset)
   if(MCall == T) {
   	# Now run fisher's tests for all other pids
   	query <- "select distinct(pathwayRampId) from analytehaspathway where pathwaySource != 'hmdb';"
-  	con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                        password = conpass,
+  	con <- connectToRaMP( username = username,
+                        conpass = conpass,
                         dbname = dbname,
-                        host = host)
+                        host = host,socket = socket)
 	  allpids <- DBI::dbGetQuery(con,query)
 	  DBI::dbDisconnect(con)
 	  pidstorun <- setdiff(allpids[,1],pid)
@@ -242,19 +242,19 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 	  query2 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
                    pidstorunlist,")")
 
-	  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                        password = conpass,
+	  con <- connectToRaMP( username = username,
+                        conpass = conpass,
                         dbname = dbname,
-                        host = host)
+                        host = host,socket = socket)
 	  restcids <- DBI::dbGetQuery(con,query2)#[[1]]
 	  DBI::dbDisconnect(con)
 
 	  query1 <- paste0("select rampId,pathwayRampId from analytehaspathway;")
 
-	  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                        password = conpass,
+	  con <- connectToRaMP( username = username,
+                        conpass = conpass,
                         dbname = dbname,
-                        host = host)
+                        host = host,socket = socket)
 	  allcids <- DBI::dbGetQuery(con,query1)#[[1]]
 	  DBI::dbDisconnect(con)
 
@@ -297,36 +297,36 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 	      tot_in_pathway=0
 	      total_analytes <- NULL
 	    }
-
+              
 	  } else {
-	    if (i %in% kegg_gene$pathwayRampId) {
-	      tot_in_pathway <- kegg_gene[which(kegg_gene[,"pathwayRampId"]==i),"Freq"]
-	      total_analytes <- kegg_totanalytes
-	    } else if (i %in% wiki_gene$pathwayRampId) {
-	      tot_in_pathway <- wiki_gene[which(wiki_gene[,"pathwayRampId"]==i),"Freq"]
-	      total_analytes <- wiki_totanalytes
-	    } else if (i %in% reactome_gene$pathwayRampId) {
-	      tot_in_pathway <- reactome_gene[which(reactome_gene[,"pathwayRampId"]==i),"Freq"]
-	      total_analytes <- react_totanalytes
-	    } else if (i %in% hmdb_gene$pathwayRampId) {
-  	    tot_in_pathway <- hmdb_gene[which(hmdb_gene[,"pathwayRampId"]==i),"Freq"]
-  	    total_analytes <- NULL
-  	  } else {
-  	    tot_in_pathway=0
-  	    total_analytes <- NULL
-  	  }
-  	}
+              if (i %in% kegg_gene$pathwayRampId) {
+                  tot_in_pathway <- kegg_gene[which(kegg_gene[,"pathwayRampId"]==i),"Freq"]
+                  total_analytes <- kegg_totanalytes
+              } else if (i %in% wiki_gene$pathwayRampId) {
+                  tot_in_pathway <- wiki_gene[which(wiki_gene[,"pathwayRampId"]==i),"Freq"]
+                  total_analytes <- wiki_totanalytes
+              } else if (i %in% reactome_gene$pathwayRampId) {
+                  tot_in_pathway <- reactome_gene[which(reactome_gene[,"pathwayRampId"]==i),"Freq"]
+                  total_analytes <- react_totanalytes
+              } else if (i %in% hmdb_gene$pathwayRampId) {
+                  tot_in_pathway <- hmdb_gene[which(hmdb_gene[,"pathwayRampId"]==i),"Freq"]
+                  total_analytes <- NULL
+              } else {
+                  tot_in_pathway=0
+                  total_analytes <- NULL
+              }
+          }
 
 	  # Check that the pathway being considered has your analyte type, if not, move on
 
-	    if(is.null(total_analytes)) {next;}
-	    tot_out_pathway <- total_analytes - tot_in_pathway
+                  if(is.null(total_analytes)) {next;}
+                  tot_out_pathway <- total_analytes - tot_in_pathway
 	    # fill the rest of the table out
 	
 	    # JCB: Another issue 10/7/2020
 	    # This line was used for user_out_pathway
 	    # This section of code is for all pathways that have no analyte support.
-	    user_out_pathway <- length(unique(pathwaydf$rampId))
+                  user_out_pathway <- length(unique(pathwaydf$rampId))
 	
 	    # This line was commented out in production *but* now we have total_analytes set properly
 	    # not sure why this line was changed.
@@ -336,7 +336,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 	    contingencyTb[1,2] <- tot_out_pathway - user_out_pathway
 	    contingencyTb[2,1] <- user_in_pathway
 	    contingencyTb[2,2] <- user_out_pathway
-
+               
 	    # Added try catch
 	    tryCatch({
 	      result <- stats::fisher.test(contingencyTb,alternative=alternative)
@@ -392,10 +392,73 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   return(out)
 }
 
+buildFrequencyTables<-function(inputdf,
+                               password=conpass,
+                               dbname="ramp",username="root",
+                               host = "localhost", unix.socket=socket){
+    ## Get pathway ids that contain the user analytes
+    pid <- unique(inputdf$pathwayRampId);
+    list_pid <- sapply(pid,shQuote)
+    list_pid <- paste(list_pid,collapse = ",")
+    
+    ## Retrieve compound ids associated with background pathways and count 
+    query <- paste0("select * from analytehaspathway where pathwayRampId in (",
+                     list_pid,")")
+    
+    con <- connectToRaMP(username = username,
+                         conpass = password,
+                         dbname = dbname,
+                         host = host,socket = unix.socket)
+    
+    input_RampIds <- DBI::dbGetQuery(con,query)
+    DBI::dbDisconnect(con)
+    
+    return(input_RampIds)
+}
+
+segregateDataBySource<-function(input_RampIds){
+    # data frames for metabolites with pathwayRampID, Freq based  on Source(kegg, reactome, wiki)
+
+    input_RampId_C <- input_RampIds[grep("RAMP_C", input_RampIds$rampId), ]
+    unique_input_RampId_C <- unique(input_RampId_C[,c("rampId", "pathwayRampId")])
+    unique_pathwayRampId_source <- unique(input_RampId_C[,c("pathwayRampId", "pathwaySource")])
+    
+    freq_unique_input_RampId_C <- as.data.frame(table(unique_input_RampId_C[,"pathwayRampId"]))
+    
+    names(freq_unique_input_RampId_C)[1] = 'pathwayRampId'
+    merge_Pathwayfreq_source <- merge(freq_unique_input_RampId_C, unique_pathwayRampId_source, by="pathwayRampId")
+    
+    # subset metabolite data based on source -  kegg, reactome, wiki
+
+    input_kegg_metab <- subset(merge_Pathwayfreq_source, merge_Pathwayfreq_source$pathwaySource == "kegg")
+    input_reactome_metab <- subset(merge_Pathwayfreq_source, merge_Pathwayfreq_source$pathwaySource == "reactome")
+    input_wiki_metab <- subset(merge_Pathwayfreq_source, merge_Pathwayfreq_source$pathwaySource == "wiki")
+
+# data frames for Genes with pathawayRampID, Freq based  on Source(kegg, reactome, wiki, hmdb)
+
+    input_RampId_G <- input_RampIds[grep("RAMP_G", input_RampIds$rampId), ]
+    unique_input_RampId_G <- unique(input_RampId_G[,c("rampId", "pathwayRampId")])
+    unique_pathwayG_source <- unique(input_RampId_G[,c("pathwayRampId", "pathwaySource")])
+    
+    freq_unique_input_RampId_G <- as.data.frame(table(unique_input_RampId_G[,"pathwayRampId"]))
+    
+    names(freq_unique_input_RampId_G)[1] = 'pathwayRampId'
+    merge_PathwayG_source <- merge(freq_unique_input_RampId_G, unique_pathwayG_source, by="pathwayRampId")
+
+   # subset gene data based on source -  kegg, reactome, wiki
+
+    input_kegg_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "kegg")
+    input_reactome_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "reactome")
+    input_wiki_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "wiki")
+    return(list(list(input_kegg_metab, input_reactome_metab, input_wiki_metab),
+                list(input_kegg_metab, input_reactome_metab, input_wiki_metab)))
+}
+
 
 #' Do fisher test for only one pathway from search result
 #' clicked on highchart
 #' @param pathwaydf a data frame resulting from getPathwayFromAnalyte
+#' @param backgrounddf optional dataframe resulting from getPathwayFromAnalyte run on all analytes detected in study. This will be used as the background for the Fisher's contingency table. If left NULL, all analytes in RaMP are used as background
 #' @param total_metabolites number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param min_analyte if the number of analytes (gene or metabolite) in a pathway is
@@ -404,6 +467,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
+#' @param socket (optional) location of mysql.sock file
 #' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
 #' @return a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
@@ -414,10 +478,11 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 #' fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
 #'}
 #' @export
-runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
+runCombinedFisherTest <- function(pathwaydf,backgrounddf=NULL,
+                                  total_metabolites=NULL,total_genes=20000,
                                   min_analyte=2,conpass=NULL,
                                   dbname="ramp",username="root",
-                                  host = "localhost",MCall=T, alternative="less"){
+                                  host = "localhost",socket=NULL,MCall=T, alternative="less"){
 
   if(is.null(conpass)) {
     stop("Please define the password for the mysql connection")
@@ -431,10 +496,11 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
   if(nrow(fishmetab) == 0) {outmetab=NULL} else{
     M=1
     print("Running Fisher's tests on metabolites")
-    outmetab <- runFisherTest(pathwaydf=fishmetab,analyte_type="metabolites",
+    outmetab <- runFisherTest(pathwaydf=fishmetab,backgrounddf=backgrounddf,
+                              analyte_type="metabolites",
                               total_metabolites=total_metabolites,total_genes=total_genes,
                               conpass=conpass,dbname=dbname,
-                              username=username,host=host,MCall=MCall)
+                              username=username,host=host,socket=socket,MCall=MCall)
   }
 
   # Grab pathways that contain genes to run Fisher on genes
@@ -442,10 +508,11 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
   if(nrow(fishgene) == 0) {outgene=NULL} else{
     G=1
     print("Running Fisher's tests on genes")
-    outgene <- runFisherTest(pathwaydf=fishgene,analyte_type="genes",
+    outgene <- runFisherTest(pathwaydf=fishgene,backgrounddf=backgrounddf,
+                             analyte_type="genes",
                              total_metabolites=total_metabolites,total_genes=total_genes,
                              conpass=conpass,dbname=dbname,
-                             username=username,host=host,MCall=MCall)
+                             username=username,host=host,socket=socket,MCall=MCall)
   }
 
   if(is.null(outgene) & !is.null(outmetab)) {
@@ -536,6 +603,7 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
 #' @param conpass password for database access (string)
 #' @param NameOrIds whether input is "names" or "ids" (default is "ids")
 #' @param host host name for database access (default is "localhost")
+#' @param socket (optional) location of mysql.sock file
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @return a list contains all metabolites as name and pathway inside.
@@ -548,6 +616,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
                                  find_synonym = FALSE,
                                  conpass=NULL,
                                  host = "localhost",
+                                 socket=NULL,
                                  dbname="ramp",
                                  username="root",
                                  NameOrIds = "ids"){
@@ -575,7 +644,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
     list_metabolite <- sapply(list_metabolite,shQuote)
     list_metabolite <- paste(list_metabolite,collapse = ",")
   } else if (NameOrIds == "ids"){
-    sourceramp <- rampFindSourceRampId(sourceId=analytes, conpass=conpass, host=host, dbname=dbname,username=username)
+    sourceramp <- rampFindSourceRampId(sourceId=analytes, conpass=conpass, host=host, dbname=dbname,username=username,socket=socket)
     if (nrow(sourceramp)==0) {
       stop("Make sure you are actually inputting ids and not names (you have NameOrIds set to 'ids'. If you are, then no ids were matched in the RaMP database.")
     }
@@ -598,7 +667,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
   query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where
                       rampId in (",
                    list_metabolite,");")
-  con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
+  con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host,socket = socket)
   #print(query2)
   df2 <- DBI::dbGetQuery(con,query2)
   DBI::dbDisconnect(con)
@@ -612,7 +681,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
   }
   query3 <- paste0("select pathwayName,sourceId as pathwaysourceId,type as pathwaysource,pathwayRampId from pathway where pathwayRampId in (",
                     pathid_list,");")
-  con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
+  con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host,socket = socket)
   df3 <- DBI::dbGetQuery(con,query3)
   DBI::dbDisconnect(con)
   #Format output
@@ -623,7 +692,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
     list_analytes <- sapply(analytes,shQuote)
     list_analytes <- paste(list_analytes,collapse = ",")
     query4 <-paste0("select sourceId,commonName,rampId from source where sourceId in (",list_analytes,");")
-    con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
+    con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host,socket = socket)
     df4 <- DBI::dbGetQuery(con,query4)
     DBI::dbDisconnect(con)
     #convert latin1 encoding to UTF-8

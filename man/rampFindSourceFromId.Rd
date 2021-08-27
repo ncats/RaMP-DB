@@ -10,7 +10,8 @@ rampFindSourceFromId(
   conpass = NULL,
   dbname = "ramp",
   username = "root",
-  host = "localhost"
+  host = "localhost",
+  socket = NULL
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ rampId}
 \item{username}{username for database access (default is "root")}
 
 \item{host}{host name for database access (default is "localhost")}
+
+\item{socket}{(optional) location of mysql.sock file}
 }
 \value{
 a data frame that has all source Id in the column or the source table that has metaoblites entry

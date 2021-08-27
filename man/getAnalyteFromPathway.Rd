@@ -9,7 +9,8 @@ getAnalyteFromPathway(
   conpass = NULL,
   dbname = "ramp",
   username = "root",
-  host = "localhost"
+  host = "localhost",
+  socket = NULL
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ getAnalyteFromPathway(
 \item{username}{username for database access (default is "root")}
 
 \item{host}{host name for database access (default is "localhost")}
+
+\item{socket}{(optional) location of mysql.sock file}
 }
 \value{
 a data.frame that contains all search results

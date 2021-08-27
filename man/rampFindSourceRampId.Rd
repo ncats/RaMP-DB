@@ -10,7 +10,8 @@ rampFindSourceRampId(
   conpass = NULL,
   dbname = "ramp",
   username = "root",
-  host = "localhost"
+  host = "localhost",
+  socket = NULL
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ separated by new line}
 \item{username}{username for database access (default is "root")}
 
 \item{host}{host name for database access (default is "localhost")}
+
+\item{socket}{(optional) location of mysql.sock file}
 }
 \value{
 data.frame that has sourceId and rampId and source as columns

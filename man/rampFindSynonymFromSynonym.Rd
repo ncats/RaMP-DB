@@ -14,7 +14,8 @@ rampFindSynonymFromSynonym(
   conpass = NULL,
   dbname = "ramp",
   username = "root",
-  host = "localhost"
+  host = "localhost",
+  socket = NULL
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ rampFindSynonymFromSynonym(
 
 \item{host}{host name for database access (default is "localhost")
 as input (there are some common synonyms that will mess up whole searching)}
+
+\item{socket}{(optional) location of mysql.sock file}
 }
 \value{
 a data frame that contains synonym in the first column rampId in the second column

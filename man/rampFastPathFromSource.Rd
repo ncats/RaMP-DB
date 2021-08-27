@@ -10,7 +10,8 @@ rampFastPathFromSource(
   conpass = NULL,
   dbname = "ramp",
   username = "root",
-  host = "localhost"
+  host = "localhost",
+  socket = NULL
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ rampFastPathFromSource(
 \item{username}{username for database access (default is "root")}
 
 \item{host}{host name for database access (default is "localhost")}
+
+\item{socket}{(optional) location of mysql.sock file}
 }
 \value{
 a list contains all metabolits as name and pathway inside.

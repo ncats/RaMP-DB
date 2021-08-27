@@ -5,6 +5,7 @@
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
+#' @param socket (optional) location of mysql.sock file
 #' @param NameOrIds whether input is "names" or "ids" (default is "ids")
 #' @return a dataframe containing query results. If the input is a metabolite, the function will output
 #' gene transcript common names and source IDs that are known to catalyze
@@ -20,6 +21,7 @@
 rampFastCata <- function(analytes=NULL,conpass=NULL,
                          dbname="ramp",username="root",
                          host = "localhost",
+                         socket=NULL,
                          NameOrIds="ids") {
   
   if(is.null(analytes))
@@ -52,10 +54,10 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
   #  print(list_metabolite)
   
   # Retrieve RaMP analyte ids 
-  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
+  con <- connectToRaMP(username = username,
                         password = conpass,
                         dbname = dbname,
-                        host = host)
+                        host = host,socket=socket)
   if (NameOrIds == 'names'){
     #    query1 <- paste0("select Synonym as analyte1,rampId,geneOrCompound as type1 from analytesynonym where Synonym in (",list_metabolite,");")
     query1 <- paste0("select rampId,geneOrCompound as type1,Synonym as InputAnalyte from analytesynonym where Synonym in (",list_metabolite,");")
@@ -88,10 +90,10 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
       # Retrieve rampid of genes that are in same reaction
       query_c <- paste0("select rampCompoundId as rampId,rampGeneId as rampId2 from catalyzed where rampCompoundId in (",c_id,");")
       print("Geting gene Id from Compound Id ...")
-      con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
+      con <- connectToRaMP(username = username,
                             password = conpass,
                             dbname = dbname,
-                            host = host)
+                            host = host,socket=socket)
       df_c2 <- DBI::dbGetQuery(con,query_c)
       DBI::dbDisconnect(con) 
       if(nrow(df_c2) == 0){
@@ -105,10 +107,10 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
         # Get names for metabolite ids
         query2 <- paste0("select * from source 
              		where rampId in (",analyte2_list,");")
-        con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
+        con <- connectToRaMP(username = username,
                               password = conpass,
                               dbname = dbname,
-                              host = host)
+                              host = host,socket=socket)
         df_c3 <- DBI::dbGetQuery(con,query2)
         DBI::dbDisconnect(con)
         
@@ -165,10 +167,10 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
       # Get rampID for genes and catalyzed metabolites
       query_g <- paste0("select * from catalyzed where rampGeneId in (",g_id,");")
       
-      con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
+      con <- connectToRaMP(username = username,
                             password = conpass,
                             dbname = dbname,
-                            host = host)
+                            host = host,socket=socket)
       df_g2 <- DBI::dbGetQuery(con,query_g)
       DBI::dbDisconnect(con)
       if(nrow(df_g2) == 0){
@@ -181,9 +183,9 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
         
         # Get names for metabolite IDs
         query2 <- paste0("select * from source where rampId in (",analyte2_list,");")
-        con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
+        con <- connectToRaMP(username = username,
                               password = conpass,
-                              dbname = dbname,host=host)
+                              dbname = dbname,host=host,socket=socket)
         df_g3 <-DBI::dbGetQuery(con,query2)
         DBI::dbDisconnect(con)
         if(nrow(df_g3) == 0){

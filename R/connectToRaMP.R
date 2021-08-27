@@ -3,7 +3,8 @@
 #' @param dbname the name of the database (by default a string that is database name including all tables
 #' @param username a string that is username for database (default: root)
 #' @param conpass password for database (string)
-#' @param host a string that stand for host 
+#' @param host a string that stand for host
+#' @param socket (optional) location of mysql.sock file
 #' 
 #' @examples
 #' \dontrun{
@@ -14,7 +15,8 @@
 connectToRaMP <- function(dbname = "ramp",
                        username = "root",
                        conpass = NULL,
-                       host ="localhost"){
+                       host ="localhost",
+                       socket=NULL){
 
   
   if(is.null(conpass)) {
@@ -26,7 +28,8 @@ connectToRaMP <- function(dbname = "ramp",
     dbname = dbname,
     username = username,
     password = conpass,
-    host = host
+    host = host,
+    unix.socket=socket
   )
  return(con) 
 }
