@@ -5,6 +5,7 @@
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
+#' @param socket (optional) location of mysql.sock file
 #' @return a data.frame that contains all search results
 #' @examples
 #' \dontrun{
@@ -17,7 +18,7 @@
 #' }
 #' @export
 getAnalyteFromPathway <- function(pathway,conpass=NULL,
-                                  dbname="ramp",username="root",host = "localhost"){
+                                  dbname="ramp",username="root",host = "localhost",socket=NULL){
   
   if(is.null(conpass)) {
     stop("Please define the password for the mysql connection")
@@ -44,7 +45,7 @@ getAnalyteFromPathway <- function(pathway,conpass=NULL,
   list_pathway <- paste(list_pathway,collapse = ",")
   # Retrieve pathway RaMP id
   con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass,
-                       host = host)
+                       host = host,socket=socket)
   query1 <- paste0("select * from pathway where pathwayName
                    in (",list_pathway,");")
   
@@ -59,7 +60,7 @@ getAnalyteFromPathway <- function(pathway,conpass=NULL,
                    pathwayRampId in (select pathwayRampId from pathway where
                    pathwayName in (",list_pathway,"));")
   con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass,
-                       host = host)
+                       host = host,socket=socket)
   df2 <- DBI::dbGetQuery(con,query2)
   DBI::dbDisconnect(con)
   cid_list <- unlist(df2[,2])
@@ -69,7 +70,7 @@ getAnalyteFromPathway <- function(pathway,conpass=NULL,
   # Retrieve all common name from compounds associated with RaMP compound ids (query2)
   query3 <- paste0("select * from source where rampId in (",cid_list,");")
   con <- connectToRaMP(dbname=dbname,username=username,conpass=conpass,
-                       host = host)
+                       host = host,socket=socket)
   df3 <- DBI::dbGetQuery(con,query3)
   DBI::dbDisconnect(con)
   

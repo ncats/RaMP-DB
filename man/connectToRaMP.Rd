@@ -8,7 +8,8 @@ connectToRaMP(
   dbname = "ramp",
   username = "root",
   conpass = NULL,
-  host = "localhost"
+  host = "localhost",
+  socket = NULL
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ connectToRaMP(
 \item{conpass}{password for database (string)}
 
 \item{host}{a string that stand for host}
+
+\item{socket}{(optional) location of mysql.sock file}
 }
 \value{
 MySQL connection based on given dbname,username,password, and host

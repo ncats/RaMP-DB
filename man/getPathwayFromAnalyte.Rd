@@ -10,6 +10,7 @@ getPathwayFromAnalyte(
   find_synonym = FALSE,
   conpass = NULL,
   host = "localhost",
+  socket = NULL,
   dbname = "ramp",
   username = "root",
   NameOrIds = "ids"
@@ -23,6 +24,8 @@ getPathwayFromAnalyte(
 \item{conpass}{password for database access (string)}
 
 \item{host}{host name for database access (default is "localhost")}
+
+\item{socket}{(optional) location of mysql.sock file}
 
 \item{dbname}{name of the mysql database (default is "ramp")}
 

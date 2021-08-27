@@ -7,6 +7,7 @@ clicked on highchart}
 \usage{
 runCombinedFisherTest(
   pathwaydf,
+  backgrounddf = NULL,
   total_metabolites = NULL,
   total_genes = 20000,
   min_analyte = 2,
@@ -14,12 +15,15 @@ runCombinedFisherTest(
   dbname = "ramp",
   username = "root",
   host = "localhost",
+  socket = NULL,
   MCall = T,
   alternative = "less"
 )
 }
 \arguments{
 \item{pathwaydf}{a data frame resulting from getPathwayFromAnalyte}
+
+\item{backgrounddf}{optional dataframe resulting from getPathwayFromAnalyte run on all analytes detected in study. This will be used as the background for the Fisher's contingency table. If left NULL, all analytes in RaMP are used as background}
 
 \item{total_metabolites}{number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")}
 
@@ -35,6 +39,8 @@ runCombinedFisherTest(
 \item{username}{username for database access (default is "root")}
 
 \item{host}{host name for database access (default is "localhost")}
+
+\item{socket}{(optional) location of mysql.sock file}
 
 \item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")}
 

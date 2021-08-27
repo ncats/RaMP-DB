@@ -10,6 +10,7 @@ rampFastCata(
   dbname = "ramp",
   username = "root",
   host = "localhost",
+  socket = NULL,
   NameOrIds = "ids"
 )
 }
@@ -23,6 +24,8 @@ rampFastCata(
 \item{username}{username for database access (default is "root")}
 
 \item{host}{host name for database access (default is "localhost")}
+
+\item{socket}{(optional) location of mysql.sock file}
 
 \item{NameOrIds}{whether input is "names" or "ids" (default is "ids")}
 }
