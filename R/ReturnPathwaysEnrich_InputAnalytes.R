@@ -205,9 +205,6 @@ runFisherTest <- function(pathwaydf,backgrounddf=NULL,
       contingencyTb[2,1] <- user_in_pathway
       contingencyTb[2,2] <- user_out_pathway
 
-      print(i)
-      print(contingencyTb)
-
       # Put the test into a try catch in case there's an issue, we'll have some details on the contingency matrix
       tryCatch({
         result <- stats::fisher.test(contingencyTb,alternative=alternative)
