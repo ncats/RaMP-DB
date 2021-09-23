@@ -549,10 +549,15 @@ sysdataObject <- function() {
 #
 # Run these methods to update 4 RData files for overlapMatricies(mets, genes, and analytes) and for fisher exact base pathway stats.
 # Check time stamps. These WILL be updated within your RaMP package, in  <your-R-dir>/library/RaMP/extdata.
-#
-# RaMP:::updateOverlapMatrices(method="balanced" ,all="all", conpass=<password>, dbname=<db_name>, username=<user_name>, host=<host_uri>)
-# RaMP:::updateOverlapMatrices(method="balanced" ,all="analyte", dbname=<db_name>, conpass=<password>, username=<user_name>, host=<host_uri>)
-# RaMP:::processData(conpass=<password>, dbname=<db_name>, username=<user_name>, host=<host_uri>)
+
+# Set these for login then run three methods
+# hostname = <db_host_name>
+# dbname = <db_name>
+# username = <username>
+# conpass = <connection_password>
+# RaMP:::updateOverlapMatrices(method="balanced" ,all="all", conpass=conpass, dbname=dbname, username=username, host=hostname)
+# RaMP:::updateOverlapMatrices(method="balanced" ,all="analyte", dbname=dbname, conpass=conpass, username=username, host=hostname)
+# RaMP:::processData(conpass=conpass, dbname=dbname, username=username, host=hostname)
 #
 # STEP 2
 #
@@ -560,7 +565,7 @@ sysdataObject <- function() {
 # uncomment usethis::use_data in the function just above. This command will builds sysdata.Rda to contain the objects
 #
 # Then execute the function definition above to establish the updated function. Then execute the method to save R/sysdata.rda.
-# sysdataObject()
+#sysdataObject()
 #
 # STEP 3
 # Comment the usethis::use_data() method above
