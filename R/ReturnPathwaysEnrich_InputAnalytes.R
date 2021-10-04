@@ -66,14 +66,17 @@ runFisherTest <- function(pathwaydf,backgrounddf=NULL,
     # kegg_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="kegg"),"rampId"])]))
 
     # first extract source-specific ids, then select for compound ids from the source-specific ids
-    sourceIds <- allids[which(allids$pathwaySource=="wiki"),"rampId"]
-    wiki_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
+      sourceIds <- allids[which(allids$pathwaySource=="wiki"),"rampId"]
+      wiki_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
+      
+      sourceIds <- allids[which(allids$pathwaySource=="reactome"),"rampId"]
+      react_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
+      
+      ## sourceIds <- allids[which(allids$pathwaySource=="kegg"),"rampId"]
+      ## kegg_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
 
-    sourceIds <- allids[which(allids$pathwaySource=="reactome"),"rampId"]
-    react_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
-
-    sourceIds <- allids[which(allids$pathwaySource=="kegg"),"rampId"]
-    kegg_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
+      sourceIds <- allids[which(allids$pathwaySource=="kegg"),"rampId"]
+      kegg_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
 
   } else {
     print("either not metabolites or total_metabolites is not null")
@@ -347,7 +350,7 @@ runFisherTest <- function(pathwaydf,backgrounddf=NULL,
 	    userinpath2<-c(userinpath2,user_in_pathway)
 	    totinpath2<-c(totinpath2,tot_in_pathway)
 	    # pidused <- c(pidused,i)
-	} # end for loop 
+          } # end for loop
      keepers <- intersect(which(c(totinpath,totinpath2)>=8),
                        which(c(totinpath,totinpath2)<100))
 
@@ -511,7 +514,6 @@ runCombinedFisherTest <- function(pathwaydf,backgrounddf=NULL,
                              conpass=conpass,dbname=dbname,
                              username=username,host=host,socket=socket,MCall=MCall)
   }
-
   if(is.null(outgene) & !is.null(outmetab)) {
     out <- outmetab
     fdr <- stats::p.adjust(out$Pval,method="fdr")
@@ -703,7 +705,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
   # For now, not returning HMDB pathways because they include the 30K
   # new pathways that are mainly drug and lipid pathways (need more proper
   # structural resolution matching)
-  return(out[which(out$pathwaysource!="hmdb"),c("commonName", "pathwayName","pathwaysource",
+    return(out[which(out$pathwaysource!="hmdb"),c("commonName", "pathwayName","pathwaysource",
 	"pathwaysourceId","rampId","pathwayRampId")])
 }
 
