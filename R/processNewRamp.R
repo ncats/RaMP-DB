@@ -399,6 +399,10 @@ updateOverlapMatrices <- function(method,all,
     result <- updateOverlapMatrix(min_analyte = 5,overlapmethod = 'balanced',together = F, conpass=conpass, host = host, dbname = dbname, username=username)
     metabolites_result <- result[[1]]
     genes_result <- result[[2]]
+
+    print(dim(metabolites_result))
+    print(dim(genes_result))
+
     save(metabolites_result, file = system.file(package = "RaMP",... = "extdata/metabolites_overlap_matrix.RData"))
     save(genes_result, file = system.file(package = "RaMP",... = "extdata/genes_overlap_matrix.RData"))
   } else if(all == 'analyte'){
@@ -558,14 +562,14 @@ sysdataObject <- function() {
 # RaMP:::updateOverlapMatrices(method="balanced" ,all="all", conpass=conpass, dbname=dbname, username=username, host=hostname)
 # RaMP:::updateOverlapMatrices(method="balanced" ,all="analyte", dbname=dbname, conpass=conpass, username=username, host=hostname)
 # RaMP:::processData(conpass=conpass, dbname=dbname, username=username, host=hostname)
-#
+
 # STEP 2
 #
 # The 4 Rdata files will be loaded to create objects, then stored to sysdata.Rda which is loaded to support package functions.
 # uncomment usethis::use_data in the function just above. This command will builds sysdata.Rda to contain the objects
 #
 # Then execute the function definition above to establish the updated function. Then execute the method to save R/sysdata.rda.
-#sysdataObject()
+# sysdataObject()
 #
 # STEP 3
 # Comment the usethis::use_data() method above
