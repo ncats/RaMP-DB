@@ -1,7 +1,7 @@
 Package: RaMP
 Title: RaMP (Relational Database of Metabolomic Pathways)
 Type: Package
-Version: 1.0.1
+Version: 2.0.0
 License: GPL-2
 Depends: R (>= 3.6.0)
 Authors@R: c(
@@ -9,6 +9,7 @@ Authors@R: c(
     person("Ewy", "Mathe", email = "Ewy.Mathe@nih.gov", role = c("aut", "cre")),
     person("Ivan", "Grishagin", email = "ivan.grishagin@nih.gov", role = "aut"),
     person("Jorge", "Neyra", email = "jorge.neyra@nih.gov", role = "aut"),
+    person("Cole", "Tindall", email = "cole.tindall@nih.gov", role = "aut"))
     person("John", "Braisted", email = "john.braisted@nih.gov", role = "aut"))
 Description: RaMP integrates 4 different databases (KEGG, Reactome, 
     HMDB, and WikiPathways), and provides comprehensive pathway annotations and queries for compounds (metabolites), genes, and pathways.
