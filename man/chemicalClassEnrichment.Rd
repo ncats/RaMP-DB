@@ -32,7 +32,8 @@ metList = c('hmdb:HMDB0000056',
             'hmdb:HMDB0008057',
             'hmdb:HMDB0011211')
 
-# the background population can be a separate ID list (preferred) or all database entries (skip pop parameter).
+# the background population can be a separate ID list (preferred) or all database entries 
+# (skip pop parameter).
 metClassResult <- chemicalClassSurvey(mets = mets, conpass, dbname, host, username)
 
 enrichedClassStats <- chemicalClassEnrichment(metClassResult)

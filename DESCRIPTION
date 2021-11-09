@@ -5,14 +5,12 @@ Version: 2.0.0
 License: GPL-2
 Depends: R (>= 3.6.0)
 Authors@R: c(
-    person("Andrew", "Patt", email = "andrew.patt@nih.gov", role = "aut"),
+    person("John", "Braisted", email = "john.braisted@nih.gov", role = "aut"),
     person("Ewy", "Mathe", email = "Ewy.Mathe@nih.gov", role = c("aut", "cre")),
-    person("Ivan", "Grishagin", email = "ivan.grishagin@nih.gov", role = "aut"),
-    person("Jorge", "Neyra", email = "jorge.neyra@nih.gov", role = "aut"),
-    person("Cole", "Tindall", email = "cole.tindall@nih.gov", role = "aut"),
-    person("John", "Braisted", email = "john.braisted@nih.gov", role = "aut"))
-Description: RaMP integrates 4 different databases (KEGG, Reactome, 
-    HMDB, and WikiPathways), and provides comprehensive pathway annotations and queries for compounds (metabolites), genes, and pathways.
+    person("Andrew", "Patt", email = "andrew.patt@nih.gov", role = "aut"),
+    person("Kyle", "Spencer", email = "kyle.spencer@nih.gov", rol="aut"),
+    person("Cole", "Tindall", email = "cole.tindall@nih.gov", role = "aut"))
+Description: The RaMP R package allows users to interact with the RaMP database, which integrates biological, reaction-level, ontologies, and chemical annoations from multiple resources (Reactome, HMDB, WikiPathways, KEGG, LipidMAPS, ChEBI).  The package allows users to query RaMP and to perform pathway and chemical overrepresentation analyses.  
 Imports:
     magrittr,
     shiny,
@@ -25,6 +23,7 @@ Imports:
     properties,
     stringi,
     RMariaDB,
-    DBI
+    DBI,
+    usethis
 Encoding: UTF-8
 RoxygenNote: 7.1.1

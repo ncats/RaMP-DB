@@ -57,7 +57,8 @@ metList = c('hmdb:HMDB0000056',
             'hmdb:HMDB0008057',
             'hmdb:HMDB0011211')
 chemProps <- getChemicalProperties(mets, propertyList = c('smiles', 'inchi_key', 'common_name')
-                         conpass = <conn_password>, dbname = <db_name>, host = <host_name>, username = <user_name>)
+                         conpass = <conn_password>, dbname = <db_name>, host = <host_name>, 
+			    username = <user_name>)
 head(chemProps$chem_props)
 }
 }
