@@ -34,7 +34,8 @@
 #'             'hmdb:HMDB0008057',
 #'             'hmdb:HMDB0011211')
 #' chemProps <- getChemicalProperties(mets, propertyList = c('smiles', 'inchi_key', 'common_name')
-#'                          conpass = <conn_password>, dbname = <db_name>, host = <host_name>, username = <user_name>)
+#'                          conpass = <conn_password>, dbname = <db_name>, host = <host_name>, 
+#' 			    username = <user_name>)
 #' head(chemProps$chem_props)
 #'}
 #' @export
@@ -120,7 +121,7 @@ buildPropertyList <- function(propList) {
   if(haveInvalidProps) {
     propword <- 'Error: A requested chemical property name is invalid.'
     if(length(invalidProps) > 1) propword <- 'Error: Some requested chemical property names are invalid.'
-    errorMsg <- paste0(str(length(invalidProps)), propword, "\n")
+    errorMsg <- paste0(utils::str(length(invalidProps)), propword, "\n")
     errorMsg <- paste0(errorMsg, "Valid property names: 'smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'commmon_name'\n")
     errorMsg <- paste0(errorMsg, "Invalid input property name list:")
     for(badName in invalidProps) {
