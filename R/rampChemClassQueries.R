@@ -5,10 +5,6 @@
 #' @param mets a list object of source prepended metaboite ids, representing a metabolite set of interest
 #' @param pop an optional list object of source prepended metaboite ids, represenbting a lareger list of metabolites from which the mets were selected this list serves as
 #' the backround reference population of metabolites for comparision and enrichment. If NULL, the background population is taken as all RaMP DB metabolites.
-#' @param conpass the ramp database password
-#' @param dbname the ramp database name
-#' @param host the ramp database host name
-#' @param username the ramp database user name
 #' @return Returns chemcial class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
 #' metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolve and listing those metabolite ids
 #' that are not found in the database.
@@ -52,7 +48,8 @@
 #'
 #' # the background population can be a separate ID list (preferred) or all database entries 
 #' # (skip pop parameter).
-#' metClassResult <- chemicalClassSurvey(mets = mets, conpass, dbname, host, username)
+#' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
+#' metClassResult <- chemicalClassSurvey(mets = mets)
 #'
 #' # show structure
 #' utils::str(metClassResult)
@@ -63,14 +60,8 @@
 #' metClassResult$query_report
 #'}
 #' @export
-chemicalClassSurvey <- function(mets, pop = NULL,
-                                conpass,
-                                dbname,
-                                host,
-                                username) {
-
-  conn <- connectToRaMP(conpass=conpass, dbname = dbname, host=host, username=username)
-
+chemicalClassSurvey <- function(mets, pop = NULL){
+  conn <- connectToRaMP()
   print("Starting Chemical Class Survey")
 
   if(is.null(pop)) {
@@ -109,7 +100,8 @@ chemicalClassSurvey <- function(mets, pop = NULL,
 #'
 #' # the background population can be a separate ID list (preferred) or all database entries 
 #' # (skip pop parameter).
-#' metClassResult <- chemicalClassSurvey(mets = mets, conpass, dbname, host, username)
+#' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
+#' metClassResult <- chemicalClassSurvey(mets = mets)
 #'
 #' enrichedClassStats <- chemicalClassEnrichment(metClassResult)
 #'}

@@ -5,18 +5,10 @@
 #' @param synonym name to search for
 #' @param full bool if return whole data.frame
 #' @param find_synonym bool if find all synonyms or just return same synonym
-#' @param conpass password for database access (string)
-#' @param dbname name of the mysql database (default is "ramp")
-#' @param username username for database access (default is "root")
-#' @param host host name for database access (default is "localhost")
 #' as input (there are some common synonyms that will mess up whole searching)
 #' @return a data frame that contains synonym in the first column rampId in the second column
 rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
-	find_synonym = FALSE,conpass=NULL,dbname="ramp",username="root",
-	host = "localhost"){
-  if(is.null(conpass)) {
-        stop("Please define the password for the mysql connection")
-  }
+	find_synonym = FALSE){
 
   if(is.character(synonym)){
     if(grepl("\n",synonym)[1]){
@@ -42,11 +34,7 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
     query <- paste0("select Synonym as origins,rampId from analytesynonym where Synonym in(",
                     list_metabolite,
                     ");")
-  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-        password = conpass,
-        dbname = dbname,
-        host = host)
-
+  con <- connectToRaMP()
     df1 <- DBI::dbGetQuery(con,query)
     DBI::dbDisconnect(con)
     return(df1)
@@ -57,10 +45,7 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
   query <- paste0("select Synonym as origins,rampId from analytesynonym where Synonym in(",
                   list_metabolite,
                   ");")
-  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-        password = conpass,
-        dbname = dbname,
-        host = host)
+  con <- connectToRaMP()
 
   df1 <- DBI::dbGetQuery(con,query)
   DBI::dbDisconnect(con)
@@ -68,10 +53,7 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
   rampid <- sapply(rampid,shQuote)
   rampid <- paste(rampid,collapse = ",")
   query <- paste0("select * from analytesynonym where rampId in(",rampid,");")
-  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-        password = conpass,
-	      dbname = dbname,
-        host = host)
+  con <- connectToRaMP()
   df2 <- DBI::dbGetQuery(con,query)
   DBI::dbDisconnect(con)
   df2 <- merge(df1,df2)
@@ -85,18 +67,9 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
 #' @param rampId could be a data frame return by rampFindSynonymFromSynonym
 #' containing all information related to synonym. Or can be a list of
 #' rampId
-#' @param conpass password for database access (string)
-#' @param dbname name of the mysql database (default is "ramp")
-#' @param username username for database access (default is "root")
-#' @param host host name for database access (default is "localhost")
 #' @param full return whole searching result or not (TRUE/FALSE)
 #' @return a data frame that has all source Id in the column or the source table that has metaoblites entry
-rampFindSourceFromId <- function(rampId=NULL,full = TRUE,
-	conpass=NULL,dbname="ramp",username="root",
-	host = "localhost"){
-  if(is.null(conpass)) {
-        stop("Please define the password for the mysql connection")
-  }
+rampFindSourceFromId <- function(rampId=NULL,full = TRUE){
 
   if(is.data.frame(rampId)){
     list_id <- rampId$rampId
@@ -118,11 +91,7 @@ rampFindSourceFromId <- function(rampId=NULL,full = TRUE,
   list_id <- sapply(list_id,shQuote)
   list_id <- paste(list_id,collapse = ",")
   query <- paste0("select * from source where rampId in (",list_id,");")
-
-  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-        password = conpass,
-        dbname = dbname,
-        host = host)
+  con <- connectToRaMP()
   df <- DBI::dbGetQuery(con,query)
   DBI::dbDisconnect(con)
   if(full){
@@ -136,22 +105,13 @@ rampFindSourceFromId <- function(rampId=NULL,full = TRUE,
 #' Fast search given a list of metabolites source Id
 #' @param sourceid a vector of synonym that need to be searched
 #' @param find_synonym bool if find all synonyms or just return same synonym
-#' @param conpass password for database access (string)
-#' @param dbname name of the mysql database (default is "ramp")
-#' @param username username for database access (default is "root")
-#' @param host host name for database access (default is "localhost")
 #' @return a list contains all metabolits as name and pathway inside.
-rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
-	conpass=NULL,dbname="ramp",username="root",host = "localhost"){
+rampFastPathFromSource<- function(sourceid,find_synonym = FALSE){
   # progress<- shiny::Progress$new()
   # progress$set(message = "Querying databases ...",value = 0)
   now <- proc.time()
   # on.exit(dbDisconnect(con))
   # find synonym
-
-    if(is.null(conpass)) {
-        stop("Please define the password for the mysql connection")
-  }
 
   #synonym <- rampFindSynonymFromSynonym(synonym,find_synonym=find_synonym)
 
@@ -160,11 +120,7 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
   list_metabolite <- paste(list_metabolite,collapse = ",")
   query1 <- paste0("select * from source where sourceid in (",
                    list_metabolite,");")
-  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-        password = conpass,
-        dbname = dbname,
-        host = host)
-
+  con <- connectToRaMP()
   df1<- DBI::dbGetQuery(con,query1)
   DBI::dbDisconnect(con)
   colnames(df1)[1] <-"sourceId2"
@@ -174,10 +130,7 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
   rampid <- paste(rampid,collapse = ",")
   query2 <- paste0("select * from analytehaspathway where
                    rampId in (",rampid,");")
-  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-        password = conpass,
-        dbname = dbname,
-        host = host)
+  con <- connectToRaMP()
   df2 <- DBI::dbGetQuery(con,query2)
   DBI::dbDisconnect(con)
   #return(df2)
@@ -187,10 +140,7 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
   print(id_list)
   query3 <- paste0("select * from pathway where pathwayRampId in (",
                    id_list,");")
-  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-        password = conpass,
-        dbname = dbname,
-        host = host)
+  con <- connectToRaMP()
   df3 <- DBI::dbGetQuery(con,query3)
   DBI::dbDisconnect(con)
   #return(df3)
@@ -205,17 +155,8 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
 #' The rampId can be plugged in other functions to continue query
 #' @param sourceId a data frame or string separated by comma or string
 #' separated by new line
-#' @param conpass password for database access (string)
-#' @param dbname name of the mysql database (default is "ramp")
-#' @param username username for database access (default is "root")
-#' @param host host name for database access (default is "localhost")
 #' @return data.frame that has sourceId and rampId and source as columns
-rampFindSourceRampId <- function(sourceId, conpass=NULL,
-	dbname="ramp",username="root",
-	host = "localhost"){
-  if(is.null(conpass)) {
-        stop("Please define the password for the mysql connection")
-  }
+rampFindSourceRampId <- function(sourceId){
 
   if(is.character(sourceId)){
     if(grepl("\n",sourceId)[1]){
@@ -235,10 +176,7 @@ rampFindSourceRampId <- function(sourceId, conpass=NULL,
   }
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
-  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-        password = conpass,
-        dbname = dbname,
-        host = host)
+  con <- connectToRaMP()
   query <- paste0("select sourceId,IDtype as analytesource, rampId from source where sourceId in (",list_metabolite,");")
   df <- DBI::dbGetQuery(con,query)
   DBI::dbDisconnect(con)

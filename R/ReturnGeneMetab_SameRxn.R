@@ -1,10 +1,6 @@
 #' Retrieves analytes that involved in same reaction as input metabolite
 #'
 #' @param analytes a vector of analytes that need to be searched
-#' @param conpass password for database access (string)
-#' @param dbname name of the mysql database (default is "ramp")
-#' @param username username for database access (default is "root")
-#' @param host host name for database access (default is "localhost")
 #' @param NameOrIds whether input is "names" or "ids" (default is "ids")
 #' @return a dataframe containing query results. If the input is a metabolite, the function will output
 #' gene transcript common names and source IDs that are known to catalyze
@@ -14,21 +10,16 @@
 #'
 #' @examples
 #' \dontrun{
-#' rampFastCata(analytes="creatine",conpass="mypassword",NameOrIds="names")
+#' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
+#' rampFastCata(analytes="creatine",NameOrIds="names")
 #' }
 #' @export
-rampFastCata <- function(analytes=NULL,conpass=NULL,
-                         dbname="ramp",username="root",
-                         host = "localhost",
-                         NameOrIds="ids") {
+rampFastCata <- function(analytes=NULL, NameOrIds="ids") {
   
   if(is.null(analytes))
     stop("Please provide input analytes")
   if (!(NameOrIds %in% c('names','ids')))
     stop('Please specify search by "names" or "ids"')
-  if(is.null(conpass)) {
-    stop("Please define the password for the mysql connection")
-  }
   
   now <- proc.time()
   if(is.character(analytes)){
@@ -52,10 +43,7 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
   #  print(list_metabolite)
   
   # Retrieve RaMP analyte ids 
-  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                        password = conpass,
-                        dbname = dbname,
-                        host = host)
+  con <- connectToRaMP()
   if (NameOrIds == 'names'){
     #    query1 <- paste0("select Synonym as analyte1,rampId,geneOrCompound as type1 from analytesynonym where Synonym in (",list_metabolite,");")
     query1 <- paste0("select rampId,geneOrCompound as type1,Synonym as InputAnalyte from analytesynonym where Synonym in (",list_metabolite,");")
@@ -88,10 +76,8 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
       # Retrieve rampid of genes that are in same reaction
       query_c <- paste0("select rampCompoundId as rampId,rampGeneId as rampId2 from catalyzed where rampCompoundId in (",c_id,");")
       print("Geting gene Id from Compound Id ...")
-      con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                            password = conpass,
-                            dbname = dbname,
-                            host = host)
+
+      con <- connectToRaMP()
       df_c2 <- DBI::dbGetQuery(con,query_c)
       DBI::dbDisconnect(con) 
       if(nrow(df_c2) == 0){
@@ -105,10 +91,7 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
         # Get names for metabolite ids
         query2 <- paste0("select * from source 
              		where rampId in (",analyte2_list,");")
-        con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                              password = conpass,
-                              dbname = dbname,
-                              host = host)
+	con <- connectToRaMP()
         df_c3 <- DBI::dbGetQuery(con,query2)
         DBI::dbDisconnect(con)
         
@@ -164,11 +147,7 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
     } else {
       # Get rampID for genes and catalyzed metabolites
       query_g <- paste0("select * from catalyzed where rampGeneId in (",g_id,");")
-      
-      con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                            password = conpass,
-                            dbname = dbname,
-                            host = host)
+      con <- connectToRaMP()      
       df_g2 <- DBI::dbGetQuery(con,query_g)
       DBI::dbDisconnect(con)
       if(nrow(df_g2) == 0){
@@ -181,9 +160,7 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
         
         # Get names for metabolite IDs
         query2 <- paste0("select * from source where rampId in (",analyte2_list,");")
-        con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                              password = conpass,
-                              dbname = dbname,host=host)
+	con <- connectToRaMP()
         df_g3 <-DBI::dbGetQuery(con,query2)
         DBI::dbDisconnect(con)
         if(nrow(df_g3) == 0){
@@ -229,33 +206,6 @@ rampFastCata <- function(analytes=NULL,conpass=NULL,
   return(mdf)
 }
 
-#' Generate dataframe from given files for shiny app input list of metabolites
-#'
-#' @param infile a file object given from files
-#' @param conpass password for database access (string)
-#' @param dbname name of the mysql database (default is "ramp")
-#' @param username username for database access (default is "root")
-#' @param host host name for database access (default is "localhost")
-#'
-#' @return a dataframe either from multiple csv file
-rampFileOfAnalytes_tab4 <- function(infile,conpass=NULL,
-	dbname="ramp",username="root",host = "localhost"){
-  if(is.null(conpass)) {
-    stop("Please define the password for the mysql connection")
-  }
-
-  name <- infile[[1,'name']]
-  summary <- data.frame(pathway  = character(0),id = character(0),
-                        source = character(0),metabolite = character(0))
-  rampOut <- list()
-  for (i in 1:length(infile[,1])){
-    rampOut <- readLines(infile[[i,'datapath']])
-    summary <- rampFastCata(analytes=rampOut,conpass=conpass,
-                            host = host, dbname=dbname, username = username)
-  }
-  return(summary)
-}
-
 #' Plots a network based on gene-metabolite relationships
 #' @importFrom magrittr %>%
 #'
@@ -263,7 +213,8 @@ rampFileOfAnalytes_tab4 <- function(infile,conpass=NULL,
 #' @return  An interactive HTML plot that allows the user to pan/zoom into regions of interest. User genes/metabolites are highlighted in blue, whereas analytes found by the function are orange.
 #' @examples
 #' \dontrun{
-#' catalyzedf <- rampFastCata(analytes="creatine",conpass="mypassword",NamesOrIds="names")
+#' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
+#' catalyzedf <- rampFastCata(analytes="creatine",NamesOrIds="names")
 #' plotCataNetwork(catalyzedf)
 #' }
 #' @export
