@@ -34,9 +34,10 @@ Fisher's test
 }
 \examples{
 \dontrun{
+pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
 pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
-                NameOrIds="names", conpass=conpass)
-fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
+                NameOrIds="names")
+fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf)
 filtered.fisher.results <- FilterFishersResults(fisher.results,p_holmadj_cutoff=0.05)
 filteredclust.fisher.results <- findCluster(filtered.fisher.results)
 }

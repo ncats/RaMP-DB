@@ -10,10 +10,6 @@ runCombinedFisherTest(
   total_metabolites = NULL,
   total_genes = 20000,
   min_analyte = 2,
-  conpass = NULL,
-  dbname = "ramp",
-  username = "root",
-  host = "localhost",
   MCall = T,
   alternative = "less"
 )
@@ -28,14 +24,6 @@ runCombinedFisherTest(
 \item{min_analyte}{if the number of analytes (gene or metabolite) in a pathway is
 < min_analyte, do not report}
 
-\item{conpass}{password for database access (string)}
-
-\item{dbname}{name of the mysql database (default is "ramp")}
-
-\item{username}{username for database access (default is "root")}
-
-\item{host}{host name for database access (default is "localhost")}
-
 \item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")}
 
 \item{alternative}{alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")}
@@ -49,8 +37,9 @@ clicked on highchart
 }
 \examples{
 \dontrun{
+pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
 pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
-                NameOrIds="names", conpass=conpass)
-fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
+                NameOrIds="names")
+fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf)
 }
 }
