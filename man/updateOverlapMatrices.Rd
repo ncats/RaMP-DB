@@ -4,14 +4,7 @@
 \alias{updateOverlapMatrices}
 \title{Update and save the overlap matrices based on current version of RaMP}
 \usage{
-updateOverlapMatrices(
-  method,
-  all,
-  conpass = NULL,
-  host = "localhost",
-  dbname = "ramp",
-  username = "root"
-)
+updateOverlapMatrices(method, all)
 }
 \arguments{
 \item{method}{a string that specifies algorithm to compute overlap matrix
@@ -19,14 +12,6 @@ should be 'balanced' or 'weighted'}
 
 \item{all}{a string that specifies which matrices to compute, should be in
 'all','analyte'}
-
-\item{conpass}{password for database access (string)}
-
-\item{host}{host name for database access (default is "localhost")}
-
-\item{dbname}{name of the mysql database (default is "ramp")}
-
-\item{username}{username for database access (default is "root")}
 }
 \description{
 Update and save the overlap matrices based on current version of RaMP

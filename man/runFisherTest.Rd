@@ -10,10 +10,6 @@ runFisherTest(
   total_metabolites = NULL,
   total_genes = 20000,
   analyte_type = "metabolites",
-  conpass = NULL,
-  dbname = "ramp",
-  username = "root",
-  host = "localhost",
   MCall = T,
   alternative = "less"
 )
@@ -26,14 +22,6 @@ runFisherTest(
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
 
 \item{analyte_type}{"metabolites" or "genes" (default is "metabolites")}
-
-\item{conpass}{password for database access (string)}
-
-\item{dbname}{name of the mysql database (default is "ramp")}
-
-\item{username}{username for database access (default is "root")}
-
-\item{host}{host name for database access (default is "localhost")}
 
 \item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")}
 

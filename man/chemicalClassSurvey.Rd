@@ -4,21 +4,13 @@
 \alias{chemicalClassSurvey}
 \title{Returns chemical class information comparing a metabolite subset to a metabolite population}
 \usage{
-chemicalClassSurvey(mets, pop = NULL, conpass, dbname, host, username)
+chemicalClassSurvey(mets, pop = NULL)
 }
 \arguments{
 \item{mets}{a list object of source prepended metaboite ids, representing a metabolite set of interest}
 
 \item{pop}{an optional list object of source prepended metaboite ids, represenbting a lareger list of metabolites from which the mets were selected this list serves as
 the backround reference population of metabolites for comparision and enrichment. If NULL, the background population is taken as all RaMP DB metabolites.}
-
-\item{conpass}{the ramp database password}
-
-\item{dbname}{the ramp database name}
-
-\item{host}{the ramp database host name}
-
-\item{username}{the ramp database user name}
 }
 \value{
 Returns chemcial class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
@@ -66,11 +58,13 @@ metList = c('hmdb:HMDB0000056',
             'hmdb:HMDB0008057',
             'hmdb:HMDB0011211')
 
-# the background population can be a separate ID list (preferred) or all database entries (skip pop parameter).
-metClassResult <- chemicalClassSurvey(mets = mets, conpass, dbname, host, username)
+# the background population can be a separate ID list (preferred) or all database entries 
+# (skip pop parameter).
+pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
+metClassResult <- chemicalClassSurvey(mets = mets)
 
 # show structure
-str(metClassResult)
+utils::str(metClassResult)
 
 # show a count summary, metabolite class mappings and query report
 metClassResult$count_summary$class

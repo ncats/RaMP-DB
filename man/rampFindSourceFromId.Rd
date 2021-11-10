@@ -4,14 +4,7 @@
 \alias{rampFindSourceFromId}
 \title{Find all source from given list of RaMP Ids}
 \usage{
-rampFindSourceFromId(
-  rampId = NULL,
-  full = TRUE,
-  conpass = NULL,
-  dbname = "ramp",
-  username = "root",
-  host = "localhost"
-)
+rampFindSourceFromId(rampId = NULL, full = TRUE)
 }
 \arguments{
 \item{rampId}{could be a data frame return by rampFindSynonymFromSynonym
@@ -19,14 +12,6 @@ containing all information related to synonym. Or can be a list of
 rampId}
 
 \item{full}{return whole searching result or not (TRUE/FALSE)}
-
-\item{conpass}{password for database access (string)}
-
-\item{dbname}{name of the mysql database (default is "ramp")}
-
-\item{username}{username for database access (default is "root")}
-
-\item{host}{host name for database access (default is "localhost")}
 }
 \value{
 a data frame that has all source Id in the column or the source table that has metaoblites entry

@@ -4,22 +4,14 @@
 #' @param total_metabolites number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param analyte_type "metabolites" or "genes" (default is "metabolites")
-#' @param conpass password for database access (string)
-#' @param dbname name of the mysql database (default is "ramp")
-#' @param username username for database access (default is "root")
-#' @param host host name for database access (default is "localhost")
 #' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
 #' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
 runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
-                          analyte_type="metabolites",conpass=NULL,
-                          dbname="ramp",username="root",
-                          host = "localhost", MCall=T,alternative="less"){
+                          analyte_type="metabolites",
+                          MCall=T,alternative="less"){
   now <- proc.time()
   print("Fisher Testing ......")
-  if(is.null(conpass)) {
-    stop("Please define the password for the mysql connection")
-  }
 
   if(analyte_type=="metabolites") {total_analytes=total_metabolites
   } else if (analyte_type=="genes") {
@@ -42,10 +34,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
   # Get the total number of metabolites that are mapped to pathways in RaMP (that's the default background)
   query <- "select * from analytehaspathway"
-  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                        password = conpass,
-                        dbname = dbname,
-                        host = host)
+  con <- connectToRaMP()
   allids <- DBI::dbGetQuery(con,query)
 
   # Close connection, then deduplicate id list
@@ -88,10 +77,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
                    list_pid,")")
 
-  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                        password = conpass,
-                        dbname = dbname,
-                        host = host)
+  con <- connectToRaMP()
   cids <- DBI::dbGetQuery(con,query1)#[[1]]
 
   DBI::dbDisconnect(con)
@@ -101,11 +87,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   query2 <- paste0("select * from analytehaspathway where pathwayRampId in (",
                    list_pid,")")
 
-  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                        password = conpass,
-                        dbname = dbname,
-                        host = host)
-
+  con <- connectToRaMP()
   input_RampIds <- DBI::dbGetQuery(con,query2)
   DBI::dbDisconnect(con)
   if(is.null(input_RampIds)) {
@@ -229,10 +211,7 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
   if(MCall == T) {
   	# Now run fisher's tests for all other pids
   	query <- "select distinct(pathwayRampId) from analytehaspathway where pathwaySource != 'hmdb';"
-  	con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                        password = conpass,
-                        dbname = dbname,
-                        host = host)
+	con <- connectToRaMP()
 	  allpids <- DBI::dbGetQuery(con,query)
 	  DBI::dbDisconnect(con)
 	  pidstorun <- setdiff(allpids[,1],pid)
@@ -241,20 +220,13 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 
 	  query2 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
                    pidstorunlist,")")
-
-	  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                        password = conpass,
-                        dbname = dbname,
-                        host = host)
+	  con <- connectToRaMP()
 	  restcids <- DBI::dbGetQuery(con,query2)#[[1]]
 	  DBI::dbDisconnect(con)
 
 	  query1 <- paste0("select rampId,pathwayRampId from analytehaspathway;")
 
-	  con <- DBI::dbConnect(RMariaDB::MariaDB(), user = username,
-                        password = conpass,
-                        dbname = dbname,
-                        host = host)
+	  con <- connectToRaMP()
 	  allcids <- DBI::dbGetQuery(con,query1)#[[1]]
 	  DBI::dbDisconnect(con)
 
@@ -400,28 +372,20 @@ runFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param min_analyte if the number of analytes (gene or metabolite) in a pathway is
 #' < min_analyte, do not report
-#' @param conpass password for database access (string)
-#' @param dbname name of the mysql database (default is "ramp")
-#' @param username username for database access (default is "root")
-#' @param host host name for database access (default is "localhost")
 #' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
 #' @return a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
 #'@examples
 #'\dontrun{
+#' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
 #' pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
-#'                 NameOrIds="names", conpass=conpass)
-#' fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
+#'                 NameOrIds="names")
+#' fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf)
 #'}
 #' @export
 runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=20000,
-                                  min_analyte=2,conpass=NULL,
-                                  dbname="ramp",username="root",
-                                  host = "localhost",MCall=T, alternative="less"){
-
-  if(is.null(conpass)) {
-    stop("Please define the password for the mysql connection")
-  }
+                                  min_analyte=2,
+                                  MCall=T, alternative="less"){
 
   G <- M <- 0
 
@@ -433,8 +397,7 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
     print("Running Fisher's tests on metabolites")
     outmetab <- runFisherTest(pathwaydf=fishmetab,analyte_type="metabolites",
                               total_metabolites=total_metabolites,total_genes=total_genes,
-                              conpass=conpass,dbname=dbname,
-                              username=username,host=host,MCall=MCall)
+                              MCall=MCall)
   }
 
   # Grab pathways that contain genes to run Fisher on genes
@@ -444,8 +407,7 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
     print("Running Fisher's tests on genes")
     outgene <- runFisherTest(pathwaydf=fishgene,analyte_type="genes",
                              total_metabolites=total_metabolites,total_genes=total_genes,
-                             conpass=conpass,dbname=dbname,
-                             username=username,host=host,MCall=MCall)
+                             MCall=MCall)
   }
 
   if(is.null(outgene) & !is.null(outmetab)) {
@@ -533,28 +495,17 @@ runCombinedFisherTest <- function(pathwaydf,total_metabolites=NULL,total_genes=2
 #'
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
 #' @param find_synonym find all synonyms or just return same synonym (T/F)
-#' @param conpass password for database access (string)
 #' @param NameOrIds whether input is "names" or "ids" (default is "ids")
-#' @param host host name for database access (default is "localhost")
-#' @param dbname name of the mysql database (default is "ramp")
-#' @param username username for database access (default is "root")
 #' @return a list contains all metabolites as name and pathway inside.
 #' @examples
 #' \dontrun{
-#' mypath <- getPathwayFromAnalyte(analytes=c("2-hydroxyglutarate","glutamate"), conpass="mypassword")
+#' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
+#' mypath <- getPathwayFromAnalyte(analytes=c("2-hydroxyglutarate","glutamate"))
 #' }
 #' @export
 getPathwayFromAnalyte<- function(analytes=NULL,
                                  find_synonym = FALSE,
-                                 conpass=NULL,
-                                 host = "localhost",
-                                 dbname="ramp",
-                                 username="root",
                                  NameOrIds = "ids"){
-
-  if(is.null(conpass)) {
-    stop("Please define the password for the mysql connection")
-  }
 
   now <- proc.time()
   if(is.null(analytes)) {return(NULL)}
@@ -562,8 +513,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
 
   if(NameOrIds == "names"){
     synonym <- rampFindSynonymFromSynonym(synonym=analytes,
-	  find_synonym=find_synonym,
-	  conpass=conpass, host=host, dbname=dbname,username=username)
+	  find_synonym=find_synonym)
 
     colnames(synonym)[1]="commonName"
     synonym$commonName <- tolower(synonym$commonName)
@@ -575,7 +525,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
     list_metabolite <- sapply(list_metabolite,shQuote)
     list_metabolite <- paste(list_metabolite,collapse = ",")
   } else if (NameOrIds == "ids"){
-    sourceramp <- rampFindSourceRampId(sourceId=analytes, conpass=conpass, host=host, dbname=dbname,username=username)
+    sourceramp <- rampFindSourceRampId(sourceId=analytes)
     if (nrow(sourceramp)==0) {
       stop("Make sure you are actually inputting ids and not names (you have NameOrIds set to 'ids'. If you are, then no ids were matched in the RaMP database.")
     }
@@ -598,7 +548,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
   query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where
                       rampId in (",
                    list_metabolite,");")
-  con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
+  con <- connectToRaMP()
   #print(query2)
   df2 <- DBI::dbGetQuery(con,query2)
   DBI::dbDisconnect(con)
@@ -612,7 +562,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
   }
   query3 <- paste0("select pathwayName,sourceId as pathwaysourceId,type as pathwaysource,pathwayRampId from pathway where pathwayRampId in (",
                     pathid_list,");")
-  con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
+  con <- connectToRaMP()
   df3 <- DBI::dbGetQuery(con,query3)
   DBI::dbDisconnect(con)
   #Format output
@@ -623,7 +573,7 @@ getPathwayFromAnalyte<- function(analytes=NULL,
     list_analytes <- sapply(analytes,shQuote)
     list_analytes <- paste(list_analytes,collapse = ",")
     query4 <-paste0("select sourceId,commonName,rampId from source where sourceId in (",list_analytes,");")
-    con <- RaMP::connectToRaMP(dbname=dbname,username=username,conpass=conpass,host = host)
+    con <- connectToRaMP()    
     df4 <- DBI::dbGetQuery(con,query4)
     DBI::dbDisconnect(con)
     #convert latin1 encoding to UTF-8
@@ -660,9 +610,10 @@ getPathwayFromAnalyte<- function(analytes=NULL,
 #' [[3]] cluster assignment in the list form
 #'@examples
 #'\dontrun{
+#' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
 #' pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
-#'                 NameOrIds="names", conpass=conpass)
-#' fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
+#'                 NameOrIds="names")
+#' fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf)
 #' filtered.fisher.results <- FilterFishersResults(fisher.results,p_holmadj_cutoff=0.05)
 #' filteredclust.fisher.results <- findCluster(filtered.fisher.results)
 #'}
@@ -829,9 +780,10 @@ findCluster <- function(fishers_df,perc_analyte_overlap = 0.5,
 #' [[2]]analyte type
 #'@examples
 #'\dontrun{
+#' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
 #' pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
-#'                 NameOrIds="names", conpass=conpass)
-#' fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
+#'                 NameOrIds="names")
+#' fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf)
 #' filtered.fisher.results <- FilterFishersResults(fisher.results,p_holmadj_cutoff=0.05)
 #'}
 #' @export
