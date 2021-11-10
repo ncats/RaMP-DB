@@ -4,15 +4,7 @@
 \alias{updateOverlapMatrix}
 \title{Update the overlap matrix for store in the shiny app directory}
 \usage{
-updateOverlapMatrix(
-  min_analyte,
-  overlapmethod,
-  together,
-  conpass,
-  host = "localhost",
-  dbname = "ramp",
-  username = "root"
-)
+updateOverlapMatrix(min_analyte, overlapmethod, together)
 }
 \arguments{
 \item{min_analyte}{a int that specifies the minimum of analytes the
@@ -23,14 +15,6 @@ must be 'balanced' or 'weighted'}
 
 \item{together}{a boolean value to compute overlap matrix for
 gene/metabolites separatly or together}
-
-\item{conpass}{a string that specifies password for database connection}
-
-\item{host}{a string that specifes host for database connection}
-
-\item{dbname}{a string that specifies database name of MySQL database}
-
-\item{username}{a string that specifies name of MySQL database}
 }
 \description{
 Update the overlap matrix for store in the shiny app directory

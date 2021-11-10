@@ -4,24 +4,10 @@
 \alias{getAnalyteFromPathway}
 \title{Use fast search algorithm to find all pathways from given analytes}
 \usage{
-getAnalyteFromPathway(
-  pathway,
-  conpass = NULL,
-  dbname = "ramp",
-  username = "root",
-  host = "localhost"
-)
+getAnalyteFromPathway(pathway)
 }
 \arguments{
 \item{pathway}{a string or a vector of strings that contains pathways of interest}
-
-\item{conpass}{password for database access (string)}
-
-\item{dbname}{name of the mysql database (default is "ramp")}
-
-\item{username}{username for database access (default is "root")}
-
-\item{host}{host name for database access (default is "localhost")}
 }
 \value{
 a data.frame that contains all search results
@@ -32,10 +18,11 @@ Use fast search algorithm to find all pathways from given analytes
 \examples{
 \dontrun{
 # To query one pathway:
-myanalytes <- getAnalyteFromPathway(pathway="sphingolipid metabolism",conpass="mypassword")
+myanalytes <- getAnalyteFromPathway(pathway="sphingolipid metabolism")
 
 # To query multiple pathways:
+pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
 myanalytes <- getAnalyteFromPathway(pathway=c("De Novo Triacylglycerol Biosynthesis", 
-"sphingolipid metabolism"),conpass="")
+"sphingolipid metabolism"))
 }
 }

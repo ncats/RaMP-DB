@@ -5,10 +5,6 @@
 #' @param mets a list object of source prepended metaboite ids, representing a metabolite set of interest
 #' @param propertyList an optional list of sepecific properties to extract c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'commmon_name')
 #' If a props list is not supplied, all property fields will be returned.
-#' @param conpass the ramp database password
-#' @param dbname the ramp database name
-#' @param host the ramp database host name
-#' @param username the ramp database user name
 #' @return Returns chemcial property information for the list of input metabolites and a query report reporting on the number of metabolite ids that were matched and the list of un-matched input ids.
 #'
 #' The returned object (return_obj below) contains two results. Use str(return_obj) to see the structure described here.
@@ -33,28 +29,17 @@
 #'             'hmdb:HMDB0007973',
 #'             'hmdb:HMDB0008057',
 #'             'hmdb:HMDB0011211')
-#' chemProps <- getChemicalProperties(mets, propertyList = c('smiles', 'inchi_key', 'common_name')
-#'                          conpass = <conn_password>, dbname = <db_name>, host = <host_name>, 
-#' 			    username = <user_name>)
+#' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
+#' chemProps <- getChemicalProperties(mets, propertyList = c('smiles', 'inchi_key', 'common_name'))
 #' head(chemProps$chem_props)
 #'}
 #' @export
-getChemicalProperties <- function(mets, propertyList = NULL,
-                      conpass,
-                      dbname,
-                      host,
-                      username) {
-
-  conn <- connectToRaMP(conpass=conpass, dbname = dbname, host=host, username=username)
-
+getChemicalProperties <- function(mets, propertyList = NULL){
+  conn <- connectToRaMP()
   message("Starting Chemical Property Query")
-
   res <- chemicalPropertiesQuery(mets, props=propertyList, conn)
-
   RMariaDB::dbDisconnect(conn)
-
   if(!is.null(res)) message("Finished Chemical Property Query")
-
   return(res)
 }
 
