@@ -3,7 +3,7 @@
 #' Returns chemical properties given a metabolite list
 #'
 #' @param mets a list object of source prepended metaboite ids, representing a metabolite set of interest
-#' @param propertyList an optional list of sepecific properties to extract c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'commmon_name')
+#' @param propertyList an optional list of sepecific properties to extract c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name')
 #' If a props list is not supplied, all property fields will be returned.
 #' @return Returns chemcial property information for the list of input metabolites and a query report reporting on the number of metabolite ids that were matched and the list of un-matched input ids.
 #'
@@ -94,7 +94,7 @@ queryReport <- function(queryList, foundList) {
 buildPropertyList <- function(propList) {
 
   # validate that all properties are valid
-  validProperties <- c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'commmon_name')
+  validProperties <- c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name')
   haveInvalidProps = FALSE
   invalidProps = c()
   for(prop in propList) {
@@ -107,7 +107,7 @@ buildPropertyList <- function(propList) {
     propword <- 'Error: A requested chemical property name is invalid.'
     if(length(invalidProps) > 1) propword <- 'Error: Some requested chemical property names are invalid.'
     errorMsg <- paste0(utils::str(length(invalidProps)), propword, "\n")
-    errorMsg <- paste0(errorMsg, "Valid property names: 'smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'commmon_name'\n")
+    errorMsg <- paste0(errorMsg, "Valid property names: 'smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'\n")
     errorMsg <- paste0(errorMsg, "Invalid input property name list:")
     for(badName in invalidProps) {
       errorMsg <- paste(errorMsg, badName)
