@@ -205,7 +205,15 @@ checkIdPrefixes <- function(idList, perc_cutoff=0.9) {
 }
 
 
-# runs and tallies chemical class information *when there is a user defined population
+#'chemicalClassSurveyRampIdsConn is a helper function that takes a list of metabolite ids, a list of 'population' metabolite ids
+#' and a MariaDB Connection object. The method returns metabolite class information for the metabolite list and a population of all ramp metabolites.
+#' @param mets a list object of prefixed metabolite ids of interest
+#' @param pop a list object of prefixed metabolite ids, representing a larger population of metabolites from which the mets were selected.
+#' @param conn a MariaDB Connection object to support queries
+#' @returns a list object containing three objects 'count_summary', 'met_classes' and 'met_query_report'.
+#' The count_summary is a dataframe containing metabolite classes and number of metabolites in each class.
+#' The met_classes is a detailed listing of compound classes associated with each input metabolite
+#' The met_query_report indicates the number of input metabolites, how many were found in the DB and the list of metabolites not found in RaMP DB.
 chemicalClassSurveyRampIdsConn <- function(mets, pop, conn) {
 
   mets <- unique(mets)
@@ -294,7 +302,14 @@ chemicalClassSurveyRampIdsConn <- function(mets, pop, conn) {
 }
 
 
-# runs and tallies chemical class information when there is NOT a user defined population, uses the DB population
+#'chemicalClassSurveyRampIdsFullPopConn is a helper function that takes a list of metabolite ids and a MariaDB Connection object
+#'and returns metabolite class information for the metabolite list and a population of all ramp metabolites.
+#' @param mets a list object of prefixed metabolite ids of interest
+#' @param conn a MariaDB Connection object to support queries
+#' @returns a list object containing three objects 'count_summary', 'met_classes' and 'met_query_report'.
+#' The count_summary is a dataframe containing metabolite classes and number of metabolites in each class.
+#' The met_classes is a detailed listing of compound classes associated with each input metabolite
+#' The met_query_report indicates the number of input metabolites, how many were found in the DB and the list of metabolites not found in RaMP DB.
 chemicalClassSurveyRampIdsFullPopConn <- function(mets, conn) {
 
   mets <- unique(mets)
@@ -366,7 +381,12 @@ chemicalClassSurveyRampIdsFullPopConn <- function(mets, conn) {
 }
 
 
-# reports on how well the query performed
+#' queryReport is a helper function to report on the number of query items that were found and missed, and the list of missed query values.
+#' @param queryList is a list object that contains all user input query values
+#' @param foundList is a list object of all user input query values that were retrieved during the query
+#' @returns returns a list object with three return values, 'query_list_size', 'found_list_size', 'missed_query_elements'
+#' The 'size' values are integers for the size of the input query and the number of input query values found.
+#' The missed_query_elements is a list containing the subset of query values that are not found during the query.
 queryReport <- function(queryList, foundList) {
   querySummary = list()
   querySummary[["query_list_size"]] <- length(unique(queryList))
@@ -375,9 +395,16 @@ queryReport <- function(queryList, foundList) {
   querySummary
 }
 
-
-# reports on the total number of metabolites found within a collection of classes
-# the tallies are for the population list and the met list
+#' Utility method to return metabolite counts found in compound class categories
+#' based on an input data compound class data object from the chemicalClassSurvey function
+#' The returned counts for each class category are for both the metabolite id query list
+#' and for the larger full or user-defined population of metabolite ids.
+#' This method is used in the exported chemicalClassEnrichment function
+#' @param classData Data object returned from a call to chemicalClassSurvey
+#' This input contains lists of chemical classes that pertain to a query list of metabolites and pertaining to
+#' metabolites in a larger metabolite population.
+#' @returns a list object with two keys, 'mets' and 'pop' that each has a table of metabolite or population
+#' chemical classes and metabolite counts per class. This supports the chemicalClassEnrichment function.
 getTotalFoundInCategories <- function(classData) {
   counts <- list()
 
@@ -410,7 +437,10 @@ getTotalFoundInCategories <- function(classData) {
 }
 
 
-# returns a p-value ordered matrix with adjP_BH column added
+#' Helper function to return a Benjamini-Hochberg (BH) corrected p-values. The method supports
+#' chemical class enrichment p-value corrections.
+#' @param resultMat is a dataframe containing p-values in a column named 'p-value'
+#' @returns the input dataFrame with BH corrected p-values with column name 'adjP_BH'
 bhCorrect <- function(resultMat) {
   resultMat <- resultMat[order(resultMat$`p-value`),]
   bhPvals <- stats::p.adjust(resultMat$`p-value`, method = "BH")
