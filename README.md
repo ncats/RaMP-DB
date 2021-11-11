@@ -1,4 +1,4 @@
-[![Build Status](https://api.travis-ci.com/ncats/RaMP-DB.svg?branch=dev)
+[![Build Status](https://api.travis-ci.com/ncats/RaMP-DB.svg?branch=master&status=passed)](https://travis-ci.com/github/ncats/RaMP-DB)
 
 # New!  RaMP app is accessible via a server (no installation needed!).
 Coming Soon!
