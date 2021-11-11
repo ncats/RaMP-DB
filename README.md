@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ncats/RaMP-DB.svg?branch=master)](https://travis-ci.org/ncats/RaMP-DB)
+[![Build Status](https://travis-ci.org/ncats/RaMP-DB.svg?branch=dev)](https://travis-ci.org/ncats/RaMP-DB)
 
 # New!  RaMP app is accessible via a server (no installation needed!).
 Please [click here](https://rampdb.ncats.io/).  And let us know if additional functionalities would be useful (see contact info below).
