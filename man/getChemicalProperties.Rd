@@ -9,7 +9,7 @@ getChemicalProperties(mets, propertyList = NULL)
 \arguments{
 \item{mets}{a list object of source prepended metaboite ids, representing a metabolite set of interest}
 
-\item{propertyList}{an optional list of sepecific properties to extract c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name')
+\item{propertyList}{an optional list of specific properties to extract c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name')
 If a props list is not supplied, all property fields will be returned.}
 }
 \value{
