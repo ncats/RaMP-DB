@@ -8,7 +8,8 @@ setConnectionToRaMP(
   dbname = "ramp",
   username = "root",
   conpass = NULL,
-  host = "localhost"
+  host = "localhost",
+  socket = NULL
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ setConnectionToRaMP(
 \item{conpass}{password for database (string)}
 
 \item{host}{a string that stand for host}
+
+\item{socket}{optional, location of mySQL.sock file (useful when running RaMP on remote clusters)}
 }
 \description{
 Set Connection Parameters or RaMP

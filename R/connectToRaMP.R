@@ -4,6 +4,7 @@
 #' @param username a string that is username for database (default: root)
 #' @param conpass password for database (string)
 #' @param host a string that stand for host
+#' @param socket optional, location of mySQL.sock file (useful when running RaMP on remote clusters)
 #'
 #' @examples
 #' \dontrun{
@@ -13,12 +14,14 @@
 setConnectionToRaMP <- function(dbname="ramp",
                        username = "root",
                        conpass = NULL,
-                       host ="localhost"){
+                       host ="localhost",
+		       socket = NULL){
   pkg.globals <- new.env()
   pkg.globals$dbname=dbname
   pkg.globals$username=username
   pkg.globals$conpass=conpass
   pkg.globals$host=host
+  pkg.globals$socket=socket
   return(pkg.globals)
 }
 
@@ -32,17 +35,27 @@ setConnectionToRaMP <- function(dbname="ramp",
 #' @return MySQL connection based on given dbname,username,password, and host
 #' @export
 connectToRaMP <- function() {
-  if(is.null(get("conpass",pkg.globals))) {
-        stop("Please define the password for the mysql connection using the setConnectionToRaMP() function")
+  if(!exists("pkg.globals")) {
+	stop("Be sure the run the setConnectionToRaMP() and assign it to pkg.globals");
   }
-
-  con <- DBI::dbConnect(
-    drv = RMariaDB::MariaDB(),
-    dbname = get("dbname",pkg.globals),
-    username = get("username",pkg.globals),
-    password = get("conpass",pkg.globals),
-    host = get("host",pkg.globals)
-  )
+  if(!is.null(get("socket",pkg.globals))) {
+  	con <- DBI::dbConnect(
+	    drv = RMariaDB::MariaDB(),
+	    dbname = get("dbname",pkg.globals),
+	    username = get("username",pkg.globals),
+	    password = get("conpass",pkg.globals),
+	    host = get("host",pkg.globals),
+	    unix.socket = get("socket",pkg.globals) 
+	)
+  } else {
+       con <- DBI::dbConnect(
+            drv = RMariaDB::MariaDB(),
+            dbname = get("dbname",pkg.globals),
+            username = get("username",pkg.globals),
+            password = get("conpass",pkg.globals),
+            host = get("host",pkg.globals)
+	) 
+   }
  return(con)
 }
 
