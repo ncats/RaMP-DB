@@ -2,7 +2,7 @@
 #' clicked on highchart
 #' @param pathwaydf a data frame resulting from getPathwayFromAnalyte
 #' @param backgrounddf optional dataframe resulting from getPathwayFromAnalyte run on all analytes detected in study. This will be used as the background for the Fisher's contingency table. If left NULL, all analytes in RaMP are used as background
-#' @param total_metabolites number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")
+#' @param biospecimen_background If NULL, test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param analyte_type "metabolites" or "genes" (default is "metabolites")
 #' @param conpass password for database access (string)
@@ -14,7 +14,8 @@
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
 #' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
 runFisherTest <- function(pathwaydf,backgrounddf=NULL,
-                          total_metabolites=NULL,total_genes=20000,
+                          biospecimen_background = NULL,
+                          total_genes=20000,
                           analyte_type="metabolites",conpass=NULL,
                           dbname="ramp",username="root",
                           host = "localhost", socket=NULL,
@@ -25,15 +26,35 @@ runFisherTest <- function(pathwaydf,backgrounddf=NULL,
     stop("Please define the password for the mysql connection")
   }
 
-  if(analyte_type=="metabolites") {total_analytes=total_metabolites
-  } else if (analyte_type=="genes") {
-    total_analytes=total_genes
-  } else {
-    stop("Please define the analyte_type variable as 'metabolites' or 'genes'")
+  ## if(analyte_type=="metabolites") {
+  ##     total_analytes=total_metabolites
+  ## } else if (analyte_type=="genes") {
+  ##     total_analytes=total_genes
+  ## } else {
+  ##   stop("Please define the analyte_type variable as 'metabolites' or 'genes'")
+  ## }
+  if(!is.null(biospecimen_background)){
+      if(biospecimen_background == "Adipose"){
+          biospecimen_background = "Adipose tissue"
+      }
+      query = paste0("SELECT analytehasontology.*, ontology.*, analytehaspathway.* from analytehasontology, ontology, analytehaspathway where ontology.commonName in ('",
+                     biospecimen_background,
+                     "') and ontology.rampOntologyIdLocation = analytehasontology.rampOntologyIdLocation and analytehasontology.rampCompoundId = analytehaspathway.rampId")
+      con <- connectToRaMP( username = username,
+                           conpass = conpass,
+                           dbname = dbname,
+                           host = host,socket = socket)
+      backgrounddf <- DBI::dbGetQuery(con,query)
+      DBI::dbDisconnect(con)
+      if(nrow(backgrounddf)==0){
+          stop("Biospecimen background not found. Choices are 'Blood', 'Adipose', 'Heart', 'Urine', 'Brain', 'Liver', 'Kidney', 'Saliva', and 'Feces'")
+      }
+      pathwaydf<-pathwaydf %>%
+          dplyr::filter(rampId %in% backgrounddf$rampId)
+      if(nrow(pathwaydf)==0){
+          stop("There are no metabolites in your input that map to your selected biospecimen")
+      }
   }
-
-  #print(paste("early in fisher... total analytes =",toString(total_analytes),sep=" "))
-  #print(paste("early in fisher... total mets=",toString(total_metabolites),sep=" "))
 
   ## Initialize empty contingency table for later
   contingencyTb <- matrix(0,nrow = 2,ncol = 2)
@@ -56,7 +77,7 @@ runFisherTest <- function(pathwaydf,backgrounddf=NULL,
   DBI::dbDisconnect(con)
   allids <- allids[!duplicated(allids),]
 
-  if((analyte_type == "metabolites") && (is.null(total_metabolites))) {
+  if((analyte_type == "metabolites")) {
 
     # JCB replaced these lines. Reducing to a source, extracting compound indices, then applying to the full set of rampIds
     # caused an error in the tally of analytes
@@ -93,7 +114,9 @@ runFisherTest <- function(pathwaydf,backgrounddf=NULL,
   ## Input_RampIds is a table of all analytes included in pathways represented in the user set
   ## "User" refers to significant analytes
   input_RampIds<-buildFrequencyTables(pathwaydf,
-                             password=conpass, unix.socket=socket)
+                                      dbname = dbname, host = host,
+                                      username = username,
+                                      password=conpass, unix.socket=socket)
 
   if(is.null(input_RampIds)) {
 
@@ -101,12 +124,6 @@ runFisherTest <- function(pathwaydf,backgrounddf=NULL,
 
   } else {
       segregated_id_list<-segregateDataBySource(input_RampIds)
-      ## if(!is.null(backgrounddf)){
-      ##     input_RampIds_bg<-buildFrequencyTables(backgrounddf,
-      ##                                            password=conpass, unix.socket=socket)
-      ##     segregated_id_list_bg<-segregateDataBySource(input_RampIds_bg)
-      ## }
-
   }
 
   # Loop through each pathway, build the contingency table, and calculate Fisher's Exact
@@ -149,34 +166,17 @@ runFisherTest <- function(pathwaydf,backgrounddf=NULL,
 	inputwiki <- segregated_id_list[[2]][3][[1]]
 	tot_user_analytes <- length(grep("RAMP_G",unique(pathwaydf$rampId)))
         tot_bg_analytes <- length(grep("RAMP_G",unique(backgrounddf$rampId)))
-        ## if(!is.null(backgrounddf)){
-        ##     inputkegg_bg <- segregated_id_list_bg[[2]][1][[1]]
-        ##     inputreact_bg <- segregated_id_list_bg[[2]][2][[1]]
-        ##     inputwiki_bg <- segregated_id_list_bg[[2]][3][[1]]
-        ## }
     }
 
     if ((!is.na(inputkegg$pathwayRampId[1])) && i %in% inputkegg$pathwayRampId) {
         tot_in_pathway <- inputkegg[which(inputkegg[,"pathwayRampId"]==i),"Freq"]
-        ## if(is.null(backgrounddf)){
             total_pathway_analytes <- kegg_totanalytes
-        ## }else{
-        ##     total_pathway_analytes <- inputkegg_bg[which(inputkegg_bg[,"pathwayRampId"]==i),"Freq"]
-        ## }
     } else if ((!is.na(inputwiki$pathwayRampId[1])) && i %in% inputwiki$pathwayRampId) {
         tot_in_pathway <- inputwiki[which(inputwiki[,"pathwayRampId"]==i),"Freq"]
-        ## if(is.null(backgrounddf)){
             total_pathway_analytes <- wiki_totanalytes
-        ## }else{
-        ##     total_pathway_analytes <- inputwiki_bg[which(inputwiki_bg[,"pathwayRampId"]==i),"Freq"]
-        ## }
     } else if ((!is.na(inputreact$pathwayRampId[1])) && i %in% inputreact$pathwayRampId) {
         tot_in_pathway <- inputreact[which(inputreact[,"pathwayRampId"]==i),"Freq"]
-        ## if(is.null(backgrounddf)){
             total_pathway_analytes <- react_totanalytes
-        ## }else{
-        ##     total_pathway_analytes <- inputreact_bg[which(inputreact_bg[,"pathwayRampId"]==i),"Freq"]
-        ## }
     } else {
         tot_in_pathway = 0
     }
@@ -207,7 +207,7 @@ runFisherTest <- function(pathwaydf,backgrounddf=NULL,
                                    bg_out_pathway)
       contingencyTb[2,1] <- user_in_pathway
       contingencyTb[2,2] <- user_out_pathway
-
+      ## browser()
       # Put the test into a try catch in case there's an issue, we'll have some details on the contingency matrix
       tryCatch({
         result <- stats::fisher.test(contingencyTb,alternative=alternative)
@@ -459,7 +459,7 @@ segregateDataBySource<-function(input_RampIds){
 #' clicked on highchart
 #' @param pathwaydf a data frame resulting from getPathwayFromAnalyte
 #' @param backgrounddf optional dataframe resulting from getPathwayFromAnalyte run on all analytes detected in study. This will be used as the background for the Fisher's contingency table. If left NULL, all analytes in RaMP are used as background
-#' @param total_metabolites number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")
+#' @param biospecimen_background If NULL, test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param min_analyte if the number of analytes (gene or metabolite) in a pathway is
 #' < min_analyte, do not report
@@ -479,7 +479,8 @@ segregateDataBySource<-function(input_RampIds){
 #'}
 #' @export
 runCombinedFisherTest <- function(pathwaydf,backgrounddf=NULL,
-                                  total_metabolites=NULL,total_genes=20000,
+                                  biospecimen_background=NULL,
+                                  total_genes=20000,
                                   min_analyte=2,conpass=NULL,
                                   dbname="ramp",username="root",
                                   host = "localhost",socket=NULL,MCall=T, alternative="less"){
@@ -497,20 +498,24 @@ runCombinedFisherTest <- function(pathwaydf,backgrounddf=NULL,
     M=1
     print("Running Fisher's tests on metabolites")
     outmetab <- runFisherTest(pathwaydf=fishmetab,backgrounddf=backgrounddf,
+                              biospecimen_background = biospecimen_background,
                               analyte_type="metabolites",
-                              total_metabolites=total_metabolites,total_genes=total_genes,
+                              total_genes=total_genes,
                               conpass=conpass,dbname=dbname,
                               username=username,host=host,socket=socket,MCall=MCall)
   }
 
   # Grab pathways that contain genes to run Fisher on genes
   fishgene <- pathwaydf[grep("RAMP_G_",pathwaydf$rampId),]
-  if(nrow(fishgene) == 0) {outgene=NULL} else{
+    if(nrow(fishgene) == 0) {outgene=NULL}
+    else if(!is.null(biospecimen_background)){
+        stop("Biospecimen background is not supported for datasets containing genes")
+        }else{
     G=1
     print("Running Fisher's tests on genes")
     outgene <- runFisherTest(pathwaydf=fishgene,backgrounddf=backgrounddf,
                              analyte_type="genes",
-                             total_metabolites=total_metabolites,total_genes=total_genes,
+                             total_genes=total_genes,
                              conpass=conpass,dbname=dbname,
                              username=username,host=host,socket=socket,MCall=MCall)
   }
@@ -620,48 +625,25 @@ getPathwayFromAnalyte<- function(analytes=NULL,
                                  username="root",
                                  NameOrIds = "ids"){
 
-  if(is.null(conpass)) {
-    stop("Please define the password for the mysql connection")
-  }
-
-  now <- proc.time()
-  if(is.null(analytes)) {return(NULL)}
-
-
-  if(NameOrIds == "names"){
-    synonym <- rampFindSynonymFromSynonym(synonym=analytes,
-	  find_synonym=find_synonym,
-	  conpass=conpass, host=host, dbname=dbname,username=username)
-
-    colnames(synonym)[1]="commonName"
-    synonym$commonName <- tolower(synonym$commonName)
-    if(nrow(synonym)==0) {
-      stop("Could not find any matches to the analytes entered.  If pasting, please make sure the names are delimited by end of line (not analyte per line)\nand that you are selecting 'names', not 'ids'");
+    if(is.null(conpass)) {
+        stop("Please define the password for the mysql connection")
     }
-    # Get all unique RaMP ids and call it list_metabolite
-    list_metabolite <- unique(synonym$rampId)
+    
+    now <- proc.time()
+    if(is.null(analytes)) {return(NULL)}
+    
+    list_metabolite = getRaMPInfoFromAnalytes(analytes = analytes,NameOrIds = NameOrIds,
+                                              PathOrChem = "path",
+                                              find_synonym = find_synonym,
+                                              conpass = conpass, host = host,
+                                              socket = socket)
+    list_metabolite <- unique(list_metabolite$rampId)
     list_metabolite <- sapply(list_metabolite,shQuote)
     list_metabolite <- paste(list_metabolite,collapse = ",")
-  } else if (NameOrIds == "ids"){
-    sourceramp <- rampFindSourceRampId(sourceId=analytes, conpass=conpass, host=host, dbname=dbname,username=username,socket=socket)
-    if (nrow(sourceramp)==0) {
-      stop("Make sure you are actually inputting ids and not names (you have NameOrIds set to 'ids'. If you are, then no ids were matched in the RaMP database.")
+    if(list_metabolite=="") {
+        warning("Unable to retrieve metabolites")
+        return(NULL)
     }
-    # get all unique RaMP ids and call it list_metabolite
-    list_metabolite <- unique(sourceramp$rampId)
-    #sourceIDTable <- list_metabolite
-    #list_metabolite <- list_metabolite$rampId
-    list_metabolite <- sapply(list_metabolite,shQuote)
-    list_metabolite <- paste(list_metabolite,collapse = ",")
-  } else {
-    stop("Make sure NameOrIds is set to 'names' or 'ids'")
-  }
-  # Parse data to fit mysql
-  # Can be simplified here
-  if(list_metabolite=="") {
-    warning("Unable to retrieve metabolites")
-    return(NULL)
-  }
   # Now using the RaMP compound id, retrieve associated pathway ids
   query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where
                       rampId in (",
@@ -936,4 +918,67 @@ FilterFishersResults<-function(fishers_df,p_holmadj_cutoff=NULL,
                         (p_fdradj_cutoff)")
     }
   }
+}
+
+
+#' 
+#'
+#' @param analytes a vector of analytes (genes or metabolites) that need to be searched
+#' @param PathOrChem return "path" information for pathways or "chem" for chemical class
+#' @param find_synonym find all synonyms or just return same synonym (T/F)
+#' @param conpass password for database access (string)
+#' @param NameOrIds whether input is "names" or "ids" (default is "ids")
+#' @param host host name for database access (default is "localhost")
+#' @param socket (optional) location of mysql.sock file
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
+#' @return a list of rampIds for "path" or a dataframe of chemClass info
+getRaMPInfoFromAnalytes<-function(analytes,
+                                  NameOrIds = "ids",
+                                  PathOrChem = "path",
+                                  find_synonym = FALSE,
+                                  conpass="mysql123",
+                                  host = "localhost",
+                                  socket=paste0(,
+                                                '/lscratch/',,
+                                                Sys.getenv('SLURM_JOB_ID'),
+                                                '/mysql/mysql.sock'),
+                                  dbname="ramp",
+                                  username="root"){
+    if(PathOrChem == "path"){
+        if(NameOrIds == "names"){
+            synonym <- rampFindSynonymFromSynonym(synonym=analytes,
+                                                         find_synonym=find_synonym,
+                                                         conpass=conpass, host=host,
+                                                         dbname=dbname,username=username,
+                                                         socket = socket)
+            
+            colnames(synonym)[1]="commonName"
+            synonym$commonName <- tolower(synonym$commonName)
+            if(nrow(synonym)==0) {
+                stop("Could not find any matches to the analytes entered.  If pasting, please make sure the names are delimited by end of line (not analyte per line)\nand that you are selecting 'names', not 'ids'");
+            }
+            return(synonym)
+        } else if (NameOrIds == "ids"){
+            sourceramp <- rampFindSourceRampId(sourceId=analytes, conpass=conpass, host=host,
+                                                      dbname=dbname,username=username, socket=socket)
+            if (nrow(sourceramp)==0) {
+                stop("Make sure you are actually inputting ids and not names (you have NameOrIds set to 'ids'. If you are, then no ids were matched in the RaMP database.")
+            }
+            return(sourceramp)
+        } else {
+            stop("Make sure NameOrIds is set to 'names' or 'ids'")
+        }
+    }else if(PathOrChem == "chem"){
+        if(NameOrIds == "names"){
+            stop("Please do not use common names when searching for chemical structures, as a single name often refers to many structures")
+        }else if (NameOrIds == "ids"){
+            chem_info<-rampFindClassInfoFromSourceId(sourceIds=analytes, conpass=conpass,
+                                                  host=host,dbname=dbname,username=username,
+                                                  socket=socket)
+            return(chem_info)
+        }
+    }else{
+        stop("'PathOrChem' must be set to 'path' or 'chem'")
+    }
 }
