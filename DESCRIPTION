@@ -23,7 +23,6 @@ Imports:
     properties,
     stringi,
     RMariaDB,
-    DBI,
-    usethis
+    DBI
 Encoding: UTF-8
 RoxygenNote: 7.1.1

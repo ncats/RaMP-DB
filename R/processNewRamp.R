@@ -214,7 +214,7 @@ updateOverlapMatrix <- function(min_analyte, overlapmethod, together){
     listOfKeggG <- findAnalyteHasPathway(pathwayInKegg$pathwayRampId,GC="G",n = min_analyte)
     listOfWikiG <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,GC="G",n = min_analyte)
     listOfReacG <- findAnalyteHasPathway(pathwayInReac$pathwayRampId,GC="G",n = min_analyte)
-    
+
     # Setup minimum number of analytes that will be considered
 
     # May need to filter out that pathway that has less than 5 metabolites
@@ -455,19 +455,19 @@ sysdataObject <- function() {
             is.data.frame(wiki_metab))
 
   # uncomment usethis::use_data function to create sysdata.rda object
-  usethis::use_data(genes_result,
-                     metabolites_result,
-                     analyte_result,
-                     hmdb_gene,
-                     hmdb_metab,
-                     kegg_gene,
-                     kegg_metab,
-                     reactome_gene,
-                     reactome_metab,
-                     wiki_gene,
-                     wiki_metab,
-                     overwrite = TRUE,
-                     internal = TRUE)
+  # usethis::use_data(genes_result,
+  #                    metabolites_result,
+  #                    analyte_result,
+  #                    hmdb_gene,
+  #                    hmdb_metab,
+  #                    kegg_gene,
+  #                    kegg_metab,
+  #                    reactome_gene,
+  #                    reactome_metab,
+  #                    wiki_gene,
+  #                    wiki_metab,
+  #                    overwrite = TRUE,
+  #                    internal = TRUE)
 
 }
 
