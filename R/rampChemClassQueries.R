@@ -9,6 +9,7 @@
 #' @param dbname the ramp database name
 #' @param host the ramp database host name
 #' @param username the ramp database user name
+#' @param socket (optional) location of mysql.sock file
 #' @return Returns chemcial class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
 #' metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolve and listing those metabolite ids
 #' that are not found in the database.
@@ -66,16 +67,27 @@ chemicalClassSurvey <- function(mets, pop = NULL,
                                 conpass,
                                 dbname,
                                 host,
-                                username) {
+                                username,
+                                socket = NULL) {
 
-  conn <- connectToRaMP(conpass=conpass, dbname = dbname, host=host, username=username)
+  conn <- connectToRaMP(conpass=conpass, dbname = dbname, host=host, username=username, socket = socket)
 
   print("Starting Chemical Class Survey")
 
   if(is.null(pop)) {
-    res <- chemicalClassSurveyRampIdsFullPopConn(mets, conn)
+      res <- chemicalClassSurveyRampIdsFullPopConn(mets, conn,
+                                                   conpass=conpass,
+                                                   dbname = dbname,
+                                                   host=host,
+                                                   username=username,
+                                                   socket = socket)
   } else {
-    res <- chemicalClassSurveyRampIdsConn(mets, pop, conn)
+    res <- chemicalClassSurveyRampIdsConn(mets, pop, conn,
+                                                   conpass=conpass,
+                                                   dbname = dbname,
+                                                   host=host,
+                                                   username=username,
+                                                   socket = socket)
   }
   RMariaDB::dbDisconnect(conn)
 
@@ -182,30 +194,45 @@ checkIdPrefixes <- function(idList) {
 }
 
 
-# runs and tallies chemical class information *when there is a user defined population
-chemicalClassSurveyRampIdsConn <- function(mets, pop, conn) {
+                                        # runs and tallies chemical class information *when there is a user defined population
+#' @param conpass password for database access (string)
+#' @param host host name for database access (default is "localhost")
+#' @param socket (optional) location of mysql.sock file
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
+#' @param socket (optional) location of mysql.sock file
+chemicalClassSurveyRampIdsConn <- function(mets, pop, conn,
+                                           conpass, host,dbname,username,
+                                           socket) {
 
-  mets <- unique(mets)
+  ## mets <- unique(mets)
 
-  checkIdPrefixes(mets)
+  ## checkIdPrefixes(mets)
 
-  pop <- unique(pop)
+  ## pop <- unique(pop)
 
-  checkIdPrefixes(pop)
+  ## checkIdPrefixes(pop)
 
-  result <- list()
+  ## result <- list()
 
-  # first handle metabolites of interest
-  metStr <- paste(mets, collapse = "','")
-  metStr <- paste("'" ,metStr, "'", sep = "")
+  ## # first handle metabolites of interest
+  ## metStr <- paste(mets, collapse = "','")
+  ## metStr <- paste("'" ,metStr, "'", sep = "")
 
-  sql <- paste("select distinct a.ramp_id, b.sourceId, a.class_level_name, a.class_name, a.source from metabolite_class a, source b
-          where b.rampId = a.ramp_id and b.sourceId in (",metStr,")")
+  ## sql <- paste("select distinct a.ramp_id, b.sourceId, a.class_level_name, a.class_name, a.source from metabolite_class a, source b
+  ##         where b.rampId = a.ramp_id and b.sourceId in (",metStr,")")
 
-  metsData <- RMariaDB::dbGetQuery(conn, sql)
+  ## metsData <- RMariaDB::dbGetQuery(conn, sql)
 
-  # need to filter for our specific source ids
-  metsData <- subset(metsData, sourceId %in% mets)
+  ## # need to filter for our specific source ids
+    ## metsData <- subset(metsData, sourceId %in% mets)
+
+    metsData <- getRaMPInfoFromAnalytes(analytes = mets,NameOrIds = "ids",
+                                        PathOrChem = "chem",
+                                        find_synonym = FALSE,
+                                        conpass = conpass, host = host,
+                                        dbname = dbname, username = username,
+                                        socket = NULL)
 
   # get query summary
   metQueryReport <- queryReport(mets, metsData$sourceId)
@@ -270,26 +297,40 @@ chemicalClassSurveyRampIdsConn <- function(mets, pop, conn) {
 }
 
 
-# runs and tallies chemical class information when there is NOT a user defined population, uses the DB population
-chemicalClassSurveyRampIdsFullPopConn <- function(mets, conn) {
+                                        # runs and tallies chemical class information when there is NOT a user defined population, uses the DB population
+#' @param conpass password for database access (string)
+#' @param host host name for database access (default is "localhost")
+#' @param socket (optional) location of mysql.sock file
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
+#' @param socket (optional) location of mysql.sock file
+chemicalClassSurveyRampIdsFullPopConn <- function(mets, conn,
+                                                  conpass, host,dbname,
+                                                  username,
+                                                  socket) {
 
-  mets <- unique(mets)
+  ## mets <- unique(mets)
 
-  checkIdPrefixes(mets)
+  ## checkIdPrefixes(mets)
 
-  result <- list()
+  ## result <- list()
 
-  # first handle metabolites of interest
-  metStr <- paste(mets, collapse = "','")
-  metStr <- paste("'" ,metStr, "'", sep = "")
+  ## # first handle metabolites of interest
+  ## metStr <- paste(mets, collapse = "','")
+  ## metStr <- paste("'" ,metStr, "'", sep = "")
 
-  sql <- paste("select distinct a.ramp_id, b.sourceId, a.class_level_name, a.class_name, a.source from metabolite_class a, source b
-          where b.rampId = a.ramp_id and b.sourceId in (",metStr,")")
+  ## sql <- paste("select distinct a.ramp_id, b.sourceId, a.class_level_name, a.class_name, a.source from metabolite_class a, source b
+  ##         where b.rampId = a.ramp_id and b.sourceId in (",metStr,")")
 
-  metsData <- RMariaDB::dbGetQuery(conn, sql)
+  ## metsData <- RMariaDB::dbGetQuery(conn, sql)
 
-  # need to filter for our specific source ids
-  metsData <- subset(metsData, sourceId %in% mets)
+  ## # need to filter for our specific source ids
+    ## metsData <- subset(metsData, sourceId %in% mets)
+    metsData <- getRaMPInfoFromAnalytes(analytes = mets,NameOrIds = "ids",
+                                        PathOrChem = "chem",
+                                        find_synonym = FALSE,
+                                        conpass = conpass, host = host,
+                                        socket = socket)
 
   # get query summary
   metQueryReport <- queryReport(mets, metsData$sourceId)
@@ -393,5 +434,64 @@ bhCorrect <- function(resultMat) {
   return(resultMat)
 }
 
+#' @param sourceIds a vector of analytes (genes or metabolites) that need to be searched
+#' @param conpass password for database access (string)
+#' @param host host name for database access (default is "localhost")
+#' @param socket (optional) location of mysql.sock file
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
+#' @param socket (optional) location of mysql.sock file
+#' @return a dataframe of chemClass info
+rampFindClassInfoFromSourceId<-function(sourceIds, conpass = NULL, dbname = "ramp",
+                                     username = "root", host = "localhost",
+                                     socket = NULL){
+        
+    sourceIds <- unique(sourceIds)
+    
+    checkIdPrefixes(sourceIds)
 
+    idsToCheck <- sapply(sourceIds,function(x){
+        if(!grepl("hmdb|chebi|LIPIDMAPS",x)){
+            return(x)
+        }
+    })
+    idsToCheck <- paste(idsToCheck, collapse = "','")
+    idsToCheck <- paste("'" ,idsToCheck, "'", sep = "")
+    conn <- connectToRaMP(username = username, conpass = conpass, 
+                                 dbname = dbname, host = host, socket = socket)
+    sql <- paste("select * from source where sourceId in (",idsToCheck,")")
+    
+    potentialMultiMappings <- RMariaDB::dbGetQuery(conn, sql)
+    potentialMultiMappings <- potentialMultiMappings %>%
+        dplyr::select("sourceId","rampId") %>%
+        dplyr::distinct()
+
+    multimapped<-duplicated(potentialMultiMappings$sourceId)
+    sourceIds<-sapply(sourceIds,function(x){
+        ifelse(x %in% multimapped, return("Ambiguous"),return(x))
+    })
+    if("Ambiguous" %in% sourceIds){
+        noAmbiguous = length(which(sourceIds=="Ambiguous"))
+        print(paste0(noAmbiguous,
+                     " metabolite(s) could not be unambiguously mapped to a chemical structure and have been discarded"))
+    }
+    
+                                        # first handle metabolites of interest
+    metStr <- paste(sourceIds, collapse = "','")
+    metStr <- paste("'" ,metStr, "'", sep = "")
+
+    conn <- connectToRaMP(username = username, conpass = conpass, 
+                                dbname = dbname, host = host, socket = socket)
+
+    sql <- paste("select distinct a.ramp_id, b.sourceId, a.class_level_name, a.class_name, a.source from metabolite_class a, source b
+          where b.rampId = a.ramp_id and b.sourceId in (",metStr,")")
+    
+    metsData <- RMariaDB::dbGetQuery(conn, sql)
+    
+                                        # need to filter for our specific source ids
+    metsData <- subset(metsData, sourceId %in% sourceIds)
+    
+    DBI::dbDisconnect(conn)
+    return(metsData)
+}
 

@@ -9,6 +9,7 @@
 #' @param dbname the ramp database name
 #' @param host the ramp database host name
 #' @param username the ramp database user name
+#' @param socket (optional) location of mysql.sock file
 #' @return Returns chemcial property information for the list of input metabolites and a query report reporting on the number of metabolite ids that were matched and the list of un-matched input ids.
 #'
 #' The returned object (return_obj below) contains two results. Use str(return_obj) to see the structure described here.
@@ -42,9 +43,10 @@ getChemicalProperties <- function(mets, propertyList = NULL,
                       conpass,
                       dbname,
                       host,
-                      username) {
+                      username,
+                      socket = NULL) {
 
-  conn <- connectToRaMP(conpass=conpass, dbname = dbname, host=host, username=username)
+  conn <- connectToRaMP(conpass=conpass, dbname = dbname, host=host, username=username, socket = socket)
 
   message("Starting Chemical Property Query")
 
