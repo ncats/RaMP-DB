@@ -454,7 +454,7 @@ sysdataObject <- function() {
             is.data.frame(wiki_gene),
             is.data.frame(wiki_metab))
 
-  # uncomment usethis::use_data function to create sysdata.rda object
+  #uncomment usethis::use_data function to create sysdata.rda object
   # usethis::use_data(genes_result,
   #                    metabolites_result,
   #                    analyte_result,
