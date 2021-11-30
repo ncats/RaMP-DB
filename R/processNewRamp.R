@@ -455,19 +455,19 @@ sysdataObject <- function() {
             is.data.frame(wiki_metab))
 
   #uncomment usethis::use_data function to create sysdata.rda object
-  # usethis::use_data(genes_result,
-  #                    metabolites_result,
-  #                    analyte_result,
-  #                    hmdb_gene,
-  #                    hmdb_metab,
-  #                    kegg_gene,
-  #                    kegg_metab,
-  #                    reactome_gene,
-  #                    reactome_metab,
-  #                    wiki_gene,
-  #                    wiki_metab,
-  #                    overwrite = TRUE,
-  #                    internal = TRUE)
+  usethis::use_data(genes_result,
+                     metabolites_result,
+                     analyte_result,
+                     hmdb_gene,
+                     hmdb_metab,
+                     kegg_gene,
+                     kegg_metab,
+                     reactome_gene,
+                     reactome_metab,
+                     wiki_gene,
+                     wiki_metab,
+                     overwrite = TRUE,
+                     internal = TRUE)
 
 }
 
@@ -481,7 +481,7 @@ sysdataObject <- function() {
 # dbname = <db_name>
 # username = <username>
 # conpass = <connection_password>
-# pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
+# pkg.globals <- setConnectionToRaMP(dbname=dbname,username=username,conpass=conpass,host=hostname)
 # RaMP:::updateOverlapMatrices(method="balanced" ,all="all")
 # RaMP:::updateOverlapMatrices(method="balanced" ,all="analyte")
 # RaMP:::processData()
