@@ -59,10 +59,10 @@ getOntoFromMeta <- function(analytes,NameOrIds = 'ids'){
     return(NULL)
   }
   DBI::dbDisconnect(con)
-  rampontoid <- unique(df2$rampOntologyIdLocation)
+  rampontoid <- unique(df2$rampOntologyId)
   rampontoid <- sapply(rampontoid,shQuote)
   rampontoid <- paste(rampontoid,collapse = ',')
-  sql <- paste0('select * from ontology where rampOntologyIdLocation in (',
+  sql <- paste0('select * from ontology where rampOntologyId in (',
                 rampontoid,');')
   con <- connectToRaMP()
   df3 <- DBI::dbGetQuery(con,sql)
@@ -74,7 +74,7 @@ getOntoFromMeta <- function(analytes,NameOrIds = 'ids'){
   colnames(mdf)[colnames(mdf) == 'commonName.x'] = 'Ontology'
   colnames(mdf)[colnames(mdf) == 'commonName.y'] = 'Metabolites'
 
-  mdf <- mdf[c('Metabolites','sourceId','IDtype','Ontology','biofluidORcellular')]
+  mdf <- mdf[c('Metabolites','sourceId','IDtype','Ontology','HMDBOntologyType')]
 
   # colnames(mdf) <- c('Metabolites','Ontology','Ontology_Type')
   return(mdf)
@@ -114,10 +114,10 @@ getMetaFromOnto <- function(ontology){
   df <- DBI::dbGetQuery(con,sql)
   DBI::dbDisconnect(con)
   print(colnames(df))
-  rampontoid <- paste(sapply(unique(df$rampOntologyIdLocation),shQuote),
+  rampontoid <- paste(sapply(unique(df$rampOntologyId),shQuote),
                       collapse = ',')
   con <- connectToRaMP()
-  sql <- paste0('select * from analytehasontology where rampOntologyIdLocation in (',
+  sql <- paste0('select * from analytehasontology where rampOntologyId in (',
                 rampontoid,');')
 
   df2 <- DBI::dbGetQuery(con,sql)
@@ -139,15 +139,15 @@ getMetaFromOnto <- function(ontology){
   print('Merging 1...')
   mdf <- unique(merge(df3,df2,by.x = 'rampId',by.y = 'rampCompoundId',all.x = T))
   print('Merging 2...')
-  mdf <- unique(merge(mdf,df,by.x = 'rampOntologyIdLocation',
-                      by.y = 'rampOntologyIdLocation',
+  mdf <- unique(merge(mdf,df,by.x = 'rampOntologyId',
+                      by.y = 'rampOntologyId',
                       all.x = T))
   # mdf <- mdf[c('sourceId','commonName.y','biofluidORcellular')]
   # colnames(mdf) <- c('Metabolites','Ontology','Ontology_Type')
   colnames(mdf)[colnames(mdf) == 'commonName.x'] = 'Metabolites'
   colnames(mdf)[colnames(mdf) == 'commonName.y'] = 'Ontology'
 
-  mdf <- mdf[c('Metabolites','sourceId','IDtype','Ontology','biofluidORcellular')]
+  mdf <- mdf[c('Metabolites','sourceId','IDtype','Ontology','HMDBOntologyType')]
   return(mdf)
 
 }

@@ -22,7 +22,7 @@ myanalytes <- getAnalyteFromPathway(pathway="sphingolipid metabolism")
 
 # To query multiple pathways:
 pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-myanalytes <- getAnalyteFromPathway(pathway=c("De Novo Triacylglycerol Biosynthesis", 
+myanalytes <- getAnalyteFromPathway(pathway=c("De Novo Triacylglycerol Biosynthesis",
 "sphingolipid metabolism"))
 }
 }
