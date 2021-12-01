@@ -9,12 +9,12 @@
 #'
 #' # To query multiple pathways:
 #' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-#' myanalytes <- getAnalyteFromPathway(pathway=c("De Novo Triacylglycerol Biosynthesis", 
+#' myanalytes <- getAnalyteFromPathway(pathway=c("De Novo Triacylglycerol Biosynthesis",
 #'	"sphingolipid metabolism"))
 #' }
 #' @export
 getAnalyteFromPathway <- function(pathway) {
-  
+
   now <- proc.time()
   print("fired")
   if(is.character(pathway)){
@@ -38,13 +38,13 @@ getAnalyteFromPathway <- function(pathway) {
   con <- connectToRaMP()
   query1 <- paste0("select * from pathway where pathwayName
                    in (",list_pathway,");")
-  
+
   df1 <- DBI::dbGetQuery(con,query1)
   DBI::dbDisconnect(con)
-  
+
   if(nrow(df1)==0) {
     stop("None of the input pathway(s) could be found")}
-  
+
   # Retrieve compound id from RaMP pathway id (query1)
   query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where
                    pathwayRampId in (select pathwayRampId from pathway where
@@ -55,13 +55,13 @@ getAnalyteFromPathway <- function(pathway) {
   cid_list <- unlist(df2[,2])
   cid_list <- sapply(cid_list,shQuote)
   cid_list <- paste(cid_list,collapse = ",")
-  
+
   # Retrieve all common name from compounds associated with RaMP compound ids (query2)
   query3 <- paste0("select * from source where rampId in (",cid_list,");")
   con <- connectToRaMP()
   df3 <- DBI::dbGetQuery(con,query3)
   DBI::dbDisconnect(con)
-  
+
   # Merge all of this together
   mdf1 <- merge(df3,df2,all.x=T)
   mdf1 <- merge(mdf1,df1,all.x=T,by="pathwayRampId")
@@ -87,10 +87,10 @@ getAnalyteFromPathway <- function(pathway) {
     count=count+1
     allout=rbind(allout,out)
   }
-  
+
   print("Timing ..")
   print(proc.time() - now)
-  
+
   return(as.data.frame(allout))
 }
 
