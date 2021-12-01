@@ -1,7 +1,7 @@
 #' Query to retrieve database ID prefixes for analyte types
+#' @param analyteType value to indicate the desired analyte type. Value one of 'gene' 'compound'
 #' @return Returns list of database ID prefixes for selected 'gene' or 'compound'
 #' @export  getPrefixesFromAnalytes
-
 getPrefixesFromAnalytes<-function(analyteType="gene") {
   con <- connectToRaMP()
   if (analyteType=="gene"){
@@ -39,14 +39,13 @@ getMetabClassTypes<-function(){
   query1<-"select distinct(class_level_name) from metabolite_class order by class_level_name asc"
   results<- RMariaDB::dbGetQuery(con,query1)
   return(results)
-  }
-#` Returns chemical classes for classType
+}
+
+#' Returns chemical classes for classType
 #' @param classType one of the metab class types as returned by getMetabClassTypes() function; if null
 #' will return a list of available classes for each class type
 #' @return Returns metabolite classes for classTypes
 #' @export getMetabChemClass
-
-
 getMetabChemClass<-function(classType= 'ClassyFire_super_class') {
   if (!is.null(classType)) {
     con <- connectToRaMP()

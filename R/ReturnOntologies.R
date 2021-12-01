@@ -76,6 +76,9 @@ getOntoFromMeta <- function(analytes,NameOrIds = 'ids'){
 
   mdf <- mdf[c('Metabolites','sourceId','IDtype','Ontology','HMDBOntologyType')]
 
+  # need to make unique list (JB, 12/1/21)
+  mdf <- unique(mdf)
+
   # colnames(mdf) <- c('Metabolites','Ontology','Ontology_Type')
   return(mdf)
 }
