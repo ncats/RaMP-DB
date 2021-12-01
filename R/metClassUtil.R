@@ -1,22 +1,24 @@
 #' Query to retrieve database ID prefixes for analyte types
-#' @param analyteType value to indicate the desired analyte type. Value one of 'gene' 'compound'
-#' @return Returns list of database ID prefixes for selected 'gene' or 'compound'
+#' @param analyteType value to indicate the desired analyte type. Value one of 'gene' or 'metabolite'
+#' @return Returns list of database ID prefixes for selected 'gene' or 'metabolite'
 #' @export  getPrefixesFromAnalytes
 getPrefixesFromAnalytes<-function(analyteType="gene") {
   con <- connectToRaMP()
   if (analyteType=="gene"){
     query1 <- "select distinct(IDtype) from source where geneOrCompound ='gene';"
     df1<- RMariaDB::dbGetQuery(con,query1)
+    df1 <- data.frame(analyteType="Genes/Proteins", idTypes=paste(df1$IDtype,collapse=", "))
     }
-  else if (analyteType=="compound"){
+  else if (analyteType=="metabolite"){
     query2 <- "select distinct(IDtype) from source where geneOrCompound ='compound';"
     df1 <- RMariaDB::dbGetQuery(con,query2)
+    df1 <- data.frame(analyteType="Metabolites", idTypes=paste(df1$IDtype,collapse=", "))
     }
   else{
-    print("analyteType must be 'gene' or 'compound'")
+    print("analyteType must be 'gene' or 'metabolite'")
   }
   RMariaDB::dbDisconnect(con)
-  return(df1[,1])
+  return(df1)
 }
 
 
