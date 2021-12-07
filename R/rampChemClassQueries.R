@@ -65,7 +65,7 @@ chemicalClassSurvey <- function(mets, pop = NULL){
   print("Starting Chemical Class Survey")
 
   if(is.null(pop)) {
-    res <- chemicalClassSurveyRampIdsFullPopConn(mets, conn)
+      res <- chemicalClassSurveyRampIdsFullPopConn(mets, conn)
   } else {
     res <- chemicalClassSurveyRampIdsConn(mets, pop, conn)
   }
@@ -149,5 +149,4 @@ chemicalClassEnrichment <- function(classData) {
   print("Finished Chemical Class Enrichment")
   return(enrichmentStat)
 }
-
 

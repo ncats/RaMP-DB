@@ -17,6 +17,10 @@ Imports:
     shinydashboard,
     highcharter,
     dplyr,
+    ggplot2,
+    plotly,
+    tidyr,
+    tidytext,
     DT,
     xtable,
     visNetwork,
@@ -25,4 +29,7 @@ Imports:
     RMariaDB,
     DBI
 Encoding: UTF-8
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

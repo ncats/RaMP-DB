@@ -68,7 +68,7 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
 #' containing all information related to synonym. Or can be a list of
 #' rampId
 #' @param full return whole searching result or not (TRUE/FALSE)
-#' @return a data frame that has all source Id in the column or the source table that has metaoblites entry
+#' @return a data frame that has all source Id in the column or the source table that has metabolites entry
 rampFindSourceFromId <- function(rampId=NULL,full = TRUE){
 
   if(is.data.frame(rampId)){
@@ -448,4 +448,161 @@ bhCorrect <- function(resultMat) {
   return(resultMat)
 }
 
+#' Get class info for an input of metabolite source Ids
+#' @param sourceIds a vector of analytes (genes or metabolites) that need to be searched
+#' @return a dataframe of chemClass info
+rampFindClassInfoFromSourceId<-function(sourceIds){
+        
+    sourceIds <- unique(sourceIds)
+    
+    checkIdPrefixes(sourceIds)
 
+    idsToCheck <- sapply(sourceIds,function(x){
+        if(!grepl("hmdb|chebi|LIPIDMAPS",x)){
+            return(x)
+        }
+    })
+    idsToCheck <- paste(idsToCheck, collapse = "','")
+    idsToCheck <- paste("'" ,idsToCheck, "'", sep = "")
+    conn <- connectToRaMP()
+    sql <- paste("select * from source where sourceId in (",idsToCheck,")")
+    
+    potentialMultiMappings <- RMariaDB::dbGetQuery(conn, sql)
+    potentialMultiMappings <- potentialMultiMappings %>%
+        dplyr::select("sourceId","rampId") %>%
+        dplyr::distinct()
+
+    multimapped<-duplicated(potentialMultiMappings$sourceId)
+    sourceIds<-sapply(sourceIds,function(x){
+        ifelse(x %in% multimapped, return("Ambiguous"),return(x))
+    })
+    if("Ambiguous" %in% sourceIds){
+        noAmbiguous = length(which(sourceIds=="Ambiguous"))
+        print(paste0(noAmbiguous,
+                     " metabolite(s) could not be unambiguously mapped to a chemical structure and have been discarded"))
+    }
+    
+                                        # first handle metabolites of interest
+    metStr <- paste(sourceIds, collapse = "','")
+    metStr <- paste("'" ,metStr, "'", sep = "")
+
+    conn <- connectToRaMP()
+
+    sql <- paste("select distinct a.ramp_id, b.sourceId, a.class_level_name, a.class_name, a.source from metabolite_class a, source b
+          where b.rampId = a.ramp_id and b.sourceId in (",metStr,")")
+    
+    metsData <- RMariaDB::dbGetQuery(conn, sql)
+    
+                                        # need to filter for our specific source ids
+    metsData <- subset(metsData, "sourceId" %in% sourceIds)
+    
+    DBI::dbDisconnect(conn)
+    return(metsData)
+}
+
+#' Internal function for extracting annotations, used by pathway and chemical enrichment test functions
+#' @param analytes a vector of analytes (genes or metabolites) that need to be searched
+#' @param PathOrChem return "path" information for pathways or "chem" for chemical class
+#' @param find_synonym find all synonyms or just return same synonym (T/F)
+#' @param NameOrIds whether input is "names" or "ids" (default is "ids")
+#' @return a list of rampIds for "path" or a dataframe of chemClass info
+getRaMPInfoFromAnalytes<-function(analytes,
+                                  NameOrIds = "ids",
+                                  PathOrChem = "path",
+                                  find_synonym = FALSE){
+    if(PathOrChem == "path"){
+        if(NameOrIds == "names"){
+            synonym <- rampFindSynonymFromSynonym(synonym=analytes,
+                                                  find_synonym=find_synonym)
+            
+            colnames(synonym)[1]="commonName"
+            synonym$commonName <- tolower(synonym$commonName)
+            if(nrow(synonym)==0) {
+                stop("Could not find any matches to the analytes entered.  If pasting, please make sure the names are delimited by end of line (not analyte per line)\nand that you are selecting 'names', not 'ids'");
+            }
+            return(synonym)
+        } else if (NameOrIds == "ids"){
+            sourceramp <- rampFindSourceRampId(sourceId=analytes)
+            if (nrow(sourceramp)==0) {
+                stop("Make sure you are actually inputting ids and not names (you have NameOrIds set to 'ids'. If you are, then no ids were matched in the RaMP database.")
+            }
+            return(sourceramp)
+        } else {
+            stop("Make sure NameOrIds is set to 'names' or 'ids'")
+        }
+    }else if(PathOrChem == "chem"){
+        if(NameOrIds == "names"){
+            stop("Please do not use common names when searching for chemical structures, as a single name often refers to many structures")
+        }else if (NameOrIds == "ids"){
+            chem_info<-rampFindClassInfoFromSourceId(sourceIds=analytes)
+            return(chem_info)
+        }
+    }else{
+        stop("'PathOrChem' must be set to 'path' or 'chem'")
+    }
+}
+
+##' Return all analytes that map to unique pathways in a pathwaydf
+##' @param inputdf internal df with pathwayramp ids
+##' @return dataframe of all analytes that map to the input pathways
+##' @author Andrew Christopher Patt
+buildFrequencyTables<-function(inputdf){
+    ## Get pathway ids that contain the user analytes
+    pid <- unique(inputdf$pathwayRampId);
+    list_pid <- sapply(pid,shQuote)
+    list_pid <- paste(list_pid,collapse = ",")
+    
+    ## Retrieve compound ids associated with background pathways and count 
+    query <- paste0("select * from analytehaspathway where pathwayRampId in (",
+                     list_pid,")")
+    
+    con <- connectToRaMP()
+    
+    input_RampIds <- DBI::dbGetQuery(con,query)
+    DBI::dbDisconnect(con)
+    
+    return(input_RampIds)
+}
+
+##' Separate input ids into lists based on database of origin
+##' @param input_RampIds list of analyte ramp IDs
+##' @return pathway lists separated by source db
+##' @author Andrew Christopher Patt
+segregateDataBySource<-function(input_RampIds){
+    # data frames for metabolites with pathwayRampID, Freq based  on Source(kegg, reactome, wiki)
+
+    input_RampId_C <- input_RampIds[grep("RAMP_C", input_RampIds$rampId), ]
+    unique_input_RampId_C <- unique(input_RampId_C[,c("rampId", "pathwayRampId")])
+    unique_pathwayRampId_source <- unique(input_RampId_C[,c("pathwayRampId", "pathwaySource")])
+    
+    freq_unique_input_RampId_C <- as.data.frame(table(unique_input_RampId_C[,"pathwayRampId"]))
+    
+    names(freq_unique_input_RampId_C)[1] = 'pathwayRampId'
+    merge_Pathwayfreq_source <- merge(freq_unique_input_RampId_C, unique_pathwayRampId_source, by="pathwayRampId")
+    
+    # subset metabolite data based on source -  kegg, reactome, wiki
+
+    input_kegg_metab <- subset(merge_Pathwayfreq_source, merge_Pathwayfreq_source$pathwaySource == "kegg")
+    input_reactome_metab <- subset(merge_Pathwayfreq_source, merge_Pathwayfreq_source$pathwaySource == "reactome")
+    input_wiki_metab <- subset(merge_Pathwayfreq_source, merge_Pathwayfreq_source$pathwaySource == "wiki")
+
+# data frames for Genes with pathawayRampID, Freq based  on Source(kegg, reactome, wiki, hmdb)
+
+    input_RampId_G <- input_RampIds[grep("RAMP_G", input_RampIds$rampId), ]
+    unique_input_RampId_G <- unique(input_RampId_G[,c("rampId", "pathwayRampId")])
+    unique_pathwayG_source <- unique(input_RampId_G[,c("pathwayRampId", "pathwaySource")])
+    
+    freq_unique_input_RampId_G <- as.data.frame(table(unique_input_RampId_G[,"pathwayRampId"]))
+    
+    names(freq_unique_input_RampId_G)[1] = 'pathwayRampId'
+    merge_PathwayG_source <- merge(freq_unique_input_RampId_G, unique_pathwayG_source, by="pathwayRampId")
+
+   # subset gene data based on source -  kegg, reactome, wiki
+
+    input_kegg_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "kegg")
+    input_reactome_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "reactome")
+    input_wiki_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "wiki")
+    return(
+        list(list(input_kegg_metab, input_reactome_metab, input_wiki_metab),
+             list(input_kegg_gene, input_reactome_gene, input_wiki_gene)))
+}

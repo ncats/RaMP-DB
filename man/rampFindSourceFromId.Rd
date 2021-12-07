@@ -14,7 +14,7 @@ rampId}
 \item{full}{return whole searching result or not (TRUE/FALSE)}
 }
 \value{
-a data frame that has all source Id in the column or the source table that has metaoblites entry
+a data frame that has all source Id in the column or the source table that has metabolites entry
 }
 \description{
 Find all source from given list of RaMP Ids
