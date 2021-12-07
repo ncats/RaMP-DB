@@ -4,16 +4,7 @@
 \alias{processData}
 \title{processData function generates pathway RampId frequency (gene or metabolite) based on pathway source (hmdb,kegg,reactome,wiki)}
 \usage{
-processData(conpass, dbname = "ramp", username = "root", host = "localhost")
-}
-\arguments{
-\item{conpass}{a string that specifies password for database connection}
-
-\item{dbname}{a string that specifies database name of MySQL database}
-
-\item{username}{a string that specifies name of MySQL database}
-
-\item{host}{a string that specifes host for database connection}
+processData()
 }
 \value{
 R object (FT_data.Rdata) with dataframes (hmdb_metab,hmdb_gene,kegg_gene,kegg_metab,reactome_gene,reactome_metab,wiki_gene,wiki_metab)

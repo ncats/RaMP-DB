@@ -26,9 +26,11 @@ Filter pathways by p-value cutoff for display and clustering
 }
 \examples{
 \dontrun{
-pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
-                NameOrIds="names", conpass=conpass)
-fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
-filtered.fisher.results <- FilterFishersResults(fisher.results,p_holmadj_cutoff=0.05)
+pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", conpass = "", host = "localhost")
+pathwaydf <- getPathwayFromAnalyte(c("MDM2", "TP53", "glutamate", "creatinine"),
+  NameOrIds = "names"
+)
+fisher.results <- runCombinedFisherTest(pathwaydf = pathwaydf)
+filtered.fisher.results <- FilterFishersResults(fisher.results, p_holmadj_cutoff = 0.05)
 }
 }

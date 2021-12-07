@@ -8,14 +8,9 @@ clicked on highchart}
 runCombinedFisherTest(
   pathwaydf,
   backgrounddf = NULL,
-  total_metabolites = NULL,
+  biospecimen_background = NULL,
   total_genes = 20000,
   min_analyte = 2,
-  conpass = NULL,
-  dbname = "ramp",
-  username = "root",
-  host = "localhost",
-  socket = NULL,
   MCall = T,
   alternative = "less"
 )
@@ -25,22 +20,12 @@ runCombinedFisherTest(
 
 \item{backgrounddf}{optional dataframe resulting from getPathwayFromAnalyte run on all analytes detected in study. This will be used as the background for the Fisher's contingency table. If left NULL, all analytes in RaMP are used as background}
 
-\item{total_metabolites}{number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")}
+\item{biospecimen_background}{If NULL, test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"}
 
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
 
 \item{min_analyte}{if the number of analytes (gene or metabolite) in a pathway is
 < min_analyte, do not report}
-
-\item{conpass}{password for database access (string)}
-
-\item{dbname}{name of the mysql database (default is "ramp")}
-
-\item{username}{username for database access (default is "root")}
-
-\item{host}{host name for database access (default is "localhost")}
-
-\item{socket}{(optional) location of mysql.sock file}
 
 \item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")}
 
@@ -55,8 +40,10 @@ clicked on highchart
 }
 \examples{
 \dontrun{
-pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
-                NameOrIds="names", conpass=conpass)
-fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
+pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", conpass = "", host = "localhost")
+pathwaydf <- getPathwayFromAnalyte(c("MDM2", "TP53", "glutamate", "creatinine"),
+  NameOrIds = "names"
+)
+fisher.results <- runCombinedFisherTest(pathwaydf = pathwaydf)
 }
 }

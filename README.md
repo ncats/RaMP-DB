@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/ncats/RaMP-DB.svg?branch=master)](https://travis-ci.org/ncats/RaMP-DB)
+[![Build Status](https://api.travis-ci.com/ncats/RaMP-DB.svg?branch=dev)](https://travis-ci.com/github/ncats/RaMP-DB)
 
 # New!  RaMP app is accessible via a server (no installation needed!).
-Please [click here](https://rampdb.ncats.io/).  And let us know if additional functionalities would be useful (see contact info below).
+Coming Soon!
 
 # RaMP - Relational Database of Metabolomic Pathways
 
@@ -85,34 +85,21 @@ select * from analytesynonym where synonym = "glucose";
 ### Install and load the RaMP package 
 You can install this package directly from GitHub using the install_github() function available through the devtools package. In the R Console, type the following:
 ```R
+# Locally install RaMP
 install.packages("devtools")
 library(devtools)
 install_github("ncats/RAMP-DB")
+
 # Load the package
 library(RaMP)
+
+# Set up your connection to the RaMP2.0 database:
+pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
 ```
 
-Before running the RaMP app or RaMP functions, the database connection information should be configured. The file that contains this information is within the package installation and the directory can be found by typing the following:
-```
-system.file("shinyApp", package="RaMP", mustWork=TRUE)
-```
-Go to that directory and find the "db.properties.template" file, copy it to a new file db.properties.  Edit db.properties file based on your current environment as follows:
+Note that prior to using RaMP functions, users much establish required parameters to appropriately connect to your local database (if you are not using the web app).  This step is simplified by a single function call (last line in the above code snippet).
 
-```
-host=<hostname of mysql server>
-dbname=<db name on mysql>
-username=<username to connect to mysql>
-conpass=<password for username to connect to mysql>
-```
-*After editing, be sure to rename this file "db.properties".*
-
-
-Now, you're set to use the web application locally!  Just type:
-```R
-RaMP::runRaMPapp(conpass="mysql_password")
-```
-
-If the username is different then root, then specify the username in the "username" parameter.  Similarly, if the name of the database is different than "ramp", then specify the "dbname" parameter.
+If the username is different then root, then specify the username in the "username" parameter.  Similarly, if the name of the database is different than "ramp2", then specify the "dbname" parameter.
 
 ### Important Notes
 
@@ -131,9 +118,12 @@ Also, when gene or metabolite ids are input for queries, IDs should be prepended
 * **Ewy Mathé** - ewy.mathe@nih.gov
 * **Jorge Neyra** -jorge.neyra@nih.gov
 * **Andrew Patt** - andy.patt@nih.gov
+* **Tim Sheils** - tim.sheils@nih.gov
 * **Kyle Spencer** - kyle.spencer@nih.gov
+* **Cole Tindall ** - cole.tindall@nih.gov
 
 ## Previous Authors
 * **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
 * **Shunchao Wang** - shunchao.wang@osumc.edu
 * **Rohith Vanam** - rohith.vanam@osumc.edu
+* ** Jorge Neyra** - jorge.neyra@nih.gov
