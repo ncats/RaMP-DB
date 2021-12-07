@@ -4,24 +4,7 @@
 \alias{connectToRaMP}
 \title{Connect to RaMP database (requires mysql password when running locally)}
 \usage{
-connectToRaMP(
-  dbname = "ramp",
-  username = "root",
-  conpass = NULL,
-  host = "localhost",
-  socket = NULL
-)
-}
-\arguments{
-\item{dbname}{the name of the database (by default a string that is database name including all tables}
-
-\item{username}{a string that is username for database (default: root)}
-
-\item{conpass}{password for database (string)}
-
-\item{host}{a string that stand for host}
-
-\item{socket}{(optional) location of mysql.sock file}
+connectToRaMP()
 }
 \value{
 MySQL connection based on given dbname,username,password, and host
@@ -31,6 +14,7 @@ Connect to RaMP database (requires mysql password when running locally)
 }
 \examples{
 \dontrun{
-con <- connectToRaMP(dbname="ramp",username="root",conpass="mypassword",host = "localhost")
+pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
+con <- connectToRaMP()
 }
 }

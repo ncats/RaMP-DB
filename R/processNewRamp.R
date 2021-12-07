@@ -6,22 +6,10 @@
 #' @param pathwayRampId a vector of ramp Pathway ID
 #' @param GC the analytes type that is either "C" for compound or "G" for gene
 #' @param n minimum analytes of which pathway to considered computing overlap
-#' @param username a string that specifies name of MySQL database
-#' @param dbname a string that specifies database name of MySQL database
-#' @param conpass a string that specifies password for database connection
-#' @param host a string that specifes host for database connection
 #' @return A list with pathway rampID as name, a vector of analytes from this pathway as content.
-findAnalyteHasPathway <- function(pathwayRampId,GC = "C",n = 10,
-                                  username ='root',
-                                  dbname = 'ramp',
-                                  conpass = NULL,
-                                  host = 'localhost'){
+findAnalyteHasPathway <- function(pathwayRampId,GC = "C",n = 10){
 
-  con <- connectToRaMP(
-                        username = username,
-                        dbname=dbname,
-                        password = conpass,
-                        host = host)
+  con <- connectToRaMP()
   on.exit(DBI::dbDisconnect(con))
   p_id <- unique(pathwayRampId)
   p_id <- sapply(p_id,shQuote)
@@ -186,24 +174,6 @@ compute_overlap_matrix2 <- function(pathwayid,
   return(analyte_result)
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #' Update the overlap matrix for store in the shiny app directory
 #'
 #' @param min_analyte a int that specifies the minimum of analytes the
@@ -212,24 +182,12 @@ compute_overlap_matrix2 <- function(pathwayid,
 #' must be 'balanced' or 'weighted'
 #' @param together a boolean value to compute overlap matrix for
 #' gene/metabolites separatly or together
-#' @param username a string that specifies name of MySQL database
-#' @param dbname a string that specifies database name of MySQL database
-#' @param conpass a string that specifies password for database connection
-#' @param host a string that specifes host for database connection
-updateOverlapMatrix <- function(min_analyte, overlapmethod, together, conpass,
-                                host = 'localhost', dbname = 'ramp',
-                                username = 'root'){
+updateOverlapMatrix <- function(min_analyte, overlapmethod, together){
 
   print("Start updateOverlapMatrix()")
 
   if(!together){
-
-    con <- connectToRaMP(
-                          username = username,
-                          dbname= dbname,
-                          password = conpass,
-                          host = host)
-
+    con <- connectToRaMP()
     on.exit(DBI::dbDisconnect(con))
     pathways<- DBI::dbGetQuery(con,'select * from pathway;')
     source <- DBI::dbGetQuery(con,'select * from source;')
@@ -247,21 +205,16 @@ updateOverlapMatrix <- function(min_analyte, overlapmethod, together, conpass,
 
     # Store Compound Ids in List
     # listOfHmdbC <- findAnalyteHasPathway(pathwayInHmdb$pathwayRampId)
-    listOfKeggC <- findAnalyteHasPathway(pathwayInKegg$pathwayRampId,n = min_analyte,host = host,
-                                         conpass = conpass, dbname = dbname, username=username)
+    listOfKeggC <- findAnalyteHasPathway(pathwayInKegg$pathwayRampId,n = min_analyte)
 
-    listOfWikiC <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,n = min_analyte,host = host,
-                                         conpass = conpass, dbname = dbname, username=username)
-    listOfReacC <- findAnalyteHasPathway(pathwayInReac$pathwayRampId,n = min_analyte,
-                                         conpass = conpass, dbname = dbname,host = host, username=username)
+    listOfWikiC <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,n = min_analyte)
+    listOfReacC <- findAnalyteHasPathway(pathwayInReac$pathwayRampId,n = min_analyte)
     # Store Gene Ids in List
     # listOfHmdbG <- findAnalyteHasPathway(pathwayInHmdb$pathwayRampId,GC="G")
-    listOfKeggG <- findAnalyteHasPathway(pathwayInKegg$pathwayRampId,GC="G",n = min_analyte,
-                                         conpass = conpass, dbname = dbname,host = host, username=username)
-    listOfWikiG <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,GC="G",n = min_analyte,
-                                         conpass = conpass, dbname = dbname,host = host, username=username)
-    listOfReacG <- findAnalyteHasPathway(pathwayInReac$pathwayRampId,GC="G",n = min_analyte,
-                                         conpass = conpass, dbname = dbname,host = host, username=username)
+    listOfKeggG <- findAnalyteHasPathway(pathwayInKegg$pathwayRampId,GC="G",n = min_analyte)
+    listOfWikiG <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,GC="G",n = min_analyte)
+    listOfReacG <- findAnalyteHasPathway(pathwayInReac$pathwayRampId,GC="G",n = min_analyte)
+
     # Setup minimum number of analytes that will be considered
 
     # May need to filter out that pathway that has less than 5 metabolites
@@ -316,13 +269,7 @@ updateOverlapMatrix <- function(min_analyte, overlapmethod, together, conpass,
       gene = gene_result
     ))
   } else if(together) {
-
-    con <- connectToRaMP(
-                          username = username,
-                          dbname=dbname,
-                          password = conpass,
-                          host = host)
-
+    con <- connectToRaMP()
     pathways<- DBI::dbGetQuery(con,'select * from pathway;')
 
     # dbname <- unique(pathways$type)
@@ -339,15 +286,9 @@ updateOverlapMatrix <- function(min_analyte, overlapmethod, together, conpass,
     # listOfHmdbC <- findAnalyteHasPathway(pathwayInHmdb$pathwayRampId)
     # use both to save metabolites/genes in the list
 
-    listOfKegg <- findAnalyteHasPathway(pathwayInKegg$pathwayRampId,GC = 'both',n = min_analyte,
-                                        host = host,
-                                        conpass = conpass, dbname = dbname, username = username)
-    listOfWiki <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,GC = 'both',n = min_analyte,
-                                        host = host,
-                                        conpass = conpass, dbname = dbname, username = username)
-    listOfReac <- findAnalyteHasPathway(pathwayInReac$pathwayRampId,GC = 'both',n = min_analyte,
-                                        host = host,
-                                        conpass = conpass, dbname = dbname, username = username)
+    listOfKegg <- findAnalyteHasPathway(pathwayInKegg$pathwayRampId,GC = 'both',n = min_analyte)
+    listOfWiki <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,GC = 'both',n = min_analyte)
+    listOfReac <- findAnalyteHasPathway(pathwayInReac$pathwayRampId,GC = 'both',n = min_analyte)
     # Append all pathways id together
 
     pathwayid <- c(#names(listOfHmdbC),
@@ -380,14 +321,8 @@ updateOverlapMatrix <- function(min_analyte, overlapmethod, together, conpass,
 #' should be 'balanced' or 'weighted'
 #' @param all a string that specifies which matrices to compute, should be in
 #' 'all','analyte'
-#' @param conpass password for database access (string)
-#' @param dbname name of the mysql database (default is "ramp")
-#' @param username username for database access (default is "root")
-#' @param host host name for database access (default is "localhost")
-updateOverlapMatrices <- function(method,all,
-                                  conpass = NULL,
-                                  host = 'localhost',dbname = 'ramp',
-                                  username = 'root'){
+updateOverlapMatrices <- function(method,all){
+
   if(!(method %in% c('balanced','weighted'))){
     stop('Wrong input for argument method')
   }
@@ -396,38 +331,29 @@ updateOverlapMatrices <- function(method,all,
   }
 
   if(all == 'all'){
-    result <- updateOverlapMatrix(min_analyte = 5,overlapmethod = 'balanced',together = F, conpass=conpass, host = host, dbname = dbname, username=username)
+    result <- updateOverlapMatrix(min_analyte = 5,overlapmethod = 'balanced',together = F)
     metabolites_result <- result[[1]]
     genes_result <- result[[2]]
+
+    print(dim(metabolites_result))
+    print(dim(genes_result))
+
     save(metabolites_result, file = system.file(package = "RaMP",... = "extdata/metabolites_overlap_matrix.RData"))
     save(genes_result, file = system.file(package = "RaMP",... = "extdata/genes_overlap_matrix.RData"))
   } else if(all == 'analyte'){
-    analyte_result <- updateOverlapMatrix(min_analyte = 5,overlapmethod = 'balanced',together = T, conpass=conpass, host = host, dbname = dbname, username=username)
+    analyte_result <- updateOverlapMatrix(min_analyte = 5,overlapmethod = 'balanced',together = T)
     save(analyte_result, file = system.file(package = "RaMP",... = "extdata/analytes_overlap_matrix.RData"))
   }
 }
 
 #' processData function generates pathway RampId frequency (gene or metabolite) based on pathway source (hmdb,kegg,reactome,wiki)
-#'@param username a string that specifies name of MySQL database
-#'@param dbname a string that specifies database name of MySQL database
-#'@param conpass a string that specifies password for database connection
-#'@param host a string that specifes host for database connection
 #'@return R object (FT_data.Rdata) with dataframes (hmdb_metab,hmdb_gene,kegg_gene,kegg_metab,reactome_gene,reactome_metab,wiki_gene,wiki_metab)
-processData <- function(conpass,
-                        dbname='ramp',username='root',
-                        host = 'localhost') {
+processData <- function(){
 
-  if(is.null(conpass)) {
-    stop("Please define the password for the mysql connection")
-  }
 
   # get all rows form analytehaspathway
   query <- "select * from analytehaspathway"
-  con <- connectToRaMP( username = username,
-                        password = conpass,
-                        dbname = dbname,
-                        host = host)
-
+  con <- connectToRaMP()
   allRampIds <- DBI::dbGetQuery(con,query)
 
   if(is.null(allRampIds)) {
@@ -529,19 +455,19 @@ sysdataObject <- function() {
             is.data.frame(wiki_metab))
 
   # uncomment usethis::use_data function to create sysdata.rda object
-  usethis::use_data(genes_result,
-                     metabolites_result,
-                     analyte_result,
-                     hmdb_gene,
-                     hmdb_metab,
-                     kegg_gene,
-                     kegg_metab,
-                     reactome_gene,
-                     reactome_metab,
-                     wiki_gene,
-                     wiki_metab,
-                     overwrite = TRUE,
-                     internal = TRUE)
+  # usethis::use_data(genes_result,
+  #                    metabolites_result,
+  #                    analyte_result,
+  #                    hmdb_gene,
+  #                    hmdb_metab,
+  #                    kegg_gene,
+  #                    kegg_metab,
+  #                    reactome_gene,
+  #                    reactome_metab,
+  #                    wiki_gene,
+  #                    wiki_metab,
+  #                    overwrite = TRUE,
+  #                    internal = TRUE)
 
 }
 
@@ -555,17 +481,18 @@ sysdataObject <- function() {
 # dbname = <db_name>
 # username = <username>
 # conpass = <connection_password>
-# RaMP:::updateOverlapMatrices(method="balanced" ,all="all", conpass=conpass, dbname=dbname, username=username, host=hostname)
-# RaMP:::updateOverlapMatrices(method="balanced" ,all="analyte", dbname=dbname, conpass=conpass, username=username, host=hostname)
-# RaMP:::processData(conpass=conpass, dbname=dbname, username=username, host=hostname)
-#
+# pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
+# RaMP:::updateOverlapMatrices(method="balanced" ,all="all")
+# RaMP:::updateOverlapMatrices(method="balanced" ,all="analyte")
+# RaMP:::processData()
+
 # STEP 2
 #
 # The 4 Rdata files will be loaded to create objects, then stored to sysdata.Rda which is loaded to support package functions.
 # uncomment usethis::use_data in the function just above. This command will builds sysdata.Rda to contain the objects
 #
 # Then execute the function definition above to establish the updated function. Then execute the method to save R/sysdata.rda.
-#sysdataObject()
+# sysdataObject()
 #
 # STEP 3
 # Comment the usethis::use_data() method above

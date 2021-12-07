@@ -23,7 +23,7 @@ writePathwaysToCSV <- function(mypathways=NULL,outputfile=NULL) {
 #' @param outputfile name of output file
 #' @param rampid whether or not to include rampId (default is FALSE)
 #' @export
-write_FishersResults <- function(fishResults=NULL,outputfile=NULL,rampid=F){
+write_FishersResults <- function(fishResults=NULL,outputfile=NULL,rampid=FALSE){
         if(is.null(fishResults)) {
                 stop("Be sure to specify the output of the function findCluster()")
         }
@@ -36,7 +36,7 @@ write_FishersResults <- function(fishResults=NULL,outputfile=NULL,rampid=F){
 		utils::write.csv(out[,mycols],file=outputfile,row.names=F)
 	}
 	else {
-		cluster_list<-clusters$cluster_list
+		cluster_list<-fishResults$cluster_list
 		out <- fishResults
 		rampOut=out$fishresults
 		if(!is.null(rampOut)) {
@@ -70,9 +70,9 @@ write_FishersResults <- function(fishResults=NULL,outputfile=NULL,rampid=F){
 		rampOut=rampOut[,-ncol(rampOut)]
 	}
 	if(is.null(outputfile)) {
-		return(rampOut[order(rampOut$Cluster),])
+		return(rampOut[order(rampOut[,"Cluster"]),])
 	} else {
-		utils::write.csv(rampOut[order(rampOut$Cluster),],outputfile,row.names = FALSE)
+		utils::write.csv(rampOut[order(rampOut[,"Cluster"]),],outputfile,row.names = FALSE)
 	}
 
 }
