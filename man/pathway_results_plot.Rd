@@ -7,8 +7,9 @@
 pathway_results_plot(
   pathwaysSig,
   pval = "FDR",
-  analyte_overlap_thresh = 0.2,
-  pathway_overlap_thresh = 0.2,
+  perc_analyte_overlap = 0.2,
+  perc_pathway_overlap = 0.2,
+  min_pathway_tocluster = 3,
   text_size = 16,
   sig_cutoff = 0.05,
   interactive = FALSE
@@ -19,10 +20,13 @@ pathway_results_plot(
 
 \item{pval}{Which p value to plot, choose from Raw, FDR or Holm-adjusted}
 
-\item{analyte_overlap_thresh}{Minimum overlap for pathways to be considered similar
+\item{perc_analyte_overlap}{Minimum overlap for pathways to be considered similar
 (Default = 0.2)}
 
-\item{pathway_overlap_thresh}{Minimum overlap for clusters to merge (Default = 0.2)}
+\item{perc_pathway_overlap}{Minimum overlap for clusters to merge (Default = 0.2)}
+
+\item{min_pathway_tocluster}{Minimum number of 'similar' pathways required to start
+a cluster (medoid) (Default = 3)}
 
 \item{text_size}{Scales all text in figure (Default=16)}
 
