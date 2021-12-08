@@ -42,8 +42,8 @@ getOntoFromMeta <- function(analytes,NameOrIds = 'ids'){
   #print(colnames(df))
   DBI::dbDisconnect(con)
   if(nrow(df) == 0) {
-    message('No searching result since this source id
-            is not existed in source table')
+    message('This source id
+            does not exist in the source table')
     return(NULL)
   }
   rampid <- unique(df$rampId)

@@ -7,10 +7,10 @@
 getPrefixesFromAnalytes(analyteType = "gene")
 }
 \arguments{
-\item{analyteType}{value to indicate the desired analyte type. Value one of 'gene' 'compound'}
+\item{analyteType}{value to indicate the desired analyte type. Value one of 'gene' or 'metabolite'}
 }
 \value{
-Returns list of database ID prefixes for selected 'gene' or 'compound'
+Returns list of database ID prefixes for selected 'gene' or 'metabolite'
 }
 \description{
 Query to retrieve database ID prefixes for analyte types

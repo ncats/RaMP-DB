@@ -879,18 +879,23 @@ FilterFishersResults <- function(fishers_df, p_holmadj_cutoff = NULL,
 #' Cluster and plot significant pathways by FDR-adjusted pval
 #' @param pathwaysSig output of FilterFisherResults
 #' @param pval Which p value to plot, choose from Raw, FDR or Holm-adjusted
-#' @param analyte_overlap_thresh Minimum overlap for pathways to be considered similar
+#' @param perc_analyte_overlap Minimum overlap for pathways to be considered similar
 #' (Default = 0.2)
-#' @param pathway_overlap_thresh Minimum overlap for clusters to merge (Default = 0.2)
+#' @param perc_pathway_overlap Minimum overlap for clusters to merge (Default = 0.2)
+#' @param min_pathway_tocluster Minimum number of 'similar' pathways required to start
+#' a cluster (medoid) (Default = 3)
 #' @param text_size Scales all text in figure (Default=16)
 #' @param sig_cutoff Aesthetic, shows pvalue cutoff for significant pathways
 #' @param interactive If TRUE, return interactive plotly object instead of ggplot object
 #' @export
-pathway_results_plot <- function(pathwaysSig, pval = "FDR", analyte_overlap_thresh = 0.2, pathway_overlap_thresh = 0.2, text_size = 16, sig_cutoff = 0.05, interactive=FALSE) {
-  fishClustering <- findCluster(pathwaysSig,
-    perc_analyte_overlap = analyte_overlap_thresh,
-    perc_pathway_overlap = pathway_overlap_thresh
-  )
+pathway_results_plot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.2,
+                                 perc_pathway_overlap = 0.2, min_pathway_tocluster = 3,
+                                 text_size = 16, sig_cutoff = 0.05, interactive=FALSE) {
+    fishClustering <- findCluster(pathwaysSig,
+                                  perc_analyte_overlap = perc_analyte_overlap,
+                                  perc_pathway_overlap = perc_pathway_overlap,
+                                  min_pathway_tocluster = min_pathway_tocluster
+                                  )
 
   fishresult <- fishClustering$fishresults
 
