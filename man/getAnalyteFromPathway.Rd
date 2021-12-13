@@ -4,10 +4,12 @@
 \alias{getAnalyteFromPathway}
 \title{Use fast search algorithm to find all pathways from given analytes}
 \usage{
-getAnalyteFromPathway(pathway)
+getAnalyteFromPathway(pathway, analyte_type = "both")
 }
 \arguments{
 \item{pathway}{a string or a vector of strings that contains pathways of interest}
+
+\item{analyte_type}{a string denoting the type of analyte to return ("gene", "metabolite", "both")}
 }
 \value{
 a data.frame that contains all search results

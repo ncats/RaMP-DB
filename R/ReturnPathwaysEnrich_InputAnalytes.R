@@ -391,7 +391,8 @@ runFisherTest <- function(pathwaydf, backgrounddf = NULL,
 #' @return a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", conpass = "", host = "localhost")
+#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
+#'	conpass = "", host = "localhost")
 #' pathwaydf <- getPathwayFromAnalyte(c("MDM2", "TP53", "glutamate", "creatinine"),
 #'   NameOrIds = "names"
 #' )
@@ -560,7 +561,8 @@ runCombinedFisherTest <- function(pathwaydf, backgrounddf = NULL,
 #' @return a list contains all metabolites as name and pathway inside.
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", conpass = "", host = "localhost")
+#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
+#'	conpass = "", host = "localhost")
 #' mypath <- getPathwayFromAnalyte(analytes = c("2-hydroxyglutarate", "glutamate"))
 #' }
 #' @export
@@ -662,7 +664,8 @@ getPathwayFromAnalyte <- function(analytes = NULL,
 #' [[3]] cluster assignment in the list form
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", conpass = "", host = "localhost")
+#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
+#'	conpass = "", host = "localhost")
 #' pathwaydf <- getPathwayFromAnalyte(c("MDM2", "TP53", "glutamate", "creatinine"),
 #'   NameOrIds = "names"
 #' )
@@ -833,7 +836,8 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
 #' [[2]]analyte type
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", conpass = "", host = "localhost")
+#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
+#'	conpass = "", host = "localhost")
 #' pathwaydf <- getPathwayFromAnalyte(c("MDM2", "TP53", "glutamate", "creatinine"),
 #'   NameOrIds = "names"
 #' )
