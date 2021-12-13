@@ -524,9 +524,11 @@ getRaMPInfoFromAnalytes<-function(analytes,
         } else if (NameOrIds == "ids"){
             sourceramp <- rampFindSourceRampId(sourceId=analytes)
             if (nrow(sourceramp)==0) {
-                stop("Make sure you are actually inputting ids and not names (you have NameOrIds set to 'ids'. If you are, then no ids were matched in the RaMP database.")
-            }
-            return(sourceramp)
+                warning("Make sure you are actually inputting ids and not names (you have NameOrIds set to 'ids'. If you are, then no ids were matched in the RaMP database.")
+		return(NULL)
+            } else {
+	            return(sourceramp)
+   	    }
         } else {
             stop("Make sure NameOrIds is set to 'names' or 'ids'")
         }
