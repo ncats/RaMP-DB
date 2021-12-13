@@ -4,14 +4,14 @@
 \alias{display_results}
 \title{Generic function for removing RaMP identifiers and making query results more pleasant to look at}
 \usage{
-display_results(data, truncate_cells_at = 20, show_n_rows = 6)
+display_results(data, show_n_rows = 6, truncate_cells_at = 20)
 }
 \arguments{
 \item{data}{A dataframe from the following functions: runCominedFishersTests, getAnalyteFromPathway, getPathwayFromAnalyte, chemicalClassSurvey, and getChemicalProperties}
 
-\item{truncate_cells_at}{String length to truncate cells at (No truncation if NA)}
-
 \item{show_n_rows}{Only print first n rows of input (Shows all if NA)}
+
+\item{truncate_cells_at}{String length to truncate cells at (No truncation if NA)}
 }
 \value{
 Printed out and prettified version of input
