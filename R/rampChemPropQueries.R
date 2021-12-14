@@ -3,7 +3,7 @@
 #' Returns chemical properties given a metabolite list
 #'
 #' @param mets a list object of source prepended metaboite ids, representing a metabolite set of interest
-#' @param propertyList an optional list of specific properties to extract c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name')
+#' @param propertyList an optional list of specific properties to extract.  Options include 'all' (default),  'smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'.
 #' If a props list is not supplied, all property fields will be returned.
 #' @return Returns chemcial property information for the list of input metabolites and a query report reporting on the number of metabolite ids that were matched and the list of un-matched input ids.
 #'
@@ -16,7 +16,7 @@
 #'@examples
 #'\dontrun{
 #' # metabolite list of interest
-#' metList = c('hmdb:HMDB0000056',
+#' mets = c('hmdb:HMDB0000056',
 #'             'hmdb:HMDB0000439',
 #'             'hmdb:HMDB0000479',
 #'             'hmdb:HMDB0000532',
@@ -30,37 +30,27 @@
 #'             'hmdb:HMDB0008057',
 #'             'hmdb:HMDB0011211')
 #' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-#' chemProps <- getChemicalProperties(mets, propertyList = c('smiles', 'inchi_key', 'common_name'))
+#' chemProps <- getChemicalProperties(mets, propertyList = c('iso_smiles', 'inchi_key', 'common_name'))
 #' head(chemProps$chem_props)
 #'}
 #' @export
-getChemicalProperties <- function(mets, propertyList = NULL){
+getChemicalProperties <- function(mets, propertyList = 'all'){
   conn <- connectToRaMP()
   message("Starting Chemical Property Query")
-  res <- chemicalPropertiesQuery(mets, props=propertyList, conn)
-  RMariaDB::dbDisconnect(conn)
-  if(!is.null(res)) message("Finished Chemical Property Query")
-  return(res)
-}
 
-
-
-chemicalPropertiesQuery <- function(mets, props = NULL, conn) {
   mets <- unique(mets)
-
   checkIdPrefixes(mets)
-
   result <- list()
 
   # first handle metabolites of interest
   metStr <- paste(mets, collapse = "','")
   metStr <- paste("'" ,metStr, "'", sep = "")
 
-  if(is.null(props)) {
+  if(length(grep("all",propertyList))==1) {
     sql <- paste("select * from chem_props",
           "where chem_source_id in (",metStr,")")
   } else {
-      propList <- buildPropertyList(props);
+      propList <- buildPropertyList(propertyList);
       if(startsWith(propList, "Error")) {
         message(propList)
         return(NULL)
@@ -78,10 +68,14 @@ chemicalPropertiesQuery <- function(mets, props = NULL, conn) {
 
   result[['query_report']] <- queryNotes
 
+  RMariaDB::dbDisconnect(conn)
+  if(!is.null(result)) message("Finished Chemical Property Query")
   return(result)
 }
 
-# reports on how well the query performed
+
+
+# Internal function that reports on how well the query performed
 queryReport <- function(queryList, foundList) {
   querySummary = list()
   querySummary[["query_list_size"]] <- length(unique(queryList))
@@ -90,12 +84,22 @@ queryReport <- function(queryList, foundList) {
   querySummary
 }
 
-
+# Internal function to validate property list
+# @param propList an optional list of specific properties to extract.  Options include 'all' (default),  'iso_smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'.
 buildPropertyList <- function(propList) {
 
   # validate that all properties are valid
-  validProperties <- c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name')
+#  validProperties <- c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name')
+   con <- connectToRaMP()
+   ramptypes <- RMariaDB::dbGetQuery(con,"describe chem_props;")
+   RMariaDB::dbDisconnect(con)
+
+   validProperties <- setdiff(ramptypes$Field,c("ramp_id", "chem_data_source", "chem_source_id"))
+
+
   haveInvalidProps = FALSE
+
+
   invalidProps = c()
   for(prop in propList) {
     if (!(prop %in% validProperties)) {
@@ -107,7 +111,8 @@ buildPropertyList <- function(propList) {
     propword <- 'Error: A requested chemical property name is invalid.'
     if(length(invalidProps) > 1) propword <- 'Error: Some requested chemical property names are invalid.'
     errorMsg <- paste0(utils::str(length(invalidProps)), propword, "\n")
-    errorMsg <- paste0(errorMsg, "Valid property names: 'smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'\n")
+    #errorMsg <- paste0(errorMsg, "Valid property names: 'smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'\n")
+    errorMsg <- paste0(errorMsg, "Valid property names:", paste(validProperties,collapse=", "))
     errorMsg <- paste0(errorMsg, "Invalid input property name list:")
     for(badName in invalidProps) {
       errorMsg <- paste(errorMsg, badName)
@@ -117,8 +122,8 @@ buildPropertyList <- function(propList) {
 
   propStr <- paste(propList, collapse = ",")
 
-  propStr <- gsub("smiles", "iso_smiles", propStr)
-  propStr <- gsub("formula", "mol_formula", propStr)
+#  propStr <- gsub("smiles", "iso_smiles", propStr)
+#  propStr <- gsub("formula", "mol_formula", propStr)
 
   propStr <- paste("chem_source_id, ramp_id,",propStr)
 
