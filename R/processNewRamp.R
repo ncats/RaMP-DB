@@ -477,10 +477,13 @@ sysdataObject <- function() {
 # Check time stamps. These WILL be updated within your RaMP package, in  <your-R-dir>/library/RaMP/extdata.
 
 # Set these for login then run three methods
-# hostname = <db_host_name>
-# dbname = <db_name>
-# username = <username>
-# conpass = <connection_password>
+#hostname = <db_host_name>
+#dbname = <db_name>
+#username = <username>
+#conpass = <connection_password>
+
+# run these 3 methods, these generate files in the R RaMP library area
+# if commiting to git, then copy the new files into your R git project inst/extdata
 # pkg.globals <- setConnectionToRaMP(dbname=dbname,username=username,conpass=conpass,host=hostname)
 # RaMP:::updateOverlapMatrices(method="balanced" ,all="all")
 # RaMP:::updateOverlapMatrices(method="balanced" ,all="analyte")
@@ -494,12 +497,6 @@ sysdataObject <- function() {
 # Then execute the function definition above to establish the updated function. Then execute the method to save R/sysdata.rda.
 # sysdataObject()
 #
-# STEP 3
-# Comment the usethis::use_data() method above
-#
-# Note: *The sysdata.rda file will be updated within your RaMP git code base, not in the package.
-# This will set up the sysdata.rda to be committed and pushed to the remote git repo.
-# This updated sysdata.rda will be pushed to users when they install.
-#
+
 
 
