@@ -4,12 +4,12 @@
 \alias{getChemicalProperties}
 \title{Returns chemical properties given a metabolite list}
 \usage{
-getChemicalProperties(mets, propertyList = NULL)
+getChemicalProperties(mets, propertyList = "all")
 }
 \arguments{
 \item{mets}{a list object of source prepended metaboite ids, representing a metabolite set of interest}
 
-\item{propertyList}{an optional list of specific properties to extract c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name')
+\item{propertyList}{an optional list of specific properties to extract.  Options include 'all' (default),  'smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'.
 If a props list is not supplied, all property fields will be returned.}
 }
 \value{
@@ -28,7 +28,7 @@ Returns chemical properties given a metabolite list
 \examples{
 \dontrun{
 # metabolite list of interest
-metList = c('hmdb:HMDB0000056',
+mets = c('hmdb:HMDB0000056',
             'hmdb:HMDB0000439',
             'hmdb:HMDB0000479',
             'hmdb:HMDB0000532',
@@ -42,7 +42,7 @@ metList = c('hmdb:HMDB0000056',
             'hmdb:HMDB0008057',
             'hmdb:HMDB0011211')
 pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-chemProps <- getChemicalProperties(mets, propertyList = c('smiles', 'inchi_key', 'common_name'))
+chemProps <- getChemicalProperties(mets, propertyList = c('iso_smiles', 'inchi_key', 'common_name'))
 head(chemProps$chem_props)
 }
 }
