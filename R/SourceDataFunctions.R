@@ -22,7 +22,7 @@ getCurrentRaMPVersion<-function(){
 #' getCurrentRaMPDBVersions()
 #' }
 #' @export
-getCurrentRaMPDBVersions<-function(){
+getCurrentRaMPSourceDBVersions<-function(){
   con <- connectToRaMP()
   query1<- "select * from version_info where status = 'current'"
   results<- RMariaDB::dbGetQuery(con,query1)
