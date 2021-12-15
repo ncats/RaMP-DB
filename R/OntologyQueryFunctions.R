@@ -38,9 +38,9 @@ getOntoFromMeta <- function(analytes,NameOrIds = 'ids'){
     sql <- paste0('select * from source where rampId in (select * from (select rampId from analytesynonym where Synonym in (', list_metabolite,')) as subquery);')
     cat(file=stderr(), "query sql in Package call with -- ", sql, "\n")
   }
-  df <- DBI::dbGetQuery(con,sql)
+  df <- RMariaDB::dbGetQuery(con,sql)
   #print(colnames(df))
-  DBI::dbDisconnect(con)
+  RMariaDB::dbDisconnect(con)
   if(nrow(df) == 0) {
     message('This source id
             does not exist in the source table')
@@ -53,21 +53,21 @@ getOntoFromMeta <- function(analytes,NameOrIds = 'ids'){
 
   sql <- paste0('select * from analytehasontology where rampCompoundId in (',
                 rampid,');')
-  df2 <- DBI::dbGetQuery(con,sql)
+  df2 <- RMariaDB::dbGetQuery(con,sql)
   if(nrow(df2) == 0) {
     message('No searching result because these metabolites are not linked to ontology')
     return(NULL)
   }
-  DBI::dbDisconnect(con)
+  RMariaDB::dbDisconnect(con)
   rampontoid <- unique(df2$rampOntologyId)
   rampontoid <- sapply(rampontoid,shQuote)
   rampontoid <- paste(rampontoid,collapse = ',')
   sql <- paste0('select * from ontology where rampOntologyId in (',
                 rampontoid,');')
   con <- connectToRaMP()
-  df3 <- DBI::dbGetQuery(con,sql)
+  df3 <- RMariaDB::dbGetQuery(con,sql)
   #print(colnames(df3))
-  DBI::dbDisconnect(con)
+  RMariaDB::dbDisconnect(con)
   mdf <- unique(merge(df3,df2,all.x=T))
   mdf <- unique(merge(mdf,df,all.x = T,by.x = 'rampCompoundId',
                       by.y= 'rampId'))
@@ -108,49 +108,79 @@ getMetaFromOnto <- function(ontology){
     list_ontology <- unlist(ontology)
   }
   list_ontology <- unique(list_ontology)
-  list_ontology <- sapply(list_ontology,shQuote)
+  #list_ontology <- sapply(list_ontology,shQuote)
   list_ontology <- paste(list_ontology,collapse = ",")
-  con <- connectToRaMP()
-  sql <- paste0('select * from ontology where commonName in (',
-                list_ontology,');')
 
-  df <- DBI::dbGetQuery(con,sql)
-  DBI::dbDisconnect(con)
-  print(colnames(df))
-  rampontoid <- paste(sapply(unique(df$rampOntologyId),shQuote),
-                      collapse = ',')
-  con <- connectToRaMP()
-  sql <- paste0('select * from analytehasontology where rampOntologyId in (',
+  # Find the ontology in ramp2
+  allontos <- getOntologies()
+  matched_ontos <- unlist(lapply(list_ontology, 
+	function(x) grep(x, allontos$commonName)))
+  # Create df which will be used later to create the output
+  df <- allontos[matched_ontos,]
+
+  #con <- connectToRaMP()
+  #sql <- paste0('select * from ontology where commonName in (',
+  #              list_ontology,');')
+
+  #df <- RMariaDB::dbGetQuery(con,sql)
+  #RMariaDB::dbDisconnect(con)
+  #print(colnames(df))
+
+
+  # Only proceed if df has anything returned
+  if(length(matched_ontos)>0) {
+  	#rampontoid <- paste(sapply(unique(df$rampOntologyId),shQuote),
+        #              collapse = ',')
+
+	rampontoid <- paste(sapply(unique(allontos$rampOntologyId[matched_ontos]), shQuote),
+collapse=",")
+
+	# Find RaMP IDs associated with ontology
+  	con <- connectToRaMP()
+  	sql <- paste0('select * from analytehasontology where rampOntologyId in (',
                 rampontoid,');')
 
-  df2 <- DBI::dbGetQuery(con,sql)
-  DBI::dbDisconnect(con)
+	df2 <- RMariaDB::dbGetQuery(con,sql)
+	RMariaDB::dbDisconnect(con)
 
-  print(colnames(df2))
-  rampid <- paste(sapply(unique(df2$rampCompoundId),shQuote),collapse = ',')
-  con <- connectToRaMP()
-  sql <- paste0('select * from source where rampId in (',rampid,');')
-  df3 <- DBI::dbGetQuery(con,sql)
-  df3 <- unique(df3)
-  print(colnames(df3))
-  DBI::dbDisconnect(con)
-  if(nrow(df3) == 0) {
-    message('No searching result since this ramp id
-            is not existed in source table')
-    return(NULL)
-  }
-  print('Merging 1...')
-  mdf <- unique(merge(df3,df2,by.x = 'rampId',by.y = 'rampCompoundId',all.x = T))
-  print('Merging 2...')
-  mdf <- unique(merge(mdf,df,by.x = 'rampOntologyId',
+	# connect ramp IDs with source table to get source IDs and names
+	#print(colnames(df2))
+	rampid <- paste(sapply(unique(df2$rampCompoundId),shQuote),collapse = ',')
+	con <- connectToRaMP()
+	sql <- paste0('select * from source where rampId in (',rampid,');')
+	df3 <- RMariaDB::dbGetQuery(con,sql)
+	df3 <- unique(df3)
+	#print(colnames(df3))
+	RMariaDB::dbDisconnect(con)
+	if(nrow(df3) == 0) {
+	    message('No searching result since this ramp id
+	            does not exist in source table')
+	    return(NULL)
+	 }
+  
+	## Merge ontology with nice metabolite names
+	#print('Merging 1...')
+	mdf <- unique(merge(df3,df2,by.x = 'rampId',by.y = 'rampCompoundId',all.x = T))
+  	#print('Merging 2...')
+	mdf <- unique(merge(mdf,df,by.x = 'rampOntologyId',
                       by.y = 'rampOntologyId',
                       all.x = T))
-  # mdf <- mdf[c('sourceId','commonName.y','biofluidORcellular')]
-  # colnames(mdf) <- c('Metabolites','Ontology','Ontology_Type')
-  colnames(mdf)[colnames(mdf) == 'commonName.x'] = 'Metabolites'
-  colnames(mdf)[colnames(mdf) == 'commonName.y'] = 'Ontology'
+  	# mdf <- mdf[c('sourceId','commonName.y','biofluidORcellular')]
+  	# colnames(mdf) <- c('Metabolites','Ontology','Ontology_Type')
+  	colnames(mdf)[colnames(mdf) == 'commonName.x'] = 'Metabolites'
+  	colnames(mdf)[colnames(mdf) == 'commonName.y'] = 'Ontology'
 
-  mdf <- mdf[c('Metabolites','sourceId','IDtype','Ontology','HMDBOntologyType')]
-  return(mdf)
+  	mdf <- mdf[c('Metabolites','sourceId','Ontology','HMDBOntologyType')]
+	# Collapse rows for each metabolite:
+	#Metabolites<-c()
+	#print("NO ERROR YET")
+	#print(dim(mdf))
+	#out=data.table::setDT(mdf)[,lapply(data.table::.SD, function(x) paste0(unique(x),collapse=", ")), 
+	#	by=Metabolites]
+  	return(mdf)
+  } else {
+	warning("Ontology not found in RaMP.  Run the getOntologies() function to see available ontologies.")
+	return(NA)
+  } 
 
 }

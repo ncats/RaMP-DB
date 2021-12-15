@@ -21,6 +21,7 @@ Imports:
     plotly,
     tidyr,
     tidytext,
+    data.table,
     DT,
     xtable,
     visNetwork,
