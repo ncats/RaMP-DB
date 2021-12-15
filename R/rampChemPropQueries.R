@@ -73,17 +73,6 @@ getChemicalProperties <- function(mets, propertyList = 'all'){
   return(result)
 }
 
-
-
-# Internal function that reports on how well the query performed
-queryReport <- function(queryList, foundList) {
-  querySummary = list()
-  querySummary[["query_list_size"]] <- length(unique(queryList))
-  querySummary[["found_list_size"]] <- length(unique(foundList))
-  querySummary[["missed_query_elements"]] <- setdiff(queryList, foundList)
-  querySummary
-}
-
 # Internal function to validate property list
 # @param propList an optional list of specific properties to extract.  Options include 'all' (default),  'iso_smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'.
 buildPropertyList <- function(propList) {
