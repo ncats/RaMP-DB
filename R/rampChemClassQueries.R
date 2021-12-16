@@ -3,8 +3,9 @@
 #' Returns chemical class information comparing a metabolite subset to a metabolite population
 #'
 #' @param mets a list object of source prepended metaboite ids, representing a metabolite set of interest
-#' @param pop an optional list object of source prepended metaboite ids, represenbting a lareger list of metabolites from which the mets were selected this list serves as
+#' @param pop an optional list object of source prepended metaboite ids, represenbting a larger list of metabolites from which the mets were selected this list serves as
 #' the backround reference population of metabolites for comparision and enrichment. If NULL, the background population is taken as all RaMP DB metabolites.
+#' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
 #' @return Returns chemcial class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
 #' metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolve and listing those metabolite ids
 #' that are not found in the database.
@@ -60,7 +61,7 @@
 #' metClassResult$query_report
 #'}
 #' @export
-chemicalClassSurvey <- function(mets, pop = NULL){
+chemicalClassSurvey <- function(mets, pop = NULL, includeRaMPids = FALSE){
   conn <- connectToRaMP()
   print("Starting Chemical Class Survey")
 
@@ -72,13 +73,20 @@ chemicalClassSurvey <- function(mets, pop = NULL){
   RMariaDB::dbDisconnect(conn)
 
   print("Finished Chemical Class Survey")
-  return(res)
+  if(includeRaMPids){
+      return(res)
+  }else{
+      res$met_classes<-res$met_classes %>% cleanup
+      return(res)
+  }
 }
 
 
 #' returns chemical class information comparing a metabolite subset to a metabolite population
 #'
-#' @param classData a chemical class result object from chemicalClassSurvey
+#' @param mets a list object of source prepended metaboite ids, representing a metabolite set of interest
+#' @param pop an optional list object of source prepended metaboite ids, represenbting a larger list of metabolites from which the mets were selected this list serves as
+#' the backround reference population of metabolites for comparision and enrichment. If NULL, the background population is taken as all RaMP DB metabolites.
 #' @return a data frame containing chemical class enrichment statistics
 #'
 #'@examples
@@ -106,8 +114,10 @@ chemicalClassSurvey <- function(mets, pop = NULL){
 #' enrichedClassStats <- chemicalClassEnrichment(metClassResult)
 #'}
 #' @export
-chemicalClassEnrichment <- function(classData) {
-  print("Starting Chemical Class Enrichement")
+chemicalClassEnrichment <- function(mets, pop = NULL) {
+    print("Starting Chemical Class Enrichment")
+    classData <- chemicalClassSurvey(mets = mets, pop = pop,
+                                     includeRaMPids = TRUE)
   enrichmentStat <- list()
 
   totalCountInfo <- getTotalFoundInCategories(classData)

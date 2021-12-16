@@ -6,23 +6,26 @@
 clicked on highchart}
 \usage{
 runFisherTest(
-  pathwaydf,
-  backgrounddf = NULL,
+  analytes,
+  background = NULL,
   biospecimen_background = NULL,
   total_genes = 20000,
+  NameOrIds = "ids",
   analyte_type = "metabolites",
   MCall = T,
   alternative = "less"
 )
 }
 \arguments{
-\item{pathwaydf}{a data frame resulting from getPathwayFromAnalyte}
+\item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
-\item{backgrounddf}{optional dataframe resulting from getPathwayFromAnalyte run on all analytes detected in study. This will be used as the background for the Fisher's contingency table. If left NULL, all analytes in RaMP are used as background}
+\item{background}{optional vector of all metabolites detected in study. This will be used as the background for the Fisher's contingency table for metabolites. If left NULL, all metabolites in RaMP originating in the pathway database of origin are used as background for testing}
 
 \item{biospecimen_background}{If NULL, test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"}
 
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
+
+\item{NameOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
 
 \item{analyte_type}{"metabolites" or "genes" (default is "metabolites")}
 

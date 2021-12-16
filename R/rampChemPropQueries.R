@@ -78,6 +78,8 @@ chemicalPropertiesQuery <- function(mets, props = NULL, conn) {
 
   result[['query_report']] <- queryNotes
 
+  result[['chem_props']] <- result[['chem_props']] %>% cleanup
+  
   return(result)
 }
 

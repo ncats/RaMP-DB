@@ -5,7 +5,12 @@
 \title{Function that search analytes (gene or compounds)  or a list of analytes and
 returns associated pathways}
 \usage{
-getPathwayFromAnalyte(analytes = NULL, find_synonym = FALSE, NameOrIds = "ids")
+getPathwayFromAnalyte(
+  analytes = NULL,
+  find_synonym = FALSE,
+  NameOrIds = "ids",
+  includeRaMPids = FALSE
+)
 }
 \arguments{
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
@@ -13,6 +18,8 @@ getPathwayFromAnalyte(analytes = NULL, find_synonym = FALSE, NameOrIds = "ids")
 \item{find_synonym}{find all synonyms or just return same synonym (T/F)}
 
 \item{NameOrIds}{whether input is "names" or "ids" (default is "ids")}
+
+\item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
 }
 \value{
 a list contains all metabolites as name and pathway inside.

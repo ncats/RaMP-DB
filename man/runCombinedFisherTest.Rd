@@ -6,8 +6,8 @@
 clicked on highchart}
 \usage{
 runCombinedFisherTest(
-  pathwaydf,
-  backgrounddf = NULL,
+  analytes,
+  background = NULL,
   biospecimen_background = NULL,
   total_genes = 20000,
   min_analyte = 2,
@@ -16,9 +16,9 @@ runCombinedFisherTest(
 )
 }
 \arguments{
-\item{pathwaydf}{a data frame resulting from getPathwayFromAnalyte}
+\item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
-\item{backgrounddf}{optional dataframe resulting from getPathwayFromAnalyte run on all analytes detected in study. This will be used as the background for the Fisher's contingency table. If left NULL, all analytes in RaMP are used as background}
+\item{background}{optional vector of all metabolites detected in study. This will be used as the background for the Fisher's contingency table for metabolites. If left NULL, all metabolites in RaMP originating in the pathway database of origin are used as background for testing}
 
 \item{biospecimen_background}{If NULL, test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"}
 
@@ -30,6 +30,8 @@ runCombinedFisherTest(
 \item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")}
 
 \item{alternative}{alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")}
+
+\item{NameOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
 }
 \value{
 a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
