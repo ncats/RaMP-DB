@@ -22,6 +22,7 @@ Imports:
     tidyr,
     tidytext,
     DT,
+    gt,
     xtable,
     visNetwork,
     properties,
