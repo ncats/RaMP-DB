@@ -28,7 +28,8 @@ Imports:
     properties,
     stringi,
     RMariaDB,
-    DBI
+    DBI,
+    jsonlite
 Encoding: UTF-8
 RoxygenNote: 7.1.2
 Suggests: 
