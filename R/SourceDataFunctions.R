@@ -67,6 +67,8 @@ getRaMPAnalyteIntersections<-function(analyteType='metabolites', format='json'){
     query<-"select gene_intersects_json from db_version where load_timestamp order by load_timestamp desc limit 1"
   } else {
     warning("The analyteType must be one of c('metabolites','genes')")
+    #return an empty dataframe
+    return(data.frame())
   }
   con<-connectToRaMP()
   results<-RMariaDB::dbGetQuery(con,query)
@@ -100,6 +102,8 @@ getRaMPAnalyteIntersections<-function(analyteType='metabolites', format='json'){
     }
   } else {
     warning("The format must be one of c('json','upsetR_expression')")
+    #return an empty dataframe
+    return(data.frame())
   }
   return(results)
 }
