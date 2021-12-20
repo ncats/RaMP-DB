@@ -4,10 +4,13 @@
 \alias{chemicalClassEnrichment}
 \title{returns chemical class information comparing a metabolite subset to a metabolite population}
 \usage{
-chemicalClassEnrichment(classData)
+chemicalClassEnrichment(mets, pop = NULL)
 }
 \arguments{
-\item{classData}{a chemical class result object from chemicalClassSurvey}
+\item{mets}{a list object of source prepended metaboite ids, representing a metabolite set of interest}
+
+\item{pop}{an optional list object of source prepended metaboite ids, represenbting a larger list of metabolites from which the mets were selected this list serves as
+the backround reference population of metabolites for comparision and enrichment. If NULL, the background population is taken as all RaMP DB metabolites.}
 }
 \value{
 a data frame containing chemical class enrichment statistics

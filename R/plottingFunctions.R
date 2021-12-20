@@ -10,9 +10,9 @@
 #' plotCataNetwork(catalyzedf)
 #' }
 #' @export
-plotCataNetwork <- function(catalyzedf = NULL) {
+plotCataNetwork <- function(catalyzedf = "") {
 
-        if(is.null(catalyzedf) ||
+        if(catalyzedf == "" ||
         (length(intersect(c("Input_Analyte","Input_CatalyzedBy_CommonName",
                 "Input_CatalyzedBy_SourceIds"),colnames(catalyzedf)))!=3)) {
                 stop("Please make sure that the input is the resulting data.frame returned by the rampFastCata() function")

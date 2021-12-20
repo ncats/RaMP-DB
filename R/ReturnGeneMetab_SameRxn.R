@@ -14,9 +14,9 @@
 #' rampFastCata(analytes="creatine",NameOrIds="names")
 #' }
 #' @export
-rampFastCata <- function(analytes=NULL, NameOrIds="ids") {
+rampFastCata <- function(analytes="", NameOrIds="ids") {
 
-  if(is.null(analytes))
+  if(analytes=="")
     stop("Please provide input analytes")
   if (!(NameOrIds %in% c('names','ids')))
     stop('Please specify search by "names" or "ids"')

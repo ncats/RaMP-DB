@@ -2,8 +2,8 @@
 % Please edit documentation in R/ReturnPathwaysEnrich_InputAnalytes.R
 \name{findCluster}
 \alias{findCluster}
-\title{Perform fuzzy multiple linkage partitioning clustering on pathways identified by
-Fisher's test}
+\title{Perform fuzzy multiple linkage partitioning clustering on pathways
+identified by Fisher's test}
 \usage{
 findCluster(
   fishers_df,
@@ -29,8 +29,8 @@ list:[[1]] Pathway enrichment result dataframe with cluster assignment column ad
 [[3]] cluster assignment in the list form
 }
 \description{
-Perform fuzzy multiple linkage partitioning clustering on pathways identified by
-Fisher's test
+Perform fuzzy multiple linkage partitioning clustering on pathways
+identified by Fisher's test
 }
 \examples{
 \dontrun{

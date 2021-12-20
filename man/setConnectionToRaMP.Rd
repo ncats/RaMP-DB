@@ -7,9 +7,9 @@
 setConnectionToRaMP(
   dbname = "ramp",
   username = "root",
-  conpass = NULL,
+  conpass = "",
   host = "localhost",
-  socket = NULL
+  socket = ""
 )
 }
 \arguments{
