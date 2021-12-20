@@ -69,8 +69,10 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
 #' rampId
 #' @param full return whole searching result or not (TRUE/FALSE)
 #' @return a data frame that has all source Id in the column or the source table that has metabolites entry
-rampFindSourceFromId <- function(rampId=NULL,full = TRUE){
-
+rampFindSourceFromId <- function(rampId = "",full = TRUE){
+    if(rampId == ""){
+        stop("Data must be a list or dataframe")
+    }
   if(is.data.frame(rampId)){
     list_id <- rampId$rampId
   } else if(is.character(rampId)){

@@ -7,8 +7,8 @@ clicked on highchart}
 \usage{
 runFisherTest(
   analytes,
-  background = NULL,
-  biospecimen_background = NULL,
+  background = "",
+  biospecimen_background = "",
   total_genes = 20000,
   NameOrIds = "ids",
   analyte_type = "metabolites",
@@ -19,9 +19,9 @@ runFisherTest(
 \arguments{
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
-\item{background}{optional vector of all metabolites detected in study. This will be used as the background for the Fisher's contingency table for metabolites. If left NULL, all metabolites in RaMP originating in the pathway database of origin are used as background for testing}
+\item{background}{optional vector of all metabolites detected in study. This will be used as the background for the Fisher's contingency table for metabolites. If left "", all metabolites in RaMP originating in the pathway database of origin are used as background for testing}
 
-\item{biospecimen_background}{If NULL, test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"}
+\item{biospecimen_background}{If "", test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"}
 
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
 

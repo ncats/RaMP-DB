@@ -34,7 +34,7 @@
 #' head(chemProps$chem_props)
 #'}
 #' @export
-getChemicalProperties <- function(mets, propertyList = NULL){
+getChemicalProperties <- function(mets, propertyList = ""){
   conn <- connectToRaMP()
   message("Starting Chemical Property Query")
   res <- chemicalPropertiesQuery(mets, props=propertyList, conn)
@@ -45,7 +45,7 @@ getChemicalProperties <- function(mets, propertyList = NULL){
 
 
 
-chemicalPropertiesQuery <- function(mets, props = NULL, conn) {
+chemicalPropertiesQuery <- function(mets, props = "", conn) {
   mets <- unique(mets)
 
   checkIdPrefixes(mets)
@@ -56,7 +56,7 @@ chemicalPropertiesQuery <- function(mets, props = NULL, conn) {
   metStr <- paste(mets, collapse = "','")
   metStr <- paste("'" ,metStr, "'", sep = "")
 
-  if(is.null(props)) {
+  if(props == "") {
     sql <- paste("select * from chem_props",
           "where chem_source_id in (",metStr,")")
   } else {

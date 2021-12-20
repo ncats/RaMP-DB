@@ -4,13 +4,15 @@
 \alias{chemicalClassSurvey}
 \title{Returns chemical class information comparing a metabolite subset to a metabolite population}
 \usage{
-chemicalClassSurvey(mets, pop = NULL)
+chemicalClassSurvey(mets, pop = NULL, includeRaMPids = FALSE)
 }
 \arguments{
 \item{mets}{a list object of source prepended metaboite ids, representing a metabolite set of interest}
 
-\item{pop}{an optional list object of source prepended metaboite ids, represenbting a lareger list of metabolites from which the mets were selected this list serves as
+\item{pop}{an optional list object of source prepended metaboite ids, represenbting a larger list of metabolites from which the mets were selected this list serves as
 the backround reference population of metabolites for comparision and enrichment. If NULL, the background population is taken as all RaMP DB metabolites.}
+
+\item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
 }
 \value{
 Returns chemcial class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,

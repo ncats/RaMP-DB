@@ -13,15 +13,19 @@
 #' @export
 setConnectionToRaMP <- function(dbname="ramp",
                        username = "root",
-                       conpass = NULL,
+                       conpass = "",
                        host ="localhost",
-		       socket = NULL){
+		       socket = ""){
   pkg.globals <- new.env()
   pkg.globals$dbname=dbname
   pkg.globals$username=username
   pkg.globals$conpass=conpass
   pkg.globals$host=host
-  pkg.globals$socket=socket
+  if(socket ==""){
+      pkg.globals$socket=NULL
+  }else{
+      pkg.globals$socket = socket
+  }
   return(pkg.globals)
 }
 
