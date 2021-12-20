@@ -452,11 +452,8 @@ bhCorrect <- function(resultMat) {
 #' @param sourceIds a vector of analytes (genes or metabolites) that need to be searched
 #' @return a dataframe of chemClass info
 rampFindClassInfoFromSourceId<-function(sourceIds){
-        
     sourceIds <- unique(sourceIds)
-    
     checkIdPrefixes(sourceIds)
-
     idsToCheck <- sapply(sourceIds,function(x){
         if(!grepl("hmdb|chebi|LIPIDMAPS",x)){
             return(x)
