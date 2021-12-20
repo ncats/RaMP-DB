@@ -21,13 +21,15 @@ Imports:
     plotly,
     tidyr,
     tidytext,
+    data.table,
     DT,
     xtable,
     visNetwork,
     properties,
     stringi,
     RMariaDB,
-    DBI
+    DBI,
+    jsonlite
 Encoding: UTF-8
 RoxygenNote: 7.1.2
 Suggests: 
