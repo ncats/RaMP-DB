@@ -99,7 +99,7 @@ getMetaFromOnto <- function(ontology){
       list_ontology <- strsplit(ontology,"\n")
       list_ontology <- unlist(list_ontology)
     } else if(grepl(",",ontology)[1]){
-      list_ontology <- strsplit(ontology,"\n")
+      list_ontology <- strsplit(ontology,",")
       list_ontology <- unlist(list_ontology)
     } else {
       list_ontology <- ontology
@@ -109,11 +109,14 @@ getMetaFromOnto <- function(ontology){
   }
   list_ontology <- unique(list_ontology)
   #list_ontology <- sapply(list_ontology,shQuote)
-  list_ontology <- paste(list_ontology,collapse = ",")
+
+  #JCB Mod 12/20/21 - drop collapse at this point, until we determine matched ontologies
+  # Comment out
+  #list_ontology <- paste(list_ontology,collapse = ",")
 
   # Find the ontology in ramp2
   allontos <- getOntologies()
-  matched_ontos <- unlist(lapply(list_ontology, 
+  matched_ontos <- unlist(lapply(list_ontology,
 	function(x) grep(x, allontos$commonName)))
   # Create df which will be used later to create the output
   df <- allontos[matched_ontos,]
@@ -157,7 +160,7 @@ collapse=",")
 	            does not exist in source table')
 	    return(NULL)
 	 }
-  
+
 	## Merge ontology with nice metabolite names
 	#print('Merging 1...')
 	mdf <- unique(merge(df3,df2,by.x = 'rampId',by.y = 'rampCompoundId',all.x = T))
@@ -175,12 +178,12 @@ collapse=",")
 	#Metabolites<-c()
 	#print("NO ERROR YET")
 	#print(dim(mdf))
-	#out=data.table::setDT(mdf)[,lapply(data.table::.SD, function(x) paste0(unique(x),collapse=", ")), 
+	#out=data.table::setDT(mdf)[,lapply(data.table::.SD, function(x) paste0(unique(x),collapse=", ")),
 	#	by=Metabolites]
   	return(mdf)
   } else {
 	warning("Ontology not found in RaMP.  Run the getOntologies() function to see available ontologies.")
 	return(NA)
-  } 
+  }
 
 }
