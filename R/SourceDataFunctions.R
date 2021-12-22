@@ -30,7 +30,6 @@ getCurrentRaMPSourceDBVersions<-function(){
   return(results)
 }
 
-
 #' Retrieve counts of entitites (e.g. Metabolites, Pathways, Metabolite-Pathway associations, etc.) for RaMP source databases
 #' @return database sources and entity counts associated with each data source
 #' @examples
@@ -46,7 +45,9 @@ getEntityCountsFromSourceDBs<-function(){
   results<-RMariaDB::dbGetQuery(con,query1)
   RMariaDB::dbDisconnect(con)
   results<-results[,-2]
-  results<-results %>% tidyr::spread(unique(entity_source_name),entity_count,fill = "-")
+  results<-results %>% tidyr::spread(unique(entity_source_name),entity_count)
+  results[is.na(results)]=0
+  results<- transform(results, HMDB = as.numeric(HMDB))
   return(results)
 }
 

@@ -116,15 +116,16 @@ getMetaFromOnto <- function(ontology) {
     list_ontology <- unlist(ontology)
   }
   list_ontology <- unique(list_ontology)
-  ## #list_ontology <- sapply(list_ontology,shQuote)
-  ## list_ontology <- paste(list_ontology,collapse = ",")
+  #list_ontology <- sapply(list_ontology,shQuote)
+
+  #JCB Mod 12/20/21 - drop collapse at this point, until we determine matched ontologies
+  # Comment out
+  #list_ontology <- paste(list_ontology,collapse = ",")
 
   # Find the ontology in ramp2
   allontos <- getOntologies()
-  matched_ontos <- unlist(lapply(
-    list_ontology,
-    function(x) grep(x, allontos$commonName)
-  ))
+  matched_ontos <- unlist(lapply(list_ontology,
+	function(x) grep(x, allontos$commonName)))
   # Create df which will be used later to create the output
   df <- allontos[matched_ontos, ]
 
