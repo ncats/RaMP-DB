@@ -420,7 +420,8 @@ runFisherTest <- function(analytes, background = "",
 #' @return a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", conpass = "", host = "localhost")
+#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
+#'	conpass = "", host = "localhost")
 #' pathwaydf <- getPathwayFromAnalyte(c("MDM2", "TP53", "glutamate", "creatinine"),
 #'   NameOrIds = "names"
 #' )
@@ -590,7 +591,8 @@ runCombinedFisherTest <- function(analytes, background = "",
 #' @return a list contains all metabolites as name and pathway inside.
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", conpass = "", host = "localhost")
+#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
+#'	conpass = "", host = "localhost")
 #' mypath <- getPathwayFromAnalyte(analytes = c("2-hydroxyglutarate", "glutamate"))
 #' }
 #' @export
@@ -703,10 +705,10 @@ getPathwayFromAnalyte <- function(analytes = "",
 #' [[3]] cluster assignment in the list form
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", conpass = "", host = "localhost")
-#' pathwaydf <- getPathwayFromAnalyte(c("MDM2", "TP53", "glutamate", "creatinine"),
-#'   NameOrIds = "names"
-#' )
+#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
+#'	conpass = "", host = "localhost")
+#' pathwaydf <- getPathwayFromAnalyte(c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
+#'        "hmdb:HMDB0000148", "ensembl:ENSG00000141510"))
 #' fisher.results <- runCombinedFisherTest(pathwaydf = pathwaydf)
 #' filtered.fisher.results <- FilterFishersResults(fisher.results, p_holmadj_cutoff = 0.05)
 #' filteredclust.fisher.results <- findCluster(filtered.fisher.results)
@@ -909,7 +911,8 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
 #' [[2]]analyte type
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", conpass = "", host = "localhost")
+#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
+#'	conpass = "", host = "localhost")
 #' pathwaydf <- getPathwayFromAnalyte(c("MDM2", "TP53", "glutamate", "creatinine"),
 #'   NameOrIds = "names"
 #' )

@@ -1,6 +1,7 @@
 #' Use fast search algorithm to find all pathways from given analytes
 #'
 #' @param pathway a string or a vector of strings that contains pathways of interest
+#' @param analyte_type a string denoting the type of analyte to return ("gene", "metabolite", "both")
 #' @return a data.frame that contains all search results
 #' @examples
 #' \dontrun{
@@ -13,7 +14,7 @@
 #'	"sphingolipid metabolism"))
 #' }
 #' @export
-getAnalyteFromPathway <- function(pathway) {
+getAnalyteFromPathway <- function(pathway, analyte_type="both") {
 
   now <- proc.time()
   print("fired")
@@ -39,8 +40,8 @@ getAnalyteFromPathway <- function(pathway) {
   query1 <- paste0("select * from pathway where pathwayName
                    in (",list_pathway,");")
 
-  df1 <- DBI::dbGetQuery(con,query1)
-  DBI::dbDisconnect(con)
+  df1 <- RMariaDB::dbGetQuery(con,query1)
+  RMariaDB::dbDisconnect(con)
 
   if(nrow(df1)==0) {
     stop("None of the input pathway(s) could be found")}
@@ -50,8 +51,8 @@ getAnalyteFromPathway <- function(pathway) {
                    pathwayRampId in (select pathwayRampId from pathway where
                    pathwayName in (",list_pathway,"));")
   con <- connectToRaMP()
-  df2 <- DBI::dbGetQuery(con,query2)
-  DBI::dbDisconnect(con)
+  df2 <- RMariaDB::dbGetQuery(con,query2)
+  RMariaDB::dbDisconnect(con)
   cid_list <- unlist(df2[,2])
   cid_list <- sapply(cid_list,shQuote)
   cid_list <- paste(cid_list,collapse = ",")
@@ -59,8 +60,8 @@ getAnalyteFromPathway <- function(pathway) {
   # Retrieve all common name from compounds associated with RaMP compound ids (query2)
   query3 <- paste0("select * from source where rampId in (",cid_list,");")
   con <- connectToRaMP()
-  df3 <- DBI::dbGetQuery(con,query3)
-  DBI::dbDisconnect(con)
+  df3 <- RMariaDB::dbGetQuery(con,query3)
+  RMariaDB::dbDisconnect(con)
 
   # Merge all of this together
   mdf1 <- merge(df3,df2,all.x=T)
@@ -92,6 +93,13 @@ getAnalyteFromPathway <- function(pathway) {
   print("Timing ..")
   print(proc.time() - now)
 
-  return(as.data.frame(allout))
+  if(analyte_type=="gene") {
+	allout <- allout[which(allout$geneOrCompound=="gene"),]
+  } else if (analyte_type=="metabolite") {
+        allout <- allout[which(allout$geneOrCompound=="compound"),]
+  } else {	
+    allout <- allout
+  }
+ return(allout)
 }
 

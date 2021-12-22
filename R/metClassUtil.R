@@ -29,6 +29,7 @@ getMetabClassDataSources<-function(){
   con <- connectToRaMP()
   query1<-"select distinct(source) from metabolite_class order by source asc"
   results<- RMariaDB::dbGetQuery(con,query1)
+  RMariaDB::dbDisconnect(con)
   return(results)
 }
 
@@ -40,6 +41,7 @@ getMetabClassTypes<-function(){
   con <- connectToRaMP()
   query1<-"select distinct(class_level_name) from metabolite_class order by class_level_name asc"
   results<- RMariaDB::dbGetQuery(con,query1)
+  RMariaDB::dbDisconnect(con)
   return(results)
 }
 
@@ -68,6 +70,7 @@ getMetabChemClass<-function(classType= 'ClassyFire_super_class') {
       res<-getMetabClassTypes()
 
   }
+  RMariaDB::dbDisconnect(con)
   return(res)
   }
 
@@ -78,8 +81,9 @@ getMetabChemClass<-function(classType= 'ClassyFire_super_class') {
 
 getOntologies<-function(){
     con <- connectToRaMP()
-    query1<- "select distinct(commonName) from ontology"
+    query1<- "select * from ontology"
     OntoRes<-RMariaDB::dbGetQuery(con,query1)
+    RMariaDB::dbDisconnect(con)
     return(OntoRes)
 }
 

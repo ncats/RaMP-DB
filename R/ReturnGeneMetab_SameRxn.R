@@ -53,8 +53,8 @@ rampFastCata <- function(analytes="", NameOrIds="ids") {
   }
 
   # Retrieves Name, RaMPID and type (gene or compound) for input
-  df1<- DBI::dbGetQuery(con,query1)
-  DBI::dbDisconnect(con)
+  df1<- RMariaDB::dbGetQuery(con,query1)
+  RMariaDB::dbDisconnect(con)
 
   #print(df1$rampId)
   df_c <- df_g <- NULL
@@ -78,8 +78,8 @@ rampFastCata <- function(analytes="", NameOrIds="ids") {
       print("Geting gene Id from Compound Id ...")
 
       con <- connectToRaMP()
-      df_c2 <- DBI::dbGetQuery(con,query_c)
-      DBI::dbDisconnect(con)
+      df_c2 <- RMariaDB::dbGetQuery(con,query_c)
+      RMariaDB::dbDisconnect(con)
       if(nrow(df_c2) == 0){
         message("No genes found in same reaction as input metabolite")
         mdf_cfin2 <- NULL
@@ -92,8 +92,8 @@ rampFastCata <- function(analytes="", NameOrIds="ids") {
         query2 <- paste0("select * from source
              		where rampId in (",analyte2_list,");")
 	con <- connectToRaMP()
-        df_c3 <- DBI::dbGetQuery(con,query2)
-        DBI::dbDisconnect(con)
+        df_c3 <- RMariaDB::dbGetQuery(con,query2)
+        RMariaDB::dbDisconnect(con)
 
         if(nrow(df_c3) == 0){
           message("Cannot retrieve names for those metabolites")
@@ -148,8 +148,8 @@ rampFastCata <- function(analytes="", NameOrIds="ids") {
       # Get rampID for genes and catalyzed metabolites
       query_g <- paste0("select * from catalyzed where rampGeneId in (",g_id,");")
       con <- connectToRaMP()
-      df_g2 <- DBI::dbGetQuery(con,query_g)
-      DBI::dbDisconnect(con)
+      df_g2 <- RMariaDB::dbGetQuery(con,query_g)
+      RMariaDB::dbDisconnect(con)
       if(nrow(df_g2) == 0){
         message("Could not find metabolites in same reaction as input genes")
         mdf_gfin2=c()
@@ -161,8 +161,8 @@ rampFastCata <- function(analytes="", NameOrIds="ids") {
         # Get names for metabolite IDs
         query2 <- paste0("select * from source where rampId in (",analyte2_list,");")
 	con <- connectToRaMP()
-        df_g3 <-DBI::dbGetQuery(con,query2)
-        DBI::dbDisconnect(con)
+        df_g3 <-RMariaDB::dbGetQuery(con,query2)
+        RMariaDB::dbDisconnect(con)
         if(nrow(df_g3) == 0){
           message("Cannot retrieve names for those genes")
           mdf_gfin2 <- NULL

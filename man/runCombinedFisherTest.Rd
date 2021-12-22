@@ -43,7 +43,8 @@ clicked on highchart
 }
 \examples{
 \dontrun{
-pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", conpass = "", host = "localhost")
+pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
+conpass = "", host = "localhost")
 pathwaydf <- getPathwayFromAnalyte(c("MDM2", "TP53", "glutamate", "creatinine"),
   NameOrIds = "names"
 )
