@@ -454,11 +454,8 @@ bhCorrect <- function(resultMat) {
 #' @param sourceIds a vector of analytes (genes or metabolites) that need to be searched
 #' @return a dataframe of chemClass info
 rampFindClassInfoFromSourceId<-function(sourceIds){
-        
     sourceIds <- unique(sourceIds)
-    
     checkIdPrefixes(sourceIds)
-
     idsToCheck <- sapply(sourceIds,function(x){
         if(!grepl("hmdb|chebi|LIPIDMAPS",x)){
             return(x)
@@ -526,9 +523,11 @@ getRaMPInfoFromAnalytes<-function(analytes,
         } else if (NameOrIds == "ids"){
             sourceramp <- rampFindSourceRampId(sourceId=analytes)
             if (nrow(sourceramp)==0) {
-                stop("Make sure you are actually inputting ids and not names (you have NameOrIds set to 'ids'. If you are, then no ids were matched in the RaMP database.")
-            }
-            return(sourceramp)
+                warning("Make sure you are actually inputting ids and not names (you have NameOrIds set to 'ids'. If you are, then no ids were matched in the RaMP database.")
+		return(NULL)
+            } else {
+	            return(sourceramp)
+   	    }
         } else {
             stop("Make sure NameOrIds is set to 'names' or 'ids'")
         }
