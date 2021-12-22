@@ -47,7 +47,7 @@ getEntityCountsFromSourceDBs<-function(){
   results<-results[,-2]
   results<-results %>% tidyr::spread(unique(entity_source_name),entity_count)
   results[is.na(results)]=0
-  results<- transform(results, HMDB = as.numeric(HMDB))
+  results<- with(results,{transform(results, HMDB = as.numeric(HMDB))})
   return(results)
 }
 
