@@ -7,8 +7,8 @@ clicked on highchart}
 \usage{
 runCombinedFisherTest(
   analytes,
-  background = NULL,
-  biospecimen_background = NULL,
+  background = "database",
+  biospecimen_background = "none",
   NameOrIds = "ids",
   total_genes = 20000,
   min_analyte = 2,

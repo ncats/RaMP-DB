@@ -1,17 +1,17 @@
 #' Do fisher test for only one pathway from search result
 #' clicked on highchart
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
-#' @param background optional vector of all metabolites detected in study. This will be used as the background for the Fisher's contingency table for metabolites. If left "", all metabolites in RaMP originating in the pathway database of origin are used as background for testing
+#' @param background optional vector of all metabolites detected in study. This will be used as the background for the Fisher's contingency table for metabolites. If left "database", all metabolites in RaMP originating in the pathway database of origin are used as background for testing
 #' @param NameOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
-#' @param biospecimen_background If "", test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"
+#' @param biospecimen_background If "none", test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param analyte_type "metabolites" or "genes" (default is "metabolites")
 #' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
 #' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
 
-runFisherTest <- function(analytes, background = "",
-                          biospecimen_background = "", total_genes = 20000,
+runFisherTest <- function(analytes, background = "database",
+                          biospecimen_background = "none", total_genes = 20000,
                           NameOrIds = "ids",
                           analyte_type = "metabolites",
                           MCall = T, alternative = "less") {
@@ -33,14 +33,14 @@ runFisherTest <- function(analytes, background = "",
     return(NULL)
   }
 
-  if (background != "") {
+  if (background != "database") {
     backgrounddf <- getPathwayFromAnalyte(background,
       includeRaMPids = TRUE,
       NameOrIds = NameOrIds
     )
   }
 
-  if (biospecimen_background != "") {
+  if (biospecimen_background != "none") {
     if (biospecimen_background == "Adipose") {
       biospecimen_background <- "Adipose tissue"
     }
@@ -63,7 +63,7 @@ runFisherTest <- function(analytes, background = "",
   }
 
   ## Check that all metabolites of interest are in the background
-  if (background != "") {
+  if (background != "database") {
     if (length(setdiff(pathwaydf$rampId, backgrounddf$rampId) != 0)) {
       stop("All analytes in pathwaydf must also be in backgrounddf")
     }
@@ -142,7 +142,7 @@ runFisherTest <- function(analytes, background = "",
         user_in_pathway <- 0
       } else {
         user_in_pathway <- length(unique(grep("RAMP_C", ids_inpath, value = TRUE)))
-        if (background != "") {
+        if (background != "database") {
           ids_inpath_bg <- backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]
           bg_in_pathway <- length(unique(grep("RAMP_C", ids_inpath_bg, value = TRUE)))
         }
@@ -151,10 +151,10 @@ runFisherTest <- function(analytes, background = "",
       inputreact <- segregated_id_list[[1]][2][[1]]
       inputwiki <- segregated_id_list[[1]][3][[1]]
       tot_user_analytes <- length(grep("RAMP_C", unique(pathwaydf$rampId)))
-      if (background != "") {
+      if (background != "database") {
         tot_bg_analytes <- length(grep("RAMP_C", unique(backgrounddf$rampId)))
       }
-      ## if(background != ""){
+      ## if(background != "database"){
       ##     inputkegg_bg <- segregated_id_list_bg[[1]][1][[1]]
       ##     inputreact_bg <- segregated_id_list_bg[[1]][2][[1]]
       ##     inputwiki_bg <- segregated_id_list_bg[[1]][3][[1]]
@@ -193,7 +193,7 @@ runFisherTest <- function(analytes, background = "",
       # fill the rest of the table out
 
       ## user_in_pathway <- length(unique(pathwaydf[which(pathwaydf$pathwayRampId==i),"rampId"]))
-      if (background != ""){
+      if (background != "database"){
           bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]))
           }
       # EM - Corrected the following line that initially counted all input analytes without regard as to whether
@@ -201,16 +201,16 @@ runFisherTest <- function(analytes, background = "",
       # user_out_pathway <- length(unique(pathwaydf$rampId)) - user_in_pathway
       user_out_pathway <- tot_user_analytes - user_in_pathway
 
-      if (background != "") {
+      if (background != "database") {
         bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]))
         bg_out_pathway <- tot_bg_analytes - bg_in_pathway
       }
 
-      contingencyTb[1, 1] <- ifelse(background == "",
+      contingencyTb[1, 1] <- ifelse(background == "database",
         tot_in_pathway - user_in_pathway,
         bg_in_pathway
       )
-      contingencyTb[1, 2] <- ifelse(background == "",
+      contingencyTb[1, 2] <- ifelse(background == "database",
         tot_out_pathway - user_out_pathway,
         bg_out_pathway
       )
@@ -428,8 +428,8 @@ runFisherTest <- function(analytes, background = "",
 #' fisher.results <- runCombinedFisherTest(pathwaydf = pathwaydf)
 #' }
 #' @export
-runCombinedFisherTest <- function(analytes, background = "",
-                                  biospecimen_background = "",
+runCombinedFisherTest <- function(analytes, background = "database",
+                                  biospecimen_background = "none",
                                   NameOrIds = "ids",
                                   total_genes = 20000,
                                   min_analyte = 2,
@@ -504,23 +504,23 @@ runCombinedFisherTest <- function(analytes, background = "",
     allfish <- merge(outmetab, outgene,
       by = "pathwayRampId", all.x = T, all.y = T
     )
-    colnames(allfish)[which(colnames(allfish) == "Pval.x")] <- "Pval.Metab"
-    colnames(allfish)[which(colnames(allfish) == "Pval.y")] <- "Pval.Gene"
-    colnames(allfish)[which(colnames(allfish) == "Total_In_Path.x")] <- "Total_In_Path.Metab"
-    colnames(allfish)[which(colnames(allfish) == "Total_In_Path.y")] <- "Total_In_Path.Gene"
-    colnames(allfish)[which(colnames(allfish) == "Num_In_Path.x")] <- "Num_In_Path.Metab"
-    colnames(allfish)[which(colnames(allfish) == "Num_In_Path.y")] <- "Num_In_Path.Gene"
+    colnames(allfish)[which(colnames(allfish) == "Pval.x")] <- "Pval_Metab"
+    colnames(allfish)[which(colnames(allfish) == "Pval.y")] <- "Pval_Gene"
+    colnames(allfish)[which(colnames(allfish) == "Total_In_Path.x")] <- "Total_In_Path_Metab"
+    colnames(allfish)[which(colnames(allfish) == "Total_In_Path.y")] <- "Total_In_Path_Gene"
+    colnames(allfish)[which(colnames(allfish) == "Num_In_Path.x")] <- "Num_In_Path_Metab"
+    colnames(allfish)[which(colnames(allfish) == "Num_In_Path.y")] <- "Num_In_Path_Gene"
 
     # Calculate combined p-values for pathways that have both genes and metabolites
-    gm <- intersect(which(!is.na(allfish$Pval.Metab)), which(!is.na(allfish$Pval.Gene)))
-    combpval <- stats::pchisq(-2 * (log(allfish$Pval.Metab[gm]) + log(allfish$Pval.Gene[gm])),
+    gm <- intersect(which(!is.na(allfish$Pval_Metab)), which(!is.na(allfish$Pval_Gene)))
+    combpval <- stats::pchisq(-2 * (log(allfish$Pval_Metab[gm]) + log(allfish$Pval_Gene[gm])),
       df = 2, lower.tail = FALSE
     )
 
-    g <- which(is.na(allfish$Pval.Metab))
-    gpval <- allfish$Pval.Gene[g]
-    m <- which(is.na(allfish$Pval.Gene))
-    mpval <- allfish$Pval.Metab[m]
+    g <- which(is.na(allfish$Pval_Metab))
+    gpval <- allfish$Pval_Gene[g]
+    m <- which(is.na(allfish$Pval_Gene))
+    mpval <- allfish$Pval_Metab[m]
 
     out <- rbind(allfish[gm, ], allfish[g, ], allfish[m, ])
     out <- cbind(out, c(combpval, gpval, mpval))
@@ -534,12 +534,12 @@ runCombinedFisherTest <- function(analytes, background = "",
 
     keepers <- intersect(
       c(
-        which(out$Num_In_Path.Metab >= min_analyte),
-        which(is.na(out$Num_In_Path.Metab))
+        which(out$Num_In_Path_Metab >= min_analyte),
+        which(is.na(out$Num_In_Path_Metab))
       ),
       c(
-        which(out$Num_In_Path.Gene >= min_analyte),
-        which(is.na(out$Num_In_Path.Gene))
+        which(out$Num_In_Path_Gene >= min_analyte),
+        which(is.na(out$Num_In_Path_Gene))
       )
     )
 
@@ -596,14 +596,15 @@ runCombinedFisherTest <- function(analytes, background = "",
 #' mypath <- getPathwayFromAnalyte(analytes = c("2-hydroxyglutarate", "glutamate"))
 #' }
 #' @export
-getPathwayFromAnalyte <- function(analytes = "",
+getPathwayFromAnalyte <- function(analytes = "none",
                                   find_synonym = FALSE,
                                   NameOrIds = "ids",
                                   includeRaMPids = FALSE) {
-  now <- proc.time()
-  if (analytes == "") {
-    return(NULL)
-  }
+    now <- proc.time()
+    if (length(analytes)==1){
+        if (analytes == "none") {
+            return(NULL)
+        }}
 
   list_metabolite <- getRaMPInfoFromAnalytes(
     analytes = analytes, NameOrIds = NameOrIds,
@@ -747,7 +748,6 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
   fishers_df <-
       fishers_df %>%
       dplyr::left_join(idkey, by = "pathwaysourceId")
-  
   if (nrow(fishers_df) == 0) {
     return(NULL)
   } else if (nrow(fishers_df) == 1) {
@@ -781,15 +781,15 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
       pathway_indices <- pathway_indices[-which(is.na(pathway_indices))]
     }
 
-    pathway_matrix <- similarity_matrix[pathway_indices, pathway_indices]
-    unmerged_clusters <- apply(pathway_matrix, 1, function(x) {
+      pathway_matrix <- similarity_matrix[pathway_indices, pathway_indices]
+      unmerged_clusters <- apply(pathway_matrix, 1, function(x) {
       # if(length(which(x>=perc_analyte_overlap))>(min_pathway_tocluster+1)){
-      if (length(which(x >= perc_analyte_overlap)) > (min_pathway_tocluster - 1)) {
-        return(colnames(pathway_matrix)[which(x >= perc_analyte_overlap)])
-      } else {
-        return(NA)
-      }
-    })
+          if (length(which(x >= perc_analyte_overlap)) > (min_pathway_tocluster - 1)) {
+              return(colnames(pathway_matrix)[which(x >= perc_analyte_overlap)])
+          } else {
+              return(NA)
+          }
+      })
     # Remove the unmerged clusters
     if (length(which(is.na(unmerged_clusters))) > 0) {
       unmerged_clusters <- unmerged_clusters[-which(is.na(unmerged_clusters))]

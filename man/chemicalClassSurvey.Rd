@@ -4,7 +4,7 @@
 \alias{chemicalClassSurvey}
 \title{Returns chemical class information comparing a metabolite subset to a metabolite population}
 \usage{
-chemicalClassSurvey(mets, pop = NULL, includeRaMPids = FALSE)
+chemicalClassSurvey(mets, pop = "database", includeRaMPids = FALSE)
 }
 \arguments{
 \item{mets}{a list object of source prepended metaboite ids, representing a metabolite set of interest}

@@ -15,7 +15,6 @@
 #' }
 #' @export
 getAnalyteFromPathway <- function(pathway, analyte_type="both") {
-
   now <- proc.time()
   print("fired")
   if(is.character(pathway)){
@@ -72,7 +71,7 @@ getAnalyteFromPathway <- function(pathway, analyte_type="both") {
   mdf1$temp<-paste(mdf1$pathwayRampId,mdf1$rampId,sep=";")
   # use regular expression to remove substring before ':'
   #mdf1$sourceId <- gsub('.*:','',mdf1$sourceId)
-  out=data.frame(pathwayName=NA,pathwayCategory=NA,pathwayType=NA,analyteName=NA,
+  out=data.frame(pathwayName=NA,pathwayType=NA,analyteName=NA,
                  sourceAnalyteIDs=NA,geneOrCompound=NA)
   # Reformat so that you have one metabolite, with all synonyms, in one line:
   count=1
@@ -80,7 +79,7 @@ getAnalyteFromPathway <- function(pathway, analyte_type="both") {
   for (i in unique(mdf1$temp)) {
     temp <- mdf1[which(mdf1$temp==i),]
     #out$sourceCompoundIDs <- paste(paste(temp$IDtype,temp$sourceId,sep=": "),collapse="; ")
-    out$sourceAnalyteIDs <- paste(temp$sourceId,collapse="; ")
+    out$sourceAnalyteIDs <- paste(unique(temp$sourceId),collapse="; ")
     out$pathwayName <- temp[1,"pathwayName"]
     #out$pathwayCategory <- temp[1,"pathwayCategory"]
     out$pathwayType <- temp[1,"type"]

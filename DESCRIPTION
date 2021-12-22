@@ -23,6 +23,7 @@ Imports:
     tidytext,
     data.table,
     DT,
+    rlang,
     gt,
     xtable,
     visNetwork,

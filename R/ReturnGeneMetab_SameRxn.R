@@ -14,10 +14,10 @@
 #' rampFastCata(analytes="creatine",NameOrIds="names")
 #' }
 #' @export
-rampFastCata <- function(analytes="", NameOrIds="ids") {
-
-  if(analytes=="")
-    stop("Please provide input analytes")
+rampFastCata <- function(analytes="none", NameOrIds="ids") {
+    if(length(analytes)==1){
+        if(analytes=="none"){
+    stop("Please provide input analytes")}}
   if (!(NameOrIds %in% c('names','ids')))
     stop('Please specify search by "names" or "ids"')
 
@@ -202,7 +202,6 @@ rampFastCata <- function(analytes="", NameOrIds="ids") {
   #  if(!is.null(mdf)) {
   #  	colnames(mdf) <- c("Input_Analyte","Input_CatalyzedBy_CommonName",
   #		"Input_CatalyzedBy_SourceIds")
-  #   }
+                                        #   }
   return(mdf)
 }
-

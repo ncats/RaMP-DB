@@ -4,7 +4,7 @@
 \alias{plotCataNetwork}
 \title{Plots a network based on gene-metabolite relationships}
 \usage{
-plotCataNetwork(catalyzedf = NULL)
+plotCataNetwork(catalyzedf = "")
 }
 \arguments{
 \item{catalyzedf}{a data.frame output by rampFastCata() that contains analytes that are in the same reaction}

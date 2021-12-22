@@ -1,6 +1,5 @@
 ##' Generic function for removing RaMP identifiers and making query results more pleasant to look at
 ##' @param data A dataframe from the following functions: runCominedFishersTests, getAnalyteFromPathway, getPathwayFromAnalyte, chemicalClassSurvey, and getChemicalProperties
-##' @param truncate_cells_at String length to truncate cells at (No truncation if NA)
 ##' @param show_n_rows Only print first n rows of input (Shows all if NA)
 ##' @return Printed out and prettified version of input
 ##' @author Andrew Christopher Patt
