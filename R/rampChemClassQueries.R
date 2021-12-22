@@ -61,12 +61,14 @@
 #' metClassResult$query_report
 #'}
 #' @export
-chemicalClassSurvey <- function(mets, pop = "", includeRaMPids = FALSE){
+chemicalClassSurvey <- function(mets, pop = "database", includeRaMPids = FALSE){
   conn <- connectToRaMP()
   print("Starting Chemical Class Survey")
 
-  if(pop == "") {
-      res <- chemicalClassSurveyRampIdsFullPopConn(mets, conn)
+  if(length(pop)==1){
+      if(pop == "database"){ 
+          res <- chemicalClassSurveyRampIdsFullPopConn(mets, conn)
+      }
   } else {
     res <- chemicalClassSurveyRampIdsConn(mets, pop, conn)
   }
@@ -114,7 +116,7 @@ chemicalClassSurvey <- function(mets, pop = "", includeRaMPids = FALSE){
 #' enrichedClassStats <- chemicalClassEnrichment(metClassResult)
 #'}
 #' @export
-chemicalClassEnrichment <- function(mets, pop = "") {
+chemicalClassEnrichment <- function(mets, pop = "database") {
     print("Starting Chemical Class Enrichment")
     classData <- chemicalClassSurvey(mets = mets, pop = pop,
                                      includeRaMPids = TRUE)

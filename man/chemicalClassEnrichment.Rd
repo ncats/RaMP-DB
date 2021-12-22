@@ -4,7 +4,7 @@
 \alias{chemicalClassEnrichment}
 \title{returns chemical class information comparing a metabolite subset to a metabolite population}
 \usage{
-chemicalClassEnrichment(mets, pop = NULL)
+chemicalClassEnrichment(mets, pop = "database")
 }
 \arguments{
 \item{mets}{a list object of source prepended metaboite ids, representing a metabolite set of interest}

@@ -3,10 +3,15 @@
 #' @param mypathways data frame returned by function getPathwayFromAnalyte()
 #' @param outputfile name of output file
 #' @export
-writePathwaysToCSV <- function(mypathways = "", outputfile = "") {
-  if (mypathways == ""  || outputfile == "") {
-    stop("Be sure to specify the output of the function getPathwayFromAnalyte() and an output file")
-  }
+writePathwaysToCSV <- function(mypathways = "none", outputfile = "none") {
+    if(length(mypathways) == 1){
+        if (mypathways == "") {
+            stop("Be sure to specify the output of the function getPathwayFromAnalyte() and an output file")
+        }}
+    if(length(outputfile) == 1){
+        if (outputfile == "") {
+            stop("Be sure to specify the output of the function getPathwayFromAnalyte() and an output file")
+  }}
   if (!all(c(
     "pathwayName", "pathwaysourceId",
     "pathwaysource", "commonName"
@@ -27,10 +32,12 @@ writePathwaysToCSV <- function(mypathways = "", outputfile = "") {
 #' @param outputfile name of output file
 #' @param rampid whether or not to include rampId (default is FALSE)
 #' @export
-write_FishersResults <- function(fishResults = "", outputfile = "", rampid = FALSE) {
-  if (fishResults == "") {
+write_FishersResults <- function(fishResults = "none", outputfile = "none", rampid = FALSE) {
+
+    if(length(fishResults) == 1){
+        if (fishResults == "") {
     stop("Be sure to specify the output of the function findCluster()")
-  }
+  }}
   clusters <- fishResults$cluster_list
   if (is.null(clusters)) {
     out <- fishResults$fishresults
@@ -79,7 +86,7 @@ write_FishersResults <- function(fishResults = "", outputfile = "", rampid = FAL
   if (!rampid) {
     rampOut <- rampOut[, -ncol(rampOut)]
   }
-  if (outputfile=="") {
+  if (outputfile=="none") {
     return(rampOut[order(rampOut[, "Cluster"]), ])
   } else {
     utils::write.csv(rampOut[order(rampOut[, "Cluster"]), ], outputfile, row.names = FALSE)

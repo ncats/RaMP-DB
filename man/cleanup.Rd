@@ -10,8 +10,6 @@ cleanup(data, show_n_rows = 6)
 \item{data}{A dataframe from the following functions: runCominedFishersTests, getAnalyteFromPathway, getPathwayFromAnalyte, chemicalClassSurvey, and getChemicalProperties}
 
 \item{show_n_rows}{Only print first n rows of input (Shows all if NA)}
-
-\item{truncate_cells_at}{String length to truncate cells at (No truncation if NA)}
 }
 \value{
 Printed out and prettified version of input
