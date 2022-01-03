@@ -6,7 +6,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", conpass = "", host = "localhost")
+#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
+#' 	conpass = "", host = "localhost")
 #' getOntoFromMeta("hmdb:HMDB0071437")
 #' }
 #' @export
@@ -95,7 +96,8 @@ getOntoFromMeta <- function(analytes, NameOrIds = "ids") {
 #' @return dataframe that  contains searched analytes from given ontology
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", conpass = "", host = "localhost")
+#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
+#' 	conpass = "", host = "localhost")
 #' getMetaFromOnto("Adiposome")
 #' }
 #' @importFrom rlang .data
