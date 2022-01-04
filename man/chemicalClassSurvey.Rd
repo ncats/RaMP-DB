@@ -9,8 +9,8 @@ chemicalClassSurvey(mets, pop = "database", includeRaMPids = FALSE)
 \arguments{
 \item{mets}{a list object of source prepended metaboite ids, representing a metabolite set of interest}
 
-\item{pop}{an optional list object of source prepended metaboite ids, represenbting a larger list of metabolites from which the mets were selected this list serves as
-the backround reference population of metabolites for comparision and enrichment. If NULL, the background population is taken as all RaMP DB metabolites.}
+\item{pop}{an optional vector of source prepended metaboite ids to be used as the background reference population of
+metabolites for enrichment.   If "database", the background population is taken as all RaMP DB metabolites. Default: "database"}
 
 \item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
 }

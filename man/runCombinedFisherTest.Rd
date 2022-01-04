@@ -19,9 +19,10 @@ runCombinedFisherTest(
 \arguments{
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
-\item{background}{optional vector of all metabolites detected in study. This will be used as the background for the Fisher's contingency table for metabolites. If left NULL, all metabolites in RaMP originating in the pathway database of origin are used as background for testing}
+\item{background}{optional vector of all metabolites detected in study to be used as the background for the Fisher's contingency table for 
+enrichment.  If value is "database", all metabolites in the RaMP database will be used as background.  Default: "database"}
 
-\item{biospecimen_background}{If NULL, test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"}
+\item{biospecimen_background}{If "none", test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"}
 
 \item{NameOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
 
