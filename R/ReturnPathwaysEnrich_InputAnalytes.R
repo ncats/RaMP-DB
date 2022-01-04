@@ -55,8 +55,10 @@ runFisherTest <- function(analytes, background = "database",
     if (nrow(backgrounddf) == 0) {
       stop("Biospecimen background not found. Choices are 'Blood', 'Adipose', 'Heart', 'Urine', 'Brain', 'Liver', 'Kidney', 'Saliva', and 'Feces'")
     }
-    pathwaydf <- with(pathwaydf,{pathwaydf %>%
-      dplyr::filter(rampId %in% backgrounddf$rampId)})
+    pathwaydf <- with(pathwaydf, {
+      pathwaydf %>%
+        dplyr::filter(rampId %in% backgrounddf$rampId)
+    })
     if (nrow(pathwaydf) == 0) {
       stop("There are no metabolites in your input that map to your selected biospecimen")
     }
@@ -193,9 +195,9 @@ runFisherTest <- function(analytes, background = "database",
       # fill the rest of the table out
 
       ## user_in_pathway <- length(unique(pathwaydf[which(pathwaydf$pathwayRampId==i),"rampId"]))
-      if (background != "database"){
-          bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]))
-          }
+      if (background != "database") {
+        bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]))
+      }
       # EM - Corrected the following line that initially counted all input analytes without regard as to whether
       # whether they were genes or metabolites.
       # user_out_pathway <- length(unique(pathwaydf$rampId)) - user_in_pathway
@@ -409,7 +411,7 @@ runFisherTest <- function(analytes, background = "database",
 #' Do fisher test for only one pathway from search result
 #' clicked on highchart
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
-#' @param background optional vector of all metabolites detected in study to be used as the background for the Fisher's contingency table for 
+#' @param background optional vector of all metabolites detected in study to be used as the background for the Fisher's contingency table for
 #' enrichment.  If value is "database", all metabolites in the RaMP database will be used as background.  Default: "database"
 #' @param biospecimen_background If "none", test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"
 #' @param NameOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
@@ -421,8 +423,10 @@ runFisherTest <- function(analytes, background = "database",
 #' @return a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
-#'	conpass = "", host = "localhost")
+#' pkg.globals <- setConnectionToRaMP(
+#'   dbname = "ramp2", username = "root",
+#'   conpass = "", host = "localhost"
+#' )
 #' pathwaydf <- getPathwayFromAnalyte(c("MDM2", "TP53", "glutamate", "creatinine"),
 #'   NameOrIds = "names"
 #' )
@@ -546,11 +550,11 @@ runCombinedFisherTest <- function(analytes, background = "database",
 
 
     # Now that p-values are calculated, only return pathways that are in the list
-                                        # of pathways that contain user genes and metabolites
-      pathwaydf <- getPathwayFromAnalyte(analytes,
-                                         includeRaMPids = TRUE,
-                                         NameOrIds = NameOrIds
-                                         )
+    # of pathways that contain user genes and metabolites
+    pathwaydf <- getPathwayFromAnalyte(analytes,
+      includeRaMPids = TRUE,
+      NameOrIds = NameOrIds
+    )
     out2 <- merge(out[keepers, ],
       pathwaydf[, c(
         "pathwayName", "pathwayRampId", "pathwaysourceId",
@@ -578,7 +582,7 @@ runCombinedFisherTest <- function(analytes, background = "database",
       paste0(collapse = ";")
     return(analytes)
   })
-  return(list(fishresults = out2 %>% cleanup, analyte_type = analyte_type))
+  return(list(fishresults = out2 %>% cleanup(), analyte_type = analyte_type))
 }
 
 
@@ -592,8 +596,10 @@ runCombinedFisherTest <- function(analytes, background = "database",
 #' @return a list contains all metabolites as name and pathway inside.
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
-#'	conpass = "", host = "localhost")
+#' pkg.globals <- setConnectionToRaMP(
+#'   dbname = "ramp2", username = "root",
+#'   conpass = "", host = "localhost"
+#' )
 #' mypath <- getPathwayFromAnalyte(analytes = c("2-hydroxyglutarate", "glutamate"))
 #' }
 #' @export
@@ -601,11 +607,12 @@ getPathwayFromAnalyte <- function(analytes = "none",
                                   find_synonym = FALSE,
                                   NameOrIds = "ids",
                                   includeRaMPids = FALSE) {
-    now <- proc.time()
-    if (length(analytes)==1){
-        if (analytes == "none") {
-            return(NULL)
-        }}
+  now <- proc.time()
+  if (length(analytes) == 1) {
+    if (analytes == "none") {
+      return(NULL)
+    }
+  }
 
   list_metabolite <- getRaMPInfoFromAnalytes(
     analytes = analytes, NameOrIds = NameOrIds,
@@ -643,7 +650,7 @@ getPathwayFromAnalyte <- function(analytes = "none",
   )
   con <- connectToRaMP()
   df3 <- DBI::dbGetQuery(con, query3)
-    DBI::dbDisconnect(con)
+  DBI::dbDisconnect(con)
   # Format output
   mdf <- merge(df3, df2, all.x = T)
   # And with rampIds (list_metabolite), get common names when Ids are input
@@ -665,12 +672,12 @@ getPathwayFromAnalyte <- function(analytes = "none",
     mdf <- merge(mdf, df4, all.x = T, by.y = "rampId")
     mdf$commonName <- tolower(mdf$commonName)
   } else { # Just take on the name
-      list_analytes <- sapply(mdf$rampId, shQuote)
-      list_analytes <- paste(list_analytes, collapse = ",")
-      query4 <- paste0("select sourceId,commonName,rampId from source where rampId in (", list_analytes, ");")
-      con <- connectToRaMP()
-      df4 <- DBI::dbGetQuery(con, query4)
-      DBI::dbDisconnect(con)
+    list_analytes <- sapply(mdf$rampId, shQuote)
+    list_analytes <- paste(list_analytes, collapse = ",")
+    query4 <- paste0("select sourceId,commonName,rampId from source where rampId in (", list_analytes, ");")
+    con <- connectToRaMP()
+    df4 <- DBI::dbGetQuery(con, query4)
+    DBI::dbDisconnect(con)
     # convert latin1 encoding to UTF-8
     df4$commonName <- sapply(as.character(df4$commonName), function(x) {
       if (stringi::stri_enc_mark(x) == "native") {
@@ -679,12 +686,15 @@ getPathwayFromAnalyte <- function(analytes = "none",
         x
       }
     })
-      ## browser()
-    mdf <- merge(mdf, df4, all.x = T, by.y = "rampId")
-    mdf$commonName <- tolower(mdf$commonName)
-      if(find_synonym){
-          mdf <- merge(mdf, "synonym", all.x = T, by.y = "rampId")
-      }
+  }
+  ## browser()
+  mdf <- merge(mdf, df4, all.x = T, by.y = "rampId")
+  mdf$commonName <- tolower(mdf$commonName)
+  if (find_synonym) {
+    mdf <- merge(mdf, "synonym", all.x = T, by.y = "rampId")
+  } else {
+      mdf <- mdf[unlist(lapply(tolower(analytes),
+                               function(x) which(tolower(mdf$commonName) %in% x))),]
   }
   out <- mdf[!duplicated(mdf), ]
   # For now, not returning HMDB pathways because they include the 30K
@@ -725,10 +735,14 @@ getPathwayFromAnalyte <- function(analytes = "none",
 #' [[3]] cluster assignment in the list form
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
-#'	conpass = "", host = "localhost")
-#' pathwaydf <- getPathwayFromAnalyte(c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
-#'        "hmdb:HMDB0000148", "ensembl:ENSG00000141510"))
+#' pkg.globals <- setConnectionToRaMP(
+#'   dbname = "ramp2", username = "root",
+#'   conpass = "", host = "localhost"
+#' )
+#' pathwaydf <- getPathwayFromAnalyte(c(
+#'   "ensembl:ENSG00000135679", "hmdb:HMDB0000064",
+#'   "hmdb:HMDB0000148", "ensembl:ENSG00000141510"
+#' ))
 #' fisher.results <- runCombinedFisherTest(pathwaydf = pathwaydf)
 #' filtered.fisher.results <- FilterFishersResults(fisher.results, p_holmadj_cutoff = 0.05)
 #' filteredclust.fisher.results <- findCluster(filtered.fisher.results)
@@ -746,27 +760,29 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
   list_pathways <- sapply(list_pathways, shQuote)
   list_pathways <- paste(list_pathways, collapse = ",")
   query <- paste0(
-      "SELECT pathwayRampId, sourceId from pathway where sourceId in (",
-      list_pathways,
-      ")"
+    "SELECT pathwayRampId, sourceId from pathway where sourceId in (",
+    list_pathways,
+    ")"
   )
   con <- connectToRaMP()
   idkey <- DBI::dbGetQuery(con, query) %>%
-      dplyr::rename("pathwaysourceId" = "sourceId")##  %>%
-      ## dplyr::rename("rampId" = "pathwayRampId")
+    dplyr::rename("pathwaysourceId" = "sourceId") ##  %>%
+  ## dplyr::rename("rampId" = "pathwayRampId")
 
-  rampToSource<-function(x){
-      out <- with(idkey,{idkey %>%
-          dplyr::filter(pathwayRampId == x) %>%
-          dplyr::pull("pathwaysourceId")})
-      return(out)
+  rampToSource <- function(x) {
+    out <- with(idkey, {
+      idkey %>%
+        dplyr::filter(pathwayRampId == x) %>%
+        dplyr::pull("pathwaysourceId")
+    })
+    return(out)
   }
-  
+
   DBI::dbDisconnect(con)
 
   fishers_df <-
-      fishers_df %>%
-      dplyr::left_join(idkey, by = "pathwaysourceId")
+    fishers_df %>%
+    dplyr::left_join(idkey, by = "pathwaysourceId")
   if (nrow(fishers_df) == 0) {
     return(NULL)
   } else if (nrow(fishers_df) == 1) {
@@ -800,15 +816,15 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
       pathway_indices <- pathway_indices[-which(is.na(pathway_indices))]
     }
 
-      pathway_matrix <- similarity_matrix[pathway_indices, pathway_indices]
-      unmerged_clusters <- apply(pathway_matrix, 1, function(x) {
+    pathway_matrix <- similarity_matrix[pathway_indices, pathway_indices]
+    unmerged_clusters <- apply(pathway_matrix, 1, function(x) {
       # if(length(which(x>=perc_analyte_overlap))>(min_pathway_tocluster+1)){
-          if (length(which(x >= perc_analyte_overlap)) > (min_pathway_tocluster - 1)) {
-              return(colnames(pathway_matrix)[which(x >= perc_analyte_overlap)])
-          } else {
-              return(NA)
-          }
-      })
+      if (length(which(x >= perc_analyte_overlap)) > (min_pathway_tocluster - 1)) {
+        return(colnames(pathway_matrix)[which(x >= perc_analyte_overlap)])
+      } else {
+        return(NA)
+      }
+    })
     # Remove the unmerged clusters
     if (length(which(is.na(unmerged_clusters))) > 0) {
       unmerged_clusters <- unmerged_clusters[-which(is.na(unmerged_clusters))]
@@ -904,19 +920,21 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
       fishers_df <- cbind(fishers_df, rep("Did not cluster", times = nrow(fishers_df)))
     }
 
-      ## fishers_df$rampids <- rampids
-      fishers_df <- cleanup(fishers_df)
-      rownames(fishers_df) <- NULL
-      
-      ## Remove RaMP ids
-      colnames(pathway_matrix) <- rownames(pathway_matrix) <- sapply(rownames(pathway_matrix),
-                                                                     rampToSource)
-      cluster_list <- lapply(cluster_list, function(x){
-          out<-sapply(x, rampToSource)
-          names(out)<-NULL
-          return(out)
-      })
-      names(cluster_list) <- paste("Cluster", 1:length(cluster_list))
+    ## fishers_df$rampids <- rampids
+    fishers_df <- cleanup(fishers_df)
+    rownames(fishers_df) <- NULL
+
+    ## Remove RaMP ids
+    colnames(pathway_matrix) <- rownames(pathway_matrix) <- sapply(
+      rownames(pathway_matrix),
+      rampToSource
+    )
+    cluster_list <- lapply(cluster_list, function(x) {
+      out <- sapply(x, rampToSource)
+      names(out) <- NULL
+      return(out)
+    })
+    names(cluster_list) <- paste("Cluster", 1:length(cluster_list))
     output <- list(fishresults = fishers_df, analyte_type = analyte_type, cluster_list = cluster_list, pathway_matrix = pathway_matrix)
     return(output)
   }
@@ -930,8 +948,10 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
 #' [[2]]analyte type
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
-#'	conpass = "", host = "localhost")
+#' pkg.globals <- setConnectionToRaMP(
+#'   dbname = "ramp2", username = "root",
+#'   conpass = "", host = "localhost"
+#' )
 #' pathwaydf <- getPathwayFromAnalyte(c("MDM2", "TP53", "glutamate", "creatinine"),
 #'   NameOrIds = "names"
 #' )
