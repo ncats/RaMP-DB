@@ -642,10 +642,9 @@ getPathwayFromAnalyte <- function(analytes = "none",
   )
   con <- connectToRaMP()
   df3 <- DBI::dbGetQuery(con, query3)
-  DBI::dbDisconnect(con)
+    DBI::dbDisconnect(con)
   # Format output
   mdf <- merge(df3, df2, all.x = T)
-
   # And with rampIds (list_metabolite), get common names when Ids are input
   if (NameOrIds == "ids") {
     list_analytes <- sapply(analytes, shQuote)
@@ -665,7 +664,26 @@ getPathwayFromAnalyte <- function(analytes = "none",
     mdf <- merge(mdf, df4, all.x = T, by.y = "rampId")
     mdf$commonName <- tolower(mdf$commonName)
   } else { # Just take on the name
-    mdf <- merge(mdf, "synonym", all.x = T, by.y = "rampId")
+      list_analytes <- sapply(mdf$rampId, shQuote)
+      list_analytes <- paste(list_analytes, collapse = ",")
+      query4 <- paste0("select sourceId,commonName,rampId from source where rampId in (", list_analytes, ");")
+      con <- connectToRaMP()
+      df4 <- DBI::dbGetQuery(con, query4)
+      DBI::dbDisconnect(con)
+    # convert latin1 encoding to UTF-8
+    df4$commonName <- sapply(as.character(df4$commonName), function(x) {
+      if (stringi::stri_enc_mark(x) == "native") {
+        x <- iconv(x, "latin1", "UTF-8")
+      } else {
+        x
+      }
+    })
+      ## browser()
+    mdf <- merge(mdf, df4, all.x = T, by.y = "rampId")
+    mdf$commonName <- tolower(mdf$commonName)
+      if(find_synonym){
+          mdf <- merge(mdf, "synonym", all.x = T, by.y = "rampId")
+      }
   }
   out <- mdf[!duplicated(mdf), ]
   # For now, not returning HMDB pathways because they include the 30K
