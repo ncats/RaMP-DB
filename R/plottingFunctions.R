@@ -75,27 +75,26 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
                                   )
 
   fishresult <- fishClustering$fishresults
-
   if (pathwaysSig$analyte_type == "genes" | pathwaysSig$analyte_type == "metabolites") {
     inPath <- fishresult$Num_In_Path
     totPath <- fishresult$Total_In_Path
   } else {
-    inPath <- apply(fishresult, 1, function(x) {
-      if (is.na(x["Num_In_Path.Metab"])) {
-        return(as.numeric(x["Num_In_Path.Gene"]))
-      } else if (is.na(x["Num_In_Path.Gene"])) {
-        return(as.numeric(x["Num_In_Path.Metab"]))
+      inPath <- apply(fishresult, 1, function(x) {
+      if (is.na(x["Num_In_Path_Metab"])) {
+        return(as.numeric(x["Num_In_Path_Gene"]))
+      } else if (is.na(x["Num_In_Path_Gene"])) {
+        return(as.numeric(x["Num_In_Path_Metab"]))
       } else {
-        return(as.numeric(x["Num_In_Path.Metab"]) + as.numeric(x["Num_In_Path.Gene"]))
+        return(as.numeric(x["Num_In_Path_Metab"]) + as.numeric(x["Num_In_Path_Gene"]))
       }
     })
     totPath <- apply(fishresult, 1, function(x) {
-      if (is.na(x["Total_In_Path.Metab"])) {
-        return(as.numeric(x["Total_In_Path.Gene"]))
-      } else if (is.na(x["Total_In_Path.Gene"])) {
-        return(as.numeric(x["Total_In_Path.Metab"]))
+      if (is.na(x["Total_In_Path_Metab"])) {
+        return(as.numeric(x["Total_In_Path_Gene"]))
+      } else if (is.na(x["Total_In_Path_Gene"])) {
+        return(as.numeric(x["Total_In_Path_Metab"]))
       } else {
-        return(as.numeric(x["Total_In_Path.Metab"]) + as.numeric(x["Total_In_Path.Gene"]))
+        return(as.numeric(x["Total_In_Path_Metab"]) + as.numeric(x["Total_In_Path_Gene"]))
       }
     })
   }
@@ -154,7 +153,6 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
   clusterDF$pathway.db <- with(clusterDF, {
     paste0(y," (", pathwaysource,")")
   })
-
   p <- clusterDF %>%
       dplyr::mutate("pathway.db" =
                         with(clusterDF,{tidytext::reorder_within(pathway.db,
