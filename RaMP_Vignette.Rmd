@@ -37,11 +37,14 @@ Supported enrichment analyses are:
 Once installed, first load the package:
 ```{r}
 library(RaMP)
-library(formattable) # this is to make some of the outputs look nicer
-pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
+library(DT) # for prettier tables in vignette
+library(dplyr)
+library(magrittr)
+pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",
+                                   host = "localhost")
 ```
 
-The latter line cannot be modiiefd, other than changes to the parameters inside the function (e.g., values for dbname, username, conpass, and host).  For example, if your password is different than "", you would set conpass="mypassword".  This line needs be run only once, every time the package is loaded.
+The latter line cannot be modified, other than changes to the parameters inside the function (e.g., values for dbname, username, conpass, and host).  For example, if your password is different than "", you would set conpass="mypassword".  This line needs be run only once, every time the package is loaded.
 
 ## Supported RaMP Queries
 
@@ -55,17 +58,17 @@ myanalytes <- getAnalyteFromPathway(pathway="sphingolipid metabolism")
 cutoff <- 100
 
 for(i in 1:nrow(myanalytes)) {
-  char.length <- nchar(myanalytes$sourceCompoundIDs[i])
+  char.length <- nchar(myanalytes$sourceAnalyteIDs[i])
   if(char.length >= cutoff) {
-    new.string <- substr(myanalytes$sourceCompoundIDs[i], 1, cutoff)
+    new.string <- substr(myanalytes$sourceAnalyteIDs[i], 1, cutoff)
     new.string <- paste0(new.string, "...")
-    myanalytes$sourceCompoundIDs[i] <- new.string
+    myanalytes$sourceAnalyteIDs[i] <- new.string
   }
 }
 ```
 
 ```{r}
-formattable(myanalytes[1:4,])
+datatable(myanalytes)
 ```
 
 To retrieve information from multiple pathways, input a vector of pathway names:
@@ -88,7 +91,7 @@ When entering IDs, prepend with the database of origin followed by a colon, for 
   DBI::dbDisconnect(con)
 
   print(paste("IDs to be prepended for compounds:",paste(df2[,1],collapse=", ")))
-  print(paste("IDs to be prepended for compounds:",paste(df1[,1],collapse=", ")))
+  print(paste("IDs to be prepended for genes:",paste(df1[,1],collapse=", ")))
 ```
 
 In this example, we will search for pathways that involve the two genes MDM2 and TP53, and the two metabolites glutamate and creatinine.
@@ -96,43 +99,38 @@ In this example, we will search for pathways that involve the two genes MDM2 and
 ```{r}
 pathwaydfids <- getPathwayFromAnalyte(c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
         "hmdb:HMDB0000148", "ensembl:ENSG00000141510"))
-formattable(head(pathwaydfids))
+datatable(pathwaydfids)
 ```
 
-Note that each row returns a pathway attributed to one of the input analytes.  The last two columns are internal IDs that are not useful to most users and can be ignored.  These last two columns are however needed to run pathway enrichment analysis.
+Note that each row returns a pathway attributed to one of the input analytes.
 To retrieve the number of unique pathways returned for all analytes or each analyte, try the following:
 
 ```{r}
-print(paste("Number of Unique Pathways Returned for All Analytes:", length(unique(pathwaydfids$pathwayRampId))))
+print(paste("Number of Unique Pathways Returned for All Analytes:", length(unique(pathwaydfids$pathwaysourceId))))
 lapply(unique(pathwaydfids$commonName), function(x) {
         (paste("Number of Unique Pathways Returned for",x,":",
-                length(unique(pathwaydfids[which(pathwaydfids$commonName==x),]$pathwayRampId))))})
+                length(unique(pathwaydfids[which(pathwaydfids$commonName==x),]$pathwaysourceId))))})
 ```
 
 ### Retrieve Metabolites from Metabolite Ontologies
 Conversely, the user can retrieve the metabolites that are associated with a specific ontology or vector of ontologies. We can accomplish this using the function getMetaFromOnto(). It should be noted that it does not matter which ontology the metabolites are from. The function will return all metabolites associated with all the ontologies specified by the user.
-```{r eval = FALSE}
+```{r}
 ontologies.of.interest <- c("Colon", "Liver", "Lung")
 
 new.metabolites <- RaMP::getMetaFromOnto(ontology = ontologies.of.interest)
 
-formattable(head(new.metabolites))
+datatable(new.metabolites)
 ```
 
 ### Retrieve Ontologies from Input Metabolites
 RaMP contains information on where the metabolites originate from the biospecimen. This information is called ontology. Here are all the ontologies found in RaMP.
-
-```{r, eval=FALSE}
-# INCORPORATE COLE'S function
-formattable(ontology.table)
-```
 
 To retrieve ontologies that are associated with our metabolites we can use getOntoFromMeta(). This function takes in a vector of metabolites as an input and returns a vector comprised of the ontologies from the user's defined metabolites.
 ```{r}
 metabolites.of.interest <- c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
         "hmdb:HMDB0000148", "ensembl:ENSG00000141510")
 new.ontologies <- RaMP::getOntoFromMeta(analytes = metabolites.of.interest)
-formattable(head(new.ontologies))
+datatable(new.ontologies)
 ```
 
 ### Retrieve Analytes Involved in the Same Reaction
@@ -146,14 +144,14 @@ metabolites.of.interest <- c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
 
 new.transcripts <- rampFastCata(analytes = metabolites.of.interest)
 
-formattable(head(new.transcripts))
+datatable(new.transcripts)
 
 #Input Proteins
 proteins.of.interest <- c("hmdb:HMDBP00214", "hmdb:HMDBP00703", "kegg:2346")
 
 new.metabolites <- rampFastCata(analytes = proteins.of.interest)
 
-formattable(head(new.metabolites))
+datatable(new.metabolites)
 ```
 
 RaMP has a built in function which is able to generate networks from the transcript data. This function is named plotCataNetwork(). This function uses the dataframe created by rampFastCata() as an input. These plots are completely interactive.
@@ -171,7 +169,7 @@ metabolites.of.interest = c('hmdb:HMDB0000056','hmdb:HMDB0000439','hmdb:HMDB0000
                             'hmdb:HMDB0011211')
 chemical.classes <- chemicalClassSurvey(mets = metabolites.of.interest)
 metabolite.classes <- as.data.frame(chemical.classes$met_classes)
-formattable(metabolite.classes)
+datatable(metabolite.classes)
 ```
 
 ### Retrieve Chemical Property Information from Input Metabolites
@@ -180,7 +178,7 @@ Chemical properties captured by RaMP include SMILES, InChI, InChI-keys, monoisot
 ```{r}
 chemical.properties <- getChemicalProperties(metabolites.of.interest)
 chemical.data <- chemical.properties$chem_props
-formattable(chemical.data)
+datatable(chemical.data)
 ```
 
 ## Enrichment Analyses
@@ -189,10 +187,65 @@ RaMP performs pathway and chemical class overrespresentation analysis using Fish
 ### Perform Pathway Enrichment
 Using the pathways that our analytes map to, captured in the pathwaydfids data frame in the previous step, we can now run Fisher's Exact test to identify pathways that are enriched for our analytes of interest:
 
-```{r}
-pathwaydfids <- getPathwayFromAnalyte(c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
-        "hmdb:HMDB0000148", "ensembl:ENSG00000141510"))
-fisher.results <- RaMP::runCombinedFisherTest(pathwaydf = pathwaydfids)
+```{r, results='hide'}
+fisher.results <- RaMP::runCombinedFisherTest(analytes = c(
+  "ensembl:ENSG00000135679",
+  "ensembl:ENSG00000141510",
+  "chemspider:10026",
+  "hmdb:HMDB0006059",
+  "Chemspider:6405",
+  "CAS:5657-19-2",
+  "hmdb:HMDB0002511",
+  "chemspider:20171375",
+  "CAS:133-32-4",
+  "CAS:5746-90-7",
+  "CAS:477251-67-5",
+  "hmdb:HMDB0000695",
+  "chebi:15934",
+  "CAS:838-07-3",
+  "hmdb:HMDB0001308",
+  "hmdb:HMDB0004624",
+  "CAS:57-06-7",
+  "kegg:C00062",
+  "kegg:C00049",
+  "CAS:635-65-4",
+  "CAS:3724-65-0",
+  "kegg:C00487",
+  "kegg:C00114",
+  "CAS:65-46-3",
+  "CAS:1492-27-9",
+  "hmdb:HMDB0000450",
+  "CAS:696-04-8",
+  "CAS:582-60-5",
+  "CAS:20556-22-3",
+  "CAS:6418-78-6",
+  "CAS:68-94-0",
+  "kegg:C00262",
+  "chemspider:389600",
+  "chemspider:50",
+  "hmdb:HMDB0011167",
+  "CAS:498-24-8",
+  "CAS:62697-73-8",
+  "CAS:105-45-3",
+  "CAS:471-29-4",
+  "CAS:516-05-2",
+  "CAS:6539-57-7",
+  "CAS:503-48-0",
+  "CAS:30833-53-5",
+  "CAS:1113-83-3",
+  "CAS:1116-21-8",
+  "hmdb:HMDB0000791",
+  "CAS:471-87-4",
+  "CAS:1463-10-1",
+  "CAS:79617-96-2",
+  "CAS:692-29-5",
+  "CAS:4542-23-8",
+  "CAS:107-35-7",
+  "CAS:58-22-0",
+  "CAS:25976-00-5",
+  "CAS:75-50-3"
+))
+
 ```
 
 Once we have our fisher results we can format them into a new dataframe and filter the pathways for significance.
@@ -200,35 +253,43 @@ For this example we will be using an FDR p-value cutoff of 0.05.
 ```{r}
 #Returning Fisher Pathways and P-Values
 filtered.fisher.results <- FilterFishersResults(fisher.results, p_holmadj_cutoff = 0.05)
-
-print("Pathways with Holm-adjusted Pval < 0.05")
-print(filtered.fisher.results$fishresults[,c("pathwayName","Pval_combined_Holm")])
 ```
 
 Because RaMP combines pathways from multiple sources, pathways may be represented more than once.  Further, due to the hierarchical nature of pathways and because Fisher's testing assumes pathways are independent, subpathways and their parent pathways may appear in a list.
 To help group together pathways that represent similar biological processes, we have implemented a clustering algorithm that groups pathways together if they share analytes in common.
 
 ```{r}
-clusters <- RaMP::findCluster(filtered.fisher.results, perc_analyte_overlap = 0.2, 
-	min_pathway_tocluster = 3)
+clusters <- RaMP::findCluster(fisher.results,
+  perc_analyte_overlap = 0.2,
+  min_pathway_tocluster = 2, perc_pathway_overlap = 0.2
+)
 
-# To view the results in a nicer format:
-formattable(RaMP::write_FishersResults(fishResults=clusters))
+## print("Pathways with Holm-adjusted Pval < 0.05")
+
+datatable(clusters$fishresults %>% mutate_if(is.numeric, ~ round(., 8)),
+  rownames = FALSE
+)
+
+```
+
+To view clustered pathway results:
+
+```{r, fig.height = 10}
+pathwayResultsPlot(fisher.results, text_size = 10, perc_analyte_overlap = 0.2, 
+	min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE)
 ```
 
 ### Perform Chemical Enrichment
-After retrieving chemical classes of metabolites, the function chemicalClassEnrichment() function will perform overrepresentation analysis using a Fisher's test and output classes that show enrichment in the user input list of metabolites relative to the backgroud metabolite population (all meteabolites in RaMP).  
+After retrieving chemical classes of metabolites, the function chemicalClassEnrichment() function will perform overrepresentation analysis using a Fisher's test and output classes that show enrichment in the user input list of metabolites relative to the backgroud metabolite population (all meteabolites in RaMP).
 
 ```r
 metabolites.of.interest = c('hmdb:HMDB0000056','hmdb:HMDB0000439','hmdb:HMDB0000479','hmdb:HMDB0000532',
                             'hmdb:HMDB0001015','hmdb:HMDB0001138','hmdb:HMDB0029159','hmdb:HMDB0029412',
                             'hmdb:HMDB0034365','hmdb:HMDB0035227','hmdb:HMDB0007973','hmdb:HMDB0008057',
                             'hmdb:HMDB0011211')
-chemical.classes <- chemicalClassSurvey(mets = metabolites.of.interest)
-
-chemical.enrichment <- chemicalClassEnrichment(classData = chemical.classes)
+chemical.enrichment <- chemicalClassEnrichment(mets = metabolites.of.interest)
 classy_fire_classes <- chemical.enrichment$ClassyFire_class
-formattable(classy_fire_classes)
+classy_fire_classes
 ```
 
 
