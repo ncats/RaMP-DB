@@ -409,8 +409,9 @@ runFisherTest <- function(analytes, background = "database",
 #' Do fisher test for only one pathway from search result
 #' clicked on highchart
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
-#' @param background optional vector of all metabolites detected in study. This will be used as the background for the Fisher's contingency table for metabolites. If left NULL, all metabolites in RaMP originating in the pathway database of origin are used as background for testing
-#' @param biospecimen_background If NULL, test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"
+#' @param background optional vector of all metabolites detected in study to be used as the background for the Fisher's contingency table for 
+#' enrichment.  If value is "database", all metabolites in the RaMP database will be used as background.  Default: "database"
+#' @param biospecimen_background If "none", test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"
 #' @param NameOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param min_analyte if the number of analytes (gene or metabolite) in a pathway is
