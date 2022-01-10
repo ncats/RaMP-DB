@@ -607,7 +607,7 @@ getPathwayFromAnalyte <- function(analytes = "none",
                                   find_synonym = FALSE,
                                   NameOrIds = "ids",
                                   includeRaMPids = FALSE) {
-  now <- proc.time()
+    now <- proc.time()
   if (length(analytes) == 1) {
     if (analytes == "none") {
       return(NULL)
@@ -616,8 +616,7 @@ getPathwayFromAnalyte <- function(analytes = "none",
 
   list_metabolite <- getRaMPInfoFromAnalytes(
     analytes = analytes, NameOrIds = NameOrIds,
-    PathOrChem = "path",
-    find_synonym = find_synonym
+    PathOrChem = "path"
   )
   list_metabolite <- unique(list_metabolite$rampId)
   list_metabolite <- sapply(list_metabolite, shQuote)
@@ -678,7 +677,7 @@ getPathwayFromAnalyte <- function(analytes = "none",
     con <- connectToRaMP()
     df4 <- DBI::dbGetQuery(con, query4)
     DBI::dbDisconnect(con)
-    # convert latin1 encoding to UTF-8
+                                        # convert latin1 encoding to UTF-8
     df4$commonName <- sapply(as.character(df4$commonName), function(x) {
       if (stringi::stri_enc_mark(x) == "native") {
         x <- iconv(x, "latin1", "UTF-8")
