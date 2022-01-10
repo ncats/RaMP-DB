@@ -4,12 +4,7 @@
 \alias{getRaMPInfoFromAnalytes}
 \title{Internal function for extracting annotations, used by pathway and chemical enrichment test functions}
 \usage{
-getRaMPInfoFromAnalytes(
-  analytes,
-  NameOrIds = "ids",
-  PathOrChem = "path",
-  find_synonym = FALSE
-)
+getRaMPInfoFromAnalytes(analytes, NameOrIds = "ids", PathOrChem = "path")
 }
 \arguments{
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
@@ -17,8 +12,6 @@ getRaMPInfoFromAnalytes(
 \item{NameOrIds}{whether input is "names" or "ids" (default is "ids")}
 
 \item{PathOrChem}{return "path" information for pathways or "chem" for chemical class}
-
-\item{find_synonym}{find all synonyms or just return same synonym (T/F)}
 }
 \value{
 a list of rampIds for "path" or a dataframe of chemClass info
