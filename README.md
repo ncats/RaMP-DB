@@ -1,6 +1,8 @@
 [![Build Status](https://api.travis-ci.com/ncats/RaMP-DB.svg?branch=dev)](https://travis-ci.com/github/ncats/RaMP-DB)
 
-# New!  RaMP 2.0 is now released and includes an updated backend database with expanded annotations for >150,000 metabolites and ~14,000 genes/proteins.  Annotations include biological pathways, chemical classes and structures (for metabolites only), ontologies (metabolites only), and enzyme-metabolite relationships based on chemical reactions. Annotations are drawn from HMDB, KEGG (through HMDB), Lipid-MAPS, WikiPathways, Reactome, and CheBI. 
+# New!  RaMP 2.0!
+
+RaMP 2.0 is now released and includes an updated backend database with expanded annotations for >150,000 metabolites and ~14,000 genes/proteins.  Annotations include biological pathways, chemical classes and structures (for metabolites only), ontologies (metabolites only), and enzyme-metabolite relationships based on chemical reactions. Annotations are drawn from HMDB, KEGG (through HMDB), Lipid-MAPS, WikiPathways, Reactome, and CheBI. 
 
 This R package includes functions that allow users to interface with this up-do-date and comprehensive resource.  Functionalities include 1) simple and batch queries for pathways, ontologies, chemical annotations, and reaction-level gene-metabolite relationships; 2) pathway and chemical enrichment analyses.
 
@@ -14,10 +16,13 @@ Please check out the following paper for further details.
 The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene/protein biological, chemical and other from multiple sources. The database is relational and it can be directly downloaded as a MySQL dump (under the folder inst/extdata) for integration into any tools.  Please note that this project is in continuous development and we appreciated any feedback. 
 
 ## Contact Info:
-For any questions or feedback, please send us a note at [NCATSRaMP@mail.nih.gov](NCATSRaMP@mail.nih.gov).  If you find a bug, please submit an issue through this GitHub repo.   
+For any questions or feedback, please send us a note at [NCATSRaMP@mail.nih.gov](NCATSRaMP@mail.nih.gov).  
+
+If you find a bug, please submit an issue through this GitHub repo.   
 
 ## Basic Features:
 The R packages and associated app perform  the following queries:
+
 	1. Retrieve analytes (genes, proteins, metabolites) given pathway(s) as input.
 	2. Retrieve pathway annotations given analytes as input.
 	3. Retrieve chemical annotations/structures given metabolites as input.
@@ -25,6 +30,7 @@ The R packages and associated app perform  the following queries:
 	5. Retrieve ontologies (e.g. biospecimen location, disease, etc.) given input meteabolites.
 
 The following analyses are also supported:
+
 	1. Multi-omic pathway enrichment analysis
 	2. Chemical enrichment analyses
 
