@@ -454,7 +454,9 @@ sysdataObject <- function() {
             is.data.frame(wiki_gene),
             is.data.frame(wiki_metab))
 
+
   #uncomment usethis::use_data function to create sysdata.rda object
+  # rampdb_version = 'v2.0.5'
   # usethis::use_data(genes_result,
   #                    metabolites_result,
   #                    analyte_result,
@@ -466,6 +468,7 @@ sysdataObject <- function() {
   #                    reactome_metab,
   #                    wiki_gene,
   #                    wiki_metab,
+  #                    rampdb_version,
   #                    overwrite = TRUE,
   #                    internal = TRUE)
 
@@ -482,6 +485,7 @@ sysdataObject <- function() {
 #username = <username>
 #conpass = <connection_password>
 
+
 # run these 3 methods, these generate files in the R RaMP library area
 # if commiting to git, then copy the new files into your R git project inst/extdata
 # pkg.globals <- setConnectionToRaMP(dbname=dbname,username=username,conpass=conpass,host=hostname)
@@ -495,7 +499,7 @@ sysdataObject <- function() {
 # uncomment usethis::use_data in the function just above. This command will builds sysdata.Rda to contain the objects
 #
 # Then execute the function definition above to establish the updated function. Then execute the method to save R/sysdata.rda.
-# sysdataObject()
+#
 #
 
 

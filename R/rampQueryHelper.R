@@ -465,7 +465,7 @@ rampFindClassInfoFromSourceId<-function(sourceIds){
     idsToCheck <- paste("'" ,idsToCheck, "'", sep = "")
     conn <- connectToRaMP()
     sql <- paste("select * from source where sourceId in (",idsToCheck,")")
-    
+
     potentialMultiMappings <- RMariaDB::dbGetQuery(conn, sql)
     potentialMultiMappings <- potentialMultiMappings %>%
         dplyr::select("sourceId","rampId") %>%
@@ -480,7 +480,7 @@ rampFindClassInfoFromSourceId<-function(sourceIds){
         print(paste0(noAmbiguous,
                      " metabolite(s) could not be unambiguously mapped to a chemical structure and have been discarded"))
     }
-    
+
                                         # first handle metabolites of interest
     metStr <- paste(sourceIds, collapse = "','")
     metStr <- paste("'" ,metStr, "'", sep = "")
@@ -489,12 +489,12 @@ rampFindClassInfoFromSourceId<-function(sourceIds){
 
     sql <- paste("select distinct a.ramp_id, b.sourceId, a.class_level_name, a.class_name, a.source from metabolite_class a, source b
           where b.rampId = a.ramp_id and b.sourceId in (",metStr,")")
-    
+
     metsData <- RMariaDB::dbGetQuery(conn, sql)
-    
+
                                         # need to filter for our specific source ids
     metsData <- subset(metsData, "sourceId" %in% sourceIds)
-    
+
     DBI::dbDisconnect(conn)
     return(metsData)
 }
@@ -513,9 +513,11 @@ getRaMPInfoFromAnalytes<-function(analytes,
         if(NameOrIds == "names"){
             synonym <- rampFindSynonymFromSynonym(synonym=analytes,
                                                   find_synonym=find_synonym)
-            
+
+            synonym <- data.frame(synonym)
             colnames(synonym)[1]="commonName"
             synonym$commonName <- tolower(synonym$commonName)
+            print(dim(synonym))
             if(nrow(synonym)==0) {
                 stop("Could not find any matches to the analytes entered.  If pasting, please make sure the names are delimited by end of line (not analyte per line)\nand that you are selecting 'names', not 'ids'");
             }
@@ -552,16 +554,16 @@ buildFrequencyTables<-function(inputdf){
     pid <- unique(inputdf$pathwayRampId);
     list_pid <- sapply(pid,shQuote)
     list_pid <- paste(list_pid,collapse = ",")
-    
-    ## Retrieve compound ids associated with background pathways and count 
+
+    ## Retrieve compound ids associated with background pathways and count
     query <- paste0("select * from analytehaspathway where pathwayRampId in (",
                      list_pid,")")
-    
+
     con <- connectToRaMP()
-    
+
     input_RampIds <- DBI::dbGetQuery(con,query)
     DBI::dbDisconnect(con)
-    
+
     return(input_RampIds)
 }
 
@@ -575,12 +577,12 @@ segregateDataBySource<-function(input_RampIds){
     input_RampId_C <- input_RampIds[grep("RAMP_C", input_RampIds$rampId), ]
     unique_input_RampId_C <- unique(input_RampId_C[,c("rampId", "pathwayRampId")])
     unique_pathwayRampId_source <- unique(input_RampId_C[,c("pathwayRampId", "pathwaySource")])
-    
+
     freq_unique_input_RampId_C <- as.data.frame(table(unique_input_RampId_C[,"pathwayRampId"]))
-    
+
     names(freq_unique_input_RampId_C)[1] = 'pathwayRampId'
     merge_Pathwayfreq_source <- merge(freq_unique_input_RampId_C, unique_pathwayRampId_source, by="pathwayRampId")
-    
+
     # subset metabolite data based on source -  kegg, reactome, wiki
 
     input_kegg_metab <- subset(merge_Pathwayfreq_source, merge_Pathwayfreq_source$pathwaySource == "kegg")
@@ -592,9 +594,9 @@ segregateDataBySource<-function(input_RampIds){
     input_RampId_G <- input_RampIds[grep("RAMP_G", input_RampIds$rampId), ]
     unique_input_RampId_G <- unique(input_RampId_G[,c("rampId", "pathwayRampId")])
     unique_pathwayG_source <- unique(input_RampId_G[,c("pathwayRampId", "pathwaySource")])
-    
+
     freq_unique_input_RampId_G <- as.data.frame(table(unique_input_RampId_G[,"pathwayRampId"]))
-    
+
     names(freq_unique_input_RampId_G)[1] = 'pathwayRampId'
     merge_PathwayG_source <- merge(freq_unique_input_RampId_G, unique_pathwayG_source, by="pathwayRampId")
 
