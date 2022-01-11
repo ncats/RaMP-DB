@@ -17,10 +17,10 @@ runFisherTest <- function(analytes, background = "database",
                           MCall = T, alternative = "less") {
   now <- proc.time()
   print("Fisher Testing ......")
-
   pathwaydf <- getPathwayFromAnalyte(analytes,
     includeRaMPids = TRUE,
-    NameOrIds = NameOrIds
+    NameOrIds = NameOrIds,
+    find_synonym=FALSE
   )
 
   if (analyte_type == "metabolites") {
@@ -505,7 +505,7 @@ runCombinedFisherTest <- function(analytes, background = "database",
     )
   } else {
     # merge the results if both genes and metabolites were run
-    G <- M <- 1
+      G <- M <- 1
     allfish <- merge(outmetab, outgene,
       by = "pathwayRampId", all.x = T, all.y = T
     )
@@ -685,16 +685,18 @@ getPathwayFromAnalyte <- function(analytes = "none",
         x
       }
     })
+    mdf <- merge(mdf, df4, all.x = T, by = "rampId")
   }
-  ## browser()
-  mdf <- merge(mdf, df4, all.x = T, by.y = "rampId")
+  ## mdf <- merge(mdf, df4, all.x = T, by.y = "rampId")
   mdf$commonName <- tolower(mdf$commonName)
-  if (find_synonym) {
-    mdf <- merge(mdf, "synonym", all.x = T, by.y = "rampId")
-  } else {
+  ## if (find_synonym) {
+  ##   mdf <- merge(mdf, "synonym", all.x = T, by = "rampId")
+  ## } else
+    if(NameOrIds == "names" & !find_synonym){
       mdf <- mdf[unlist(lapply(tolower(analytes),
                                function(x) which(tolower(mdf$commonName) %in% x))),]
   }
+    
   out <- mdf[!duplicated(mdf), ]
   # For now, not returning HMDB pathways because they include the 30K
   # new pathways that are mainly drug and lipid pathways (need more proper
@@ -708,14 +710,16 @@ getPathwayFromAnalyte <- function(analytes = "none",
       )
     ])
   } else {
-    return(out[
+    out <- out[
       which(out$pathwaysource != "hmdb"),
       c(
         "commonName", "pathwayName", "pathwaysource",
         "pathwaysourceId", "rampId", "pathwayRampId"
       )
     ] %>%
-      cleanup())
+        cleanup()
+    out <- out[!duplicated(out), ]
+    return(out)
   }
 }
 
