@@ -19,7 +19,7 @@ runCombinedFisherTest(
 \arguments{
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
-\item{background}{optional vector of all metabolites detected in study to be used as the background for the Fisher's contingency table for 
+\item{background}{optional vector of all metabolites detected in study to be used as the background for the Fisher's contingency table for
 enrichment.  If value is "database", all metabolites in the RaMP database will be used as background.  Default: "database"}
 
 \item{biospecimen_background}{If "none", test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"}
@@ -44,8 +44,10 @@ clicked on highchart
 }
 \examples{
 \dontrun{
-pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
-conpass = "", host = "localhost")
+pkg.globals <- setConnectionToRaMP(
+  dbname = "ramp2", username = "root",
+  conpass = "", host = "localhost"
+)
 pathwaydf <- getPathwayFromAnalyte(c("MDM2", "TP53", "glutamate", "creatinine"),
   NameOrIds = "names"
 )

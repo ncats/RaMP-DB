@@ -4,19 +4,18 @@
 #' and entire string separated by comma are working.
 #' @param synonym name to search for
 #' @param full bool if return whole data.frame
-#' @param find_synonym bool if find all synonyms or just return same synonym
-#' as input (there are some common synonyms that will mess up whole searching)
+#' @param return_rampIds bool to return ramp Ids with output
+#' (there are some common synonyms that will mess up whole searching)
 #' @return a data frame that contains synonym in the first column rampId in the second column
 rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
-	find_synonym = FALSE){
-
+	return_rampIds = FALSE){
   if(is.character(synonym)){
     if(grepl("\n",synonym)[1]){
       list_metabolite <- strsplit(synonym,"\n")
       list_metabolite <- unlist(list_metabolite)
-    } else if(grepl(",",synonym)[1]){
-      list_metabolite <- strsplit(synonym,",")
-      list_metabolite <- unlist(list_metabolite)
+    ## } else if(grepl(",",synonym)[1]){
+    ##   list_metabolite <- strsplit(synonym,",")
+    ##   list_metabolite <- unlist(list_metabolite)
     } else {
       list_metabolite <- synonym
     }
@@ -26,19 +25,7 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
     message("Wrong Format of argument")
     return(NULL)
   }
-  if(!find_synonym){
-    #message("Dont Find synonym due to common synonyms (Triglyceride?).")
-    list_metabolite <- unique(list_metabolite)
-    list_metabolite <- sapply(list_metabolite,shQuote)
-    list_metabolite <- paste(list_metabolite,collapse = ",")
-    query <- paste0("select Synonym as origins,rampId from analytesynonym where Synonym in(",
-                    list_metabolite,
-                    ");")
-  con <- connectToRaMP()
-    df1 <- DBI::dbGetQuery(con,query)
-    DBI::dbDisconnect(con)
-    return(df1)
-  }
+
   list_metabolite <- unique(list_metabolite)
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
@@ -49,19 +36,24 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
 
   df1 <- DBI::dbGetQuery(con,query)
   DBI::dbDisconnect(con)
-  rampid <- df1$rampId
-  rampid <- sapply(rampid,shQuote)
-  rampid <- paste(rampid,collapse = ",")
-  query <- paste0("select * from analytesynonym where rampId in(",rampid,");")
-  con <- connectToRaMP()
-  df2 <- DBI::dbGetQuery(con,query)
-  DBI::dbDisconnect(con)
-  df2 <- merge(df1,df2)
-  if(full){
-    return(df2)
+
+  if(!return_rampIds){
+      return(df1)
+  }else{
+      rampid <- df1$rampId
+      rampid <- sapply(rampid,shQuote)
+      rampid <- paste(rampid,collapse = ",")
+      query <- paste0("select * from analytesynonym where rampId in(",rampid,");")
+      con <- connectToRaMP()
+      df2 <- DBI::dbGetQuery(con,query)
+      DBI::dbDisconnect(con)
+      df2 <- merge(df1,df2)
+      if(full){
+          return(df2)
+      }
+      synonym <- df2$Synonym
+      return(synonym)
   }
-  synonym <- df2$Synonym
-  synonym
 }
 #' Find all source from given list of RaMP Ids
 #' @param rampId could be a data frame return by rampFindSynonymFromSynonym
@@ -502,19 +494,16 @@ rampFindClassInfoFromSourceId<-function(sourceIds){
 #' Internal function for extracting annotations, used by pathway and chemical enrichment test functions
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
 #' @param PathOrChem return "path" information for pathways or "chem" for chemical class
-#' @param find_synonym find all synonyms or just return same synonym (T/F)
 #' @param NameOrIds whether input is "names" or "ids" (default is "ids")
 #' @return a list of rampIds for "path" or a dataframe of chemClass info
 getRaMPInfoFromAnalytes<-function(analytes,
                                   NameOrIds = "ids",
-                                  PathOrChem = "path",
-                                  find_synonym = FALSE){
+                                  PathOrChem = "path"){
     if(PathOrChem == "path"){
         if(NameOrIds == "names"){
             synonym <- rampFindSynonymFromSynonym(synonym=analytes,
-                                                  find_synonym=find_synonym)
+                                                  return_rampIds=FALSE)
 
-            synonym <- data.frame(synonym)
             colnames(synonym)[1]="commonName"
             synonym$commonName <- tolower(synonym$commonName)
             print(dim(synonym))
