@@ -30,8 +30,10 @@ returns associated pathways
 }
 \examples{
 \dontrun{
-pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
-conpass = "", host = "localhost")
+pkg.globals <- setConnectionToRaMP(
+  dbname = "ramp2", username = "root",
+  conpass = "", host = "localhost"
+)
 mypath <- getPathwayFromAnalyte(analytes = c("2-hydroxyglutarate", "glutamate"))
 }
 }
