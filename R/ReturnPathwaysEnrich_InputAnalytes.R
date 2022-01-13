@@ -33,6 +33,7 @@ runFisherTest <- function(analytes, background = "database",
     return(NULL)
   }
 
+
   if (background != "database") {
     backgrounddf <- getPathwayFromAnalyte(background,
       includeRaMPids = TRUE,
@@ -89,6 +90,7 @@ runFisherTest <- function(analytes, background = "database",
   # Close connection, then deduplicate id list
   DBI::dbDisconnect(con)
   allids <- allids[!duplicated(allids), ]
+
 
   if ((analyte_type == "metabolites")) {
 
@@ -696,7 +698,7 @@ getPathwayFromAnalyte <- function(analytes = "none",
       mdf <- mdf[unlist(lapply(tolower(analytes),
                                function(x) which(tolower(mdf$commonName) %in% x))),]
   }
-    
+
   out <- mdf[!duplicated(mdf), ]
   # For now, not returning HMDB pathways because they include the 30K
   # new pathways that are mainly drug and lipid pathways (need more proper
