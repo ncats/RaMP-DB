@@ -54,6 +54,7 @@ getEntityCountsFromSourceDBs<-function(){
 #' Retrieve RaMP Analyte Source Intersections, these indicate the level of analyte overlaps between our sources
 #' @param analyteType returns analyte overlaps for 'metabolites' or 'genes'
 #' @param format can be one of either 'json', 'upsetR_expression'
+#' @param scope value in c('global', 'mapped-to-pathway'), indicates all metabolite stats should be returned, or just those asssociated with pathways.
 #' @return current analyte overlaps counts between current data sources, for the specified analyteType
 #' @examples
 #' \dontrun{
@@ -61,11 +62,19 @@ getEntityCountsFromSourceDBs<-function(){
 #' jsonResult <- getRaMPAnalyteIntersections(analyteType='genes', format='json')
 #' }
 #' @export
-getRaMPAnalyteIntersections<-function(analyteType='metabolites', format='json'){
+getRaMPAnalyteIntersections<-function(analyteType='metabolites', format='json', scope='mapped-to-pathway'){
   if(analyteType == 'metabolites') {
-    query<-"select met_intersects_json from db_version where load_timestamp order by load_timestamp desc limit 1"
+    if(scope == 'global') {
+      query<-"select met_intersects_json from db_version where load_timestamp order by load_timestamp desc limit 1"
+    } else {
+      query<-"select met_intersects_json_pw_mapped from db_version where load_timestamp order by load_timestamp desc limit 1"
+    }
   } else if (analyteType == 'genes') {
-    query<-"select gene_intersects_json from db_version where load_timestamp order by load_timestamp desc limit 1"
+    if(scope == 'global') {
+      query<-"select gene_intersects_json from db_version where load_timestamp order by load_timestamp desc limit 1"
+    } else {
+      query<-"select gene_intersects_json_pw_mapped from db_version where load_timestamp order by load_timestamp desc limit 1"
+    }
   } else {
     warning("The analyteType must be one of c('metabolites','genes')")
     #return an empty dataframe
