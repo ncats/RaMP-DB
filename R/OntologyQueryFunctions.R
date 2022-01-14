@@ -231,7 +231,8 @@ getMetaFromOnto <- function(ontology) {
           }
       })
       mdf_final <- do.call(rbind.data.frame, mdf_final)
-    mdf_final <- mdf_final[c("Metabolites", "sourceId", "Ontology", "HMDBOntologyType")]
+      mdf_final <- mdf_final[c("Metabolites", "sourceId", "Ontology", "HMDBOntologyType")]
+      mdf_final <- unique(mdf_final)
     # Collapse rows for each metabolite:
     # Metabolites<-c()
     # print("NO ERROR YET")

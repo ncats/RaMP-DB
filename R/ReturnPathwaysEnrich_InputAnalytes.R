@@ -32,12 +32,13 @@ runFisherTest <- function(analytes, background = "database",
   if (nrow(pathwaydf) == 0) {
     return(NULL)
   }
-
-  if (background != "database") {
-    backgrounddf <- getPathwayFromAnalyte(background,
-      includeRaMPids = TRUE,
-      NameOrIds = NameOrIds
-    )
+  if (length(background)!=1){
+      if (background != "database") {
+          backgrounddf <- getPathwayFromAnalyte(background,
+                                                includeRaMPids = TRUE,
+                                                NameOrIds = NameOrIds
+                                                )
+      }
   }
 
   if (biospecimen_background != "none") {
@@ -65,17 +66,18 @@ runFisherTest <- function(analytes, background = "database",
   }
 
   ## Check that all metabolites of interest are in the background
-  if (background != "database") {
-    if (length(setdiff(pathwaydf$rampId, backgrounddf$rampId) != 0)) {
-      stop("All analytes in pathwaydf must also be in backgrounddf")
-    }
+  if(length(background)!=1){
+      if (background != "database") {
+          if (length(setdiff(pathwaydf$rampId, backgrounddf$rampId) != 0)) {
+              stop("All analytes in pathwaydf must also be in backgrounddf")
+          }
+      }
   }
 
   ## Initialize empty contingency table for later
   contingencyTb <- matrix(0, nrow = 2, ncol = 2)
   colnames(contingencyTb) <- c("In Pathway", "Not In Pathway")
   rownames(contingencyTb) <- c("All Metabolites", "User's Metabolites")
-
   ## Get pathway ids that contain the user analytes
   pid <- unique(pathwaydf$pathwayRampId)
   list_pid <- sapply(pid, shQuote)
@@ -143,19 +145,23 @@ runFisherTest <- function(analytes, background = "database",
       if (length(grep("RAMP_C", ids_inpath)) == 0) {
         user_in_pathway <- 0
       } else {
-        user_in_pathway <- length(unique(grep("RAMP_C", ids_inpath, value = TRUE)))
-        if (background != "database") {
-          ids_inpath_bg <- backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]
-          bg_in_pathway <- length(unique(grep("RAMP_C", ids_inpath_bg, value = TRUE)))
-        }
+          user_in_pathway <- length(unique(grep("RAMP_C", ids_inpath, value = TRUE)))
+          if(length(background)!=1){
+              if (background != "database") {
+                  ids_inpath_bg <- backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]
+                  bg_in_pathway <- length(unique(grep("RAMP_C", ids_inpath_bg, value = TRUE)))
+              }
+          }
       }
       inputkegg <- segregated_id_list[[1]][1][[1]]
       inputreact <- segregated_id_list[[1]][2][[1]]
       inputwiki <- segregated_id_list[[1]][3][[1]]
-      tot_user_analytes <- length(grep("RAMP_C", unique(pathwaydf$rampId)))
-      if (background != "database") {
-        tot_bg_analytes <- length(grep("RAMP_C", unique(backgrounddf$rampId)))
-      }
+        tot_user_analytes <- length(grep("RAMP_C", unique(pathwaydf$rampId)))
+        if(length(background)!=1){
+            if (background != "database") {
+                tot_bg_analytes <- length(grep("RAMP_C", unique(backgrounddf$rampId)))
+            }
+        }
       ## if(background != "database"){
       ##     inputkegg_bg <- segregated_id_list_bg[[1]][1][[1]]
       ##     inputreact_bg <- segregated_id_list_bg[[1]][2][[1]]
@@ -195,27 +201,47 @@ runFisherTest <- function(analytes, background = "database",
       # fill the rest of the table out
 
       ## user_in_pathway <- length(unique(pathwaydf[which(pathwaydf$pathwayRampId==i),"rampId"]))
-      if (background != "database") {
-        bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]))
+      if(length(background)!=1){
+          if (background != "database") {
+              bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]))
+          }
       }
       # EM - Corrected the following line that initially counted all input analytes without regard as to whether
       # whether they were genes or metabolites.
       # user_out_pathway <- length(unique(pathwaydf$rampId)) - user_in_pathway
       user_out_pathway <- tot_user_analytes - user_in_pathway
 
-      if (background != "database") {
-        bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]))
-        bg_out_pathway <- tot_bg_analytes - bg_in_pathway
+      if(length(background)!=1){
+          if (background != "database") {
+              bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]))
+              bg_out_pathway <- tot_bg_analytes - bg_in_pathway
+          }
       }
 
-      contingencyTb[1, 1] <- ifelse(background == "database",
-        tot_in_pathway - user_in_pathway,
-        bg_in_pathway
-      )
-      contingencyTb[1, 2] <- ifelse(background == "database",
-        tot_out_pathway - user_out_pathway,
-        bg_out_pathway
-      )
+      if(class(background) == "character"){
+          if(background == "database"){
+              contingencyTb[1, 1] = tot_in_pathway - user_in_pathway
+          }
+      }else{
+          contingencyTb[1, 1] = bg_in_pathway
+      }
+
+      if(class(background) == "character"){
+          if(background == "database"){
+              contingencyTb[1, 2] = tot_out_pathway - user_out_pathway
+          }
+      }else{
+          contingencyTb[1, 2] = bg_out_pathway
+      }
+      
+      ## contingencyTb[1, 1] <- ifelse(background == "database",
+      ##   tot_in_pathway - user_in_pathway,
+      ##   bg_in_pathway
+      ## )
+      ## contingencyTb[1, 2] <- ifelse(background == "database",
+      ##   tot_out_pathway - user_out_pathway,
+      ##   bg_out_pathway
+      ## )
       contingencyTb[2, 1] <- user_in_pathway
       contingencyTb[2, 2] <- user_out_pathway
       # Put the test into a try catch in case there's an issue, we'll have some details on the contingency matrix
@@ -245,7 +271,7 @@ runFisherTest <- function(analytes, background = "database",
   } # end for loop
   # Now run fisher's tests for all other pids (all pathways not covered in dataset)
   if (MCall == T) {
-    # Now run fisher's tests for all other pids
+                                        # Now run fisher's tests for all other pids
     query <- "select distinct(pathwayRampId) from analytehaspathway where pathwaySource != 'hmdb';"
     con <- connectToRaMP()
     allpids <- DBI::dbGetQuery(con, query)
@@ -470,7 +496,6 @@ runCombinedFisherTest <- function(analytes, background = "database",
   if (!is.null(outgene)) {
     G <- 1
   }
-
   if (is.null(outgene) & !is.null(outmetab)) {
     out <- outmetab
     fdr <- stats::p.adjust(out$Pval, method = "fdr")
@@ -504,7 +529,7 @@ runCombinedFisherTest <- function(analytes, background = "database",
       by = "pathwayRampId"
     )
   } else {
-    # merge the results if both genes and metabolites were run
+                                        # merge the results if both genes and metabolites were run
       G <- M <- 1
     allfish <- merge(outmetab, outgene,
       by = "pathwayRampId", all.x = T, all.y = T
@@ -537,24 +562,29 @@ runCombinedFisherTest <- function(analytes, background = "database",
     out <- cbind(out, holm)
     colnames(out)[ncol(out)] <- "Pval_combined_Holm"
 
-    keepers <- intersect(
-      c(
-        which(out$Num_In_Path_Metab >= min_analyte),
-        which(is.na(out$Num_In_Path_Metab))
-      ),
-      c(
-        which(out$Num_In_Path_Gene >= min_analyte),
-        which(is.na(out$Num_In_Path_Gene))
-      )
-    )
+    ## keepers <- intersect(
+    ##   c(
+    ##     which(out$Num_In_Path_Metab >= min_analyte),
+    ##     which(is.na(out$Num_In_Path_Metab))
+    ##   ),
+    ##   c(
+    ##     which(out$Num_In_Path_Gene >= min_analyte),
+    ##     which(is.na(out$Num_In_Path_Gene))
+    ##   )
+      ## )
 
+          keepers <- unique(
+              c(which(out$Num_In_Path_Metab >= min_analyte),
+                which(out$Num_In_Path_Gene >= min_analyte)
+                )
+          )
 
     # Now that p-values are calculated, only return pathways that are in the list
     # of pathways that contain user genes and metabolites
     pathwaydf <- getPathwayFromAnalyte(analytes,
       includeRaMPids = TRUE,
       NameOrIds = NameOrIds
-    )
+      )
     out2 <- merge(out[keepers, ],
       pathwaydf[, c(
         "pathwayName", "pathwayRampId", "pathwaysourceId",
