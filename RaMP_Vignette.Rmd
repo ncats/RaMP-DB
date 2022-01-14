@@ -127,9 +127,9 @@ RaMP contains information on where the metabolites originate from the biospecime
 
 To retrieve ontologies that are associated with our metabolites we can use getOntoFromMeta(). This function takes in a vector of metabolites as an input and returns a vector comprised of the ontologies from the user's defined metabolites.
 ```{r}
-metabolites.of.interest <- c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
+analytes.of.interest <- c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
         "hmdb:HMDB0000148", "ensembl:ENSG00000141510")
-new.ontologies <- RaMP::getOntoFromMeta(analytes = metabolites.of.interest)
+new.ontologies <- RaMP::getOntoFromMeta(analytes = analytes.of.interest)
 datatable(new.ontologies)
 ```
 
@@ -139,15 +139,15 @@ The user may want to know what gene transcripts encode enzymes which can catalyz
 We can return the gene transcripts using the rampFastCata() function. To use it the user needs to provide a vector of metabolites they are interested in and the connection information for MySQL. The user can also input a vector of protein IDs or gene transcripts to return the metabolites involved in chemical reactions with the input proteins or gene transcript encoded proteins.
 ```{r}
 #Input Metabolites
-metabolites.of.interest <- c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
+analytes.of.interest <- c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
         "hmdb:HMDB0000148", "ensembl:ENSG00000141510")
 
-new.transcripts <- rampFastCata(analytes = metabolites.of.interest)
+new.transcripts <- rampFastCata(analytes = analytes.of.interest)
 
 datatable(new.transcripts)
 
 #Input Proteins
-proteins.of.interest <- c("hmdb:HMDBP00214", "hmdb:HMDBP00703", "kegg:2346")
+proteins.of.interest <- c("uniprot:094808", "uniprot:Q99259")
 
 new.metabolites <- rampFastCata(analytes = proteins.of.interest)
 
@@ -188,62 +188,30 @@ RaMP performs pathway and chemical class overrespresentation analysis using Fish
 Using the pathways that our analytes map to, captured in the pathwaydfids data frame in the previous step, we can now run Fisher's Exact test to identify pathways that are enriched for our analytes of interest:
 
 ```{r, results='hide'}
-fisher.results <- RaMP::runCombinedFisherTest(analytes = c(
-  "ensembl:ENSG00000135679",
-  "ensembl:ENSG00000141510",
-  "chemspider:10026",
-  "hmdb:HMDB0006059",
-  "Chemspider:6405",
-  "CAS:5657-19-2",
-  "hmdb:HMDB0002511",
-  "chemspider:20171375",
-  "CAS:133-32-4",
-  "CAS:5746-90-7",
-  "CAS:477251-67-5",
-  "hmdb:HMDB0000695",
-  "chebi:15934",
-  "CAS:838-07-3",
-  "hmdb:HMDB0001308",
-  "hmdb:HMDB0004624",
-  "CAS:57-06-7",
-  "kegg:C00062",
-  "kegg:C00049",
-  "CAS:635-65-4",
-  "CAS:3724-65-0",
-  "kegg:C00487",
-  "kegg:C00114",
-  "CAS:65-46-3",
-  "CAS:1492-27-9",
-  "hmdb:HMDB0000450",
-  "CAS:696-04-8",
-  "CAS:582-60-5",
-  "CAS:20556-22-3",
-  "CAS:6418-78-6",
-  "CAS:68-94-0",
-  "kegg:C00262",
-  "chemspider:389600",
-  "chemspider:50",
-  "hmdb:HMDB0011167",
-  "CAS:498-24-8",
-  "CAS:62697-73-8",
-  "CAS:105-45-3",
-  "CAS:471-29-4",
-  "CAS:516-05-2",
-  "CAS:6539-57-7",
-  "CAS:503-48-0",
-  "CAS:30833-53-5",
-  "CAS:1113-83-3",
-  "CAS:1116-21-8",
-  "hmdb:HMDB0000791",
-  "CAS:471-87-4",
-  "CAS:1463-10-1",
-  "CAS:79617-96-2",
-  "CAS:692-29-5",
-  "CAS:4542-23-8",
-  "CAS:107-35-7",
-  "CAS:58-22-0",
-  "CAS:25976-00-5",
-  "CAS:75-50-3"
+fisher.results <- runCombinedFisherTest(analytes = c(
+                                                  "hmdb:HMDB0000033",
+                                                  "hmdb:HMDB0000052",
+                                                  "hmdb:HMDB0000094",
+                                                  "hmdb:HMDB0000161",
+                                                  "hmdb:HMDB0000168",
+                                                  "hmdb:HMDB0000191",
+                                                  "hmdb:HMDB0000201",
+                                                  "chemspider:10026",
+                                                  "hmdb:HMDB0006059",
+                                                  "Chemspider:6405",
+                                                  "CAS:5657-19-2",
+                                                  "hmdb:HMDB0002511",
+                                                  "chemspider:20171375",
+                                                  "CAS:133-32-4",
+                                                  "CAS:5746-90-7",
+                                                  "CAS:477251-67-5",
+                                                  "hmdb:HMDB0000695",
+                                                  "chebi:15934",
+                                                  "CAS:838-07-3",
+                                                  "hmdb:HMDBP00789",
+                                                  "hmdb:HMDBP00283",
+                                                  "hmdb:HMDBP00284",
+                                                  "hmdb:HMDBP00850"
 ))
 
 ```
@@ -259,7 +227,7 @@ Because RaMP combines pathways from multiple sources, pathways may be represente
 To help group together pathways that represent similar biological processes, we have implemented a clustering algorithm that groups pathways together if they share analytes in common.
 
 ```{r}
-clusters <- RaMP::findCluster(fisher.results,
+clusters <- RaMP::findCluster(filtered.fisher.results,
   perc_analyte_overlap = 0.2,
   min_pathway_tocluster = 2, perc_pathway_overlap = 0.2
 )
@@ -274,8 +242,8 @@ datatable(clusters$fishresults %>% mutate_if(is.numeric, ~ round(., 8)),
 
 To view clustered pathway results:
 
-```{r, fig.height = 10}
-pathwayResultsPlot(fisher.results, text_size = 10, perc_analyte_overlap = 0.2, 
+```{r, fig.height = 8}
+pathwayResultsPlot(filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2, 
 	min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE)
 ```
 
@@ -289,7 +257,10 @@ metabolites.of.interest = c('hmdb:HMDB0000056','hmdb:HMDB0000439','hmdb:HMDB0000
                             'hmdb:HMDB0011211')
 chemical.enrichment <- chemicalClassEnrichment(mets = metabolites.of.interest)
 classy_fire_classes <- chemical.enrichment$ClassyFire_class
-classy_fire_classes
+```
+
+```{r}
+print(classy_fire_classes)
 ```
 
 
