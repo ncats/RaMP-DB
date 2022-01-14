@@ -4,12 +4,18 @@
 \alias{getRaMPAnalyteIntersections}
 \title{Retrieve RaMP Analyte Source Intersections, these indicate the level of analyte overlaps between our sources}
 \usage{
-getRaMPAnalyteIntersections(analyteType = "metabolites", format = "json")
+getRaMPAnalyteIntersections(
+  analyteType = "metabolites",
+  format = "json",
+  scope = "mapped-to-pathway"
+)
 }
 \arguments{
 \item{analyteType}{returns analyte overlaps for 'metabolites' or 'genes'}
 
 \item{format}{can be one of either 'json', 'upsetR_expression'}
+
+\item{scope}{value in c('global', 'mapped-to-pathway'), indicates all metabolite stats should be returned, or just those asssociated with pathways.}
 }
 \value{
 current analyte overlaps counts between current data sources, for the specified analyteType

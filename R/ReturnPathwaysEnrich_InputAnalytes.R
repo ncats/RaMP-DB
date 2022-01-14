@@ -92,6 +92,7 @@ runFisherTest <- function(analytes, background = "database",
   DBI::dbDisconnect(con)
   allids <- allids[!duplicated(allids), ]
 
+
   if ((analyte_type == "metabolites")) {
 
     # JCB replaced these lines. Reducing to a source, extracting compound indices, then applying to the full set of rampIds
@@ -726,7 +727,7 @@ getPathwayFromAnalyte <- function(analytes = "none",
       mdf <- mdf[unlist(lapply(tolower(analytes),
                                function(x) which(tolower(mdf$commonName) %in% x))),]
   }
-    
+
   out <- mdf[!duplicated(mdf), ]
   # For now, not returning HMDB pathways because they include the 30K
   # new pathways that are mainly drug and lipid pathways (need more proper
