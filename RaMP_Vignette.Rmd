@@ -247,7 +247,7 @@ pathwayResultsPlot(filtered.fisher.results, text_size = 8, perc_analyte_overlap 
 ```
 
 ### Perform Chemical Enrichment
-After retrieving chemical classes of metabolites, the function chemicalClassEnrichment() function will perform overrepresentation analysis using a Fisher's test and output classes that show enrichment in the user input list of metabolites relative to the backgroud metabolite population (all meteabolites in RaMP).
+After retrieving chemical classes of metabolites, the function chemicalClassEnrichment() function will perform overrepresentation analysis using a Fisher's test and output classes that show enrichment in the user input list of metabolites relative to the backgroud metabolite population (all meteabolites in RaMP).  The function performs enrichment analysis for Classyfire classes, sub-classess, and super-classes, and for LipidMaps categories, main classess, and sub classes.
 
 ```{r message=F}
 metabolites.of.interest = c('hmdb:HMDB0000056','hmdb:HMDB0000439','hmdb:HMDB0000479','hmdb:HMDB0000532',
@@ -255,11 +255,13 @@ metabolites.of.interest = c('hmdb:HMDB0000056','hmdb:HMDB0000439','hmdb:HMDB0000
                             'hmdb:HMDB0034365','hmdb:HMDB0035227','hmdb:HMDB0007973','hmdb:HMDB0008057',
                             'hmdb:HMDB0011211')
 chemical.enrichment <- chemicalClassEnrichment(mets = metabolites.of.interest)
-classy_fire_classes <- chemical.enrichment$ClassyFire_class
-```
 
-```{r}
-print(classy_fire_classes)
+# Enrichment was performed on the following chemical classes:
+names(chemical.enrichment)
+
+# To retrieve results for the ClassyFire Class:
+classy_fire_classes <- chemical.enrichment$ClassyFire_class
+datatable(classy_fire_classes)
 ```
 
 
