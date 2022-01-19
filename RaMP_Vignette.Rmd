@@ -1,6 +1,6 @@
 ---
-title: "RaMP 2.0 Vignette"
-author: "Kyle Spencer and Ewy Mathé"
+title: "RaMP-DB 2.0 Vignette"
+author: "Kyle Spencer, Ewy Mathé, Andrew Patt, and Cole Tindall"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -18,24 +18,26 @@ vignette: >
 ---
 ## Introduction
 
-This vignette will provide basic steps for interacting with [RaMP](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5876005/) (Relational database of Metabolomic Pathways).  
-The codebase for RaMP is available on [our GitHub site](https://github.com/ncats/RaMP-DB).  Details on RaMP installation are also avaialble through GitHub, and questions can be asked through the Issues tab.
+This vignette will provide basic steps for interacting with [RaMP-DB](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5876005/) (Relational database of Metabolomic Pathways).  
+The codebase for RaMP-DB is available on [our GitHub site](https://github.com/ncats/RaMP-DB).  Details on RaMP-DB installation are also avaialble through GitHub, and questions can be asked through the Issues tab or by sending an email to [NCATSRaMP@nih.gov](mailto:NCATSRaMP@nih.gov).
 
-RaMP supports queries and enrichment analyses.  Supported queries are:
-1) Retrieve Analytes From Input Pathway(s)
-2) Retrieve Pathways From Input Analyte(s)
-3) Retrieve Metabolites from Metabolite Ontologies
-4) Retrieve Ontologies from Input Metabolites
-5) Retrieve Analytes Involved in the Same Reaction
-7) Retrieve Chemical Classes from Input Metabolites
-8) Retrieve Chemical Properties from Input Metabolites
+RaMP-DB supports queries and enrichment analyses.  Supported queries are:
+
+- Retrieve Analytes From Input Pathway(s)
+- Retrieve Pathways From Input Analyte(s)
+- Retrieve Metabolites from Metabolite Ontologies
+- Retrieve Ontologies from Input Metabolites
+- Retrieve Analytes Involved in the Same Reaction
+- Retrieve Chemical Classes from Input Metabolites
+- Retrieve Chemical Properties from Input Metabolites
 
 Supported enrichment analyses are:
-9) Perform Pathway Enrichment
-10) Perform Chemical Enrichment
+
+- Perform Pathway Enrichment
+- Perform Chemical Enrichment
 
 Once installed, first load the package:
-```{r}
+```{r message=F}
 library(RaMP)
 library(DT) # for prettier tables in vignette
 library(dplyr)
@@ -73,25 +75,21 @@ datatable(myanalytes)
 
 To retrieve information from multiple pathways, input a vector of pathway names:
 ```{r}
-myanalytes <- getAnalyteFromPathway(pathway=c("De Novo Triacylglycerol Biosynthesis", "sphingolipid metabolism"))
+myanalytes <- getAnalyteFromPathway(pathway=c("De Novo Triacylglycerol Biosynthesis", 
+                                              "sphingolipid metabolism"))
 ```
 
 ### Retrieve Pathways From Input Analyte(s)
 It is oftentimes useful to get a sense of what pathways are represented in a dataset (this is particularly true for metabolomics, where coverage of metabolites varies depending on what platform is used).  In other cases, one may be interested in exploring one or several metabolites to see what pathways they are arepresented in.
 
 Note that it is always preferable to utilize IDs rather then common names.
-When entering IDs, prepend with the database of origin followed by a colon, for example kegg:C02712, hmdb:HMDB04824, etc.. It is possible to input IDs using multiple different sources. RaMP currently supports the following IDs:
+When entering IDs, prepend each ID with the database of origin followed by a colon, for example kegg:C02712, hmdb:HMDB04824, etc.. It is possible to input IDs using multiple different sources. RaMP currently supports the following ID types (that should be prepended):
 
 ```{r}
-  con <- RaMP::connectToRaMP()
-  query1 <- "select distinct(IDtype) from source where geneOrCompound ='gene';"
-  query2 <- "select distinct(IDtype) from source where geneOrCompound ='compound';"
-  df1 <- DBI::dbGetQuery(con,query1)
-  df2 <- DBI::dbGetQuery(con,query2)
-  DBI::dbDisconnect(con)
+  metabprefixes <- getPrefixesFromAnalytes("metabolite")
+  geneprefixes <- getPrefixesFromAnalytes("gene")
 
-  print(paste("IDs to be prepended for compounds:",paste(df2[,1],collapse=", ")))
-  print(paste("IDs to be prepended for genes:",paste(df1[,1],collapse=", ")))
+  datatable(rbind(metabprefixes, geneprefixes))
 ```
 
 In this example, we will search for pathways that involve the two genes MDM2 and TP53, and the two metabolites glutamate and creatinine.
@@ -106,7 +104,8 @@ Note that each row returns a pathway attributed to one of the input analytes.
 To retrieve the number of unique pathways returned for all analytes or each analyte, try the following:
 
 ```{r}
-print(paste("Number of Unique Pathways Returned for All Analytes:", length(unique(pathwaydfids$pathwaysourceId))))
+print(paste("Number of Unique Pathways Returned for All Analytes:", 
+            length(unique(pathwaydfids$pathwaysourceId))))
 lapply(unique(pathwaydfids$commonName), function(x) {
         (paste("Number of Unique Pathways Returned for",x,":",
                 length(unique(pathwaydfids[which(pathwaydfids$commonName==x),]$pathwaysourceId))))})
@@ -137,7 +136,7 @@ datatable(new.ontologies)
 The user may want to know what gene transcripts encode enzymes which can catalyze reactions involving metabolites in their experiment. RaMP can return this data to its user.
 
 We can return the gene transcripts using the rampFastCata() function. To use it the user needs to provide a vector of metabolites they are interested in and the connection information for MySQL. The user can also input a vector of protein IDs or gene transcripts to return the metabolites involved in chemical reactions with the input proteins or gene transcript encoded proteins.
-```{r}
+```{r message=F}
 #Input Metabolites
 analytes.of.interest <- c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
         "hmdb:HMDB0000148", "ensembl:ENSG00000141510")
@@ -250,7 +249,7 @@ pathwayResultsPlot(filtered.fisher.results, text_size = 8, perc_analyte_overlap 
 ### Perform Chemical Enrichment
 After retrieving chemical classes of metabolites, the function chemicalClassEnrichment() function will perform overrepresentation analysis using a Fisher's test and output classes that show enrichment in the user input list of metabolites relative to the backgroud metabolite population (all meteabolites in RaMP).
 
-```r
+```{r message=F}
 metabolites.of.interest = c('hmdb:HMDB0000056','hmdb:HMDB0000439','hmdb:HMDB0000479','hmdb:HMDB0000532',
                             'hmdb:HMDB0001015','hmdb:HMDB0001138','hmdb:HMDB0029159','hmdb:HMDB0029412',
                             'hmdb:HMDB0034365','hmdb:HMDB0035227','hmdb:HMDB0007973','hmdb:HMDB0008057',
