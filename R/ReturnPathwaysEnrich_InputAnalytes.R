@@ -432,7 +432,7 @@ runFisherTest <- function(analytes, background = "database",
   out <- out[!duplicated(out), ]
   print(colnames(out))
   # for user is the output needed, based on what user input
-  return(out)
+  return(list(out,pathwaydf))
 }
 
 #' Do fisher test for only one pathway from search result
@@ -480,6 +480,8 @@ runCombinedFisherTest <- function(analytes, background = "database",
     total_genes = total_genes,
     MCall = MCall
   )
+  pathwaydf_metab <- outmetab[[2]]
+  outmetab <- outmetab[[1]]
   if (!is.null(outmetab)) {
     M <- 1
   }
@@ -494,6 +496,11 @@ runCombinedFisherTest <- function(analytes, background = "database",
     MCall = MCall
   )
 
+  pathwaydf_gene <- outgene[[2]]
+  outgene <- outgene[[1]]
+
+  pathwaydf<-rbind(pathwaydf_metab,pathwaydf_gene)
+  
   if (!is.null(outgene)) {
     G <- 1
   }
@@ -507,7 +514,7 @@ runCombinedFisherTest <- function(analytes, background = "database",
     colnames(out)[ncol(out)] <- "Pval_Holm"
     keepers <- which(out$Num_In_Path >= min_analyte)
     out2 <- merge(out[keepers, ],
-      pathwaydf[, c(
+      pathwaydf_metab[, c(
         "pathwayName", "pathwayRampId", "pathwaysourceId",
         "pathwaysource"
       )],
@@ -523,7 +530,7 @@ runCombinedFisherTest <- function(analytes, background = "database",
     colnames(out)[ncol(out)] <- "Pval_Holm"
     keepers <- which(out$Num_In_Path >= min_analyte)
     out2 <- merge(out[keepers, ],
-      pathwaydf[, c(
+      pathwaydf_gene[, c(
         "pathwayName", "pathwayRampId", "pathwaysourceId",
         "pathwaysource"
       )],
@@ -582,10 +589,10 @@ runCombinedFisherTest <- function(analytes, background = "database",
 
     # Now that p-values are calculated, only return pathways that are in the list
     # of pathways that contain user genes and metabolites
-    pathwaydf <- getPathwayFromAnalyte(analytes,
-      includeRaMPids = TRUE,
-      NameOrIds = NameOrIds
-      )
+    ## pathwaydf <- getPathwayFromAnalyte(analytes,
+    ##   includeRaMPids = TRUE,
+    ##   NameOrIds = NameOrIds
+    ##   )
     out2 <- merge(out[keepers, ],
       pathwaydf[, c(
         "pathwayName", "pathwayRampId", "pathwaysourceId",
