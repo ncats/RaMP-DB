@@ -13,7 +13,9 @@ runFisherTest(
   NameOrIds = "ids",
   analyte_type = "metabolites",
   MCall = T,
-  alternative = "less"
+  alternative = "less",
+  min_path_size = 5,
+  max_path_size = 150
 )
 }
 \arguments{
@@ -32,6 +34,10 @@ runFisherTest(
 \item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")}
 
 \item{alternative}{alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")}
+
+\item{min_path_size}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
+
+\item{max_path_size}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
 }
 \value{
 a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway

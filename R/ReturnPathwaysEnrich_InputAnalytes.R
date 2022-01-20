@@ -8,13 +8,15 @@
 #' @param analyte_type "metabolites" or "genes" (default is "metabolites")
 #' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
+#' @param min_path_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
+#' @param max_path_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
 #' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
 
 runFisherTest <- function(analytes, background = "database",
                           biospecimen_background = "none", total_genes = 20000,
                           NameOrIds = "ids",
                           analyte_type = "metabolites",
-                          MCall = T, alternative = "less") {
+                          MCall = T, alternative = "less", min_path_size=5, max_path_size=150) {
   now <- proc.time()
   print("Fisher Testing ......")
   pathwaydf <- getPathwayFromAnalyte(analytes,
@@ -234,7 +236,7 @@ runFisherTest <- function(analytes, background = "database",
       }else{
           contingencyTb[1, 2] = bg_out_pathway
       }
-      
+
       ## contingencyTb[1, 1] <- ifelse(background == "database",
       ##   tot_in_pathway - user_in_pathway,
       ##   bg_in_pathway
@@ -390,8 +392,8 @@ runFisherTest <- function(analytes, background = "database",
       # pidused <- c(pidused,i)
     } # end for loop
     keepers <- intersect(
-      which(c(totinpath, totinpath2) >= 8),
-      which(c(totinpath, totinpath2) < 100)
+      which(c(totinpath, totinpath2) >= min_path_size),
+      which(c(totinpath, totinpath2) < max_path_size)
     )
 
     print(paste0("Calculated p-values for ", length(c(pval, pval2)), " pathways"))
@@ -406,10 +408,10 @@ runFisherTest <- function(analytes, background = "database",
 
   else {
 
-    # only keep pathways that have > 8 or < 100 compounds
+    # only keep pathways that have >= min_path_size or < max_path_size compounds
     keepers <- intersect(
-      which(c(totinpath) >= 8),
-      which(c(totinpath) < 100)
+      which(c(totinpath) >= min_path_size),
+      which(c(totinpath) < max_path_size)
     )
 
     # hist(totinpath,breaks=1000)
@@ -447,6 +449,8 @@ runFisherTest <- function(analytes, background = "database",
 #' < min_analyte, do not report
 #' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
+#' @param min_path_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
+#' @param max_path_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
 #' @return a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
 #' @examples
 #' \dontrun{
@@ -454,18 +458,23 @@ runFisherTest <- function(analytes, background = "database",
 #'   dbname = "ramp2", username = "root",
 #'   conpass = "", host = "localhost"
 #' )
-#' pathwaydf <- getPathwayFromAnalyte(c("MDM2", "TP53", "glutamate", "creatinine"),
-#'   NameOrIds = "names"
-#' )
-#' fisher.results <- runCombinedFisherTest(pathwaydf = pathwaydf)
+#' analyte.list <- c('chebi:15344', 'chebi:10983', 'chebi:15351',
+#'                   'uniprot:Q86V21', 'uniprot:Q02338', 'uniprot:Q9BUT1')
+#'
+#' fisher.results <- runCombinedFisherTest(analytes = analyte.list, NameOrIds = 'ids')
 #' }
 #' @export
-runCombinedFisherTest <- function(analytes, background = "database",
+runCombinedFisherTest <- function(analytes,
+                                  background = "database",
                                   biospecimen_background = "none",
                                   NameOrIds = "ids",
                                   total_genes = 20000,
                                   min_analyte = 2,
-                                  MCall = T, alternative = "less") {
+                                  MCall = T,
+                                  alternative = "less",
+                                  min_path_size = 5,
+                                  max_path_size = 150) {
+
   G <- M <- 0
 
   # Grab pathways that contain metabolites to run Fisher on metabolites
@@ -478,7 +487,9 @@ runCombinedFisherTest <- function(analytes, background = "database",
     biospecimen_background = biospecimen_background,
     analyte_type = "metabolites",
     total_genes = total_genes,
-    MCall = MCall
+    MCall = MCall,
+    min_path_size = min_path_size,
+    max_path_size = max_path_size
   )
   pathwaydf_metab <- outmetab[[2]]
   outmetab <- outmetab[[1]]
@@ -493,14 +504,16 @@ runCombinedFisherTest <- function(analytes, background = "database",
     analytes = analytes,
     analyte_type = "genes",
     total_genes = total_genes,
-    MCall = MCall
+    MCall = MCall,
+    min_path_size = min_path_size,
+    max_path_size = max_path_size
   )
 
   pathwaydf_gene <- outgene[[2]]
   outgene <- outgene[[1]]
 
   pathwaydf<-rbind(pathwaydf_metab,pathwaydf_gene)
-  
+
   if (!is.null(outgene)) {
     G <- 1
   }

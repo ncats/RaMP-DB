@@ -13,7 +13,9 @@ runCombinedFisherTest(
   total_genes = 20000,
   min_analyte = 2,
   MCall = T,
-  alternative = "less"
+  alternative = "less",
+  min_path_size = 5,
+  max_path_size = 150
 )
 }
 \arguments{
@@ -34,6 +36,10 @@ enrichment.  If value is "database", all metabolites in the RaMP database will b
 \item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")}
 
 \item{alternative}{alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")}
+
+\item{min_path_size}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
+
+\item{max_path_size}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
 }
 \value{
 a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
@@ -48,9 +54,9 @@ pkg.globals <- setConnectionToRaMP(
   dbname = "ramp2", username = "root",
   conpass = "", host = "localhost"
 )
-pathwaydf <- getPathwayFromAnalyte(c("MDM2", "TP53", "glutamate", "creatinine"),
-  NameOrIds = "names"
-)
-fisher.results <- runCombinedFisherTest(pathwaydf = pathwaydf)
+analyte.list <- c('chebi:15344', 'chebi:10983', 'chebi:15351',
+                  'uniprot:Q86V21', 'uniprot:Q02338', 'uniprot:Q9BUT1')
+
+fisher.results <- runCombinedFisherTest(analytes = analyte.list, NameOrIds = 'ids')
 }
 }
