@@ -12,7 +12,7 @@ runCombinedFisherTest(
   NameOrIds = "ids",
   total_genes = 20000,
   min_analyte = 2,
-  MCall = T,
+  MCall = F,
   alternative = "less",
   min_path_size = 5,
   max_path_size = 150
@@ -33,7 +33,7 @@ enrichment.  If value is "database", all metabolites in the RaMP database will b
 \item{min_analyte}{if the number of analytes (gene or metabolite) in a pathway is
 < min_analyte, do not report}
 
-\item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")}
+\item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "F")}
 
 \item{alternative}{alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")}
 
