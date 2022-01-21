@@ -1,4 +1,5 @@
-[![Build Status](https://api.travis-ci.com/ncats/RaMP-DB.svg?branch=dev)](https://travis-ci.com/github/ncats/RaMP-DB)
+
+[![Build Status](https://api.travis-ci.com/ncats/RaMP-DB.svg?branch=master)](https://travis-ci.com/github/ncats/RaMP-DB)
 
 # New!  RaMP 2.0!
 
