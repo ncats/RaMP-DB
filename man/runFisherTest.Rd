@@ -12,7 +12,7 @@ runFisherTest(
   total_genes = 20000,
   NameOrIds = "ids",
   analyte_type = "metabolites",
-  MCall = T,
+  MCall = F,
   alternative = "less",
   min_path_size = 5,
   max_path_size = 150
@@ -31,7 +31,7 @@ runFisherTest(
 
 \item{analyte_type}{"metabolites" or "genes" (default is "metabolites")}
 
-\item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")}
+\item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "F")}
 
 \item{alternative}{alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")}
 

@@ -6,7 +6,7 @@
 #' @param biospecimen_background If "none", test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param analyte_type "metabolites" or "genes" (default is "metabolites")
-#' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")
+#' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "F")
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
 #' @param min_path_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
 #' @param max_path_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
@@ -16,7 +16,7 @@ runFisherTest <- function(analytes, background = "database",
                           biospecimen_background = "none", total_genes = 20000,
                           NameOrIds = "ids",
                           analyte_type = "metabolites",
-                          MCall = T, alternative = "less", min_path_size=5, max_path_size=150) {
+                          MCall = F, alternative = "less", min_path_size=5, max_path_size=150) {
   now <- proc.time()
   print("Fisher Testing ......")
   pathwaydf <- getPathwayFromAnalyte(analytes,
@@ -447,7 +447,7 @@ runFisherTest <- function(analytes, background = "database",
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param min_analyte if the number of analytes (gene or metabolite) in a pathway is
 #' < min_analyte, do not report
-#' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")
+#' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "F")
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
 #' @param min_path_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
 #' @param max_path_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
@@ -470,7 +470,7 @@ runCombinedFisherTest <- function(analytes,
                                   NameOrIds = "ids",
                                   total_genes = 20000,
                                   min_analyte = 2,
-                                  MCall = T,
+                                  MCall = F,
                                   alternative = "less",
                                   min_path_size = 5,
                                   max_path_size = 150) {
@@ -526,11 +526,12 @@ runCombinedFisherTest <- function(analytes,
     out <- cbind(out, holm)
     colnames(out)[ncol(out)] <- "Pval_Holm"
     keepers <- which(out$Num_In_Path >= min_analyte)
-    out2 <- merge(out[keepers, ],
+    out2 <- merge(
       pathwaydf_metab[, c(
         "pathwayName", "pathwayRampId", "pathwaysourceId",
         "pathwaysource"
       )],
+      out[keepers, ],
       by = "pathwayRampId"
     )
   } else if (!is.null(outgene) & is.null(outmetab)) {
@@ -542,11 +543,12 @@ runCombinedFisherTest <- function(analytes,
     out <- cbind(out, holm)
     colnames(out)[ncol(out)] <- "Pval_Holm"
     keepers <- which(out$Num_In_Path >= min_analyte)
-    out2 <- merge(out[keepers, ],
+    out2 <- merge(
       pathwaydf_gene[, c(
         "pathwayName", "pathwayRampId", "pathwaysourceId",
         "pathwaysource"
       )],
+      out[keepers, ],
       by = "pathwayRampId"
     )
   } else {
@@ -606,11 +608,12 @@ runCombinedFisherTest <- function(analytes,
     ##   includeRaMPids = TRUE,
     ##   NameOrIds = NameOrIds
     ##   )
-    out2 <- merge(out[keepers, ],
+    out2 <- merge(
       pathwaydf[, c(
         "pathwayName", "pathwayRampId", "pathwaysourceId",
         "pathwaysource"
       )],
+      out[keepers, ],
       by = "pathwayRampId"
     )
   } # end merging when genes and metabolites were run
