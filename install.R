@@ -1,1 +1,1 @@
-install_github("mathelab/RAMP-DB")
+install_github("ncats/RAMP-DB")

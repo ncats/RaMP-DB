@@ -9,3 +9,5 @@
 ^\.vscode/.*$
 ^Dockerfile$
 ^Jenkinsfile$
+
+^tests/.*$

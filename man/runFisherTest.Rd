@@ -6,38 +6,38 @@
 clicked on highchart}
 \usage{
 runFisherTest(
-  pathwaydf,
-  total_metabolites = NULL,
+  analytes,
+  background = "database",
+  biospecimen_background = "none",
   total_genes = 20000,
+  NameOrIds = "ids",
   analyte_type = "metabolites",
-  conpass = NULL,
-  dbname = "ramp",
-  username = "root",
-  host = "localhost",
-  MCall = T,
-  alternative = "less"
+  MCall = F,
+  alternative = "less",
+  min_path_size = 5,
+  max_path_size = 150
 )
 }
 \arguments{
-\item{pathwaydf}{a data frame resulting from getPathwayFromAnalyte}
+\item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
-\item{total_metabolites}{number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")}
+\item{background}{optional vector of all metabolites detected in study. This will be used as the background for the Fisher's contingency table for metabolites. If left "database", all metabolites in RaMP originating in the pathway database of origin are used as background for testing}
+
+\item{biospecimen_background}{If "none", test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"}
 
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
 
+\item{NameOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
+
 \item{analyte_type}{"metabolites" or "genes" (default is "metabolites")}
 
-\item{conpass}{password for database access (string)}
-
-\item{dbname}{name of the mysql database (default is "ramp")}
-
-\item{username}{username for database access (default is "root")}
-
-\item{host}{host name for database access (default is "localhost")}
-
-\item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")}
+\item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "F")}
 
 \item{alternative}{alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")}
+
+\item{min_path_size}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
+
+\item{max_path_size}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
 }
 \value{
 a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway

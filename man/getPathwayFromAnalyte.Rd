@@ -6,13 +6,10 @@
 returns associated pathways}
 \usage{
 getPathwayFromAnalyte(
-  analytes = NULL,
+  analytes = "none",
   find_synonym = FALSE,
-  conpass = NULL,
-  host = "localhost",
-  dbname = "ramp",
-  username = "root",
-  NameOrIds = "ids"
+  NameOrIds = "ids",
+  includeRaMPids = FALSE
 )
 }
 \arguments{
@@ -20,15 +17,9 @@ getPathwayFromAnalyte(
 
 \item{find_synonym}{find all synonyms or just return same synonym (T/F)}
 
-\item{conpass}{password for database access (string)}
-
-\item{host}{host name for database access (default is "localhost")}
-
-\item{dbname}{name of the mysql database (default is "ramp")}
-
-\item{username}{username for database access (default is "root")}
-
 \item{NameOrIds}{whether input is "names" or "ids" (default is "ids")}
+
+\item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
 }
 \value{
 a list contains all metabolites as name and pathway inside.
@@ -39,6 +30,10 @@ returns associated pathways
 }
 \examples{
 \dontrun{
-mypath <- getPathwayFromAnalyte(analytes=c("2-hydroxyglutarate","glutamate"), conpass="mypassword")
+pkg.globals <- setConnectionToRaMP(
+  dbname = "ramp2", username = "root",
+  conpass = "", host = "localhost"
+)
+mypath <- getPathwayFromAnalyte(analytes = c("2-hydroxyglutarate", "glutamate"))
 }
 }

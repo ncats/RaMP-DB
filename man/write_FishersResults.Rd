@@ -4,7 +4,7 @@
 \alias{write_FishersResults}
 \title{Function that writes Fishers Test results, after clustering to a CSV file}
 \usage{
-write_FishersResults(fishResults = NULL, outputfile = NULL, rampid = F)
+write_FishersResults(fishResults = "none", outputfile = "none", rampid = FALSE)
 }
 \arguments{
 \item{fishResults}{a data frame returned by function runCombinedFisherTest()}
