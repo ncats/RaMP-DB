@@ -157,7 +157,7 @@ mysql> select distinct(IDtype) from source where geneOrCompound ="gene";
 * **Andrew Patt** - andy.patt@nih.gov
 * **Tim Sheils** - tim.sheils@nih.gov
 * **Kyle Spencer** - kyle.spencer@nih.gov
-* **Cole Tindall ** - cole.tindall@nih.gov
+* **Cole Tindall** - cole.tindall@nih.gov
 
 ## Previous Authors
 * **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
