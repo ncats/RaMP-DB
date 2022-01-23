@@ -161,6 +161,6 @@ mysql> select distinct(IDtype) from source where geneOrCompound ="gene";
 
 ## Previous Authors
 * **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
-* **Shunchao Wang** - shunchao.wang@osumc.edu
-* **Rohith Vanam** - rohith.vanam@osumc.edu
-* ** Jorge Neyra** - jorge.neyra@nih.gov
+* **Shunchao Wang** - 
+* **Rohith Vanam** - 
+* **Jorge Neyra** - [Jorgeso](https://github.com/jorgeso)
