@@ -1,18 +1,40 @@
-[![Build Status](https://api.travis-ci.com/ncats/RaMP-DB.svg?branch=master)](https://travis-ci.com/github/ncats/RaMP-DB)
+[![Build Status](https://api.travis-ci.com/ncats/RaMP-DB.svg?branch=dev)](https://travis-ci.com/github/ncats/RaMP-DB)
 
-# New!  RaMP app is accessible via a server (no installation needed!).
-Please [click here](https://rampdb.ncats.io/).  And let us know if additional functionalities would be useful (see contact info below).
+# New!  RaMP 2.0!
 
-# RaMP - Relational Database of Metabolomic Pathways
+RaMP 2.0 is now released and includes an updated backend database with expanded annotations for >150,000 metabolites and ~14,000 genes/proteins.  Annotations include biological pathways, chemical classes and structures (for metabolites only), ontologies (metabolites only), and enzyme-metabolite relationships based on chemical reactions. Annotations are drawn from HMDB, KEGG (through HMDB), Lipid-MAPS, WikiPathways, Reactome, and CheBI. 
 
-The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene biological pathways from multiple sources. Currently, we have integrated information from HMDB, KEGG, Reactome, and WikiPathways. The relational structure of RaMP enables complex and batch queries.  To facilitate its usage, we have created this R shiny web application that includes a user-friendly R Shiny web application.  Please note that this project is in continuous development and we certainly appreciate your feedback (through [our](https://github.com/ncats/RaMP-DB) GitHub site). More details can be found in <a href="http://www.mdpi.com/2218-1989/8/1/16" target="_blank">our manuscript</a>.
+This R package includes functions that allow users to interface with this up-do-date and comprehensive resource.  Functionalities include 1) simple and batch queries for pathways, ontologies, chemical annotations, and reaction-level gene-metabolite relationships; 2) pathway and chemical enrichment analyses.
 
-Also note that we are working on a server version of RaMP so that users do not have to install anything on their local machines.  Stay tuned!
+The code used to build the backend RaMP database is freely available at https://github.com/ncats/RaMP-Backend and we are currently working on a revamp of the web interface.
+
+Please check out the following paper for further details.   
+
+
+# Why RaMP (Relational Database of Metabolomic Pathways)
+
+The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene/protein biological, chemical and other from multiple sources. The database is relational and it can be directly downloaded as a MySQL dump (under the folder inst/extdata) for integration into any tools.  Please note that this project is in continuous development and we appreciated any feedback. 
+
+## Contact Info:
+For any questions or feedback, please send us a note at [NCATSRaMP@mail.nih.gov](NCATSRaMP@mail.nih.gov).  
+
+If you find a bug, please submit an issue through this GitHub repo.   
 
 ## Basic Features:
-The R packages and associated app performs some complex queries (e.g. retrieve all metabolites and/or genes that belong to a user input pathway or list of pathways).  It also performs pathway enrichment analysis given a list of metabolites and/or genes. Run the app to get further details.
+The R packages and associated app perform  the following queries:
 
-Last date of dump file update: 03/02/2018
+	1. Retrieve analytes (genes, proteins, metabolites) given pathway(s) as input.
+	2. Retrieve pathway annotations given analytes as input.
+	3. Retrieve chemical annotations/structures given metabolites as input.
+	4. Retrieve analytes involved in the same reaction (e.g. enzymes catalyzing reactions involving input metabolites)
+	5. Retrieve ontologies (e.g. biospecimen location, disease, etc.) given input meteabolites.
+
+The following analyses are also supported:
+
+	1. Multi-omic pathway enrichment analysis
+	2. Chemical enrichment analyses
+
+Last date of dump file update: 12/13/2021
 
 ## Vignette
 Detailed instructions for installing RaMP locally are below.  We've also put together a vignette to get you started on the analyses.  Click here for [vignette](https://ncats.github.io/RaMP-DB/RaMP_Vignette.html).
@@ -28,16 +50,14 @@ PMID: 29470400; PMCID: PMC5876005; DOI: 10.3390/metabo8010016
 To access, [click here](https://www.mdpi.com/2218-1989/8/1/16)
 
 ## Installation Instructions
-In order to use the web application, you will need the following:
+In order to use this R package locally, you will need the following:
 * The R code under this repo
 * The mysql dump file that contains the RaMP database (in the folder inst/extdata/)
 
 If you would like to know how to build RaMP database from scratch, please check another GitHub site at [RaMP-BackEnd](https://github.com/ncats/RaMP-BackEnd)
 
 ### MySQL set-up
-**Warning:** RaMP will not readily work with the new MySQL version (8.X.X), but is fully functional with MySQL version 5.7. We will be working toward updating RaMP to work with the newest MySQL version.
-
-RaMP requires that MySQL and the RaMP database be set up on the machine that you will be running the app from.
+RaMP requires that MySQL and the RaMP database be set up on the machine that you will be running the R package from.
 To download MySQL, you can go to the [MySQL Downloads page](https://www.mysql.com/downloads/)
 
 When installing, you will be prompted to create a password for the user "root", or it will create one automatically for you.  **Importantly, remember your MySQL password!**  You will need to get into mysql and to pass it as an argument to the RaMP R shiny web application.
@@ -45,6 +65,8 @@ When installing, you will be prompted to create a password for the user "root", 
 If you want to reset your password , you can go to [MySQL References 5.7 - How to reset root password ] (https://dev.mysql.com/doc/refman/5.7/en/resetting-permissions.html)
 
 Please note that you will need administrator privileges for this step..
+
+If you are using a Mac, we recommend using brew to install MySQL.  Here's a good tutorial: https://www.novicedev.com/blog/how-install-mysql-macos-homebrew.
 
 ### Creating the database locally
 Once your MySQL environment is in place, creating the RaMP database locally is trivial.
@@ -55,11 +77,13 @@ mysql> create database ramp;
 mysql> exit;
 ```
 
-Here, we are naming the database RaMP but you can use any name you'd like.  It is worth noting though that the R package assumes that the name of the database is 'ramp' by default.  So if you change the name, remember to pass that name as arguments in the R package functions.
+Here, we are naming the database "ramp" but you can use any name you'd like.  It is worth noting though that the R package assumes that the name of the database is "ramp" by default.  So if you change the name, remember to pass that name as arguments in the R package functions.
 
-Second, populate the named database with the mysql dump file (which you can get from  inst/extdata/ramp180302.sql):
+Second, download and unzip the latest RaMP database from the inst/extdata folder.
+
+Third, populate the named database with the mysql dump file (which you can get from  inst/extdata/rampXXXXXX.sql, where XXXXXX denotes the latest date):
 ```
-> mysql -u root -p ramp < ramp180302.sql
+> mysql -u root -p ramp < rampXXXX.sql  
 ```
 
 You're done!
@@ -69,71 +93,74 @@ Your "ramp" database should contain the following 8 tables:
 2. analyehasontology
 3. analytehaspathway
 4. analytesynonym
+5. binary_source_matrix_view
 5. catalyzed
-6. ontology
-7. pathway
-8. source
+6. chem_props
+7. db_version
+8. metabolite_class
+9. ontology
+10. pathway
+11. source
+12. version_info
 
 If you want to explore this in MySQL, you can try:
 ```
-mysql -u root -p
+mysql -u root
 use ramp;
 show tables;
-select * from analytesynonym where synonym = "glucose";
+select * from source limit 4; 
+select * from source where commonName = "creatine riboside";
+select distinct(HMDBOntologyType) from ontology;
 ```
 
 ### Install and load the RaMP package 
-You can install this package directly from GitHub using the install_github() function available through the devtools package. In the R Console, type the following:
+You can install this package directly from GitHub using the install_github() function available through the [devtools package](https://cran.r-project.org/web/packages/devtools/index.html). In the R Console, type the following:
 ```R
+# Locally install RaMP
 install.packages("devtools")
 library(devtools)
 install_github("ncats/RAMP-DB")
+
 # Load the package
 library(RaMP)
+
+# Set up your connection to the RaMP2.0 database:
+pkg.globals <- setConnectionToRaMP(dbname="ramp",username="root",conpass="",host = "localhost")
 ```
 
-Before running the RaMP app or RaMP functions, the database connection information should be configured. The file that contains this information is within the package installation and the directory can be found by typing the following:
-```
-system.file("shinyApp", package="RaMP", mustWork=TRUE)
-```
-Go to that directory and find the "db.properties.template" file, copy it to a new file db.properties.  Edit db.properties file based on your current environment as follows:
+Note that prior to using RaMP functions, users much establish required parameters to appropriately connect to your local database (if you are not using the web app).  This step is simplified by a single function call (last line in the above code snippet).
 
-```
-host=<hostname of mysql server>
-dbname=<db name on mysql>
-username=<username to connect to mysql>
-conpass=<password for username to connect to mysql>
-```
-*After editing, be sure to rename this file "db.properties".*
-
-
-Now, you're set to use the web application locally!  Just type:
-```R
-RaMP::runRaMPapp(conpass="mysql_password")
-```
-
-If the username is different then root, then specify the username in the "username" parameter.  Similarly, if the name of the database is different than "ramp", then specify the "dbname" parameter.
+If the username is different then root, then specify the username in the "username" parameter.  Similarly, if the name of the database is different than "ramp2", then specify the "dbname" parameter.
 
 ### Important Notes
 
-If you reinstall the latest version of the RaMP package, be sure to also install the latest version of the mysql RaMP dump file.  
+If you reinstall the latest version of the RaMP package, be sure to also install the latest version of the MySQL RaMP dump file.  
 
 Also, when gene or metabolite ids are input for queries, IDs should be prepended with their database of origin, e.g. kegg:C02712, hmdb:HMDB04824, or CAS:2566-39-4. The list of metabolite or gene/protien IDs may be of mixed source. Remember to include the colon in the prefix. The id prefixes that are currently included in RaMP are: 
 
 | Analyte Type | ID Prefix Types |
 |--------------|-----------------|
-| Metabolites | CAS, chebi, chemspider, enzymeNomenclature, hmdb, kegg, LIPIDMAPS, pubchem |
-| Genes/Proteins |ensembl, entrez, uniprot |
+| Metabolites | hmdb, pubchem, chebi, chemspider, kegg, CAS, LIPIDMAPS, swisslipids, lipidbank, wikidata, plantfa, kegg_glycan |
+| Genes/Proteins | ensembl, entrez, gene_symbol, uniprot, hmdb, ncbiprotein, EN, wikidata, chebi |
 
+To query the ID types supports in MySQL:
 
-## Current Authors
+```
+select distinct(IDtype) from source where geneOrCompound ="compound";
+mysql> select distinct(IDtype) from source where geneOrCompound ="gene";
+```
+
+## Current Authors and Testers
 * **John Braisted** - john.braisted@nih.gov
+* **Tara Eicher** - tara.eicher@nih.gov
 * **Ewy Mathé** - ewy.mathe@nih.gov
-* **Jorge Neyra** -jorge.neyra@nih.gov
 * **Andrew Patt** - andy.patt@nih.gov
+* **Tim Sheils** - tim.sheils@nih.gov
 * **Kyle Spencer** - kyle.spencer@nih.gov
+* **Cole Tindall ** - cole.tindall@nih.gov
 
 ## Previous Authors
 * **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
 * **Shunchao Wang** - shunchao.wang@osumc.edu
 * **Rohith Vanam** - rohith.vanam@osumc.edu
+* ** Jorge Neyra** - jorge.neyra@nih.gov

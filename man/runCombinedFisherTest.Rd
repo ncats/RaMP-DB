@@ -6,39 +6,40 @@
 clicked on highchart}
 \usage{
 runCombinedFisherTest(
-  pathwaydf,
-  total_metabolites = NULL,
+  analytes,
+  background = "database",
+  biospecimen_background = "none",
+  NameOrIds = "ids",
   total_genes = 20000,
   min_analyte = 2,
-  conpass = NULL,
-  dbname = "ramp",
-  username = "root",
-  host = "localhost",
-  MCall = T,
-  alternative = "less"
+  MCall = F,
+  alternative = "less",
+  min_path_size = 5,
+  max_path_size = 150
 )
 }
 \arguments{
-\item{pathwaydf}{a data frame resulting from getPathwayFromAnalyte}
+\item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
-\item{total_metabolites}{number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")}
+\item{background}{optional vector of all metabolites detected in study to be used as the background for the Fisher's contingency table for
+enrichment.  If value is "database", all metabolites in the RaMP database will be used as background.  Default: "database"}
+
+\item{biospecimen_background}{If "none", test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"}
+
+\item{NameOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
 
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
 
 \item{min_analyte}{if the number of analytes (gene or metabolite) in a pathway is
 < min_analyte, do not report}
 
-\item{conpass}{password for database access (string)}
-
-\item{dbname}{name of the mysql database (default is "ramp")}
-
-\item{username}{username for database access (default is "root")}
-
-\item{host}{host name for database access (default is "localhost")}
-
-\item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "T")}
+\item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "F")}
 
 \item{alternative}{alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")}
+
+\item{min_path_size}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
+
+\item{max_path_size}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
 }
 \value{
 a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
@@ -49,8 +50,13 @@ clicked on highchart
 }
 \examples{
 \dontrun{
-pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
-                NameOrIds="names", conpass=conpass)
-fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
+pkg.globals <- setConnectionToRaMP(
+  dbname = "ramp2", username = "root",
+  conpass = "", host = "localhost"
+)
+analyte.list <- c('chebi:15344', 'chebi:10983', 'chebi:15351',
+                  'uniprot:Q86V21', 'uniprot:Q02338', 'uniprot:Q9BUT1')
+
+fisher.results <- runCombinedFisherTest(analytes = analyte.list, NameOrIds = 'ids')
 }
 }

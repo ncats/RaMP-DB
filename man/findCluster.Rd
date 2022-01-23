@@ -2,8 +2,8 @@
 % Please edit documentation in R/ReturnPathwaysEnrich_InputAnalytes.R
 \name{findCluster}
 \alias{findCluster}
-\title{Perform fuzzy multiple linkage partitioning clustering on pathways identified by
-Fisher's test}
+\title{Perform fuzzy multiple linkage partitioning clustering on pathways
+identified by Fisher's test}
 \usage{
 findCluster(
   fishers_df,
@@ -29,15 +29,21 @@ list:[[1]] Pathway enrichment result dataframe with cluster assignment column ad
 [[3]] cluster assignment in the list form
 }
 \description{
-Perform fuzzy multiple linkage partitioning clustering on pathways identified by
-Fisher's test
+Perform fuzzy multiple linkage partitioning clustering on pathways
+identified by Fisher's test
 }
 \examples{
 \dontrun{
-pathwaydf<-getPathwayFromAnalyte(c("MDM2","TP53","glutamate","creatinine"),
-                NameOrIds="names", conpass=conpass)
-fisher.results <- runCombinedFisherTest(pathwaydf=pathwaydf,conpass=conpass)
-filtered.fisher.results <- FilterFishersResults(fisher.results,p_holmadj_cutoff=0.05)
+pkg.globals <- setConnectionToRaMP(
+  dbname = "ramp2", username = "root",
+  conpass = "", host = "localhost"
+)
+pathwaydf <- getPathwayFromAnalyte(c(
+  "ensembl:ENSG00000135679", "hmdb:HMDB0000064",
+  "hmdb:HMDB0000148", "ensembl:ENSG00000141510"
+))
+fisher.results <- runCombinedFisherTest(pathwaydf = pathwaydf)
+filtered.fisher.results <- FilterFishersResults(fisher.results, p_holmadj_cutoff = 0.05)
 filteredclust.fisher.results <- findCluster(filtered.fisher.results)
 }
 }

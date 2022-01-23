@@ -4,7 +4,7 @@
 \alias{writePathwaysToCSV}
 \title{Function that writes output from getPathwayFromAnalyte() to a CSV file}
 \usage{
-writePathwaysToCSV(mypathways = NULL, outputfile = NULL)
+writePathwaysToCSV(mypathways = "none", outputfile = "none")
 }
 \arguments{
 \item{mypathways}{data frame returned by function getPathwayFromAnalyte()}
