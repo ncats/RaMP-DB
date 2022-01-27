@@ -21,7 +21,7 @@ the given list of analytes
 }
 \examples{
 \dontrun{
-pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
+pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root",
 	conpass = "", host = "localhost")
 getOntoFromMeta("hmdb:HMDB0071437")
 }
