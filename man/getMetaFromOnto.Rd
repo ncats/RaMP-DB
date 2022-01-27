@@ -17,7 +17,7 @@ function that query database to find analytes in given ontologies
 }
 \examples{
 \dontrun{
-pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
+pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root",
 	conpass = "", host = "localhost")
 getMetaFromOnto("Adiposome")
 }
