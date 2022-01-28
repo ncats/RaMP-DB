@@ -6,7 +6,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
+#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root",
 #' 	conpass = "", host = "localhost")
 #' getOntoFromMeta("hmdb:HMDB0071437")
 #' }
@@ -90,13 +90,14 @@ getOntoFromMeta <- function(analytes, NameOrIds = "ids") {
   # colnames(mdf) <- c('Metabolites','Ontology','Ontology_Type')
   return(mdf)
 }
+
 #' function that query database to find analytes in given ontologies
 #' @param ontology a vector of ontology or ontologies delimited by new line character
 #'
 #' @return dataframe that  contains searched analytes from given ontology
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root", 
+#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root",
 #' 	conpass = "", host = "localhost")
 #' getMetaFromOnto("Adiposome")
 #' }
@@ -124,7 +125,7 @@ getMetaFromOnto <- function(ontology) {
   # Comment out
   #list_ontology <- paste(list_ontology,collapse = ",")
 
-  # Find the ontology in ramp2
+
   allontos <- getOntologies()
   matched_ontos <- unlist(lapply(list_ontology,
 	function(x) grep(x, allontos$commonName)))
@@ -245,3 +246,4 @@ getMetaFromOnto <- function(ontology) {
     return(NA)
   }
 }
+
