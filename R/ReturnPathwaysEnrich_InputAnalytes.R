@@ -42,7 +42,7 @@ runFisherTest <- function(analytes, background = "database",
   if(class(background) != "character"){
       stop("'background' should either be a vector of background metabolites or 'database' to use all analytes in RaMP-DB!")
   }
-  
+
   if (length(background)!=1){
           backgrounddf <- getPathwayFromAnalyte(background,
                                                 includeRaMPids = TRUE,
@@ -218,14 +218,14 @@ runFisherTest <- function(analytes, background = "database",
           bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]))
           bg_out_pathway <- tot_bg_analytes - bg_in_pathway
       }
-      
-      if(length(background) != 1){
+
+      if(length(background) == 1){
           contingencyTb[1, 1] = tot_in_pathway - user_in_pathway
       }else{
           contingencyTb[1, 1] = bg_in_pathway
       }
 
-      if(length(background) != 1){
+      if(length(background) == 1){
           contingencyTb[1, 2] = tot_out_pathway - user_out_pathway
       }else{
           contingencyTb[1, 2] = bg_out_pathway
@@ -505,7 +505,7 @@ runCombinedFisherTest <- function(analytes,
             max_path_size = max_path_size
         )
         pathwaydf_gene <- outgene[[2]]
-        outgene <- outgene[[1]]        
+        outgene <- outgene[[1]]
     }else{
         outgene <- NULL
         pathwaydf_gene <- NULL
