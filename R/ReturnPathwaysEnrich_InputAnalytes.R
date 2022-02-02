@@ -42,7 +42,7 @@ runFisherTest <- function(analytes, background = "database",
   if(class(background) != "character"){
       stop("'background' should either be a vector of background metabolites or 'database' to use all analytes in RaMP-DB!")
   }
-  
+
   if (length(background)!=1){
           backgrounddf <- getPathwayFromAnalyte(background,
                                                 includeRaMPids = TRUE,
@@ -218,7 +218,7 @@ runFisherTest <- function(analytes, background = "database",
           bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]))
           bg_out_pathway <- tot_bg_analytes - bg_in_pathway
       }
-      
+
       if(length(background) != 1){
           contingencyTb[1, 1] = tot_in_pathway - user_in_pathway
       }else{
@@ -505,7 +505,7 @@ runCombinedFisherTest <- function(analytes,
             max_path_size = max_path_size
         )
         pathwaydf_gene <- outgene[[2]]
-        outgene <- outgene[[1]]        
+        outgene <- outgene[[1]]
     }else{
         outgene <- NULL
         pathwaydf_gene <- NULL
@@ -653,128 +653,104 @@ runCombinedFisherTest <- function(analytes,
 #'   dbname = "ramp2", username = "root",
 #'   conpass = "", host = "localhost"
 #' )
-#' mypath <- getPathwayFromAnalyte(analytes = c("2-hydroxyglutarate", "glutamate"))
+#' mypath <- getPathwayFromAnalyteV2(analytes = c("2-hydroxyglutarate", "glutamate"))
 #' }
 #' @export
 getPathwayFromAnalyte <- function(analytes = "none",
                                   find_synonym = FALSE,
                                   NameOrIds = "ids",
                                   includeRaMPids = FALSE) {
-    now <- proc.time()
-  if (length(analytes) == 1) {
-    if (analytes == "none") {
-      return(NULL)
-    }
+
+  print("Starting getPathwayFromAnalyte()")
+  if (is.null(analytes) || length(analytes) == 0) {
+    warning("Input analyte list is NULL or empty. Aborting getPathwayFromAnalyte()")
+    return(NULL)
   }
 
-  list_metabolite <- getRaMPInfoFromAnalytes(
-    analytes = analytes, NameOrIds = NameOrIds,
-    PathOrChem = "path"
-  )
-  list_metabolite <- unique(list_metabolite$rampId)
+  if(!(NameOrIds %in% c("ids","names"))) {
+    warning(paste0("NameOrIds must have a value in c('ids','names')\n",
+                   "Supplied NameOrIds falue = ('", NameOrIds, "')\nAborting getPathwayFromAnlyte()"))
+    return(NULL)
+  }
+
+  list_metabolite <- analytes
   list_metabolite <- sapply(list_metabolite, shQuote)
   list_metabolite <- paste(list_metabolite, collapse = ",")
   if (list_metabolite == "") {
     warning("Unable to retrieve metabolites")
     return(NULL)
   }
-  # Now using the RaMP compound id, retrieve associated pathway ids
-  query2 <- paste0(
-    "select pathwayRampId,rampId from analytehaspathway where
-                      rampId in (",
-    list_metabolite, ");"
-  )
-  con <- connectToRaMP()
-  # print(query2)
-  df2 <- DBI::dbGetQuery(con, query2)
-  DBI::dbDisconnect(con)
-  pathid_list <- df2$pathwayRampId
-  pathid_list <- sapply(pathid_list, shQuote)
-  pathid_list <- paste(pathid_list, collapse = ",")
-  # With pathway ids, retrieve pathway information
-  if (pathid_list == "") {
-    warning("The input list of analytes do not map to any pathways")
-    return(NULL)
-  }
-  query3 <- paste0(
-    "select pathwayName,sourceId as pathwaysourceId,type as pathwaysource,pathwayRampId from pathway where pathwayRampId in (",
-    pathid_list, ");"
-  )
-  con <- connectToRaMP()
-  df3 <- DBI::dbGetQuery(con, query3)
-  DBI::dbDisconnect(con)
-  # Format output
-  mdf <- merge(df3, df2, all.x = T)
-  # And with rampIds (list_metabolite), get common names when Ids are input
-  if (NameOrIds == "ids") {
-    list_analytes <- sapply(analytes, shQuote)
-    list_analytes <- paste(list_analytes, collapse = ",")
-    query4 <- paste0("select sourceId,commonName,rampId from source where sourceId in (", list_analytes, ");")
-    con <- connectToRaMP()
-    df4 <- DBI::dbGetQuery(con, query4)
-    DBI::dbDisconnect(con)
-    # convert latin1 encoding to UTF-8
-    df4$commonName <- sapply(as.character(df4$commonName), function(x) {
-      if (stringi::stri_enc_mark(x) == "native") {
-        x <- iconv(x, "latin1", "UTF-8")
-      } else {
-        x
-      }
-    })
-    mdf <- merge(mdf, df4, all.x = T, by.y = "rampId")
-    mdf$commonName <- tolower(mdf$commonName)
-  } else { # Just take on the name
-    list_analytes <- sapply(mdf$rampId, shQuote)
-    list_analytes <- paste(list_analytes, collapse = ",")
-    query4 <- paste0("select sourceId,commonName,rampId from source where rampId in (", list_analytes, ");")
-    con <- connectToRaMP()
-    df4 <- DBI::dbGetQuery(con, query4)
-    DBI::dbDisconnect(con)
-                                        # convert latin1 encoding to UTF-8
-    df4$commonName <- sapply(as.character(df4$commonName), function(x) {
-      if (stringi::stri_enc_mark(x) == "native") {
-        x <- iconv(x, "latin1", "UTF-8")
-      } else {
-        x
-      }
-    })
-    mdf <- merge(mdf, df4, all.x = T, by = "rampId")
-  }
-  ## mdf <- merge(mdf, df4, all.x = T, by.y = "rampId")
-  mdf$commonName <- tolower(mdf$commonName)
-  ## if (find_synonym) {
-  ##   mdf <- merge(mdf, "synonym", all.x = T, by = "rampId")
-  ## } else
-    if(NameOrIds == "names" & !find_synonym){
-      mdf <- mdf[unlist(lapply(tolower(analytes),
-                               function(x) which(tolower(mdf$commonName) %in% x))),]
+
+  if(NameOrIds == 'ids') {
+    print("Working on ID List...")
+    sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, s.sourceId as inputId, group_concat(distinct s.commonName order by s.commonName separator '; ') as commonName, s.rampId from
+                  source s,
+                  analytehaspathway ap,
+                  pathway p
+                  where
+                  s.sourceId in (",list_metabolite,")
+                  and
+                  ap.rampId = s.rampId
+                  and
+                  p.pathwayRampId = ap.pathwayRampId
+                  and
+                  p.type != 'hmdb'
+                  group by inputId, rampId, pathwayId
+                  order by pathwayName asc")
+  } else {
+    print("Working on analyte name list...")
+    sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, lower(s.commonName) as inputCommonName, group_concat(distinct s.sourceId order by s.sourceId separator '; ') as sourceIds, s.rampId from
+                  source s,
+                  analytehaspathway ap,
+                  pathway p
+                  where
+                  s.commonName in (",list_metabolite,")
+                  and
+                  ap.rampId = s.rampId
+                  and
+                  p.pathwayRampId = ap.pathwayRampId
+                  and
+                  p.type != 'hmdb'
+                  group by inputCommonName, s.rampId, pathwayId
+                  order by pathwayName asc")
   }
 
-  out <- mdf[!duplicated(mdf), ]
-  # For now, not returning HMDB pathways because they include the 30K
-  # new pathways that are mainly drug and lipid pathways (need more proper
-  # structural resolution matching)
-  if (includeRaMPids) {
-    return(out[
-      which(out$pathwaysource != "hmdb"),
-      c(
-        "commonName", "pathwayName", "pathwaysource",
-        "pathwaysourceId", "rampId", "pathwayRampId"
-      )
-    ])
-  } else {
-    out <- out[
-      which(out$pathwaysource != "hmdb"),
-      c(
-        "commonName", "pathwayName", "pathwaysource",
-        "pathwaysourceId", "rampId", "pathwayRampId"
-      )
-    ] %>%
-        cleanup()
-    out <- out[!duplicated(out), ]
-    return(out)
+  con <- connectToRaMP()
+  df2 <- DBI::dbGetQuery(con, sql)
+
+
+  if(find_synonym && nrow(df2) > 0) {
+    rampIds <- df2[,'rampId']
+
+    rampIds <- sapply(rampIds, shQuote)
+    rampIds <- paste(rampIds, collapse = ",")
+
+    sql = paste0("select rampId as rampId, group_concat(distinct Synonym order by Synonym separator '; ')
+     as synonyms from analytesynonym
+     where rampId in (",rampIds,") group by rampId")
+
+    synonymsDf <- DBI::dbGetQuery(con, sql)
+
+    if(nrow(synonymsDf)>0) {
+      df2 <- merge(df2,synonymsDf, by='rampId')
+    }
   }
+
+  DBI::dbDisconnect(con)
+
+  if(!includeRaMPids && nrow(df2) > 0) {
+    df2 <- subset(df2,select=-c(rampId))
+  }
+
+  print("finished getPathwaytFromAnalyte()")
+  print(paste0("Found ",nrow(df2)," associated pathways."))
+
+  return(df2)
 }
+
+
+
+
 
 #' Perform fuzzy multiple linkage partitioning clustering on pathways
 #' identified by Fisher's test
@@ -1049,3 +1025,7 @@ FilterFishersResults <- function(fishers_df, p_holmadj_cutoff = 1,
     }
   }
 }
+
+
+
+
