@@ -34,6 +34,6 @@ pkg.globals <- setConnectionToRaMP(
   dbname = "ramp2", username = "root",
   conpass = "", host = "localhost"
 )
-mypath <- getPathwayFromAnalyte(analytes = c("2-hydroxyglutarate", "glutamate"))
+mypath <- getPathwayFromAnalyteV2(analytes = c("2-hydroxyglutarate", "glutamate"))
 }
 }
