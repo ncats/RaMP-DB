@@ -219,13 +219,13 @@ runFisherTest <- function(analytes, background = "database",
           bg_out_pathway <- tot_bg_analytes - bg_in_pathway
       }
 
-      if(length(background) != 1){
+      if(length(background) == 1){
           contingencyTb[1, 1] = tot_in_pathway - user_in_pathway
       }else{
           contingencyTb[1, 1] = bg_in_pathway
       }
 
-      if(length(background) != 1){
+      if(length(background) == 1){
           contingencyTb[1, 2] = tot_out_pathway - user_out_pathway
       }else{
           contingencyTb[1, 2] = bg_out_pathway
@@ -527,8 +527,8 @@ runCombinedFisherTest <- function(analytes,
     keepers <- which(out$Num_In_Path >= min_analyte)
     out2 <- merge(
       pathwaydf_metab[, c(
-        "pathwayName", "pathwayRampId", "pathwaysourceId",
-        "pathwaysource"
+        "pathwayName", "pathwayRampId", "pathwayId",
+        "pathwaySource"
       )],
       out[keepers, ],
       by = "pathwayRampId"
@@ -544,8 +544,8 @@ runCombinedFisherTest <- function(analytes,
     keepers <- which(out$Num_In_Path >= min_analyte)
     out2 <- merge(
       pathwaydf_gene[, c(
-        "pathwayName", "pathwayRampId", "pathwaysourceId",
-        "pathwaysource"
+        "pathwayName", "pathwayRampId", "pathwayId",
+        "pathwaySource"
       )],
       out[keepers, ],
       by = "pathwayRampId"
@@ -609,8 +609,8 @@ runCombinedFisherTest <- function(analytes,
     ##   )
     out2 <- merge(
       pathwaydf[, c(
-        "pathwayName", "pathwayRampId", "pathwaysourceId",
-        "pathwaysource"
+        "pathwayName", "pathwayRampId", "pathwayId",
+        "pathwaySource"
       )],
       out[keepers, ],
       by = "pathwayRampId"
@@ -683,7 +683,7 @@ getPathwayFromAnalyte <- function(analytes = "none",
 
   if(NameOrIds == 'ids') {
     print("Working on ID List...")
-    sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, s.sourceId as inputId, group_concat(distinct s.commonName order by s.commonName separator '; ') as commonName, s.rampId from
+    sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, s.sourceId as inputId, group_concat(distinct s.commonName order by s.commonName separator '; ') as commonName, s.rampId, p.pathwayRampId from
                   source s,
                   analytehaspathway ap,
                   pathway p
@@ -699,7 +699,7 @@ getPathwayFromAnalyte <- function(analytes = "none",
                   order by pathwayName asc")
   } else {
     print("Working on analyte name list...")
-    sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, lower(s.commonName) as inputCommonName, group_concat(distinct s.sourceId order by s.sourceId separator '; ') as sourceIds, s.rampId from
+    sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, lower(s.commonName) as inputCommonName, group_concat(distinct s.sourceId order by s.sourceId separator '; ') as sourceIds, s.rampId, p.pathwayRampId from
                   source s,
                   analytehaspathway ap,
                   pathway p
@@ -739,7 +739,7 @@ getPathwayFromAnalyte <- function(analytes = "none",
   DBI::dbDisconnect(con)
 
   if(!includeRaMPids && nrow(df2) > 0) {
-    df2 <- subset(df2,select=-c(rampId))
+    df2 <- subset(df2,select=-c(rampId, pathwayRampId))
   }
 
   print("finished getPathwaytFromAnalyte()")
@@ -788,7 +788,7 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
   }
   analyte_type <- fishers_df$analyte_type
   fishers_df <- fishers_df$fishresults
-  list_pathways <- fishers_df %>% dplyr::pull("pathwaysourceId")
+  list_pathways <- fishers_df %>% dplyr::pull("pathwayId")
   list_pathways <- sapply(list_pathways, shQuote)
   list_pathways <- paste(list_pathways, collapse = ",")
   query <- paste0(
@@ -798,14 +798,14 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
   )
   con <- connectToRaMP()
   idkey <- DBI::dbGetQuery(con, query) %>%
-    dplyr::rename("pathwaysourceId" = "sourceId") ##  %>%
+    dplyr::rename("pathwayId" = "sourceId") ##  %>%
   ## dplyr::rename("rampId" = "pathwayRampId")
 
   rampToSource <- function(x) {
     out <- with(idkey, {
       idkey %>%
         dplyr::filter(pathwayRampId == x) %>%
-        dplyr::pull("pathwaysourceId")
+        dplyr::pull("pathwayId")
     })
     return(out)
   }
@@ -814,7 +814,7 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
 
   fishers_df <-
     fishers_df %>%
-    dplyr::left_join(idkey, by = "pathwaysourceId")
+    dplyr::left_join(idkey, by = "pathwayId")
   if (nrow(fishers_df) == 0) {
     return(NULL)
   } else if (nrow(fishers_df) == 1) {
