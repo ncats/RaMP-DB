@@ -38,6 +38,6 @@ metList = c('hmdb:HMDB0000056',
 # the background population can be a separate ID list (preferred) or all database entries
 # (skip pop parameter).
 pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-enrichedClassStats <- chemicalClassEnrichment(mets = metLits)
+enrichedClassStats <- chemicalClassEnrichment(mets = metList)
 }
 }

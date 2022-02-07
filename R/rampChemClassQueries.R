@@ -112,7 +112,7 @@ chemicalClassSurvey <- function(mets, pop = "database", includeRaMPids = FALSE){
 #' # (skip pop parameter).
 #' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
 
-#' enrichedClassStats <- chemicalClassEnrichment(mets = metLits)
+#' enrichedClassStats <- chemicalClassEnrichment(mets = metList)
 #'}
 #' @export
 chemicalClassEnrichment <- function(mets, pop = "database") {
