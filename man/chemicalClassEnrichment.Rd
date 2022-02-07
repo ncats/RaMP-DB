@@ -9,7 +9,7 @@ chemicalClassEnrichment(mets, pop = "database")
 \arguments{
 \item{mets}{a vector of source prepended metabolite ids}
 
-\item{pop}{an optional vector of source prepended metabolite ids to be used as the background reference population of 
+\item{pop}{an optional vector of source prepended metabolite ids to be used as the background reference population of
 metabolites for enrichment. If "database", the background population is taken as all RaMP DB metabolites. Default: 'database'}
 }
 \value{
@@ -35,11 +35,9 @@ metList = c('hmdb:HMDB0000056',
             'hmdb:HMDB0008057',
             'hmdb:HMDB0011211')
 
-# the background population can be a separate ID list (preferred) or all database entries 
+# the background population can be a separate ID list (preferred) or all database entries
 # (skip pop parameter).
 pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-metClassResult <- chemicalClassSurvey(mets = mets)
-
-enrichedClassStats <- chemicalClassEnrichment(metClassResult)
+enrichedClassStats <- chemicalClassEnrichment(mets = metLits)
 }
 }

@@ -47,7 +47,7 @@
 #'             'hmdb:HMDB0008057',
 #'             'hmdb:HMDB0011211')
 #'
-#' # the background population can be a separate ID list (preferred) or all database entries 
+#' # the background population can be a separate ID list (preferred) or all database entries
 #' # (skip pop parameter).
 #' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
 #' metClassResult <- chemicalClassSurvey(mets = mets)
@@ -66,7 +66,7 @@ chemicalClassSurvey <- function(mets, pop = "database", includeRaMPids = FALSE){
   print("Starting Chemical Class Survey")
 
   if(length(pop)==1){
-      if(pop == "database"){ 
+      if(pop == "database"){
           res <- chemicalClassSurveyRampIdsFullPopConn(mets, conn)
       }
   } else {
@@ -87,7 +87,7 @@ chemicalClassSurvey <- function(mets, pop = "database", includeRaMPids = FALSE){
 #' returns chemical class information comparing a metabolite subset to a metabolite population
 #'
 #' @param mets a vector of source prepended metabolite ids
-#' @param pop an optional vector of source prepended metabolite ids to be used as the background reference population of 
+#' @param pop an optional vector of source prepended metabolite ids to be used as the background reference population of
 #' metabolites for enrichment. If "database", the background population is taken as all RaMP DB metabolites. Default: 'database'
 #' @return a data frame containing chemical class enrichment statistics
 #'
@@ -108,12 +108,11 @@ chemicalClassSurvey <- function(mets, pop = "database", includeRaMPids = FALSE){
 #'             'hmdb:HMDB0008057',
 #'             'hmdb:HMDB0011211')
 #'
-#' # the background population can be a separate ID list (preferred) or all database entries 
+#' # the background population can be a separate ID list (preferred) or all database entries
 #' # (skip pop parameter).
 #' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-#' metClassResult <- chemicalClassSurvey(mets = mets)
-#'
-#' enrichedClassStats <- chemicalClassEnrichment(metClassResult)
+
+#' enrichedClassStats <- chemicalClassEnrichment(mets = metLits)
 #'}
 #' @export
 chemicalClassEnrichment <- function(mets, pop = "database") {
