@@ -266,7 +266,7 @@ classy_fire_classes <- chemical.enrichment$ClassyFire_class
 datatable(classy_fire_classes)
 ```
 
-*Note*: To explicitly view the results of mapping input IDs to RaMP, users can run the getPathwayFromAnalyte() function as noted in above in the section "Retrieve Pathways From Input Analyte(s)".
+*Note*: To explicitly view the results of mapping input IDs to RaMP, users can run the chemicalClassSurvey() function as noted in above in the section "Retrieve Chemical Class from Input Metabolites".
 
 ```{r}
 sessionInfo()
