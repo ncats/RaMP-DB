@@ -215,6 +215,8 @@ fisher.results <- runCombinedFisherTest(analytes = c(
 
 ```
 
+*Note*: To explicitly view the results of mapping input IDs to RaMP, users can run the getPathwayFromAnalyte() function as noted in above in the section "Retrieve Pathways From Input Analyte(s)".
+
 Once we have our fisher results we can format them into a new dataframe and filter the pathways for significance.
 For this example we will be using an FDR p-value cutoff of 0.05.
 ```{r}
@@ -264,6 +266,7 @@ classy_fire_classes <- chemical.enrichment$ClassyFire_class
 datatable(classy_fire_classes)
 ```
 
+*Note*: To explicitly view the results of mapping input IDs to RaMP, users can run the getPathwayFromAnalyte() function as noted in above in the section "Retrieve Pathways From Input Analyte(s)".
 
 ```{r}
 sessionInfo()
