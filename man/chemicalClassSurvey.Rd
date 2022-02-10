@@ -2,7 +2,7 @@
 % Please edit documentation in R/rampChemClassQueries.R
 \name{chemicalClassSurvey}
 \alias{chemicalClassSurvey}
-\title{Returns chemical class information comparing a metabolite subset to a metabolite population}
+\title{Returns chemical class information comparing a metabolite subset to a larger metabolite population.}
 \usage{
 chemicalClassSurvey(mets, pop = "database", includeRaMPids = FALSE)
 }
@@ -16,10 +16,10 @@ metabolites for enrichment.   If "database", the background population is taken 
 }
 \value{
 Returns chemcial class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
-metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolve and listing those metabolite ids
+metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolved and listing those metabolite ids
 that are not found in the database.
 
-The returned object (return_obj below) contains three or four main result areas. Use str(return_ob) to see the structure described here.
+The returned object (return_obj below) contains three or four main result areas. Use str(return_obj) to see the structure described here.
 
 \strong{return_obj$count_summary} contains a dataframe for each category of class annotations (e.g. class, sub_class)
 This count summary contains:
@@ -41,7 +41,7 @@ that were found in the database and a list of metabolite ids that were not found
 There are two sections, one for the metabolite list and a second when an optional population list is provided.
 }
 \description{
-Returns chemical class information comparing a metabolite subset to a metabolite population
+Returns chemical class information comparing a metabolite subset to a larger metabolite population.
 }
 \examples{
 \dontrun{
@@ -60,10 +60,10 @@ metList = c('hmdb:HMDB0000056',
             'hmdb:HMDB0008057',
             'hmdb:HMDB0011211')
 
-# the background population can be a separate ID list (preferred) or all database entries
+# The background population can be a separate ID list (preferred) or all database entries
 # (skip pop parameter).
 pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-metClassResult <- chemicalClassSurvey(mets = mets)
+metClassResult <- chemicalClassSurvey(mets = metList)
 
 # show structure
 utils::str(metClassResult)

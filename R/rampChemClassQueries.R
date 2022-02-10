@@ -1,16 +1,16 @@
 # queries to retrieve and analyze chemical classes
 
-#' Returns chemical class information comparing a metabolite subset to a metabolite population
+#' Returns chemical class information comparing a metabolite subset to a larger metabolite population.
 #'
 #' @param mets a list object of source prepended metaboite ids, representing a metabolite set of interest
 #' @param pop an optional vector of source prepended metaboite ids to be used as the background reference population of
 #' metabolites for enrichment.   If "database", the background population is taken as all RaMP DB metabolites. Default: "database"
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
 #' @return Returns chemcial class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
-#' metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolve and listing those metabolite ids
+#' metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolved and listing those metabolite ids
 #' that are not found in the database.
 #'
-#' The returned object (return_obj below) contains three or four main result areas. Use str(return_ob) to see the structure described here.
+#' The returned object (return_obj below) contains three or four main result areas. Use str(return_obj) to see the structure described here.
 #'
 #' \strong{return_obj$count_summary} contains a dataframe for each category of class annotations (e.g. class, sub_class)
 #' This count summary contains:
@@ -47,10 +47,10 @@
 #'             'hmdb:HMDB0008057',
 #'             'hmdb:HMDB0011211')
 #'
-#' # the background population can be a separate ID list (preferred) or all database entries
+#' # The background population can be a separate ID list (preferred) or all database entries
 #' # (skip pop parameter).
 #' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-#' metClassResult <- chemicalClassSurvey(mets = mets)
+#' metClassResult <- chemicalClassSurvey(mets = metList)
 #'
 #' # show structure
 #' utils::str(metClassResult)
@@ -84,12 +84,15 @@ chemicalClassSurvey <- function(mets, pop = "database", includeRaMPids = FALSE){
 }
 
 
-#' returns chemical class information comparing a metabolite subset to a metabolite population
+#' Returns chemical class information comparing a metabolite subset to a metabolite population, including Fisher Exact Test
+#' enrichment p-values and FDR values.
 #'
 #' @param mets a vector of source prepended metabolite ids
 #' @param pop an optional vector of source prepended metabolite ids to be used as the background reference population of
 #' metabolites for enrichment. If "database", the background population is taken as all RaMP DB metabolites. Default: 'database'
-#' @return a data frame containing chemical class enrichment statistics
+#' @return a list of dataframes, each holding chemical classs enrichment statistics for specific chemical classification systems,
+#' such as HMDB Classyfire class categories and LIPIDMAPS class categories.  The results list chemical classes, metabolite hits counts,
+#' Fisher Exact p-values and Benjamini-Hochberg corrected p-values (FDR estimates)
 #'
 #'@examples
 #'\dontrun{

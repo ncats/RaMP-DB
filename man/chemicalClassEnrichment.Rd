@@ -2,7 +2,8 @@
 % Please edit documentation in R/rampChemClassQueries.R
 \name{chemicalClassEnrichment}
 \alias{chemicalClassEnrichment}
-\title{returns chemical class information comparing a metabolite subset to a metabolite population}
+\title{Returns chemical class information comparing a metabolite subset to a metabolite population, including Fisher Exact Test
+enrichment p-values and FDR values.}
 \usage{
 chemicalClassEnrichment(mets, pop = "database")
 }
@@ -13,10 +14,13 @@ chemicalClassEnrichment(mets, pop = "database")
 metabolites for enrichment. If "database", the background population is taken as all RaMP DB metabolites. Default: 'database'}
 }
 \value{
-a data frame containing chemical class enrichment statistics
+a list of dataframes, each holding chemical classs enrichment statistics for specific chemical classification systems,
+such as HMDB Classyfire class categories and LIPIDMAPS class categories.  The results list chemical classes, metabolite hits counts,
+Fisher Exact p-values and Benjamini-Hochberg corrected p-values (FDR estimates)
 }
 \description{
-returns chemical class information comparing a metabolite subset to a metabolite population
+Returns chemical class information comparing a metabolite subset to a metabolite population, including Fisher Exact Test
+enrichment p-values and FDR values.
 }
 \examples{
 \dontrun{

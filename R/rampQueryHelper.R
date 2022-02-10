@@ -328,12 +328,27 @@ chemicalClassSurveyRampIdsFullPopConn <- function(mets, conn) {
   # get query summary
   metQueryReport <- queryReport(mets, metsData$sourceId)
 
-  metsCountData <- data.frame(table(metsData$class_level_name,metsData$class_name))
-  colnames(metsCountData) <- c("class_level", "class_name", "freq")
-  metsCountData <- metsCountData[metsCountData$freq != 0,]
-  metsCountData <- metsCountData[order(-metsCountData$freq),]
+  emptyMetsResult = FALSE
 
-  print("...finished metabolite list query...")
+  if(nrow(metsData) > 0) {
+
+    metsCountData <- data.frame(table(metsData$class_level_name,metsData$class_name))
+
+    colnames(metsCountData) <- c("class_level", "class_name", "freq")
+    metsCountData <- metsCountData[metsCountData$freq != 0,]
+    metsCountData <- metsCountData[order(-metsCountData$freq),]
+
+    print("...finished metabolite list query...")
+
+  } else {
+
+    emptyMetsResult = TRUE
+
+    print("...finished metabolite list query, Warning: NO query term matches in RaMP DB...")
+    # build and empty result for the mets data
+    metsCountData <- data.frame(matrix(ncol=3, nrow=0))
+    colnames(metsCountData) <- c("class_level", "class_name", "freq")
+  }
 
   sql <- paste("select class_level_name, class_name, count(1) as pop_hits from metabolite_class
                  group by class_level_name, class_name")
@@ -358,10 +373,17 @@ chemicalClassSurveyRampIdsFullPopConn <- function(mets, conn) {
 
   for (className in classes) {
     subTable <- mergeCountData[mergeCountData$class_level == className,]
+
     subTable$fract_within_pop <- subTable$pop_count / sum(subTable$pop_count)
     subTable$fract_within_mets <- subTable$mets_count / sum(subTable$mets_count)
+
+    # handle NAs more gracefully
+    subTable[is.na(subTable)] <- 0
+
+    # append result for the class category
     resultSummary[[className]] <- subTable
   }
+
 
   print("...creating query efficiency summary...")
   result <- list()
