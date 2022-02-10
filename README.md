@@ -8,8 +8,10 @@ This R package includes functions that allow users to interface with this up-do-
 
 The code used to build the backend RaMP database is freely available at https://github.com/ncats/RaMP-Backend and we are currently working on a revamp of the web interface.
 
-Please check out the following paper for further details.   
+Please [click here to view our preprint](https://www.biorxiv.org/content/10.1101/2022.01.19.476987v1).
 
+# APIs
+API access is now available [here](https://ramp-api-alpha.ncats.io/__docs__/).
 
 # Why RaMP (Relational Database of Metabolomic Pathways)
 
