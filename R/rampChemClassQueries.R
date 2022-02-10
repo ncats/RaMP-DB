@@ -126,12 +126,20 @@ chemicalClassEnrichment <- function(mets, pop = "database") {
 
   totalCountInfo <- getTotalFoundInCategories(classData)
 
-  for (categoryData in classData$count_summary) {
-    if(nrow(categoryData) > 0) {
+  breakPoint <- TRUE
+
+  for (category in names(classData$count_summary)) {
+
+    categoryData <- classData$count_summary[[category]]
+
+    # only run if we have data for that class category
+    # ANNNND we have that category represented in $mets
+    if(nrow(categoryData) > 0 && category %in% names(totalCountInfo$mets)) {
       resultRow <- 1
-      classCat <- categoryData[1,'class_level']
-      totMetCnt <- totalCountInfo$mets[[classCat]]
-      totPopCnt <- as.integer(totalCountInfo$pop[[classCat]])
+
+      category <- category
+      totMetCnt <- totalCountInfo$mets[[category]]
+      totPopCnt <- as.integer(totalCountInfo$pop[[category]])
       contingencyMat <- matrix(nrow=2, ncol=2)
       resultMat <- data.frame(matrix(ncol=7))
       colnames(resultMat) <- c("category", "class_name", "met_hits", "pop_hits",
@@ -147,7 +155,7 @@ chemicalClassEnrichment <- function(mets, pop = "database") {
           p <- stats::fisher.test(contingencyMat, alternative = "greater")
           p <- p$p.value
 
-          row = list(as.character(classCat), as.character(className), contingencyMat[1,1], contingencyMat[1,1] + contingencyMat[2,1],
+          row = list(as.character(category), as.character(className), contingencyMat[1,1], contingencyMat[1,1] + contingencyMat[2,1],
                      totMetCnt, totPopCnt, p)
 
           resultMat[resultRow, ] <- row
@@ -157,7 +165,13 @@ chemicalClassEnrichment <- function(mets, pop = "database") {
       }
       resultMat
       resultMat <- bhCorrect(resultMat)
-      enrichmentStat[[as.character(classCat)]] <- resultMat
+      enrichmentStat[[as.character(category)]] <- resultMat
+    } else {
+      # just append an empty data frame place holder for that category type.
+      resultMat <- data.frame(matrix(ncol=7, nrow=0))
+      colnames(resultMat) <- c("category", "class_name", "met_hits", "pop_hits",
+                               "met_size", "pop_size", "p-value")
+      enrichmentStat[[as.character(category)]] <- resultMat
     }
   }
   print("Finished Chemical Class Enrichment")
