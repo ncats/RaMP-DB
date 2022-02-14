@@ -58,7 +58,7 @@ runFisherTest <- function(analytes, background = "database",
     query <- paste0(
       "SELECT analytehasontology.*, ontology.*, analytehaspathway.* from analytehasontology, ontology, analytehaspathway where ontology.commonName in ('",
       biospecimen_background,
-      "') and ontology.rampOntologyIdLocation = analytehasontology.rampOntologyIdLocation and analytehasontology.rampCompoundId = analytehaspathway.rampId"
+      "') and ontology.rampOntologyId = analytehasontology.rampOntologyId and analytehasontology.rampCompoundId = analytehaspathway.rampId"
     )
     con <- connectToRaMP()
     backgrounddf <- DBI::dbGetQuery(con, query)
@@ -681,7 +681,8 @@ getPathwayFromAnalyte <- function(analytes = "none",
     return(NULL)
   }
 
-  if(NameOrIds == 'ids') {
+    if(NameOrIds == 'ids') {
+        browser()
     print("Working on ID List...")
     sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, s.sourceId as inputId, group_concat(distinct s.commonName order by s.commonName separator '; ') as commonName, s.rampId, p.pathwayRampId from
                   source s,
@@ -698,7 +699,7 @@ getPathwayFromAnalyte <- function(analytes = "none",
                   group by inputId, rampId, pathwayId
                   order by pathwayName asc")
   } else {
-    print("Working on analyte name list...")
+      print("Working on analyte name list...")
     sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, lower(s.commonName) as inputCommonName, group_concat(distinct s.sourceId order by s.sourceId separator '; ') as sourceIds, s.rampId, p.pathwayRampId from
                   source s,
                   analytehaspathway ap,
