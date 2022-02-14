@@ -682,7 +682,6 @@ getPathwayFromAnalyte <- function(analytes = "none",
   }
 
     if(NameOrIds == 'ids') {
-        browser()
     print("Working on ID List...")
     sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, s.sourceId as inputId, group_concat(distinct s.commonName order by s.commonName separator '; ') as commonName, s.rampId, p.pathwayRampId from
                   source s,
