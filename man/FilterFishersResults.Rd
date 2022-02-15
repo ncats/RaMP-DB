@@ -12,7 +12,7 @@ FilterFishersResults(fishers_df, pval_type = "fdr", pval_cutoff = 0.1)
 \item{pval_type}{Specifies which p-value to use as the filter threshold.
 Permitted values are 'pval' 'holm', 'fdr'. Default is 'fdr'.}
 
-\item{pval_cutoff}{return pathways where FDR adjusted pvalues are < p_fdradj_cutoff}
+\item{pval_cutoff}{return pathways where pval_type p-values are < pval_cutoff}
 }
 \value{
 list:[[1]]Dataframe with pathway enrichment results, only significant pathways
