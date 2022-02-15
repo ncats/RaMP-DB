@@ -695,7 +695,7 @@ getPathwayFromAnalyte <- function(analytes = "none",
                   p.pathwayRampId = ap.pathwayRampId
                   and
                   p.type != 'hmdb'
-                  group by inputId, rampId, pathwayId
+                  group by inputId, rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId
                   order by pathwayName asc")
   } else {
     print("Working on analyte name list...")
@@ -711,7 +711,7 @@ getPathwayFromAnalyte <- function(analytes = "none",
                   p.pathwayRampId = ap.pathwayRampId
                   and
                   p.type != 'hmdb'
-                  group by inputCommonName, s.rampId, pathwayId
+                  group by inputCommonName, s.rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId
                   order by pathwayName asc")
   }
 
