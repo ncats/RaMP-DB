@@ -73,7 +73,6 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
                                   perc_pathway_overlap = perc_pathway_overlap,
                                   min_pathway_tocluster = min_pathway_tocluster
                                   )
-
   fishresult <- fishClustering$fishresults
   if (pathwaysSig$analyte_type == "genes" | pathwaysSig$analyte_type == "metabolites") {
     inPath <- fishresult$Num_In_Path
@@ -99,7 +98,6 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
     })
   }
 
-
   if (pval == "FDR") {
     clusterDF <- data.frame(
       x = -log10(fishresult[, grepl("FDR", colnames(fishresult))]),
@@ -107,7 +105,7 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
       inPath = inPath,
       totPath = totPath,
       cluster = fishresult$cluster_assignment,
-      pathwaysource = fishresult$pathwaysource,
+      pathwaysource = fishresult$pathwaySource,
       analytes = fishresult$analytes
     )
     ylab <- "-log10(FDR pval)"
