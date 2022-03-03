@@ -15,7 +15,8 @@ runCombinedFisherTest(
   MCall = F,
   alternative = "less",
   min_path_size = 5,
-  max_path_size = 150
+  max_path_size = 150,
+  includeRaMPids = FALSE
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ enrichment.  If value is "database", all metabolites in the RaMP database will b
 \item{min_path_size}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
 
 \item{max_path_size}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
+
+\item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
 }
 \value{
 a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
