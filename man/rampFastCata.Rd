@@ -16,7 +16,8 @@ a dataframe containing query results. If the input is a metabolite, the function
 gene transcript common names and source IDs that are known to catalyze
 reactions in the same pathway as that metabolite. Conversely, if the input
 is a gene, the function will return the common name and source id of metabolites
-known to be catalyzed directly or indirectly by that gene.
+known to be catalyzed directly or indirectly by that gene. Input ids and common names will be returned.
+If no input ids or names are found in the database, the return value will be an empty data frame, 0 rows.
 }
 \description{
 Retrieves analytes that involved in same reaction as input metabolite
