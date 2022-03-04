@@ -6,7 +6,8 @@
 #' gene transcript common names and source IDs that are known to catalyze
 #' reactions in the same pathway as that metabolite. Conversely, if the input
 #' is a gene, the function will return the common name and source id of metabolites
-#' known to be catalyzed directly or indirectly by that gene.
+#' known to be catalyzed directly or indirectly by that gene. Input ids and common names will be returned.
+#' If no input ids or names are found in the database, the return value will be an empty data frame, 0 rows.
 #'
 #' @examples
 #' \dontrun{
@@ -126,16 +127,18 @@ rampFastCata <- function(analytes="none", NameOrIds="ids") {
       df2$query_relation <- 'gene2met'
       result <- df2
     } else {
-      result <- NULL
+      # default handling of empty result
+      # empty df1 requires use of tibble/tidyr add_column
+      df1 <- add_column(df1, 'query_relation'=NA)
+      result <- df1
     }
   }
 
-  if(!is.null(result)) {
-    # remove rampId column
-    result <- subset(result, select=-c(rampId))
-    # move relation first
-    result <- result[,c(ncol(result), 1:(ncol(result)-1))]
-  }
+
+  # remove rampId column
+  result <- subset(result, select=-c(rampId))
+  # move relation first
+  result <- result[,c(ncol(result), 1:(ncol(result)-1))]
 
   print(paste0("Total Relation Count: ", (nrow(result))))
 
