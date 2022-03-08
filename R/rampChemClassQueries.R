@@ -66,9 +66,9 @@ chemicalClassSurvey <- function(mets, pop = "database", includeRaMPids = FALSE){
   print("Starting Chemical Class Survey")
 
   if(length(pop)==1){
-      if(pop == "database"){
-          res <- chemicalClassSurveyRampIdsFullPopConn(mets, conn)
-      }
+    if(pop == "database"){
+      res <- chemicalClassSurveyRampIdsFullPopConn(mets, conn)
+    }
   } else {
     res <- chemicalClassSurveyRampIdsConn(mets, pop, conn)
   }
@@ -76,10 +76,17 @@ chemicalClassSurvey <- function(mets, pop = "database", includeRaMPids = FALSE){
 
   print("Finished Chemical Class Survey")
   if(includeRaMPids){
-      return(res)
+    return(res)
   }else{
+    if(!is.null(res$met_classes)) {
       res$met_classes<-res$met_classes %>% cleanup
-      return(res)
+      res$met_classes<-res$met_classes %>% cleanup
+    }
+    if(!is.null(res$pop_classes)) {
+      res$pop_classes<-res$pop_classes %>% cleanup
+      res$pop_classes<-res$pop_classes %>% cleanup
+    }
+    return(res)
   }
 }
 
@@ -174,6 +181,7 @@ chemicalClassEnrichment <- function(mets, pop = "database") {
       enrichmentStat[[as.character(category)]] <- resultMat
     }
   }
+  enrichmentStat[['result_type']] <- 'chemical_class_enrichment'
   print("Finished Chemical Class Enrichment")
   return(enrichmentStat)
 }
