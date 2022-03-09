@@ -142,7 +142,7 @@ getMetaFromOnto <- function(ontology) {
           from source s, analytehasontology ao, ontology o where ao.rampOntologyId in (
           select distinct rampOntologyId from ontology where commonName in (",ontologyList,"))
           and o.rampOntologyId = ao.rampOntologyId and s.rampId = ao.rampCompoundId
-          group by o.commonName, s.rampId")
+          group by o.commonName, s.rampId, o.HMDBOntologyType")
 
     con <- connectToRaMP()
     mdf_final <- RMariaDB::dbGetQuery(con,sql)
