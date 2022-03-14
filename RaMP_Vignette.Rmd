@@ -105,10 +105,10 @@ To retrieve the number of unique pathways returned for all analytes or each anal
 
 ```{r}
 print(paste("Number of Unique Pathways Returned for All Analytes:", 
-            length(unique(pathwaydfids$pathwaysourceId))))
+            length(unique(pathwaydfids$pathwayId))))
 lapply(unique(pathwaydfids$commonName), function(x) {
         (paste("Number of Unique Pathways Returned for",x,":",
-                length(unique(pathwaydfids[which(pathwaydfids$commonName==x),]$pathwaysourceId))))})
+                length(unique(pathwaydfids[which(pathwaydfids$commonName==x),]$pathwayId))))})
 ```
 
 ### Retrieve Metabolites from Metabolite Ontologies
@@ -221,7 +221,7 @@ Once we have our fisher results we can format them into a new dataframe and filt
 For this example we will be using an FDR p-value cutoff of 0.05.
 ```{r}
 #Returning Fisher Pathways and P-Values
-filtered.fisher.results <- FilterFishersResults(fisher.results, p_holmadj_cutoff = 0.05)
+filtered.fisher.results <- FilterFishersResults(fisher.results, pval_type = 'holm', pval_cutoff=0.05)
 ```
 
 Because RaMP combines pathways from multiple sources, pathways may be represented more than once.  Further, due to the hierarchical nature of pathways and because Fisher's testing assumes pathways are independent, subpathways and their parent pathways may appear in a list.
