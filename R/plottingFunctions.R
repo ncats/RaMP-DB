@@ -13,12 +13,12 @@
 plotCataNetwork <- function(catalyzedf = "") {
 
         if(catalyzedf == "" ||
-        (length(intersect(c("Input_Analyte","Input_CatalyzedBy_CommonName",
-                "Input_CatalyzedBy_SourceIds"),colnames(catalyzedf)))!=3)) {
+        (length(intersect(c("input_analyte","rxn_partner_common_name",
+                "rxn_partner_ids"),colnames(catalyzedf)))!=3)) {
                 stop("Please make sure that the input is the resulting data.frame returned by the rampFastCata() function")
         }
 
-        toplot = catalyzedf[,c("Input_Analyte","Input_CatalyzedBy_CommonName")]
+        toplot = catalyzedf[,c("input_analyte","rxn_partner_common_name")]
         colnames(toplot)<-c("from","to")
 
         #colopts <- brewer.pal(12,"Set3")
@@ -194,7 +194,7 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
       breaks = c(2, 4, 6, 8, 10),
       name = "# of Altered Analytes in Pathway"
       )
-  
+
   if(interactive){
       return(plotly::ggplotly(p, tooltip="text"))
   }else if (!interactive){
