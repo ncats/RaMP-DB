@@ -8,3 +8,4 @@ pkg.globals <- setConnectionToRaMP(
 )
 
 test_check("RaMP")
+
