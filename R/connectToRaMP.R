@@ -43,22 +43,22 @@ connectToRaMP <- function() {
 	stop("Be sure the run the setConnectionToRaMP() and assign it to pkg.globals");
   }
   if(!is.null(get("socket",pkg.globals))) {
-  	con <- DBI::dbConnect(
+  	con <- RMariaDB::dbConnect(
 	    drv = RMariaDB::MariaDB(),
 	    dbname = get("dbname",pkg.globals),
 	    username = get("username",pkg.globals),
 	    password = get("conpass",pkg.globals),
 	    host = get("host",pkg.globals),
-	    unix.socket = get("socket",pkg.globals) 
+	    unix.socket = get("socket",pkg.globals)
 	)
   } else {
-       con <- DBI::dbConnect(
+       con <- RMariaDB::dbConnect(
             drv = RMariaDB::MariaDB(),
             dbname = get("dbname",pkg.globals),
             username = get("username",pkg.globals),
             password = get("conpass",pkg.globals),
             host = get("host",pkg.globals)
-	) 
+	)
    }
  return(con)
 }
