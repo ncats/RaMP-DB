@@ -1,16 +1,16 @@
 # queries to retrieve and analyze chemical classes
 
-#' Returns chemical class information comparing a metabolite subset to a metabolite population
+#' Returns chemical class information comparing a metabolite subset to a larger metabolite population.
 #'
 #' @param mets a list object of source prepended metaboite ids, representing a metabolite set of interest
 #' @param pop an optional vector of source prepended metaboite ids to be used as the background reference population of
 #' metabolites for enrichment.   If "database", the background population is taken as all RaMP DB metabolites. Default: "database"
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
 #' @return Returns chemcial class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
-#' metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolve and listing those metabolite ids
+#' metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolved and listing those metabolite ids
 #' that are not found in the database.
 #'
-#' The returned object (return_obj below) contains three or four main result areas. Use str(return_ob) to see the structure described here.
+#' The returned object (return_obj below) contains three or four main result areas. Use str(return_obj) to see the structure described here.
 #'
 #' \strong{return_obj$count_summary} contains a dataframe for each category of class annotations (e.g. class, sub_class)
 #' This count summary contains:
@@ -47,10 +47,10 @@
 #'             'hmdb:HMDB0008057',
 #'             'hmdb:HMDB0011211')
 #'
-#' # the background population can be a separate ID list (preferred) or all database entries 
+#' # The background population can be a separate ID list (preferred) or all database entries
 #' # (skip pop parameter).
 #' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-#' metClassResult <- chemicalClassSurvey(mets = mets)
+#' metClassResult <- chemicalClassSurvey(mets = metList)
 #'
 #' # show structure
 #' utils::str(metClassResult)
@@ -66,9 +66,9 @@ chemicalClassSurvey <- function(mets, pop = "database", includeRaMPids = FALSE){
   print("Starting Chemical Class Survey")
 
   if(length(pop)==1){
-      if(pop == "database"){ 
-          res <- chemicalClassSurveyRampIdsFullPopConn(mets, conn)
-      }
+    if(pop == "database"){
+      res <- chemicalClassSurveyRampIdsFullPopConn(mets, conn)
+    }
   } else {
     res <- chemicalClassSurveyRampIdsConn(mets, pop, conn)
   }
@@ -76,20 +76,30 @@ chemicalClassSurvey <- function(mets, pop = "database", includeRaMPids = FALSE){
 
   print("Finished Chemical Class Survey")
   if(includeRaMPids){
-      return(res)
+    return(res)
   }else{
+    if(!is.null(res$met_classes)) {
       res$met_classes<-res$met_classes %>% cleanup
-      return(res)
+      res$met_classes<-res$met_classes %>% cleanup
+    }
+    if(!is.null(res$pop_classes)) {
+      res$pop_classes<-res$pop_classes %>% cleanup
+      res$pop_classes<-res$pop_classes %>% cleanup
+    }
+    return(res)
   }
 }
 
 
-#' returns chemical class information comparing a metabolite subset to a metabolite population
+#' Returns chemical class information comparing a metabolite subset to a metabolite population, including Fisher Exact Test
+#' enrichment p-values and FDR values.
 #'
 #' @param mets a vector of source prepended metabolite ids
-#' @param pop an optional vector of source prepended metabolite ids to be used as the background reference population of 
+#' @param pop an optional vector of source prepended metabolite ids to be used as the background reference population of
 #' metabolites for enrichment. If "database", the background population is taken as all RaMP DB metabolites. Default: 'database'
-#' @return a data frame containing chemical class enrichment statistics
+#' @return a list of dataframes, each holding chemical classs enrichment statistics for specific chemical classification systems,
+#' such as HMDB Classyfire class categories and LIPIDMAPS class categories.  The results list chemical classes, metabolite hits counts,
+#' Fisher Exact p-values and Benjamini-Hochberg corrected p-values (FDR estimates)
 #'
 #'@examples
 #'\dontrun{
@@ -108,12 +118,11 @@ chemicalClassSurvey <- function(mets, pop = "database", includeRaMPids = FALSE){
 #'             'hmdb:HMDB0008057',
 #'             'hmdb:HMDB0011211')
 #'
-#' # the background population can be a separate ID list (preferred) or all database entries 
+#' # the background population can be a separate ID list (preferred) or all database entries
 #' # (skip pop parameter).
 #' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-#' metClassResult <- chemicalClassSurvey(mets = mets)
-#'
-#' enrichedClassStats <- chemicalClassEnrichment(metClassResult)
+
+#' enrichedClassStats <- chemicalClassEnrichment(mets = metList)
 #'}
 #' @export
 chemicalClassEnrichment <- function(mets, pop = "database") {
@@ -124,12 +133,20 @@ chemicalClassEnrichment <- function(mets, pop = "database") {
 
   totalCountInfo <- getTotalFoundInCategories(classData)
 
-  for (categoryData in classData$count_summary) {
-    if(nrow(categoryData) > 0) {
+  breakPoint <- TRUE
+
+  for (category in names(classData$count_summary)) {
+
+    categoryData <- classData$count_summary[[category]]
+
+    # only run if we have data for that class category
+    # ANNNND we have that category represented in $mets
+    if(nrow(categoryData) > 0 && category %in% names(totalCountInfo$mets)) {
       resultRow <- 1
-      classCat <- categoryData[1,'class_level']
-      totMetCnt <- totalCountInfo$mets[[classCat]]
-      totPopCnt <- as.integer(totalCountInfo$pop[[classCat]])
+
+      category <- category
+      totMetCnt <- totalCountInfo$mets[[category]]
+      totPopCnt <- as.integer(totalCountInfo$pop[[category]])
       contingencyMat <- matrix(nrow=2, ncol=2)
       resultMat <- data.frame(matrix(ncol=7))
       colnames(resultMat) <- c("category", "class_name", "met_hits", "pop_hits",
@@ -145,7 +162,7 @@ chemicalClassEnrichment <- function(mets, pop = "database") {
           p <- stats::fisher.test(contingencyMat, alternative = "greater")
           p <- p$p.value
 
-          row = list(as.character(classCat), as.character(className), contingencyMat[1,1], contingencyMat[1,1] + contingencyMat[2,1],
+          row = list(as.character(category), as.character(className), contingencyMat[1,1], contingencyMat[1,1] + contingencyMat[2,1],
                      totMetCnt, totPopCnt, p)
 
           resultMat[resultRow, ] <- row
@@ -155,9 +172,16 @@ chemicalClassEnrichment <- function(mets, pop = "database") {
       }
       resultMat
       resultMat <- bhCorrect(resultMat)
-      enrichmentStat[[as.character(classCat)]] <- resultMat
+      enrichmentStat[[as.character(category)]] <- resultMat
+    } else {
+      # just append an empty data frame place holder for that category type.
+      resultMat <- data.frame(matrix(ncol=7, nrow=0))
+      colnames(resultMat) <- c("category", "class_name", "met_hits", "pop_hits",
+                               "met_size", "pop_size", "p-value")
+      enrichmentStat[[as.character(category)]] <- resultMat
     }
   }
+  enrichmentStat[['result_type']] <- 'chemical_class_enrichment'
   print("Finished Chemical Class Enrichment")
   return(enrichmentStat)
 }

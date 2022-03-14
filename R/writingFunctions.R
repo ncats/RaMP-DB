@@ -13,16 +13,16 @@ writePathwaysToCSV <- function(mypathways = "none", outputfile = "none") {
             stop("Be sure to specify the output of the function getPathwayFromAnalyte() and an output file")
   }}
   if (!all(c(
-    "pathwayName", "pathwaysourceId",
-    "pathwaysource", "commonName"
+    "pathwayName", "pathwaySource",
+    "pathwayId", "inputId", "commonName"
   ) %in% colnames(mypathways))) {
     stop("Make sure that your input data is the output of the function getPathwayFromAnalyte()")
   }
   out <- mypathways[, c(
-    "pathwayName", "pathwaysourceId",
-    "pathwaysource", "commonName"
+    "pathwayName", "pathwaySource",
+    "pathwayId", "inputId", "commonName"
   )]
-  utils::write.csv(out, file = outputfile, row.names = F)
+  utils::write.csv(out, file = outputfile, row.names = F, quote=TRUE)
 }
 
 

@@ -13,12 +13,12 @@
 plotCataNetwork <- function(catalyzedf = "") {
 
         if(catalyzedf == "" ||
-        (length(intersect(c("Input_Analyte","Input_CatalyzedBy_CommonName",
-                "Input_CatalyzedBy_SourceIds"),colnames(catalyzedf)))!=3)) {
+        (length(intersect(c("input_analyte","rxn_partner_common_name",
+                "rxn_partner_ids"),colnames(catalyzedf)))!=3)) {
                 stop("Please make sure that the input is the resulting data.frame returned by the rampFastCata() function")
         }
 
-        toplot = catalyzedf[,c("Input_Analyte","Input_CatalyzedBy_CommonName")]
+        toplot = catalyzedf[,c("input_analyte","rxn_partner_common_name")]
         colnames(toplot)<-c("from","to")
 
         #colopts <- brewer.pal(12,"Set3")
@@ -73,7 +73,6 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
                                   perc_pathway_overlap = perc_pathway_overlap,
                                   min_pathway_tocluster = min_pathway_tocluster
                                   )
-
   fishresult <- fishClustering$fishresults
   if (pathwaysSig$analyte_type == "genes" | pathwaysSig$analyte_type == "metabolites") {
     inPath <- fishresult$Num_In_Path
@@ -99,7 +98,6 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
     })
   }
 
-
   if (pval == "FDR") {
     clusterDF <- data.frame(
       x = -log10(fishresult[, grepl("FDR", colnames(fishresult))]),
@@ -107,7 +105,7 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
       inPath = inPath,
       totPath = totPath,
       cluster = fishresult$cluster_assignment,
-      pathwaysource = fishresult$pathwaysource,
+      pathwaysource = fishresult$pathwaySource,
       analytes = fishresult$analytes
     )
     ylab <- "-log10(FDR pval)"
@@ -196,7 +194,7 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
       breaks = c(2, 4, 6, 8, 10),
       name = "# of Altered Analytes in Pathway"
       )
-  
+
   if(interactive){
       return(plotly::ggplotly(p, tooltip="text"))
   }else if (!interactive){
