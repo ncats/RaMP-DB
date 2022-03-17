@@ -34,8 +34,8 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
                   ");")
   con <- connectToRaMP()
 
-  df1 <- DBI::dbGetQuery(con,query)
-  DBI::dbDisconnect(con)
+  df1 <- RMariaDB::dbGetQuery(con,query)
+  RMariaDB::dbDisconnect(con)
 
   if(!return_rampIds){
       return(df1)
@@ -45,8 +45,8 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
       rampid <- paste(rampid,collapse = ",")
       query <- paste0("select * from analytesynonym where rampId in(",rampid,");")
       con <- connectToRaMP()
-      df2 <- DBI::dbGetQuery(con,query)
-      DBI::dbDisconnect(con)
+      df2 <- RMariaDB::dbGetQuery(con,query)
+      RMariaDB::dbDisconnect(con)
       df2 <- merge(df1,df2)
       if(full){
           return(df2)
@@ -86,8 +86,8 @@ rampFindSourceFromId <- function(rampId = "",full = TRUE){
   list_id <- paste(list_id,collapse = ",")
   query <- paste0("select * from source where rampId in (",list_id,");")
   con <- connectToRaMP()
-  df <- DBI::dbGetQuery(con,query)
-  DBI::dbDisconnect(con)
+  df <- RMariaDB::dbGetQuery(con,query)
+  RMariaDB::dbDisconnect(con)
   if(full){
     return(df)
   } else{
@@ -115,8 +115,8 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE){
   query1 <- paste0("select * from source where sourceid in (",
                    list_metabolite,");")
   con <- connectToRaMP()
-  df1<- DBI::dbGetQuery(con,query1)
-  DBI::dbDisconnect(con)
+  df1<- RMariaDB::dbGetQuery(con,query1)
+  RMariaDB::dbDisconnect(con)
   colnames(df1)[1] <-"sourceId2"
   #return(df1)
   rampid <- df1$rampId
@@ -125,8 +125,8 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE){
   query2 <- paste0("select * from analytehaspathway where
                    rampId in (",rampid,");")
   con <- connectToRaMP()
-  df2 <- DBI::dbGetQuery(con,query2)
-  DBI::dbDisconnect(con)
+  df2 <- RMariaDB::dbGetQuery(con,query2)
+  RMariaDB::dbDisconnect(con)
   #return(df2)
   id_list <- unique(df2$pathwayRampId)
   id_list <- sapply(id_list,shQuote)
@@ -135,8 +135,8 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE){
   query3 <- paste0("select * from pathway where pathwayRampId in (",
                    id_list,");")
   con <- connectToRaMP()
-  df3 <- DBI::dbGetQuery(con,query3)
-  DBI::dbDisconnect(con)
+  df3 <- RMariaDB::dbGetQuery(con,query3)
+  RMariaDB::dbDisconnect(con)
   #return(df3)
   mdf <- merge(df3,df2,all.x=T)
   mdf <- merge(mdf,df1,all.x = T)
@@ -172,8 +172,8 @@ rampFindSourceRampId <- function(sourceId){
   list_metabolite <- paste(list_metabolite,collapse = ",")
   con <- connectToRaMP()
   query <- paste0("select sourceId,IDtype as analytesource, rampId from source where sourceId in (",list_metabolite,");")
-  df <- DBI::dbGetQuery(con,query)
-  DBI::dbDisconnect(con)
+  df <- RMariaDB::dbGetQuery(con,query)
+  RMariaDB::dbDisconnect(con)
   return(df)
 }
 
@@ -524,7 +524,7 @@ rampFindClassInfoFromSourceId<-function(sourceIds){
                                         # need to filter for our specific source ids
     metsData <- subset(metsData, "sourceId" %in% sourceIds)
 
-    DBI::dbDisconnect(conn)
+    RMariaDB::dbDisconnect(conn)
     return(metsData)
 }
 
@@ -587,8 +587,8 @@ buildFrequencyTables<-function(inputdf){
 
     con <- connectToRaMP()
 
-    input_RampIds <- DBI::dbGetQuery(con,query)
-    DBI::dbDisconnect(con)
+    input_RampIds <- RMariaDB::dbGetQuery(con,query)
+    RMariaDB::dbDisconnect(con)
 
     return(input_RampIds)
 }
