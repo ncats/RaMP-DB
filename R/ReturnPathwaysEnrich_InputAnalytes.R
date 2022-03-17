@@ -61,8 +61,8 @@ runFisherTest <- function(analytes, background = "database",
       "') and ontology.rampOntologyId = analytehasontology.rampOntologyId and analytehasontology.rampCompoundId = analytehaspathway.rampId"
     )
     con <- connectToRaMP()
-    backgrounddf <- DBI::dbGetQuery(con, query)
-    DBI::dbDisconnect(con)
+    backgrounddf <- RMariaDB::dbGetQuery(con, query)
+    RMariaDB::dbDisconnect(con)
     if (nrow(backgrounddf) == 0) {
       stop("Biospecimen background not found. Choices are 'Blood', 'Adipose', 'Heart', 'Urine', 'Brain', 'Liver', 'Kidney', 'Saliva', and 'Feces'")
     }
@@ -94,10 +94,10 @@ runFisherTest <- function(analytes, background = "database",
   # Get the total number of metabolites that are mapped to pathways in RaMP (that's the default background)
   query <- "select * from analytehaspathway"
   con <- connectToRaMP()
-  allids <- DBI::dbGetQuery(con, query)
+  allids <- RMariaDB::dbGetQuery(con, query)
 
   # Close connection, then deduplicate id list
-  DBI::dbDisconnect(con)
+  RMariaDB::dbDisconnect(con)
   allids <- allids[!duplicated(allids), ]
 
 
@@ -271,8 +271,8 @@ runFisherTest <- function(analytes, background = "database",
                                         # Now run fisher's tests for all other pids
     query <- "select distinct(pathwayRampId) from analytehaspathway where pathwaySource != 'hmdb';"
     con <- connectToRaMP()
-    allpids <- DBI::dbGetQuery(con, query)
-    DBI::dbDisconnect(con)
+    allpids <- RMariaDB::dbGetQuery(con, query)
+    RMariaDB::dbDisconnect(con)
     pidstorun <- setdiff(allpids[, 1], pid)
     pidstorunlist <- sapply(pidstorun, shQuote)
     pidstorunlist <- paste(pidstorunlist, collapse = ",")
@@ -282,14 +282,14 @@ runFisherTest <- function(analytes, background = "database",
       pidstorunlist, ")"
     )
     con <- connectToRaMP()
-    restcids <- DBI::dbGetQuery(con, query2) # [[1]]
-    DBI::dbDisconnect(con)
+    restcids <- RMariaDB::dbGetQuery(con, query2) # [[1]]
+    RMariaDB::dbDisconnect(con)
 
     query1 <- paste0("select rampId,pathwayRampId from analytehaspathway;")
 
     con <- connectToRaMP()
-    allcids <- DBI::dbGetQuery(con, query1) # [[1]]
-    DBI::dbDisconnect(con)
+    allcids <- RMariaDB::dbGetQuery(con, query1) # [[1]]
+    RMariaDB::dbDisconnect(con)
 
     # We're collecting p-values for all pathways, now those with no analyte support at all - JCB:?
 
@@ -722,7 +722,7 @@ getPathwayFromAnalyte <- function(analytes = "none",
   }
 
   con <- connectToRaMP()
-  df2 <- DBI::dbGetQuery(con, sql)
+  df2 <- RMariaDB::dbGetQuery(con, sql)
 
 
   if(find_synonym && nrow(df2) > 0) {
@@ -735,14 +735,14 @@ getPathwayFromAnalyte <- function(analytes = "none",
      as synonyms from analytesynonym
      where rampId in (",rampIds,") group by rampId")
 
-    synonymsDf <- DBI::dbGetQuery(con, sql)
+    synonymsDf <- RMariaDB::dbGetQuery(con, sql)
 
     if(nrow(synonymsDf)>0) {
       df2 <- merge(df2,synonymsDf, by='rampId')
     }
   }
 
-  DBI::dbDisconnect(con)
+  RMariaDB::dbDisconnect(con)
 
   if(!includeRaMPids && nrow(df2) > 0) {
     df2 <- subset(df2,select=-c(rampId, pathwayRampId))
@@ -804,7 +804,7 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
     ")"
   )
   con <- connectToRaMP()
-  idkey <- DBI::dbGetQuery(con, query) %>%
+  idkey <- RMariaDB::dbGetQuery(con, query) %>%
     dplyr::rename("pathwayId" = "sourceId") ##  %>%
   ## dplyr::rename("rampId" = "pathwayRampId")
 
@@ -817,7 +817,7 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
     return(out)
   }
 
-  DBI::dbDisconnect(con)
+  RMariaDB::dbDisconnect(con)
 
   fishers_df <-
     fishers_df %>%

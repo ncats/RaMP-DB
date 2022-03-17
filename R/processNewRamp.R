@@ -10,7 +10,7 @@
 findAnalyteHasPathway <- function(pathwayRampId,GC = "C",n = 10){
 
   con <- connectToRaMP()
-  on.exit(DBI::dbDisconnect(con))
+  on.exit(RMariaDB::dbDisconnect(con))
   p_id <- unique(pathwayRampId)
   p_id <- sapply(p_id,shQuote)
   p_id <- paste(p_id,collapse = ",")
@@ -18,7 +18,7 @@ findAnalyteHasPathway <- function(pathwayRampId,GC = "C",n = 10){
                  p_id,
                  ");")
 
-  df <- DBI::dbGetQuery(con, query)
+  df <- RMariaDB::dbGetQuery(con, query)
 
   if(GC == 'both'){
     df2 <- stats::aggregate(df$rampId,list(df$pathwayRampId),FUN = function(x){
@@ -188,9 +188,9 @@ updateOverlapMatrix <- function(min_analyte, overlapmethod, together){
 
   if(!together){
     con <- connectToRaMP()
-    on.exit(DBI::dbDisconnect(con))
-    pathways<- DBI::dbGetQuery(con,'select * from pathway;')
-    source <- DBI::dbGetQuery(con,'select * from source;')
+    on.exit(RMariaDB::dbDisconnect(con))
+    pathways<- RMariaDB::dbGetQuery(con,'select * from pathway;')
+    source <- RMariaDB::dbGetQuery(con,'select * from source;')
 
 
     # dbname <- unique(pathways$type)
@@ -270,7 +270,7 @@ updateOverlapMatrix <- function(min_analyte, overlapmethod, together){
     ))
   } else if(together) {
     con <- connectToRaMP()
-    pathways<- DBI::dbGetQuery(con,'select * from pathway;')
+    pathways<- RMariaDB::dbGetQuery(con,'select * from pathway;')
 
     # dbname <- unique(pathways$type)
 
@@ -354,7 +354,7 @@ processData <- function(){
   # get all rows form analytehaspathway
   query <- "select * from analytehaspathway"
   con <- connectToRaMP()
-  allRampIds <- DBI::dbGetQuery(con,query)
+  allRampIds <- RMariaDB::dbGetQuery(con,query)
 
   if(is.null(allRampIds)) {
 
