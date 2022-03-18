@@ -7,23 +7,19 @@ clicked on highchart}
 \usage{
 runFisherTest(
   analytes,
-  background = "database",
-  biospecimen_background = "none",
   total_genes = 20000,
   NameOrIds = "ids",
   analyte_type = "metabolites",
   MCall = F,
   alternative = "less",
   min_path_size = 5,
-  max_path_size = 150
+  max_path_size = 150,
+  background_type = "database",
+  background = "NULL"
 )
 }
 \arguments{
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
-
-\item{background}{optional vector of all metabolites detected in study. This will be used as the background for the Fisher's contingency table for metabolites. If left "database", all metabolites in RaMP originating in the pathway database of origin are used as background for testing}
-
-\item{biospecimen_background}{If "none", test all metabolites in RaMP or custom panel as Fisher's background. Else, use background for specific biospecimens. Choices are "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney", "Saliva", and "Feces"}
 
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
 
@@ -38,6 +34,18 @@ runFisherTest(
 \item{min_path_size}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
 
 \item{max_path_size}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
+
+\item{background_type}{type of background that is input by the user.  Opions are "database" if user wants all
+analytes from the RaMP database will be used; "file", if user wnats to input a file with a list of background
+analytes; "list", if user wants to input a vector of analyte IDs; "biospecimen", if user wants to specify a
+biospecimen type (e.g. blood, adipose, etc.) and have those biospecimen-specific analytes used.  For genes,
+only the "database" option is used.}
+
+\item{background}{background to be used for Fisher's tests.  If parameter 'background_type="database"', this parameter
+is ignored (default=NULL); if parameter 'background_type= "file"', then 'background' should be a file name (with
+directory); if 'background_type="list"', then 'background' should be a vector of RaMP IDs; if 'backgroud_type="biospecimen"'
+then users should specify one of the following: "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney",
+"Saliva", and "Feces"}
 }
 \value{
 a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
