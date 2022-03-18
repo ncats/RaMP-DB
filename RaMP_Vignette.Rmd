@@ -43,13 +43,8 @@ library(DT) # for prettier tables in vignette
 library(dplyr)
 library(magrittr)
 pkg.globals <- setConnectionToRaMP(
-  dbname = "ramp2", username = "root", conpass = "mysql123",
-  host = "localhost", socket = paste0(
-    "/lscratch/",
-    Sys.getenv("SLURM_JOB_ID"),
-    "/mysql/mysql.sock"
-  )
-)
+  dbname = "ramp", username = "root", conpass = "",
+  host = "localhost")
 ```
 
 The latter line cannot be modified, other than changes to the parameters inside the function (e.g., values for dbname, username, conpass, and host).  For example, if your password is different than "", you would set conpass="mypassword".  This line needs be run only once, every time the package is loaded.
