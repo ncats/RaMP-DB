@@ -573,9 +573,12 @@ buildFrequencyTables<-function(inputdf){
     list_pid <- sapply(pid,shQuote)
     list_pid <- paste(list_pid,collapse = ",")
 
+
     ## Retrieve compound ids associated with background pathways and count
     query <- paste0("select * from analytehaspathway where pathwayRampId in (",
                      list_pid,")")
+
+    print(query)
 
     con <- connectToRaMP()
 

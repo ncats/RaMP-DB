@@ -3,8 +3,11 @@
 #' Returns chemical class information comparing a metabolite subset to a larger metabolite population.
 #'
 #' @param mets a list object of source prepended metaboite ids, representing a metabolite set of interest
-#' @param pop an optional vector of source prepended metaboite ids to be used as the background reference population of
-#' metabolites for enrichment.   If "database", the background population is taken as all RaMP DB metabolites. Default: "database"
+#' @param background an optional list of source prepended metaboite ids to be used as the background reference of
+#' metabolites for enrichment. The background can be either a list of ids or can be a file name containing the id list,
+#' one id per column, no file header rows.
+#' @param background_type one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
+#' or 'file' in which case the background parameter will be a file name.
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
 #' @return Returns chemcial class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
 #' metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolved and listing those metabolite ids
@@ -61,16 +64,25 @@
 #' metClassResult$query_report
 #'}
 #' @export
-chemicalClassSurvey <- function(mets, pop = "database", includeRaMPids = FALSE){
+chemicalClassSurvey <- function(mets, background = "NULL", background_type="database", includeRaMPids = FALSE){
   conn <- connectToRaMP()
   print("Starting Chemical Class Survey")
 
-  if(length(pop)==1){
-    if(pop == "database"){
-      res <- chemicalClassSurveyRampIdsFullPopConn(mets, conn)
-    }
+  if(background_type == "file") {
+    bkgrnd <- read.table(background)[,1]
+  } else if(background_type == "list") {
+    bkgrnd = background
+  } else if(background_type == "database") {
+    # use the full database as background
+    bkgrnd = 'database'
   } else {
-    res <- chemicalClassSurveyRampIdsConn(mets, pop, conn)
+    stop("background_type was not specified correctly. Please specify one of the following options: 'database', 'file', or 'list'.")
+  }
+
+  if(background_type == "database"){
+      res <- chemicalClassSurveyRampIdsFullPopConn(mets, conn)
+  } else {
+    res <- chemicalClassSurveyRampIdsConn(mets, bkgrnd, conn)
   }
   RMariaDB::dbDisconnect(conn)
 
@@ -95,8 +107,11 @@ chemicalClassSurvey <- function(mets, pop = "database", includeRaMPids = FALSE){
 #' enrichment p-values and FDR values.
 #'
 #' @param mets a vector of source prepended metabolite ids
-#' @param pop an optional vector of source prepended metabolite ids to be used as the background reference population of
-#' metabolites for enrichment. If "database", the background population is taken as all RaMP DB metabolites. Default: 'database'
+#' @param background an optional list of source prepended metaboite ids to be used as the background reference of
+#' metabolites for enrichment. The background can be either a list of ids or can be a file name containing the id list,
+#' one id per column, no file header rows.
+#' @param background_type one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
+#' or 'file' in which case the background parameter will be a file name.
 #' @return a list of dataframes, each holding chemical classs enrichment statistics for specific chemical classification systems,
 #' such as HMDB Classyfire class categories and LIPIDMAPS class categories.  The results list chemical classes, metabolite hits counts,
 #' Fisher Exact p-values and Benjamini-Hochberg corrected p-values (FDR estimates)
@@ -125,10 +140,13 @@ chemicalClassSurvey <- function(mets, pop = "database", includeRaMPids = FALSE){
 #' enrichedClassStats <- chemicalClassEnrichment(mets = metList)
 #'}
 #' @export
-chemicalClassEnrichment <- function(mets, pop = "database") {
+chemicalClassEnrichment <- function(mets, background = "NULL", background_type = "list") {
     print("Starting Chemical Class Enrichment")
-    classData <- chemicalClassSurvey(mets = mets, pop = pop,
-                                     includeRaMPids = TRUE)
+
+  classData <- chemicalClassSurvey(mets = mets,
+                                   background = background,
+                                   background_type = background_type,
+                                   includeRaMPids = TRUE)
   enrichmentStat <- list()
 
   totalCountInfo <- getTotalFoundInCategories(classData)
