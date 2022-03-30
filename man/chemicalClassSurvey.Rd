@@ -4,13 +4,22 @@
 \alias{chemicalClassSurvey}
 \title{Returns chemical class information comparing a metabolite subset to a larger metabolite population.}
 \usage{
-chemicalClassSurvey(mets, pop = "database", includeRaMPids = FALSE)
+chemicalClassSurvey(
+  mets,
+  background = "NULL",
+  background_type = "database",
+  includeRaMPids = FALSE
+)
 }
 \arguments{
 \item{mets}{a list object of source prepended metaboite ids, representing a metabolite set of interest}
 
-\item{pop}{an optional vector of source prepended metaboite ids to be used as the background reference population of
-metabolites for enrichment.   If "database", the background population is taken as all RaMP DB metabolites. Default: "database"}
+\item{background}{an optional list of source prepended metaboite ids to be used as the background reference of
+metabolites for enrichment. The background can be either a list of ids or can be a file name containing the id list,
+one id per column, no file header rows.}
+
+\item{background_type}{one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
+or 'file' in which case the background parameter will be a file name.}
 
 \item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
 }
