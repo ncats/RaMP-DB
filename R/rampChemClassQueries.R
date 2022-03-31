@@ -7,7 +7,8 @@
 #' metabolites for enrichment. The background can be either a list of ids or can be a file name containing the id list,
 #' one id per column, no file header rows.
 #' @param background_type one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
-#' or 'file' in which case the background parameter will be a file name.
+#' or 'file' in which case the background parameter will be a file name, or 'biospecimin' where the specified background parameter is
+#' a RaMP HMDB metabolite ontology term (use RaMP::getOntologies() to see a list of available ontology terms).
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
 #' @return Returns chemcial class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
 #' metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolved and listing those metabolite ids
@@ -69,14 +70,80 @@ chemicalClassSurvey <- function(mets, background = "NULL", background_type="data
   print("Starting Chemical Class Survey")
 
   if(background_type == "file") {
-    bkgrnd <- read.table(background)[,1]
+    bkgrnd <- read.table(background, header=F)[,1]
+
+    filteredMets <- mets[mets %in% bkgrnd]
+    print(paste0("Number of input query ids: ",length(mets)))
+    print(paste0("Number of input query ids found in supplied biospecimen background: ",length(filteredMets)))
+    print(paste0("Excluded input query ids that are NOT found in supplied biospecimen background: ",(length(mets)-length(filteredMets))))
+
+    if((length(filteredMets)) < 1) {
+      warning("All input query mets were not found in the specified background ID list.")
+      return(list())
+    }
+
+    mets <- filteredMets
+
   } else if(background_type == "list") {
     bkgrnd = background
+
+    filteredMets <- mets[mets %in% bkgrnd]
+    print(paste0("Number of input query ids: ",length(mets)))
+    print(paste0("Number of input query ids found in supplied biospecimen background: ",length(filteredMets)))
+    print(paste0("Excluded input query ids that are NOT found in supplied biospecimen background: ",(length(mets)-length(filteredMets))))
+
+    if((length(filteredMets)) < 1) {
+      warning("All input query mets were not found in the specified background ID list.")
+      return(list())
+    }
+
+    mets <- filteredMets
+
   } else if(background_type == "database") {
     # use the full database as background
     bkgrnd = 'database'
-  } else {
-    stop("background_type was not specified correctly. Please specify one of the following options: 'database', 'file', or 'list'.")
+  } else if (background_type == "biospecimen") {
+
+    print(paste0("Biospecimen background specified: ", background))
+
+    query <- paste0("select s.rampId, s.sourceId from source s, analytehasontology ao, ontology o
+    where o.commonName in ('", background, "') and o.rampOntologyId=ao.rampOntologyId and s.rampId = ao.rampCompoundId")
+    con <- connectToRaMP()
+    bg <- RMariaDB::dbGetQuery(con, query)
+    RMariaDB::dbDisconnect(con)
+
+    # cases check if bg is empty (suggest to query for biospecimen types in ramp)
+    if(is.null(bg) || nrow(bg) == 0) {
+      warning("The input biospecimen type is not represented in the RaMP Database. Use RaMP::getOntologies() to see available terms.")
+      return(list())
+    }
+    # check that all input query ids are inside the biospecimen type list
+    # make sure that query ids are culled for ids outside the specified biospeciment background
+    filteredMets <- mets[mets %in% bg$sourceId]
+    print(paste0("Number of input query ids: ",length(mets)))
+    print(paste0("Number of input query ids found in supplied biospecimen background: ",length(filteredMets)))
+    print(paste0("Excluded input query ids that are NOT found in supplied biospecimen background: ",(length(mets)-length(filteredMets))))
+
+    # check that we still have some query metabolites
+    if((length(filteredMets)) < 1) {
+      warning(paste0("All input query mets were not found in the specified biospecimen background: ",background))
+      return(list())
+    }
+
+    # try to make a set of source ids assoicated with unique rampids
+    bg <- bg[!duplicated(bg$rampId),]
+
+    # use unique list of source ids for the biospecimen type
+    # note that rampId counts will be used downstream for statistics, reducing redundancy
+    bkgrnd <- unique(unlist(bg$sourceId))
+
+    print(paste0("Number of metabolites in biospecimen background: ", length(bkgrnd)))
+
+    # set mets to the mets contained within the background
+    mets <- filteredMets
+  }
+  else {
+    stop("background_type was not specified correctly. Please specify one of the following options: 'database', 'file', 'list', or 'biospecimen'.")
   }
 
   if(background_type == "database"){
@@ -87,6 +154,14 @@ chemicalClassSurvey <- function(mets, background = "NULL", background_type="data
   RMariaDB::dbDisconnect(conn)
 
   print("Finished Chemical Class Survey")
+
+  # It's possible that the chemical class survey result is empty, no hits for metabolites
+  # or all metabolites are not in the background
+  if(is.null(res) || length(res) == 0) {
+    warning("Empty Chemical Class Result")
+    return(list())
+  }
+
   if(includeRaMPids){
     return(res)
   }else{
@@ -111,7 +186,8 @@ chemicalClassSurvey <- function(mets, background = "NULL", background_type="data
 #' metabolites for enrichment. The background can be either a list of ids or can be a file name containing the id list,
 #' one id per column, no file header rows.
 #' @param background_type one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
-#' or 'file' in which case the background parameter will be a file name.
+#' or 'file' in which case the background parameter will be a file name, or 'biospecimin' where the specified background parameter is
+#' a RaMP HMDB metabolite ontology term (use RaMP::getOntologies() to see a list of available ontology terms).
 #' @return a list of dataframes, each holding chemical classs enrichment statistics for specific chemical classification systems,
 #' such as HMDB Classyfire class categories and LIPIDMAPS class categories.  The results list chemical classes, metabolite hits counts,
 #' Fisher Exact p-values and Benjamini-Hochberg corrected p-values (FDR estimates)
@@ -141,12 +217,19 @@ chemicalClassSurvey <- function(mets, background = "NULL", background_type="data
 #'}
 #' @export
 chemicalClassEnrichment <- function(mets, background = "NULL", background_type = "list") {
-    print("Starting Chemical Class Enrichment")
+  print("Starting Chemical Class Enrichment")
 
   classData <- chemicalClassSurvey(mets = mets,
                                    background = background,
                                    background_type = background_type,
                                    includeRaMPids = TRUE)
+
+  # Quit if empty survey result
+  if(is.null(classData) || length(classData) < 1) {
+    warning("Empty survey result. Please see other warnings.")
+    return(list())
+  }
+
   enrichmentStat <- list()
 
   totalCountInfo <- getTotalFoundInCategories(classData)

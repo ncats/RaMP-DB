@@ -57,14 +57,15 @@ runFisherTest <- function(analytes,
     )
     print("Custom background specified, genes will be discarded")
   } else if (background_type=="file") {
-    userbkg <- read.table(background)[,1]
+    userbkg <- read.table(background, header=F)[,1]
     backgrounddf <- getPathwayFromAnalyte(userbkg,
                                           includeRaMPids = TRUE,
                                           NameOrIds = NameOrIds)
     print("Custom background specified, genes will be discarded")
   } else if (background_type == "biospecimen") {
-    if (biospecimen_type == "Adipose") {
-      biospecimen_type <- "Adipose tissue"
+    biospecimen <- background
+    if (biospecimen == "Adipose") {
+      biospecimen <- "Adipose tissue"
     }
     # Get metabolites that belong to a specific biospecimen
     query <- paste0(
