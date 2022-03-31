@@ -252,7 +252,10 @@ chemicalClassSurveyRampIdsConn <- function(mets, pop, conn) {
   popStr <- paste(pop, collapse = "','")
   popStr <- paste("'" ,popStr, "'", sep = "")
 
-  sql <- paste("select distinct a.ramp_id, b.sourceId, group_concat(distinct b.commonName order by b.commonName asc separator '; ') as common_names, a.class_level_name, a.class_name, a.source from metabolite_class a, source b
+  # sql <- paste("select distinct a.ramp_id, b.sourceId, group_concat(distinct b.commonName order by b.commonName asc separator '; ') as common_names, a.class_level_name, a.class_name, a.source from metabolite_class a, source b
+  #         where b.rampId = a.ramp_id and b.sourceId in (",popStr,") group by a.ramp_Id, b.sourceId, a.class_level_name, a.class_name, a.source")
+
+  sql <- paste("select distinct a.ramp_id, b.sourceId, a.class_level_name, a.class_name, a.source from metabolite_class a, source b
           where b.rampId = a.ramp_id and b.sourceId in (",popStr,") group by a.ramp_Id, b.sourceId, a.class_level_name, a.class_name, a.source")
 
   popData <- RMariaDB::dbGetQuery(conn, sql)
@@ -573,12 +576,9 @@ buildFrequencyTables<-function(inputdf){
     list_pid <- sapply(pid,shQuote)
     list_pid <- paste(list_pid,collapse = ",")
 
-
     ## Retrieve compound ids associated with background pathways and count
     query <- paste0("select * from analytehaspathway where pathwayRampId in (",
                      list_pid,")")
-
-    print(query)
 
     con <- connectToRaMP()
 

@@ -15,7 +15,8 @@ metabolites for enrichment. The background can be either a list of ids or can be
 one id per column, no file header rows.}
 
 \item{background_type}{one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
-or 'file' in which case the background parameter will be a file name.}
+or 'file' in which case the background parameter will be a file name, or 'biospecimin' where the specified background parameter is
+a RaMP HMDB metabolite ontology term (use RaMP::getOntologies() to see a list of available ontology terms).}
 }
 \value{
 a list of dataframes, each holding chemical classs enrichment statistics for specific chemical classification systems,
