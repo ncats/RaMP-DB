@@ -13,9 +13,9 @@ test_that("chemical class enrichment data is returned correctly, ChemicalClassEn
 
 
 
-  chemical.classes<-chemicalClassSurvey(mets = metabolites.of.interest)
+  chemical.classes<-chemicalClassSurvey(mets = metabolites.of.interest, background="NULL", background_type="database")
 
-  enrichedClassSets <- chemicalClassEnrichment(mets = metabolites.of.interest)
+  enrichedClassSets <- chemicalClassEnrichment(mets = metabolites.of.interest, background="NULL", background_type="database")
 
   expect_true(
     NROW(enrichedClassSets)!=0
@@ -42,8 +42,8 @@ test_that("chemical class enrichment data is returned correctly, ChemicalClassEn
                               'hmdb:HMDB0035227',
                               'hmdb:HMDB0008057',
                               'hmdb:HMDB0011211')
-   chemical.classes<-chemicalClassSurvey(mets = metabolites.of.interest)
-   enrichedClassSets <- chemicalClassEnrichment(mets = metabolites.of.interest)
+   chemical.classes<-chemicalClassSurvey(mets = metabolites.of.interest, background="NULL", background_type="database")
+   enrichedClassSets <- chemicalClassEnrichment(mets = metabolites.of.interest, background="NULL", background_type="database")
   classy_fire_classes <- enrichedClassSets$ClassyFire_class
 
 

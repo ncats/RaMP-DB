@@ -10,7 +10,7 @@ test_that("enrichment in mixed data returns correctly formatted output", {
     "hmdb:HMDB0000148",
     "ensembl:ENSG00000141510"
   )
-  result <- runCombinedFisherTest(analytes = analytes)
+  result <- runCombinedFisherTest(analytes = analytes, background="NULL", background_type="database")
   expect_equal(
     (length(result)>1),
     TRUE
@@ -38,7 +38,7 @@ test_that("enrichment in metabolite data returns correctly formatted output", {
     "hmdb:HMDB0000148"
   )
   pathwaydfids_metabolites <- getPathwayFromAnalyte(analytes = analytes)
-  result <- runCombinedFisherTest(analytes = analytes)
+  result <- runCombinedFisherTest(analytes = analytes, background="NULL", background_type="database")
   expect_equal(
     (length(result)>1),
     TRUE
@@ -64,7 +64,7 @@ test_that("enrichment in gene data returns correctly formatted output", {
     "hmdb:HMDB0000148"
   )
   pathwaydfids_metabolites <- getPathwayFromAnalyte(analytes = analytes)
-  result <- runCombinedFisherTest(analytes = analytes)
+  result <- runCombinedFisherTest(analytes = analytes, background="NULL", background_type="database")
   expect_equal(
     (length(result)>1),
     TRUE
