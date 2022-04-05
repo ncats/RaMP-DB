@@ -5,18 +5,23 @@
 \title{Returns chemical class information comparing a metabolite subset to a metabolite population, including Fisher Exact Test
 enrichment p-values and FDR values.}
 \usage{
-chemicalClassEnrichment(mets, background = "NULL", background_type = "list")
+chemicalClassEnrichment(
+  mets,
+  background = "database",
+  background_type = "database"
+)
 }
 \arguments{
 \item{mets}{a vector of source prepended metabolite ids}
 
 \item{background}{an optional list of source prepended metaboite ids to be used as the background reference of
-metabolites for enrichment. The background can be either a list of ids or can be a file name containing the id list,
-one id per column, no file header rows.}
+metabolites for enrichment. The background can be either a list of ids, a file name containing the id list,
+one id per column (no file header row) or a specificed biospecimen type (available biospecimen types: "Blood",
+"Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney","Saliva", or "Feces").}
 
 \item{background_type}{one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
-or 'file' in which case the background parameter will be a file name, or 'biospecimin' where the specified background parameter is
-a RaMP HMDB metabolite ontology term (use RaMP::getOntologies() to see a list of available ontology terms).}
+or 'file' in which case the background parameter will be a file path, or 'biospecimen' where the specified background parameter is
+a RaMP HMDB metabolite ontology term (see background parameter, above. for the most common biospecimen background values).}
 }
 \value{
 a list of dataframes, each holding chemical classs enrichment statistics for specific chemical classification systems,

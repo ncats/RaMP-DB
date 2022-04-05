@@ -4,11 +4,12 @@
 #'
 #' @param mets a list object of source prepended metaboite ids, representing a metabolite set of interest
 #' @param background an optional list of source prepended metaboite ids to be used as the background reference of
-#' metabolites for enrichment. The background can be either a list of ids or can be a file name containing the id list,
-#' one id per column, no file header rows.
+#' metabolites for enrichment. The background can be either a list of ids, a file name containing the id list,
+#' one id per column (no file header row) or a specificed biospecimen type (available biospecimen types: "Blood",
+#' "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney","Saliva", or "Feces").
 #' @param background_type one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
-#' or 'file' in which case the background parameter will be a file name, or 'biospecimin' where the specified background parameter is
-#' a RaMP HMDB metabolite ontology term (use RaMP::getOntologies() to see a list of available ontology terms).
+#' or 'file' in which case the background parameter will be a file path, or 'biospecimen' where the specified background parameter is
+#' a RaMP HMDB metabolite ontology term (see background parameter, above, for the most common biospecimen background values).
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
 #' @return Returns chemcial class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
 #' metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolved and listing those metabolite ids
@@ -65,7 +66,7 @@
 #' metClassResult$query_report
 #'}
 #' @export
-chemicalClassSurvey <- function(mets, background = "NULL", background_type="database", includeRaMPids = FALSE){
+chemicalClassSurvey <- function(mets, background = "database", background_type="database", includeRaMPids = FALSE){
   conn <- connectToRaMP()
   print("Starting Chemical Class Survey")
 
@@ -183,11 +184,12 @@ chemicalClassSurvey <- function(mets, background = "NULL", background_type="data
 #'
 #' @param mets a vector of source prepended metabolite ids
 #' @param background an optional list of source prepended metaboite ids to be used as the background reference of
-#' metabolites for enrichment. The background can be either a list of ids or can be a file name containing the id list,
-#' one id per column, no file header rows.
+#' metabolites for enrichment. The background can be either a list of ids, a file name containing the id list,
+#' one id per column (no file header row) or a specificed biospecimen type (available biospecimen types: "Blood",
+#' "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney","Saliva", or "Feces").
 #' @param background_type one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
-#' or 'file' in which case the background parameter will be a file name, or 'biospecimin' where the specified background parameter is
-#' a RaMP HMDB metabolite ontology term (use RaMP::getOntologies() to see a list of available ontology terms).
+#' or 'file' in which case the background parameter will be a file path, or 'biospecimen' where the specified background parameter is
+#' a RaMP HMDB metabolite ontology term (see background parameter, above. for the most common biospecimen background values).
 #' @return a list of dataframes, each holding chemical classs enrichment statistics for specific chemical classification systems,
 #' such as HMDB Classyfire class categories and LIPIDMAPS class categories.  The results list chemical classes, metabolite hits counts,
 #' Fisher Exact p-values and Benjamini-Hochberg corrected p-values (FDR estimates)
@@ -216,7 +218,7 @@ chemicalClassSurvey <- function(mets, background = "NULL", background_type="data
 #' enrichedClassStats <- chemicalClassEnrichment(mets = metList)
 #'}
 #' @export
-chemicalClassEnrichment <- function(mets, background = "NULL", background_type = "list") {
+chemicalClassEnrichment <- function(mets, background = "database", background_type = "database") {
   print("Starting Chemical Class Enrichment")
 
   classData <- chemicalClassSurvey(mets = mets,

@@ -16,7 +16,7 @@ runCombinedFisherTest(
   max_path_size = 150,
   includeRaMPids = FALSE,
   background_type = "database",
-  background = NULL
+  background = "database"
 )
 }
 \arguments{
@@ -40,19 +40,21 @@ runCombinedFisherTest(
 \item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
 
 \item{background_type}{type of background that is input by the user.  Opions are "database" if user wants all
-analytes from the RaMP database will be used; "file", if user wnats to input a file with a list of background
+analytes from the RaMP database to be used as background; "file", if user wnats to input a file path with a list of background
 analytes; "list", if user wants to input a vector of analyte IDs; "biospecimen", if user wants to specify a
-biospecimen type (e.g. blood, adipose, etc.) and have those biospecimen-specific analytes used.  For genes,
+biospecimen type (e.g. blood, adipose tissue, etc.) and have those biospecimen-specific analytes used.  For genes,
 only the "database" option is used.}
 
 \item{background}{background to be used for Fisher's tests.  If parameter 'background_type="database"', this parameter
-is ignored (default=NULL); if parameter 'background_type= "file"', then 'background' should be a file name (with
+is ignored (default="database"); if parameter 'background_type= "file"', then 'background' should be a file name (with
 directory); if 'background_type="list"', then 'background' should be a vector of RaMP IDs; if 'backgroud_type="biospecimen"'
-then users should specify one of the following: "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney",
+then users should specify one of the following: "Blood", "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney",
 "Saliva", and "Feces"}
 }
 \value{
-a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
+a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values
+(raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway,
+and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
 }
 \description{
 Do fisher test for only one pathway from search result
