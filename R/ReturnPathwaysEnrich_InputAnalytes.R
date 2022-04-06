@@ -9,14 +9,14 @@
 #' @param min_path_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
 #' @param max_path_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
 #' @param background_type type of background that is input by the user.  Opions are "database" if user wants all
-#' analytes from the RaMP database will be used; "file", if user wnats to input a file with a list of background
+#' analytes from the RaMP database will be used; "file", if user wants to input a file with a list of background
 #' analytes; "list", if user wants to input a vector of analyte IDs; "biospecimen", if user wants to specify a
-#' biospecimen type (e.g. blood, adipose, etc.) and have those biospecimen-specific analytes used.  For genes,
+#' biospecimen type (e.g. blood, adipose tissue, etc.) and have those biospecimen-specific analytes used.  For genes,
 #' only the "database" option is used.
 #' @param background background to be used for Fisher's tests.  If parameter 'background_type="database"', this parameter
-#' is ignored (default=NULL); if parameter 'background_type= "file"', then 'background' should be a file name (with
+#' is ignored (default="database"); if parameter 'background_type= "file"', then 'background' should be a file name (with
 #' directory); if 'background_type="list"', then 'background' should be a vector of RaMP IDs; if 'backgroud_type="biospecimen"'
-#' then users should specify one of the following: "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney",
+#' then users should specify one of the following: "Blood", "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney",
 #' "Saliva", and "Feces"
 #' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
 
@@ -25,7 +25,7 @@ runFisherTest <- function(analytes,
                           NameOrIds = "ids",
                           analyte_type = "metabolites",
                           MCall = F, alternative = "less", min_path_size=5, max_path_size=150,
-                          background_type="database", background="NULL") {
+                          background_type="database", background="database") {
 
   now <- proc.time()
   print("Fisher Testing ......")
@@ -462,16 +462,18 @@ runFisherTest <- function(analytes,
 #' @param max_path_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
 #' @param background_type type of background that is input by the user.  Opions are "database" if user wants all
-#' analytes from the RaMP database will be used; "file", if user wnats to input a file with a list of background
+#' analytes from the RaMP database to be used as background; "file", if user wnats to input a file path with a list of background
 #' analytes; "list", if user wants to input a vector of analyte IDs; "biospecimen", if user wants to specify a
-#' biospecimen type (e.g. blood, adipose, etc.) and have those biospecimen-specific analytes used.  For genes,
+#' biospecimen type (e.g. blood, adipose tissue, etc.) and have those biospecimen-specific analytes used.  For genes,
 #' only the "database" option is used.
 #' @param background background to be used for Fisher's tests.  If parameter 'background_type="database"', this parameter
-#' is ignored (default=NULL); if parameter 'background_type= "file"', then 'background' should be a file name (with
+#' is ignored (default="database"); if parameter 'background_type= "file"', then 'background' should be a file name (with
 #' directory); if 'background_type="list"', then 'background' should be a vector of RaMP IDs; if 'backgroud_type="biospecimen"'
-#' then users should specify one of the following: "Blood", "Adipose", "Heart", "Urine", "Brain", "Liver", "Kidney",
+#' then users should specify one of the following: "Blood", "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney",
 #' "Saliva", and "Feces"
-#' @return a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
+#' @return a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values
+#' (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway,
+#' and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
 #' @examples
 #' \dontrun{
 #' pkg.globals <- setConnectionToRaMP(
@@ -494,7 +496,7 @@ runCombinedFisherTest <- function(analytes,
                                   max_path_size = 150,
                                   includeRaMPids = FALSE,
 				  background_type = "database",
-				  background = NULL) {
+				  background = "database") {
 
   G <- M <- 0
 
@@ -520,24 +522,24 @@ runCombinedFisherTest <- function(analytes,
   }
 
   # Grab pathways that contain genes to run Fisher on genes
-    ## fishgene <- pathwaydf[grep("RAMP_G_", pathwaydf$rampId), ]
-    ## Genes are not evaluated if custom background is specified
-    if(background_type == "database"){
-        print("Running Fisher's tests on genes")
-        outgene <- runFisherTest(
-            analytes = analytes,
-            analyte_type = "genes",
-            total_genes = total_genes,
-            MCall = MCall,
-            min_path_size = min_path_size,
-            max_path_size = max_path_size
-        )
-        pathwaydf_gene <- outgene[[2]]
-        outgene <- outgene[[1]]
-    }else{
-        outgene <- NULL
-        pathwaydf_gene <- NULL
-    }
+  ## fishgene <- pathwaydf[grep("RAMP_G_", pathwaydf$rampId), ]
+  ## Genes are not evaluated if custom background is specified
+  if(background_type == "database"){
+    print("Running Fisher's tests on genes")
+    outgene <- runFisherTest(
+      analytes = analytes,
+      analyte_type = "genes",
+      total_genes = total_genes,
+      MCall = MCall,
+      min_path_size = min_path_size,
+      max_path_size = max_path_size
+    )
+    pathwaydf_gene <- outgene[[2]]
+    outgene <- outgene[[1]]
+  }else{
+    outgene <- NULL
+    pathwaydf_gene <- NULL
+  }
 
   # if no ids map to pathways, return an empty result.
   if((is.null(pathwaydf_metab) || nrow(pathwaydf_metab) < 1) &&
@@ -568,7 +570,7 @@ runCombinedFisherTest <- function(analytes,
       out[keepers, ],
       by = "pathwayRampId"
     )
-  } else if (!is.null(outgene) & is.null(outmetab)) {
+  } else if (!is.null(outgene) && is.null(outmetab)) {
     out <- outgene
     fdr <- stats::p.adjust(out$Pval, method = "fdr")
     out <- cbind(out, fdr)
@@ -821,11 +823,20 @@ getPathwayFromAnalyte <- function(analytes = "none",
 
 findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
                         min_pathway_tocluster = 2, perc_pathway_overlap = 0.5) {
+
   print("Clustering pathways...")
+
   if (perc_analyte_overlap <= 0 || perc_analyte_overlap >= 1 ||
     perc_pathway_overlap <= 0 || perc_pathway_overlap >= 1) {
-    return(NULL)
+    warning("No Clustering. perc_analyte_overlap and percent_pathway_overlap must bee in the range of (0,1), exclusive (not exactly 0 or 1).")
+    return(fishers_df)
   }
+
+  if(is.null(fishers_df$fishresults) || nrow(fishers_df$fishresults) < 1) {
+    warning("The contained input pathway dataframe is empty (fishers_df$fishresults). Returning input result without clustering.")
+    return(fishers_df)
+  }
+
   analyte_type <- fishers_df$analyte_type
   fishers_df <- fishers_df$fishresults
   list_pathways <- fishers_df %>% dplyr::pull("pathwayId")

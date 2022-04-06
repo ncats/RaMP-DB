@@ -6,7 +6,7 @@
 \usage{
 chemicalClassSurvey(
   mets,
-  background = "NULL",
+  background = "database",
   background_type = "database",
   includeRaMPids = FALSE
 )
@@ -15,12 +15,13 @@ chemicalClassSurvey(
 \item{mets}{a list object of source prepended metaboite ids, representing a metabolite set of interest}
 
 \item{background}{an optional list of source prepended metaboite ids to be used as the background reference of
-metabolites for enrichment. The background can be either a list of ids or can be a file name containing the id list,
-one id per column, no file header rows.}
+metabolites for enrichment. The background can be either a list of ids, a file name containing the id list,
+one id per column (no file header row) or a specificed biospecimen type (available biospecimen types: "Blood",
+"Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney","Saliva", or "Feces").}
 
 \item{background_type}{one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
-or 'file' in which case the background parameter will be a file name, or 'biospecimin' where the specified background parameter is
-a RaMP HMDB metabolite ontology term (use RaMP::getOntologies() to see a list of available ontology terms).}
+or 'file' in which case the background parameter will be a file path, or 'biospecimen' where the specified background parameter is
+a RaMP HMDB metabolite ontology term (see background parameter, above, for the most common biospecimen background values).}
 
 \item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
 }

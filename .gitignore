@@ -2,7 +2,7 @@
 .Rhistory
 .RData
 inst/shinyApp/db.properties.template
-
+dbprops.txt
 # IDE - VSCode
 .vscode/
 # !.vscode/settings.json
