@@ -740,20 +740,27 @@ getPathwayFromAnalyte <- function(analytes = "none",
                   order by pathwayName asc")
   } else {
       print("Working on analyte name list...")
-    sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, lower(s.commonName) as inputCommonName, group_concat(distinct s.sourceId order by s.sourceId separator '; ') as sourceIds, s.rampId, p.pathwayRampId from
-                  source s,
-                  analytehaspathway ap,
-                  pathway p
-                  where
-                  s.commonName in (",list_metabolite,")
-                  and
-                  ap.rampId = s.rampId
-                  and
-                  p.pathwayRampId = ap.pathwayRampId
-                  and
-                  p.type != 'hmdb'
-                  group by inputCommonName, s.rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId
-                  order by pathwayName asc")
+    sql <- paste0(
+      "select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, lower(asyn.Synonym) as inputCommonName, group_concat(distinct s.sourceId order by s.sourceId separator '; ') as sourceIds, s.rampId, p.pathwayRampId
+    from
+    source s,
+    analytesynonym asyn,
+    analytehaspathway ap,
+    pathway p
+    where
+    asyn.Synonym in (",list_metabolite,")
+    and
+    s.rampId = asyn.rampId
+    and
+    ap.rampId = s.rampId
+    and
+    p.pathwayRampId = ap.pathwayRampId
+    and
+    p.type != 'hmdb'
+    group by inputCommonName, s.rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId
+    order by pathwayName asc
+  "
+    )
   }
 
   con <- connectToRaMP()
