@@ -120,3 +120,22 @@ getRaMPAnalyteIntersections<-function(analyteType='metabolites', format='json', 
 
 
 
+#' Retrieve list of pathway names
+#' @return vector of unique pathway names (alphabetically ordered)
+#' @examples
+#' \dontrun{
+#' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
+#' getPathwayNameList()
+#' }
+#' @export
+getPathwayNameList <- function(){
+  con<-connectToRaMP()
+  query1<-"select pathwayName from pathway;"
+  results<-RMariaDB::dbGetQuery(con,query1)
+  RMariaDB::dbDisconnect(con)
+  return(sort(unique(results$pathwayName)))
+}
+
+
+
+
