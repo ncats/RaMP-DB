@@ -67,11 +67,13 @@
 #'}
 #' @export
 chemicalClassSurvey <- function(mets, background = "database", background_type="database", includeRaMPids = FALSE){
+
+  
   conn <- connectToRaMP()
   print("Starting Chemical Class Survey")
 
   if(background_type == "file") {
-    bkgrnd <- read.table(background, header=F)[,1]
+    bkgrnd <- utils::read.table(background, header=F)[,1]
 
     filteredMets <- mets[mets %in% bkgrnd]
     print(paste0("Number of input query ids: ",length(mets)))
