@@ -41,7 +41,30 @@ test_that("Table returned shows correct output for multiple pathways ,getAnalyte
 
 
 
+test_that("Fuzzy match test for TCA and Creatine",
+          {
 
+            library(properties)
+            dbpass <- properties::read.properties('../../dbprops.txt')
+
+            pkg.globals <- setConnectionToRaMP(host=dbpass$hostname, dbname=dbpass$dbname, username=dbpass$username, conpass=dbpass$conpass)
+            assign("pkg.globals", pkg.globals, envir = .GlobalEnv)
+
+            my_analytes <-
+              getAnalyteFromPathway(pathway=c(
+                "TCA",
+                "Creatine"
+              ), match="fuzzy")
+
+            print(dim(my_analytes))
+            print(unique(my_analytes$pathwayName))
+
+            expect_true(
+              !is.null(my_analytes)
+            )
+            expect_true(
+              NROW(my_analytes) != 0)
+          })
 
 
 
