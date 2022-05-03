@@ -57,7 +57,7 @@ To access, [click here](https://www.mdpi.com/2218-1989/8/1/16)
 ## Installation Instructions
 In order to use this R package locally, you will need the following:
 * The R code under this repo
-* The mysql dump file that contains the RaMP database (in the folder inst/extdata/)
+* Our latest MySQL database dump file. **Download [here](https://figshare.com/ndownloader/files/34941486).**
 
 If you would like to know how to build RaMP database from scratch, please check another GitHub site at [RaMP-BackEnd](https://github.com/ncats/RaMP-BackEnd)
 
@@ -86,9 +86,11 @@ Here, we are naming the database "ramp" but you can use any name you'd like.  It
 
 Second, download and unzip the latest RaMP database from the inst/extdata folder.
 
-Third, populate the named database with the mysql dump file (which you can get from  inst/extdata/rampXXXXXX.sql, where XXXXXX denotes the latest date):
+Third, populate the named database with the mysql dump file that was previously downloaded. ([MySQL dump file.](https://figshare.com/ndownloader/files/34941486))
+Unzip the sql.gz file and run the command below to load the unzipped databased sql file. 
+
 ```
-> mysql -u root -p ramp < rampXXXX.sql  
+> mysql -u root -p ramp < /path/to/mysqldump/rampXXXX.sql  
 ```
 
 You're done!
