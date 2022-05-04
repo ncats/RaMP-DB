@@ -16,6 +16,8 @@
 #' }
 #' @export
 rampFastCata <- function(analytes="none", NameOrIds="ids") {
+
+  rampId <- pathwayRampId <- c()
   if(length(analytes)==1){
     if(analytes=="none"){
       stop("Please provide input analytes")}}
@@ -129,7 +131,7 @@ rampFastCata <- function(analytes="none", NameOrIds="ids") {
     } else {
       # default handling of empty result
       # empty df1 requires use of tibble/tidyr add_column
-      df1 <- add_column(df1, 'query_relation'=NA)
+      df1 <- tibble::add_column(df1, 'query_relation'=NA)
       result <- df1
     }
   }

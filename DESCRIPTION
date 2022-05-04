@@ -31,7 +31,9 @@ Imports:
     stringi,
     RMariaDB,
     DBI,
-    jsonlite
+    jsonlite,
+    methods,
+    tibble
 Encoding: UTF-8
 RoxygenNote: 7.1.2
 Suggests: 

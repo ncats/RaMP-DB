@@ -35,6 +35,8 @@ runFisherTest <- function(analytes,
                                      find_synonym=FALSE
   )
 
+  pathwayRampId <- rampId <- c()
+
   if (analyte_type == "metabolites") {
     pathwaydf <- pathwaydf[grep("RAMP_C_", pathwaydf$rampId), ]
   } else if (analyte_type == "genes") {
@@ -46,7 +48,8 @@ runFisherTest <- function(analytes,
     return(NULL)
   }
 
-  if(class(background_type)=="list"){
+#  if(class(background_type)=="list"){
+   if(is(background_type, "list")){
     background = unlist(background)
   }
 
@@ -57,7 +60,7 @@ runFisherTest <- function(analytes,
     )
     print("Custom background specified, genes will be discarded")
   } else if (background_type=="file") {
-    userbkg <- read.table(background, header=F)[,1]
+    userbkg <- utils::read.table(background, header=F)[,1]
     backgrounddf <- getPathwayFromAnalyte(userbkg,
                                           includeRaMPids = TRUE,
                                           NameOrIds = NameOrIds)
@@ -701,6 +704,8 @@ getPathwayFromAnalyte <- function(analytes = "none",
                                   find_synonym = FALSE,
                                   NameOrIds = "ids",
                                   includeRaMPids = FALSE) {
+
+  rampId <- pathwayRampId <- c()
 
   print("Starting getPathwayFromAnalyte()")
   if (is.null(analytes) || length(analytes) == 0) {
