@@ -8,7 +8,7 @@ test_that("chemical class enrichment data is returned correctly, ChemicalClassEn
                               'hmdb:HMDB0000439',
                               'hmdb:HMDB0000479',
                               'hmdb:HMDB0000532',
-                              'hmdb:HMDB0011211' )
+                              'hmdb:HMDB0011211')
 
 
 

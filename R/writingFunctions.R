@@ -4,14 +4,14 @@
 #' @param outputfile name of output file
 #' @export
 writePathwaysToCSV <- function(mypathways = "none", outputfile = "none") {
-    if(length(mypathways) == 1){
-        if (mypathways == "") {
-            stop("Be sure to specify the output of the function getPathwayFromAnalyte() and an output file")
-        }}
-    if(length(outputfile) == 1){
-        if (outputfile == "") {
-            stop("Be sure to specify the output of the function getPathwayFromAnalyte() and an output file")
-  }}
+  if(length(mypathways) == 1){
+    if (mypathways == "") {
+      stop("Be sure to specify the output of the function getPathwayFromAnalyte() and an output file")
+    }}
+  if(length(outputfile) == 1){
+    if (outputfile == "") {
+      stop("Be sure to specify the output of the function getPathwayFromAnalyte() and an output file")
+    }}
   if (!all(c(
     "pathwayName", "pathwaySource",
     "pathwayId", "inputId", "commonName"
@@ -34,10 +34,10 @@ writePathwaysToCSV <- function(mypathways = "none", outputfile = "none") {
 #' @export
 write_FishersResults <- function(fishResults = "none", outputfile = "none", rampid = FALSE) {
 
-    if(length(fishResults) == 1){
-        if (fishResults == "") {
-    stop("Be sure to specify the output of the function findCluster()")
-  }}
+  if(length(fishResults) == 1){
+    if (fishResults == "") {
+      stop("Be sure to specify the output of the function findCluster()")
+    }}
   clusters <- fishResults$cluster_list
   if (is.null(clusters)) {
     out <- fishResults$fishresults

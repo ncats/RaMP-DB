@@ -7,7 +7,8 @@ cleanup<- function(data, show_n_rows = 6) {
   if (class(data) != "data.frame" & (class(data) != "list" & length(data) != 1)) {
     stop("Input should be a dataframe resulting from runCombinedFishersTest, getAnalyteFromPathway, getPathwayFromAnalyte, chemicalClassSurvey, or getChemicalProperties")
   }
-  if (class(data) == "list") {
+#  if (class(data) == "list") {
+   if (is(data, "list")){
     data <- data[[1]]
   }
   rownames(data) <- NULL
