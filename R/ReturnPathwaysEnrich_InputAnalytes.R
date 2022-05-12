@@ -445,8 +445,9 @@ runFisherTest <- function(analytes,
   } # End else if MCall (when False)
   # Remove duplicate pathways between wikipathways and KEGG
   duplicate_pathways = find_duplicate_pathways()
-
-  out <- out[-which(out$pathwayRampId %in% duplicate_pathways),]
+  if(any(out$pathwayRampId %in% duplicate_pathways)){
+    out <- out[-which(out$pathwayRampId %in% duplicate_pathways),]
+  }
   
   out <- out[!duplicated(out), ]
   print(dim(out))
