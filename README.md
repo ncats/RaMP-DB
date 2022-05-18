@@ -6,9 +6,12 @@ RaMP 2.0 is now released and includes an updated backend database with expanded 
 
 This R package includes functions that allow users to interface with this up-do-date and comprehensive resource.  Functionalities include 1) simple and batch queries for pathways, ontologies, chemical annotations, and reaction-level gene-metabolite relationships; 2) pathway and chemical enrichment analyses.
 
-The code used to build the backend RaMP database is freely available at https://github.com/ncats/RaMP-Backend and we are currently working on a revamp of the web interface.
+The code used to build the backend RaMP database is freely available at https://github.com/ncats/RaMP-Backend.
 
 Please [click here to view our preprint](https://www.biorxiv.org/content/10.1101/2022.01.19.476987v1).
+
+# Web Interface
+Our new revamped web interface can be found at https://rampdb.nih.gov/.  The code is publicly available at https://github.com/ncats/RaMP-Client/.
 
 # APIs
 API access is now available [here](https://ramp-api-alpha.ncats.io/__docs__/).
