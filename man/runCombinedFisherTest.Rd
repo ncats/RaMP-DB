@@ -66,9 +66,11 @@ pkg.globals <- setConnectionToRaMP(
   dbname = "ramp2", username = "root",
   conpass = "", host = "localhost"
 )
-analyte.list <- c('chebi:15344', 'chebi:10983', 'chebi:15351',
-                  'uniprot:Q86V21', 'uniprot:Q02338', 'uniprot:Q9BUT1')
+analyte.list <- c(
+  "chebi:15344", "chebi:10983", "chebi:15351",
+  "uniprot:Q86V21", "uniprot:Q02338", "uniprot:Q9BUT1"
+)
 
-fisher.results <- runCombinedFisherTest(analytes = analyte.list, NameOrIds = 'ids')
+fisher.results <- runCombinedFisherTest(analytes = analyte.list, NameOrIds = "ids")
 }
 }
