@@ -1,4 +1,6 @@
 #' Retrieve RaMP version
+#' @param justVersion boolean value indicating if the method should just return the version id (default, justVersion = T),
+#' or a table that includes db_version_id, load_timestamp (update time/date), version_notes, and the db_sql_url (a url for mysql schema download)
 #' @return current ramp databse version
 #' @examples
 #' \dontrun{
@@ -6,10 +8,14 @@
 #' getCurrentRaMPVersion()
 #' }
 #' @export
-getCurrentRaMPVersion<-function(){
+getCurrentRaMPVersion<-function(justVersion=T){
   con<-connectToRaMP()
-  query1<-"select ramp_version from db_version where load_timestamp order by load_timestamp desc limit 1"
-  results<-RMariaDB::dbGetQuery(con,query1)
+  if(justVersion) {
+    query<-"select ramp_version from db_version where load_timestamp order by load_timestamp desc limit 1"
+  } else {
+    query<-"select ramp_version, load_timestamp, version_notes, db_sql_url  from db_version where load_timestamp order by load_timestamp desc limit 1"
+  }
+  results<-RMariaDB::dbGetQuery(con,query)
   RMariaDB::dbDisconnect(con)
   return(results)
 }
