@@ -444,11 +444,11 @@ runFisherTest <- function(analytes,
     )
   } # End else if MCall (when False)
   # Remove duplicate pathways between wikipathways and KEGG
-  duplicate_pathways = find_duplicate_pathways()
-  if(any(out$pathwayRampId %in% duplicate_pathways)){
-    out <- out[-which(out$pathwayRampId %in% duplicate_pathways),]
+  duplicate_pathways <- find_duplicate_pathways()
+  if (any(out$pathwayRampId %in% duplicate_pathways)) {
+    out <- out[-which(out$pathwayRampId %in% duplicate_pathways), ]
   }
-  
+
   out <- out[!duplicated(out), ]
   print(dim(out))
   print(colnames(out))
@@ -469,61 +469,69 @@ runFisherTest <- function(analytes,
 #' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
 
 runCustomFisherTest <- function(analytes, background = "kegg", background_type = "database", pathways,
-                                alternative = "less") {
-  browser()
-  tryCatch({
-    pathway_definitions <- read.csv(pathways, sep = "\t")
-  },
-  error = function(e) {
-    print("Pathway file could not be found or is improperly formatted. Please supply path to GMX file for custom pathway definitions")
-  })
+                                alternative = "less", analyte_type = "metabolites", min_path_size=5,
+                                max_path_size = 150) {
+  tryCatch(
+    {
+      pathway_definitions <- read.csv(pathways, sep = "\t")
+    },
+    error = function(e) {
+      print("Pathway file could not be found or is improperly formatted. Please supply path to GMX file for custom pathway definitions")
+    }
+  )
   now <- proc.time()
   print("Fisher Testing ......")
 
-  pathwaydf <- data.frame(Analyte=character(),Pathway=character())
+  pathwaydf <- data.frame(Analyte = character(), Pathway = character())
 
-  for(i in analytes){
-    for(j in 1:ncol(pathway_definitions)){
-      if(i %in% unlist(pathway_definitions[,j])){
-        pathwaydf<-rbind(pathwaydf, data.frame(Analyte=i,Pathway=colnames(pathway_definitions)[j]))
+  for (i in analytes) {
+    for (j in 1:ncol(pathway_definitions)) {
+      if (i %in% unlist(pathway_definitions[, j])) {
+        pathwaydf <- rbind(pathwaydf, data.frame(Analyte = i, Pathway = colnames(pathway_definitions)[j]))
       }
     }
   }
 
-  print(paste0("Found ", length(unique(pathwaydf$Analyte)),
-               " out of ", length(unique(analytes)),
-               " input analytes in pathway definitions file"))
-  
+  print(paste0(
+    "Found ", length(unique(pathwaydf$Analyte)),
+    " out of ", length(unique(analytes)),
+    " input analytes in pathway definitions file"
+  ))
+
   # moved this check until we determine if we have analytes of a given type.
   if (nrow(pathwaydf) == 0) {
     return(NULL)
   }
-  
+
   if (class(background_type) == "list") {
     background <- unlist(background)
   }
-  
+
   if (background_type == "list") {
-    backgrounddf <- data.frame(Analyte=character(),Pathway=character())
-    
-    for(i in background){
-      for(j in 1:ncol(pathway_definitions)){
-        if(i %in% unlist(pathway_definitions[,j])){
-          pathwaydf<-rbind(pathwaydf, data.frame(Analyte=i,Pathway=colnames(pathway_definitions)[j]))
+    backgrounddf <- data.frame(Analyte = character(), Pathway = character())
+
+    for (i in background) {
+      for (j in 1:ncol(pathway_definitions)) {
+        if (i %in% unlist(pathway_definitions[, j])) {
+          pathwaydf <- rbind(pathwaydf, data.frame(Analyte = i, Pathway = colnames(pathway_definitions)[j]))
         }
       }
     }
   } else if (background_type == "file") {
     userbkg <- read.table(background, header = F)[, 1]
-    for(i in userbkg){
-      for(j in 1:ncol(pathway_definitions)){
-        if(i %in% unlist(pathway_definitions[,j])){
-          pathwaydf<-rbind(pathwaydf, data.frame(Analyte=i,Pathway=colnames(pathway_definitions)[j]))
+    for (i in userbkg) {
+      for (j in 1:ncol(pathway_definitions)) {
+        if (i %in% unlist(pathway_definitions[, j])) {
+          pathwaydf <- rbind(pathwaydf, data.frame(Analyte = i, Pathway = colnames(pathway_definitions)[j]))
         }
       }
     }
   } else if (background_type == "database") {
-    # do nothing, it's handled down below in if statements
+    query <- "select * from source"
+    con <- connectToRaMP()
+    allids <- RMariaDB::dbGetQuery(con, query)
+    pathwaydf <- pathwaydf[which(pathwaydf$Analyte %in% allids$sourceId),]
+    RMariaDB::dbDisconnect(con)
   } else {
     stop("background_type was not specified correctly.  Please specify one of the following options: database, file, list (biospecimen is not supported for custom pathway definitions)")
   }
@@ -556,14 +564,6 @@ runCustomFisherTest <- function(analytes, background = "kegg", background_type =
 
 
   if ((analyte_type == "metabolites")) {
-
-    # JCB replaced these lines. Reducing to a source, extracting compound indices, then applying to the full set of rampIds
-    # caused an error in the tally of analytes
-    #
-    # wiki_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="wiki"),"rampId"])]))
-    # react_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="reactome"),"rampId"])]))
-    # kegg_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="kegg"),"rampId"])]))
-
     # first extract source-specific ids, then select for compound ids from the source-specific ids
     sourceIds <- allids[which(allids$pathwaySource == "wiki"), "rampId"]
     wiki_totanalytes <- length(unique(sourceIds[grep("RAMP_C", sourceIds)]))
@@ -586,299 +586,115 @@ runCustomFisherTest <- function(analytes, background = "kegg", background_type =
     print("analyte_type must be 'metabolites' or 'genes'")
   }
 
-  ## Input_RampIds is a table of all analytes included in pathways represented in the user set
-  ## "User" refers to significant analytes
-  # Left off here 5/11/22 (ACP)
-  input_RampIds <- buildFrequencyTables(pathwaydf)
-
-  if (is.null(input_RampIds)) {
-    stop("Data doesn't exist")
-  } else {
-    segregated_id_list <- segregateDataBySource(input_RampIds)
-  }
-
   # Loop through each pathway, build the contingency table, and calculate Fisher's Exact
   # test p-value
   pval <- totinpath <- userinpath <- pidused <- c()
   for (i in pid) {
-    ids_inpath <- pathwaydf[which(pathwaydf$pathwayRampId == i), "rampId"]
-
-
-    if (analyte_type == "metabolites") {
-      # Check to make sure that this pathway does have metabolites
-      if (length(grep("RAMP_C", ids_inpath)) == 0) {
-        user_in_pathway <- 0
-      } else {
-        user_in_pathway <- length(unique(grep("RAMP_C", ids_inpath, value = TRUE)))
-        if (background_type != "database") {
-          ids_inpath_bg <- backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]
-          bg_in_pathway <- length(unique(grep("RAMP_C", ids_inpath_bg, value = TRUE)))
-        }
-      }
-      inputkegg <- segregated_id_list[[1]][1][[1]]
-      inputreact <- segregated_id_list[[1]][2][[1]]
-      inputwiki <- segregated_id_list[[1]][3][[1]]
-      tot_user_analytes <- length(grep("RAMP_C", unique(pathwaydf$rampId)))
-      if (background_type != "database") {
-        tot_bg_analytes <- length(grep("RAMP_C", unique(backgrounddf$rampId)))
-      }
-      ## if(background != "database"){
-      ##     inputkegg_bg <- segregated_id_list_bg[[1]][1][[1]]
-      ##     inputreact_bg <- segregated_id_list_bg[[1]][2][[1]]
-      ##     inputwiki_bg <- segregated_id_list_bg[[1]][3][[1]]
-      ## }
-    } else { # if genes
-      # Check to make sure that this pathway does have genes
-      if (length(grep("RAMP_G", ids_inpath)) == 0) {
-        user_in_pathway <- 0
-      } else {
-        user_in_pathway <- length(unique(grep("RAMP_G", ids_inpath, value = TRUE)))
-      }
-      inputkegg <- segregated_id_list[[2]][1][[1]]
-      inputreact <- segregated_id_list[[2]][2][[1]]
-      inputwiki <- segregated_id_list[[2]][3][[1]]
-      tot_user_analytes <- length(grep("RAMP_G", unique(pathwaydf$rampId)))
-      ## tot_bg_analytes <- length(grep("RAMP_G", unique(backgrounddf$rampId)))
+    ids_inpath <- pathwaydf[which(pathwaydf$Pathway == i), "Analyte"]
+    user_in_pathway <- length(unique(ids_inpath, value = TRUE))
+    if (background_type != "database") {
+      ids_inpath_bg <- backgrounddf[which(backgrounddf$Pathway == i), "Analyte"]
+      bg_in_pathway <- length(unique(ids_inpath_bg))
+    }
+    tot_user_analytes <- length(unique(pathwaydf$Analyte))
+    if (background_type != "database") {
+      tot_bg_analytes <- length(unique(backgrounddf$Analyte))
     }
 
-    if ((!is.na(inputkegg$pathwayRampId[1])) && i %in% inputkegg$pathwayRampId) {
-      tot_in_pathway <- inputkegg[which(inputkegg[, "pathwayRampId"] == i), "Freq"]
+    if (background_type == "database" & background == "kegg") {
       total_pathway_analytes <- kegg_totanalytes
-    } else if ((!is.na(inputwiki$pathwayRampId[1])) && i %in% inputwiki$pathwayRampId) {
-      tot_in_pathway <- inputwiki[which(inputwiki[, "pathwayRampId"] == i), "Freq"]
+    } else if (background_type == "database" & background == "wiki") {
       total_pathway_analytes <- wiki_totanalytes
-    } else if ((!is.na(inputreact$pathwayRampId[1])) && i %in% inputreact$pathwayRampId) {
-      tot_in_pathway <- inputreact[which(inputreact[, "pathwayRampId"] == i), "Freq"]
+    } else if (background_type == "database" & background == "react") {
       total_pathway_analytes <- react_totanalytes
-    } else {
-      tot_in_pathway <- 0
+    }
+    pathway_analytes = pathway_definitions[[i]]
+    pathway_analytes = pathway_analytes[which(pathway_analytes != "" & !is.na(pathway_analytes))]
+    tot_in_pathway = length(pathway_analytes)
+    
+    tot_out_pathway <- total_pathway_analytes - tot_in_pathway
+    # fill the rest of the table out
+    ## user_in_pathway <- length(unique(pathwaydf[which(pathwaydf$pathwayRampId==i),"Analyte"]))
+    if (background_type != "database") {
+      bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId == i), "Analyte"]))
+    }
+    # EM - Corrected the following line that initially counted all input analytes without regard as to whether
+    # whether they were genes or metabolites.
+    # user_out_pathway <- length(unique(pathwaydf$Analyte)) - user_in_pathway
+    user_out_pathway <- tot_user_analytes - user_in_pathway
+
+    if (background_type != "database") {
+      bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId == i), "Analyte"]))
+      bg_out_pathway <- tot_bg_analytes - bg_in_pathway
     }
 
-    if (tot_in_pathway == 0 || user_in_pathway == 0) {
-      pval <- c(pval, NA)
+    if (background_type == "database") {
+      contingencyTb[1, 1] <- tot_in_pathway - user_in_pathway
     } else {
-      tot_out_pathway <- total_pathway_analytes - tot_in_pathway
-      # fill the rest of the table out
+      contingencyTb[1, 1] <- bg_in_pathway
+    }
 
-      ## user_in_pathway <- length(unique(pathwaydf[which(pathwaydf$pathwayRampId==i),"rampId"]))
-      if (background_type != "database") {
-        bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]))
+    if (background_type == "database") {
+      contingencyTb[1, 2] <- tot_out_pathway - user_out_pathway
+    } else {
+      contingencyTb[1, 2] <- bg_out_pathway
+    }
+
+    ## contingencyTb[1, 1] <- ifelse(background_type == "database",
+    ##   tot_in_pathway - user_in_pathway,
+    ##   bg_in_pathway
+    ## )
+    ## contingencyTb[1, 2] <- ifelse(background_type == "database",
+    ##   tot_out_pathway - user_out_pathway,
+    ##   bg_out_pathway
+    ## )
+    contingencyTb[2, 1] <- user_in_pathway
+    contingencyTb[2, 2] <- user_out_pathway
+    # Put the test into a try catch in case there's an issue, we'll have some details on the contingency matrix
+    tryCatch(
+      {
+        result <- stats::fisher.test(contingencyTb, alternative = alternative)
+      },
+      error = function(e) {
+        print(toString(e))
+        print(i)
+        print(contingencyTb)
+        print(tot_in_pathway)
+        print(tot_out_pathway)
+        print(user_in_pathway)
+        print(user_out_pathway)
+        print(analyte_type)
+        print(pathwaydf)
       }
-      # EM - Corrected the following line that initially counted all input analytes without regard as to whether
-      # whether they were genes or metabolites.
-      # user_out_pathway <- length(unique(pathwaydf$rampId)) - user_in_pathway
-      user_out_pathway <- tot_user_analytes - user_in_pathway
+    )
 
-      if (background_type != "database") {
-        bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]))
-        bg_out_pathway <- tot_bg_analytes - bg_in_pathway
-      }
-
-      if (background_type == "database") {
-        contingencyTb[1, 1] <- tot_in_pathway - user_in_pathway
-      } else {
-        contingencyTb[1, 1] <- bg_in_pathway
-      }
-
-      if (background_type == "database") {
-        contingencyTb[1, 2] <- tot_out_pathway - user_out_pathway
-      } else {
-        contingencyTb[1, 2] <- bg_out_pathway
-      }
-
-      ## contingencyTb[1, 1] <- ifelse(background_type == "database",
-      ##   tot_in_pathway - user_in_pathway,
-      ##   bg_in_pathway
-      ## )
-      ## contingencyTb[1, 2] <- ifelse(background_type == "database",
-      ##   tot_out_pathway - user_out_pathway,
-      ##   bg_out_pathway
-      ## )
-      contingencyTb[2, 1] <- user_in_pathway
-      contingencyTb[2, 2] <- user_out_pathway
-      # Put the test into a try catch in case there's an issue, we'll have some details on the contingency matrix
-      tryCatch(
-        {
-          result <- stats::fisher.test(contingencyTb, alternative = alternative)
-        },
-        error = function(e) {
-          print(toString(e))
-          print(i)
-          print(contingencyTb)
-          print(tot_in_pathway)
-          print(tot_out_pathway)
-          print(user_in_pathway)
-          print(user_out_pathway)
-          print(analyte_type)
-          print(pathwaydf)
-        }
-      )
-
-      pval <- c(pval, result$p.value)
-    } # End else tot_in_pathway is not zero
+    pval <- c(pval, result$p.value)
+    # End else tot_in_pathway is not zero
 
     userinpath <- c(userinpath, user_in_pathway)
     totinpath <- c(totinpath, tot_in_pathway)
     pidused <- c(pidused, i)
   } # end for loop
-  # Now run fisher's tests for all other pids (all pathways not covered in dataset)
-  if (MCall == T) {
-    # Now run fisher's tests for all other pids
-    query <- "select distinct(pathwayRampId) from analytehaspathway where pathwaySource != 'hmdb';"
-    con <- connectToRaMP()
-    allpids <- RMariaDB::dbGetQuery(con, query)
-    RMariaDB::dbDisconnect(con)
-    pidstorun <- setdiff(allpids[, 1], pid)
-    pidstorunlist <- sapply(pidstorun, shQuote)
-    pidstorunlist <- paste(pidstorunlist, collapse = ",")
-
-    query2 <- paste0(
-      "select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
-      pidstorunlist, ")"
-    )
-    con <- connectToRaMP()
-    restcids <- RMariaDB::dbGetQuery(con, query2) # [[1]]
-    RMariaDB::dbDisconnect(con)
-
-    query1 <- paste0("select rampId,pathwayRampId from analytehaspathway;")
-
-    con <- connectToRaMP()
-    allcids <- RMariaDB::dbGetQuery(con, query1) # [[1]]
-    RMariaDB::dbDisconnect(con)
-
-    # We're collecting p-values for all pathways, now those with no analyte support at all - JCB:?
-
-    # calculating p-values for all other pathways
-    kegg_metab <- kegg_metab
-    kegg_gene <- kegg_gene
-    wiki_metab <- wiki_metab
-    wiki_gene <- wiki_gene
-    reactome_metab <- reactome_metab
-    reactome_gene <- reactome_gene
-    hmdb_metab <- hmdb_metab
-    hmdb_gene <- hmdb_gene
-    count <- 1
-    pval2 <- userinpath2 <- totinpath2 <- c()
-
-    for (i in pidstorun) {
-      if ((count %% 100) == 0) {
-        print(paste0("Processed ", count))
-      }
-      count <- count + 1
-      user_in_pathway <- 0
-      if (analyte_type == "metabolites") {
-        if (i %in% kegg_metab$pathwayRampId) {
-          tot_in_pathway <- kegg_metab[which(kegg_metab[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- kegg_totanalytes
-        } else if (i %in% wiki_metab$pathwayRampId) {
-          tot_in_pathway <- wiki_metab[which(wiki_metab[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- wiki_totanalytes
-        } else if (i %in% reactome_metab$pathwayRampId) {
-          tot_in_pathway <- reactome_metab[which(reactome_metab[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- react_totanalytes
-        } else if (i %in% hmdb_metab$pathwayRampId) {
-          tot_in_pathway <- hmdb_metab[which(hmdb_metab[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- NULL
-        } else {
-          tot_in_pathway <- 0
-          total_analytes <- NULL
-        }
-      } else {
-        if (i %in% kegg_gene$pathwayRampId) {
-          tot_in_pathway <- kegg_gene[which(kegg_gene[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- kegg_totanalytes
-        } else if (i %in% wiki_gene$pathwayRampId) {
-          tot_in_pathway <- wiki_gene[which(wiki_gene[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- wiki_totanalytes
-        } else if (i %in% reactome_gene$pathwayRampId) {
-          tot_in_pathway <- reactome_gene[which(reactome_gene[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- react_totanalytes
-        } else if (i %in% hmdb_gene$pathwayRampId) {
-          tot_in_pathway <- hmdb_gene[which(hmdb_gene[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- NULL
-        } else {
-          tot_in_pathway <- 0
-          total_analytes <- NULL
-        }
-      }
-
-      # Check that the pathway being considered has your analyte type, if not, move on
-
-      if (is.null(total_analytes)) {
-        next
-      }
-      tot_out_pathway <- total_analytes - tot_in_pathway
-      # fill the rest of the table out
-
-      # JCB: Another issue 10/7/2020
-      # This line was used for user_out_pathway
-      # This section of code is for all pathways that have no analyte support.
-      user_out_pathway <- length(unique(pathwaydf$rampId))
-
-      # This line was commented out in production *but* now we have total_analytes set properly
-      # not sure why this line was changed.
-      # user_out_pathway <- total_analytes - user_in_pathway
-
-      contingencyTb[1, 1] <- tot_in_pathway - user_in_pathway
-      contingencyTb[1, 2] <- tot_out_pathway - user_out_pathway
-      contingencyTb[2, 1] <- user_in_pathway
-      contingencyTb[2, 2] <- user_out_pathway
-      # Added try catch
-      tryCatch(
-        {
-          result <- stats::fisher.test(contingencyTb, alternative = alternative)
-        },
-        error = function(e) {
-          print(toString(e))
-          print(i)
-          print(contingencyTb)
-        }
-      )
-
-      pval2 <- c(pval2, result$p.value)
-      userinpath2 <- c(userinpath2, user_in_pathway)
-      totinpath2 <- c(totinpath2, tot_in_pathway)
-      # pidused <- c(pidused,i)
-    } # end for loop
-    keepers <- intersect(
-      which(c(totinpath, totinpath2) >= min_path_size),
-      which(c(totinpath, totinpath2) < max_path_size)
-    )
-
-    print(paste0("Calculated p-values for ", length(c(pval, pval2)), " pathways"))
-    out <- data.frame(
-      pathwayRampId = c(pidused, pidstorun)[keepers],
-      Pval = c(pval, pval2)[keepers], # FDR.Adjusted.Pval=fdr,
-      # Holm.Adjusted.Pval=holm,
-      Num_In_Path = c(userinpath, userinpath2)[keepers],
-      Total_In_Path = c(totinpath, totinpath2)[keepers]
-    )
-  } # end if MCall is T and all pathways are being calculated, even ones that do not represent input analytes
-
-  else {
-
-    # only keep pathways that have >= min_path_size or < max_path_size compounds
-    keepers <- intersect(
-      which(c(totinpath) >= min_path_size),
-      which(c(totinpath) < max_path_size)
-    )
-
-    # hist(totinpath,breaks=1000)
-    print(paste0("Keeping ", length(keepers), " pathways"))
-    # fdr <- stats::p.adjust(c(pval,pval2)[keepers],method="fdr")
-    # holm <- stats::p.adjust(c(pval,pval2)[keepers],method="holm")
-    print(paste0("Calculated p-values for ", length(pval), " pathways"))
-
-    # format output (retrieve pathway name for each unique source id first
-    out <- data.frame(
-      pathwayRampId = pidused[keepers],
-      Pval = pval[keepers], # FDR.Adjusted.Pval=fdr,
-      # Holm.Adjusted.Pval=holm,
-      Num_In_Path = userinpath[keepers],
-      Total_In_Path = totinpath[keepers]
-    )
-  } # End else if MCall (when False)
-
+  # only keep pathways that have >= min_path_size or < max_path_size compounds
+  keepers <- intersect(
+    which(c(totinpath) >= min_path_size),
+    which(c(totinpath) < max_path_size)
+  )
+  
+  # hist(totinpath,breaks=1000)
+  print(paste0("Keeping ", length(keepers), " pathways"))
+  # fdr <- stats::p.adjust(c(pval,pval2)[keepers],method="fdr")
+  # holm <- stats::p.adjust(c(pval,pval2)[keepers],method="holm")
+  print(paste0("Calculated p-values for ", length(pval), " pathways"))
+  
+  # format output (retrieve pathway name for each unique source id first
+  out <- data.frame(
+    pathwayRampId = pidused[keepers],
+    Pval = pval[keepers], # FDR.Adjusted.Pval=fdr,
+    # Holm.Adjusted.Pval=holm,
+    Num_In_Path = userinpath[keepers],
+    Total_In_Path = totinpath[keepers]
+  )
   print(dim(out))
   out <- out[!duplicated(out), ]
   print(colnames(out))
@@ -987,7 +803,7 @@ runCombinedFisherTest <- function(analytes,
   }
 
   pathwaydf <- rbind(pathwaydf_metab, pathwaydf_gene)
-  
+
   if (!is.null(outgene)) {
     G <- 1
   }
@@ -1230,13 +1046,41 @@ getPathwayFromAnalyte <- function(analytes = "none",
     df2 <- subset(df2, select = -c(rampId, pathwayRampId))
   }
 
-  print("finished getPathwaytFromAnalyte()")
+  print("finished getPathwayFromAnalyte()")
   print(paste0("Found ", nrow(df2), " associated pathways."))
 
   return(df2)
 }
 
 
+getCustomPathwayFromAnalyte <- function(analytes, pathways){
+  print("Starting getCustomPathwayFromAnalyte()")
+  tryCatch({
+    pathway_definitions <- read.csv(pathways, sep = "\t")
+  },
+  error = function(e) {
+    print("Pathway file could not be found or is improperly formatted. Please supply path to GMX file for custom pathway definitions")
+  })
+  
+  pathwaydf <- data.frame(Analyte = character(), Pathway = character())
+  
+  for (i in analytes) {
+    for (j in 1:ncol(pathway_definitions)) {
+      if (i %in% unlist(pathway_definitions[, j])) {
+        pathwaydf <- rbind(pathwaydf, data.frame(Analyte = i,
+                                                 Pathway = colnames(pathway_definitions)[j]))
+      }
+    }
+  }
+  
+  print(paste0(
+    "Found ", length(unique(pathwaydf$Analyte)),
+    " out of ", length(unique(analytes)),
+    " input analytes in pathway definitions file"
+  ))
+
+  return(pathwaydf)
+}
 
 
 
