@@ -568,14 +568,17 @@ getRaMPInfoFromAnalytes<-function(analytes,
 
 ##' Return all analytes that map to unique pathways in a pathwaydf
 ##' @param inputdf internal df with pathwayramp ids
+##' @param pathway_definitions If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows
+##' @param analyte_type "genes" or "metabolites"
 ##' @return dataframe of all analytes that map to the input pathways
 ##' @author Andrew Christopher Patt
-buildFrequencyTables<-function(inputdf){
+buildFrequencyTables<-function(inputdf, pathway_definitions, analyte_type){
+  if(pathway_definitions == "RaMP"){
     ## Get pathway ids that contain the user analytes
     pid <- unique(inputdf$pathwayRampId);
     list_pid <- sapply(pid,shQuote)
     list_pid <- paste(list_pid,collapse = ",")
-
+    
     ## Retrieve compound ids associated with background pathways and count
     query <- paste0("select * from analytehaspathway where pathwayRampId in (",
                      list_pid,")")
@@ -586,6 +589,37 @@ buildFrequencyTables<-function(inputdf){
     RMariaDB::dbDisconnect(con)
 
     return(input_RampIds)
+  }else{
+    tryCatch(
+    {
+      if (analyte_type == "metabolites") {
+        pathway_definitions <- readxl::read_excel(pathways, sheet = 1)
+      } else if (analyte_type == "genes") {
+        pathway_definitions <- readxl::read_excel(pathways, sheet = 2)
+      }
+    },
+    error = function(e) {
+      print("Pathway file could not be found or is improperly formatted. Please supply path to GMX file for custom pathway definitions")
+    }
+    )
+    input_RampIds <- data.frame(rampId=character(),
+                                pathwayRampId=character())
+    pid <- unique(inputdf$pathwayRampId)
+
+    for(i in pid){
+      temp <- data.frame(rampId = pathway_definitions[,i][which(!is.na(pathway_definitions[,i])),],
+                         pathwayRampId = i)
+      colnames(temp) <- c("rampId","pathwayRampId")
+      input_RampIds <- rbind(input_RampIds,temp)
+    }
+    input_RampIds$pathwaySource = "custom"
+    if(analyte_type == "metabolites"){
+      input_RampIds$rampId = paste0("RAMP_C",input_RampIds$rampId)
+    }else if(analyte_type == "genes"){
+      input_RampIds$rampId = paste0("RAMP_G",input_RampIds$rampId)
+    }
+    return(input_RampIds)
+  }
 }
 
 ##' Separate input ids into lists based on database of origin
@@ -593,46 +627,51 @@ buildFrequencyTables<-function(inputdf){
 ##' @return pathway lists separated by source db
 ##' @author Andrew Christopher Patt
 segregateDataBySource<-function(input_RampIds){
-    # data frames for metabolites with pathwayRampID, Freq based  on Source(kegg, reactome, wiki)
+  # data frames for metabolites with pathwayRampID, Freq based  on Source(kegg, reactome, wiki)
 
-    input_RampId_C <- input_RampIds[grep("RAMP_C", input_RampIds$rampId), ]
-    unique_input_RampId_C <- unique(input_RampId_C[,c("rampId", "pathwayRampId")])
-    unique_pathwayRampId_source <- unique(input_RampId_C[,c("pathwayRampId", "pathwaySource")])
+  input_RampId_C <- input_RampIds[grep("RAMP_C", input_RampIds$rampId), ]
+  unique_input_RampId_C <- unique(input_RampId_C[,c("rampId", "pathwayRampId")])
+  unique_pathwayRampId_source <- unique(input_RampId_C[,c("pathwayRampId", "pathwaySource")])
+  
+  freq_unique_input_RampId_C <- as.data.frame(table(unique_input_RampId_C[,"pathwayRampId"]))
+  
+  names(freq_unique_input_RampId_C)[1] = 'pathwayRampId'
+  merge_Pathwayfreq_source <- merge(freq_unique_input_RampId_C,
+                                    unique_pathwayRampId_source, by="pathwayRampId")
 
-    freq_unique_input_RampId_C <- as.data.frame(table(unique_input_RampId_C[,"pathwayRampId"]))
+  # subset metabolite data based on source -  kegg, reactome, wiki
 
-    names(freq_unique_input_RampId_C)[1] = 'pathwayRampId'
-    merge_Pathwayfreq_source <- merge(freq_unique_input_RampId_C, unique_pathwayRampId_source, by="pathwayRampId")
-
-    # subset metabolite data based on source -  kegg, reactome, wiki
-
-    input_kegg_metab <- subset(merge_Pathwayfreq_source, merge_Pathwayfreq_source$pathwaySource == "kegg")
-    input_reactome_metab <- subset(merge_Pathwayfreq_source, merge_Pathwayfreq_source$pathwaySource == "reactome")
-    input_wiki_metab <- subset(merge_Pathwayfreq_source, merge_Pathwayfreq_source$pathwaySource == "wiki")
-
-# data frames for Genes with pathawayRampID, Freq based  on Source(kegg, reactome, wiki, hmdb)
-
-    input_RampId_G <- input_RampIds[grep("RAMP_G", input_RampIds$rampId), ]
-    unique_input_RampId_G <- unique(input_RampId_G[,c("rampId", "pathwayRampId")])
-    unique_pathwayG_source <- unique(input_RampId_G[,c("pathwayRampId", "pathwaySource")])
-
-    freq_unique_input_RampId_G <- as.data.frame(table(unique_input_RampId_G[,"pathwayRampId"]))
-
-    names(freq_unique_input_RampId_G)[1] = 'pathwayRampId'
-    merge_PathwayG_source <- merge(freq_unique_input_RampId_G, unique_pathwayG_source, by="pathwayRampId")
-
-   # subset gene data based on source -  kegg, reactome, wiki
-
-    input_kegg_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "kegg")
-    input_reactome_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "reactome")
-    input_wiki_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "wiki")
-    return(
-        list(list(input_kegg_metab, input_reactome_metab, input_wiki_metab),
-             list(input_kegg_gene, input_reactome_gene, input_wiki_gene)))
+  input_kegg_metab <- subset(merge_Pathwayfreq_source,
+                             merge_Pathwayfreq_source$pathwaySource == "kegg")
+  input_reactome_metab <- subset(merge_Pathwayfreq_source,
+                                 merge_Pathwayfreq_source$pathwaySource == "reactome")
+  input_wiki_metab <- subset(merge_Pathwayfreq_source,
+                             merge_Pathwayfreq_source$pathwaySource == "wiki")
+  input_custom_metab <- subset(merge_Pathwayfreq_source,
+                               merge_Pathwayfreq_source$pathwaySource == "custom")
+  # data frames for Genes with pathawayRampID, Freq based  on Source(kegg, reactome, wiki, hmdb)
+  
+  input_RampId_G <- input_RampIds[grep("RAMP_G", input_RampIds$rampId), ]
+  unique_input_RampId_G <- unique(input_RampId_G[,c("rampId", "pathwayRampId")])
+  unique_pathwayG_source <- unique(input_RampId_G[,c("pathwayRampId", "pathwaySource")])
+  
+  freq_unique_input_RampId_G <- as.data.frame(table(unique_input_RampId_G[,"pathwayRampId"]))
+  
+  names(freq_unique_input_RampId_G)[1] = 'pathwayRampId'
+  merge_PathwayG_source <- merge(freq_unique_input_RampId_G, unique_pathwayG_source, by="pathwayRampId")
+  
+  # subset gene data based on source -  kegg, reactome, wiki
+  
+  input_kegg_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "kegg")
+  input_reactome_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "reactome")
+  input_wiki_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "wiki")
+  input_custom_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "custom")
+  return(
+    list(list(input_kegg_metab, input_reactome_metab, input_wiki_metab, input_custom_metab),
+         list(input_kegg_gene, input_reactome_gene, input_wiki_gene, input_custom_gene)))
 }
 
 ##' Return list of duplicate Wikipathway IDs from Reactome. This may be unnecessary in the future
-##' @param input_RampIds list of analyte ramp IDs
 ##' @return List of duplicate Wikipathway IDs from Reactome.
 ##' @author Andrew Patt
 find_duplicate_pathways <- function(){
