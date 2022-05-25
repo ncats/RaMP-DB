@@ -791,7 +791,8 @@ FilterFishersResults <- function(fishers_df, pval_type = 'fdr', pval_cutoff = 0.
 
     for(result in names(fishers_df)) {
 
-      if(class(fishers_df[[result]]) == 'data.frame') {
+      #if(class(fishers_df[[result]]) == 'data.frame') {
+       if(is(fishers_df[[result]], 'data.frame')) {
         print(result)
         resultDf <- fishers_df[[result]]
         resultDf <- subset(resultDf, resultDf[[criteriaCol]] <= pval_cutoff)

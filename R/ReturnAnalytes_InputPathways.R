@@ -2,6 +2,7 @@
 #'
 #' @param pathway a string or a vector of strings that contains pathways of interest
 #' @param analyte_type a string denoting the type of analyte to return ("gene", "metabolite", "both")
+#' @param match type of matching to use, options are "exact" or "fuzzy".  The default is "exact".
 #' @return a data.frame that contains all search results
 #' @examples
 #' \dontrun{
@@ -14,7 +15,7 @@
 #'	"sphingolipid metabolism"))
 #' }
 #' @export
-getAnalyteFromPathway <- function(pathway, analyte_type="both") {
+getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both") {
   now <- proc.time()
   print("fired")
   if(is.character(pathway)){
@@ -34,21 +35,42 @@ getAnalyteFromPathway <- function(pathway, analyte_type="both") {
   }
   list_pathway <- sapply(list_pathway,shQuote)
   list_pathway <- paste(list_pathway,collapse = ",")
-  # Retrieve pathway RaMP id
-  con <- connectToRaMP()
-  query1 <- paste0("select * from pathway where pathwayName
+ 
+  # Retrieve pathway RaMP ids
+  if (match=='exact') {
+  	query1 <- paste0("select * from pathway where pathwayName
                    in (",list_pathway,");")
-
-  df1 <- RMariaDB::dbGetQuery(con,query1)
-  RMariaDB::dbDisconnect(con)
+	con <- connectToRaMP()
+	df1 <- RMariaDB::dbGetQuery(con,query1)
+	RMariaDB::dbDisconnect(con)
+  } else if (match=='fuzzy') {
+	print("running fuzzy")
+	df1=c()
+	for (i in 1:length(pathway)) { 
+		# note here that we are using pathway, not list_pathway which 
+		# formats for 'exact' but not 'fuzzy'
+		con <- connectToRaMP()
+		query1 <- paste0('select * from pathway where pathwayName
+                   like "%',pathway[i],'%";')
+		df1 <- rbind(df1,RMariaDB::dbGetQuery(con,query1))
+		RMariaDB::dbDisconnect(con)
+	}
+  } else {
+	stop("Please be sure to set the match parameter to 'exact' or 'fuzzy'.")
+  }
 
   if(nrow(df1)==0) {
     stop("None of the input pathway(s) could be found")}
 
   # Retrieve compound id from RaMP pathway id (query1)
-  query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where
-                   pathwayRampId in (select pathwayRampId from pathway where
-                   pathwayName in (",list_pathway,"));")
+  #query2 <- paste0("select pathwayRampId,rampId from analytehaspathway where
+  #                 pathwayRampId in (select pathwayRampId from pathway where
+  #                 pathwayName in (",list_pathway,"));")
+  pidlist <- sapply(df1$pathwayRampId,shQuote)
+  pidlist <- paste(pidlist,collapse = ",")
+
+  query2 <- paste0("select pathwayRampId, rampId from analytehaspathway 
+	where pathwayRampId in (",pidlist,");")
   con <- connectToRaMP()
   df2 <- RMariaDB::dbGetQuery(con,query2)
   RMariaDB::dbDisconnect(con)
