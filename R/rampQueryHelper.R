@@ -37,7 +37,7 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
   df1 <- RMariaDB::dbGetQuery(con,query)
   RMariaDB::dbDisconnect(con)
 
-  if(!return_rampIds){
+  if(!return_rampIds || nrow(df1) < 1){
       return(df1)
   }else{
       rampid <- df1$rampId
@@ -578,7 +578,7 @@ buildFrequencyTables<-function(inputdf, pathway_definitions, analyte_type){
     pid <- unique(inputdf$pathwayRampId);
     list_pid <- sapply(pid,shQuote)
     list_pid <- paste(list_pid,collapse = ",")
-    
+
     ## Retrieve compound ids associated with background pathways and count
     query <- paste0("select * from analytehaspathway where pathwayRampId in (",
                      list_pid,")")
@@ -632,9 +632,9 @@ segregateDataBySource<-function(input_RampIds){
   input_RampId_C <- input_RampIds[grep("RAMP_C", input_RampIds$rampId), ]
   unique_input_RampId_C <- unique(input_RampId_C[,c("rampId", "pathwayRampId")])
   unique_pathwayRampId_source <- unique(input_RampId_C[,c("pathwayRampId", "pathwaySource")])
-  
+
   freq_unique_input_RampId_C <- as.data.frame(table(unique_input_RampId_C[,"pathwayRampId"]))
-  
+
   names(freq_unique_input_RampId_C)[1] = 'pathwayRampId'
   merge_Pathwayfreq_source <- merge(freq_unique_input_RampId_C,
                                     unique_pathwayRampId_source, by="pathwayRampId")
@@ -650,18 +650,18 @@ segregateDataBySource<-function(input_RampIds){
   input_custom_metab <- subset(merge_Pathwayfreq_source,
                                merge_Pathwayfreq_source$pathwaySource == "custom")
   # data frames for Genes with pathawayRampID, Freq based  on Source(kegg, reactome, wiki, hmdb)
-  
+
   input_RampId_G <- input_RampIds[grep("RAMP_G", input_RampIds$rampId), ]
   unique_input_RampId_G <- unique(input_RampId_G[,c("rampId", "pathwayRampId")])
   unique_pathwayG_source <- unique(input_RampId_G[,c("pathwayRampId", "pathwaySource")])
-  
+
   freq_unique_input_RampId_G <- as.data.frame(table(unique_input_RampId_G[,"pathwayRampId"]))
-  
+
   names(freq_unique_input_RampId_G)[1] = 'pathwayRampId'
   merge_PathwayG_source <- merge(freq_unique_input_RampId_G, unique_pathwayG_source, by="pathwayRampId")
-  
+
   # subset gene data based on source -  kegg, reactome, wiki
-  
+
   input_kegg_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "kegg")
   input_reactome_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "reactome")
   input_wiki_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "wiki")
@@ -804,9 +804,33 @@ FilterFishersResults <- function(fishers_df, pval_type = 'fdr', pval_cutoff = 0.
 }
 
 
-
-
-
+# mapNamesOrIdsToSourceIdsAndSynonyms <- function(analytes, analyteType, NamesOrIds='ids') {
+#
+#   aList <- concatenateListForSQL(analytes)
+#
+#   if(NamesOrIds == 'names') {
+#     namesQuery <- paste0("select distinct s.sourceId, s.rampId s.pathwayCount, group_concat(distinct syn.Synonym order by syn.Synonym asc separator '; ') as synonyms " +
+#       "from source s, analytesynonyms syn " +
+#       "where syn.Synonym in (",aList,") and s.rampId = syn.rampId group by s.sourceId, s.rampId, s.pathwayCount")
+#     result <- RMariaDB::dbGetQuery(conn, sql)
+#
+#   } else if(NamesOrIds == 'ids') {
+#       idQuery <- paste0("select distinct s.sourceId, s.rampId s.pathwayCount, group_concat(distinct syn.Synonym order by syn.Synonym asc separator '; ') as synonyms " +
+#                            "from source s, analytesynonyms syn " +
+#                            "where syn.Synonym in (",aList,") and s.rampId = syn.rampId group by s.sourceId, s.rampId, s.pathwayCount")
+#       result <- RMariaDB::dbGetQuery(conn, sql)
+#   }
+#
+#   for()
+#
+#   return(result)
+# }
+#
+# concatenateListForSQL <- function(inputList) {
+#   inputList <- unique(inputList)
+#   inputList <- sapply(inputList, shQuote)
+#   inputList <- paste(inputList, collapse = ",")
+# }
 
 
 
