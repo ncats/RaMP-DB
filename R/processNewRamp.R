@@ -436,43 +436,43 @@ processData <- function(){
 #' the output is availble only for RaMP internal functions (runFisherTest() & findCluster())
 #' @return sysdata.rda object in R directory with 3 Overlap Matrices (genes_result, metabolites_result, analyte_result) & dataframes generated from processData function.
 
-sysdataObject <- function() {
-
-  load(system.file(package = "RaMP",... = "extdata/genes_overlap_matrix.RData"))
-  load(system.file(package = "RaMP",... = "extdata/metabolites_overlap_matrix.RData"))
-  load(system.file(package = "RaMP",... = "extdata/analytes_overlap_matrix.RData"))
-  load(system.file(package = "RaMP",... = "extdata/FT_data.Rdata"))
-  stopifnot(is.matrix(genes_result),
-            is.matrix(metabolites_result),
-            is.matrix(analyte_result),
-            is.data.frame(hmdb_gene),
-            is.data.frame(hmdb_metab),
-            is.data.frame(kegg_gene),
-            is.data.frame(kegg_metab),
-            is.data.frame(reactome_gene),
-            is.data.frame(reactome_metab),
-            is.data.frame(wiki_gene),
-            is.data.frame(wiki_metab))
-
-
-  #uncomment usethis::use_data function to create sysdata.rda object
-  rampdb_version = 'v2.0.6'
-  usethis::use_data(genes_result,
-                     metabolites_result,
-                     analyte_result,
-                     hmdb_gene,
-                     hmdb_metab,
-                     kegg_gene,
-                     kegg_metab,
-                     reactome_gene,
-                     reactome_metab,
-                     wiki_gene,
-                     wiki_metab,
-                     rampdb_version,
-                     overwrite = TRUE,
-                     internal = TRUE)
-
-}
+# sysdataObject <- function() {
+#
+#   load(system.file(package = "RaMP",... = "extdata/genes_overlap_matrix.RData"))
+#   load(system.file(package = "RaMP",... = "extdata/metabolites_overlap_matrix.RData"))
+#   load(system.file(package = "RaMP",... = "extdata/analytes_overlap_matrix.RData"))
+#   load(system.file(package = "RaMP",... = "extdata/FT_data.Rdata"))
+#   stopifnot(is.matrix(genes_result),
+#             is.matrix(metabolites_result),
+#             is.matrix(analyte_result),
+#             is.data.frame(hmdb_gene),
+#             is.data.frame(hmdb_metab),
+#             is.data.frame(kegg_gene),
+#             is.data.frame(kegg_metab),
+#             is.data.frame(reactome_gene),
+#             is.data.frame(reactome_metab),
+#             is.data.frame(wiki_gene),
+#             is.data.frame(wiki_metab))
+#
+#
+#   #uncomment usethis::use_data function to create sysdata.rda object
+#   rampdb_version = 'v2.0.6'
+#   usethis::use_data(genes_result,
+#                      metabolites_result,
+#                      analyte_result,
+#                      hmdb_gene,
+#                      hmdb_metab,
+#                      kegg_gene,
+#                      kegg_metab,
+#                      reactome_gene,
+#                      reactome_metab,
+#                      wiki_gene,
+#                      wiki_metab,
+#                      rampdb_version,
+#                      overwrite = TRUE,
+#                      internal = TRUE)
+#
+# }
 
 # STEP 1
 #
