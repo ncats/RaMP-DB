@@ -16,7 +16,8 @@ runCombinedFisherTest(
   max_path_size = 150,
   includeRaMPids = FALSE,
   background_type = "database",
-  background = "database"
+  background = "database",
+  pathway_definitions = "RaMP"
 )
 }
 \arguments{
@@ -50,6 +51,8 @@ is ignored (default="database"); if parameter 'background_type= "file"', then 'b
 directory); if 'background_type="list"', then 'background' should be a vector of RaMP IDs; if 'backgroud_type="biospecimen"'
 then users should specify one of the following: "Blood", "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney",
 "Saliva", and "Feces"}
+
+\item{pathway_definitions}{If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows. Please supply a .xls or .xlsx file. If supplying pathway definitions for genes and metabolites, ensure that metabolite definitions are on tab 1, and gene definitions are on tab2.}
 }
 \value{
 a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values
@@ -66,9 +69,11 @@ pkg.globals <- setConnectionToRaMP(
   dbname = "ramp2", username = "root",
   conpass = "", host = "localhost"
 )
-analyte.list <- c('chebi:15344', 'chebi:10983', 'chebi:15351',
-                  'uniprot:Q86V21', 'uniprot:Q02338', 'uniprot:Q9BUT1')
+analyte.list <- c(
+  "chebi:15344", "chebi:10983", "chebi:15351",
+  "uniprot:Q86V21", "uniprot:Q02338", "uniprot:Q9BUT1"
+)
 
-fisher.results <- runCombinedFisherTest(analytes = analyte.list, NameOrIds = 'ids')
+fisher.results <- runCombinedFisherTest(analytes = analyte.list, NameOrIds = "ids")
 }
 }

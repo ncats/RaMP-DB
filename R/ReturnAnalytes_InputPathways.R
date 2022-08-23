@@ -35,22 +35,23 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both") {
   }
   list_pathway <- sapply(list_pathway,shQuote)
   list_pathway <- paste(list_pathway,collapse = ",")
- 
+
   # Retrieve pathway RaMP ids
   if (match=='exact') {
-  	query1 <- paste0("select * from pathway where pathwayName
+  	query1 <- paste0("select pathwayRampId, sourceId as pathwayId, type, pathwayCategory, pathwayName from pathway where pathwayName
                    in (",list_pathway,");")
 	con <- connectToRaMP()
 	df1 <- RMariaDB::dbGetQuery(con,query1)
+
 	RMariaDB::dbDisconnect(con)
   } else if (match=='fuzzy') {
 	print("running fuzzy")
 	df1=c()
-	for (i in 1:length(pathway)) { 
-		# note here that we are using pathway, not list_pathway which 
+	for (i in 1:length(pathway)) {
+		# note here that we are using pathway, not list_pathway which
 		# formats for 'exact' but not 'fuzzy'
 		con <- connectToRaMP()
-		query1 <- paste0('select * from pathway where pathwayName
+		query1 <- paste0('select  pathwayRampId, sourceId as pathwayId, type, pathwayCategory, pathwayName from pathway where pathwayName
                    like "%',pathway[i],'%";')
 		df1 <- rbind(df1,RMariaDB::dbGetQuery(con,query1))
 		RMariaDB::dbDisconnect(con)
@@ -69,7 +70,7 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both") {
   pidlist <- sapply(df1$pathwayRampId,shQuote)
   pidlist <- paste(pidlist,collapse = ",")
 
-  query2 <- paste0("select pathwayRampId, rampId from analytehaspathway 
+  query2 <- paste0("select pathwayRampId, rampId from analytehaspathway
 	where pathwayRampId in (",pidlist,");")
   con <- connectToRaMP()
   df2 <- RMariaDB::dbGetQuery(con,query2)
@@ -93,7 +94,7 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both") {
   mdf1$temp<-paste(mdf1$pathwayRampId,mdf1$rampId,sep=";")
   # use regular expression to remove substring before ':'
   #mdf1$sourceId <- gsub('.*:','',mdf1$sourceId)
-  out=data.frame(pathwayName=NA,pathwayType=NA,analyteName=NA,
+  out=data.frame(pathwayName=NA,pathwayId=NA,pathwayType=NA,analyteName=NA,
                  sourceAnalyteIDs=NA,geneOrCompound=NA)
   # Reformat so that you have one metabolite, with all synonyms, in one line:
   count=1
@@ -104,6 +105,7 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both") {
     out$sourceAnalyteIDs <- paste(unique(temp$sourceId),collapse="; ")
     out$pathwayName <- temp[1,"pathwayName"]
     #out$pathwayCategory <- temp[1,"pathwayCategory"]
+    out$pathwayId <- temp[1,"pathwayId"]
     out$pathwayType <- temp[1,"type"]
     out$analyteName <- temp[1,"commonName"]
     out$geneOrCompound <- temp[1,"geneOrCompound"]
@@ -118,7 +120,7 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both") {
 	allout <- allout[which(allout$geneOrCompound=="gene"),]
   } else if (analyte_type=="metabolite") {
         allout <- allout[which(allout$geneOrCompound=="compound"),]
-  } else {	
+  } else {
     allout <- allout
   }
  return(allout)
