@@ -2,7 +2,8 @@
 
 # New!  RaMP 2.0!
 
-RaMP 2.0 is now released and includes an updated backend database with expanded annotations for >150,000 metabolites and ~14,000 genes/proteins.  Annotations include biological pathways, chemical classes and structures (for metabolites only), ontologies (metabolites only), and enzyme-metabolite relationships based on chemical reactions. Annotations are drawn from HMDB, KEGG (through HMDB), Lipid-MAPS, WikiPathways, Reactome, and CheBI. 
+RaMP 2.0 is now released and includes an updated backend database with 
+expanded annotations for >150,000 metabolites and ~14,000 genes/proteins.  Annotations include biological pathways, chemical classes and structures (for metabolites only), ontologies (metabolites only), and enzyme-metabolite relationships based on chemical reactions. Annotations are drawn from HMDB, KEGG (through HMDB), Lipid-MAPS, WikiPathways, Reactome, and CheBI. 
 
 This R package includes functions that allow users to interface with this up-do-date and comprehensive resource.  Functionalities include 1) simple and batch queries for pathways, ontologies, chemical annotations, and reaction-level gene-metabolite relationships; 2) pathway and chemical enrichment analyses.
 
@@ -14,7 +15,7 @@ Please [click here to view our preprint](https://www.biorxiv.org/content/10.1101
 Our new revamped web interface can be found at https://rampdb.nih.gov/.  The code is publicly available at https://github.com/ncats/RaMP-Client/.
 
 # APIs
-API access is now available [here](https://ramp-api-alpha.ncats.io/__docs__/).
+API access is now available [here](https://rampdb.nih.gov/api).
 
 # Why RaMP (Relational Database of Metabolomic Pathways)
 
