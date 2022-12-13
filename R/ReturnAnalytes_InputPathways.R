@@ -43,14 +43,15 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
   if (match=='exact') {
     # return pathway name, pathway type, analyte name, source analyte ids, analyte type/class
     sql = paste0("select p.pathwayName, p.sourceId, p.type,
-    group_concat(distinct s.commonName order by s.commonName asc separator '; '),
-    group_concat(distinct s.sourceId order by s.sourceId asc separator '; '),
-    geneOrCompound
+    group_concat(distinct s.commonName order by s.commonName asc separator '; ') as commonName,
+    group_concat(distinct s.sourceId order by s.sourceId asc separator '; ') as sourceId,
+    s.geneOrCompound
     from pathway p, analytehaspathway ap, source s
     where s.rampId = ap.rampID
     and ap.pathwayRampId = p.pathwayRampId
     and p.pathwayName in (",list_pathway,") ",
-    "group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound"
+    "group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
+    order by p.pathwayName asc, s.geneOrCompound asc"
                  )
     con <- connectToRaMP()
     df <- RMariaDB::dbGetQuery(con,sql)
@@ -60,11 +61,12 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
     sql = "select p.pathwayName, p.sourceId, p.type,
     group_concat(distinct s.commonName order by s.commonName asc separator '; '),
     group_concat(distinct s.sourceId order by s.sourceId asc separator '; '),
-    geneOrCompound
+    s.geneOrCompound
     from pathway p, analytehaspathway ap, source s
     where s.rampId = ap.rampID
     and ap.pathwayRampId = p.pathwayRampId
-    and p.pathwayName like '%[SOME_PW_NAME]%' group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound"
+    and p.pathwayName like '%[SOME_PW_NAME]%' group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
+    order by p.pathwayName asc, s.geneOrCompound asc"
 
     con <- connectToRaMP()
     for(p in pathway) {
