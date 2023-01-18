@@ -42,31 +42,39 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
   # Retrieve pathway RaMP ids
   if (match=='exact') {
     # return pathway name, pathway type, analyte name, source analyte ids, analyte type/class
-    sql = paste0("select p.pathwayName, p.sourceId, p.type,
-    group_concat(distinct s.commonName order by s.commonName asc separator '; ') as commonName,
-    group_concat(distinct s.sourceId order by s.sourceId asc separator '; ') as sourceId,
-    s.geneOrCompound
+    sql = paste0("select
+    group_concat(distinct s.commonName order by s.commonName asc separator '; ') as analyteName,
+    group_concat(distinct s.sourceId order by s.sourceId asc separator '; ') as sourceAnalyteIDs,
+    s.geneOrCompound as geneOrCompound,
+    p.pathwayName as pathwayName,
+    p.pathwayCategory as pathwayCategory,
+    p.type as pathwayType
     from pathway p, analytehaspathway ap, source s
     where s.rampId = ap.rampID
     and ap.pathwayRampId = p.pathwayRampId
+    and (p.pathwayCategory not like 'smpdb%' or p.pathwayCategory is Null)
     and p.pathwayName in (",list_pathway,") ",
     "group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
-    order by p.pathwayName asc, s.geneOrCompound asc"
+    order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;"
                  )
     con <- connectToRaMP()
     df <- RMariaDB::dbGetQuery(con,sql)
     RMariaDB::dbDisconnect(con)
   } else if(match == 'fuzzy') {
     df = data.frame(matrix(nrow=0, ncol=6))
-    sql = "select p.pathwayName, p.sourceId, p.type,
-    group_concat(distinct s.commonName order by s.commonName asc separator '; '),
-    group_concat(distinct s.sourceId order by s.sourceId asc separator '; '),
-    s.geneOrCompound
+    sql = "select
+    group_concat(distinct s.commonName order by s.commonName asc separator '; ') as analyteName,
+    group_concat(distinct s.sourceId order by s.sourceId asc separator '; ') as sourceAnalyteIDs,
+    s.geneOrCompound as geneOrCompound,
+    p.pathwayName as pathwayName,
+    p.pathwayCategory as pathwayCategory,
+    p.type as pathwayType
     from pathway p, analytehaspathway ap, source s
     where s.rampId = ap.rampID
     and ap.pathwayRampId = p.pathwayRampId
+    and (p.pathwayCategory not like 'smpdb%' or p.pathwayCategory is Null)
     and p.pathwayName like '%[SOME_PW_NAME]%' group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
-    order by p.pathwayName asc, s.geneOrCompound asc"
+    order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;"
 
     con <- connectToRaMP()
     for(p in pathway) {
@@ -77,8 +85,6 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
     RMariaDB::dbDisconnect(con)
   }
 
-  colnames(df) <- c("Pathway Name", "Pathway ID", "Pathway Type", "Analyte Names", "Source Analyte IDs", "Analyte Type")
-
   # if we have a result and max_pathway size is not Infinite, filter pathway results by pathway size
   if(nrow(df) > 0 && max_pathway_size != Inf) {
     pwAnalyteCounts <- data.frame(table(df$`Pathway Name`))
@@ -88,10 +94,10 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
 
   if(analyte_type=="gene") {
     print("gene return...")
-    allout <- df[which(df$`Analyte Type`=="gene"),]
+    allout <- df[which(df$`geneOrCompound`=="gene"),]
   } else if (analyte_type=="metabolite") {
     print("met return...")
-    allout <- df[which(df$`Analyte Type`=="compound"),]
+    allout <- df[which(df$`geneOrCompound`=="compound"),]
   } else {
     allout <- df
   }
