@@ -4,7 +4,11 @@
 \alias{getCurrentRaMPVersion}
 \title{Retrieve RaMP version}
 \usage{
-getCurrentRaMPVersion()
+getCurrentRaMPVersion(justVersion = T)
+}
+\arguments{
+\item{justVersion}{boolean value indicating if the method should just return the version id (default, justVersion = T),
+or a table that includes db_version_id, load_timestamp (update time/date), version_notes, and the db_sql_url (a url for mysql schema download)}
 }
 \value{
 current ramp databse version

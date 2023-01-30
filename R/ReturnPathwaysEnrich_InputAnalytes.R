@@ -18,22 +18,36 @@
 #' directory); if 'background_type="list"', then 'background' should be a vector of RaMP IDs; if 'backgroud_type="biospecimen"'
 #' then users should specify one of the following: "Blood", "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney",
 #' "Saliva", and "Feces"
+#' @param pathway_definitions If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows
 #' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
 
 runFisherTest <- function(analytes,
                           total_genes = 20000,
                           NameOrIds = "ids",
                           analyte_type = "metabolites",
-                          MCall = F, alternative = "less", min_path_size=5, max_path_size=150,
-                          background_type="database", background="database") {
-
+                          MCall = F, alternative = "less", min_path_size = 5, max_path_size = 150,
+                          background_type = "database", background = "database",
+                          pathway_definitions = "RaMP") {
+  if(analyte_type == "genes"){
+    background_type = "database"
+    print("Using database background for genes")
+  }
   now <- proc.time()
   print("Fisher Testing ......")
-  pathwaydf <- getPathwayFromAnalyte(analytes,
-                                     includeRaMPids = TRUE,
-                                     NameOrIds = NameOrIds,
-                                     find_synonym=FALSE
-  )
+  if (pathway_definitions != "RaMP") {
+    pathwaydf <- getCustomPathwayFromAnalyte(analytes,
+      pathway_definitions,
+      analyte_type = analyte_type
+    )
+  } else {
+    pathwaydf <- getPathwayFromAnalyte(analytes,
+      includeRaMPids = TRUE,
+      NameOrIds = NameOrIds,
+      find_synonym = FALSE
+    )
+  }
+
+  pathwayRampId <- rampId <- c()
 
   pathwayRampId <- rampId <- c()
 
@@ -42,6 +56,7 @@ runFisherTest <- function(analytes,
   } else if (analyte_type == "genes") {
     pathwaydf <- pathwaydf[grep("RAMP_G_", pathwaydf$rampId), ]
   }
+
 
   # moved this check until we determine if we have analytes of a given type.
   if (nrow(pathwaydf) == 0) {
@@ -53,50 +68,74 @@ runFisherTest <- function(analytes,
     background = unlist(background)
   }
 
-  if (background_type == "list"){
-    backgrounddf <- getPathwayFromAnalyte(background,
-                                          includeRaMPids = TRUE,
-                                          NameOrIds = NameOrIds
-    )
-    print("Custom background specified, genes will be discarded")
-  } else if (background_type=="file") {
-    userbkg <- utils::read.table(background, header=F)[,1]
-    backgrounddf <- getPathwayFromAnalyte(userbkg,
-                                          includeRaMPids = TRUE,
-                                          NameOrIds = NameOrIds)
-    print("Custom background specified, genes will be discarded")
-  } else if (background_type == "biospecimen") {
-    biospecimen <- background
-    if (biospecimen == "Adipose") {
-      biospecimen <- "Adipose tissue"
-    }
-    # Get metabolites that belong to a specific biospecimen
-    query <- paste0(
-      "SELECT analytehasontology.*, ontology.*, analytehaspathway.* from analytehasontology, ontology, analytehaspathway where ontology.commonName in ('",
-      biospecimen,
-      "') and ontology.rampOntologyId = analytehasontology.rampOntologyId and analytehasontology.rampCompoundId = analytehaspathway.rampId"
-    )
-    con <- connectToRaMP()
-    backgrounddf <- RMariaDB::dbGetQuery(con, query)
-    RMariaDB::dbDisconnect(con)
-    if (nrow(backgrounddf) == 0) {
-      stop("Biospecimen background not found. Choices are 'Blood', 'Adipose', 'Heart', 'Urine', 'Brain', 'Liver', 'Kidney', 'Saliva', and 'Feces'")
-    }
-    # only keep the input metabolites (converted into pathwaydf in line above) that are in the biospecimen type specified
-    pathwaydf <- with(pathwaydf, {
-      pathwaydf %>%
-        dplyr::filter(rampId %in% backgrounddf$rampId)
-    })
-    if (nrow(pathwaydf) == 0) {
-      stop("There are no metabolites in your input that map to your selected biospecimen")
-    }
-  } else if (background_type == "database") {
+  if (pathway_definitions == "RaMP"){
+    if (background_type == "list" & analyte_type == "metabolites") {
+      backgrounddf <- getPathwayFromAnalyte(background,
+                                            includeRaMPids = TRUE,
+                                            NameOrIds = NameOrIds
+                                            )
+      print("Custom background specified, genes will be discarded")
+      
+    } else if (background_type=="file" & analyte_type == "metabolites") {
+      userbkg <- utils::read.table(background, header=F)[,1]
+      backgrounddf <- getPathwayFromAnalyte(userbkg,
+                                            includeRaMPids = TRUE,
+                                            NameOrIds = NameOrIds
+                                            )
+      print("Custom background specified, genes will be discarded")
+    } else if (background_type == "biospecimen" & analyte_type == "metabolites") {
+      biospecimen <- background
+      if (biospecimen == "Adipose") {
+        biospecimen <- "Adipose tissue"
+      }
+      # Get metabolites that belong to a specific biospecimen
+      query <- paste0(
+        "SELECT analytehasontology.*, ontology.*, analytehaspathway.* from analytehasontology, ontology, analytehaspathway where ontology.commonName in ('",
+        biospecimen,
+        "') and ontology.rampOntologyId = analytehasontology.rampOntologyId and analytehasontology.rampCompoundId = analytehaspathway.rampId"
+      )
+      con <- connectToRaMP()
+      backgrounddf <- RMariaDB::dbGetQuery(con, query)
+      RMariaDB::dbDisconnect(con)
+      if (nrow(backgrounddf) == 0) {
+        stop("Biospecimen background not found. Choices are 'Blood', 'Adipose', 'Heart', 'Urine', 'Brain', 'Liver', 'Kidney', 'Saliva', and 'Feces'")
+      }
+      # only keep the input metabolites (converted into pathwaydf in line above) that are in the biospecimen type specified
+      pathwaydf <- with(pathwaydf, {
+        pathwaydf %>%
+          dplyr::filter(rampId %in% backgrounddf$rampId)
+      })
+      if (nrow(pathwaydf) == 0) {
+        stop("There are no metabolites in your input that map to your selected biospecimen")
+      }
+    } else if (background_type == "database") {
     # do nothing, it's handled down below in if statements
-  } else {stop("background_type was not specified correctly.  Please specify one of the following options: database, file, list, biospecimen")}
-
-
+    } else {
+      stop("background_type was not specified correctly.  Please specify one of the following options: database, file, list, biospecimen")
+    }
+  }else{
+    if (background_type == "list" & analyte_type == "metabolites") {
+      backgrounddf <- getCustomPathwayFromAnalyte(background,
+                                                  pathway_definitions,
+                                                  analyte_type = analyte_type
+                                                  )
+      print("Custom background specified, genes will be discarded")
+    } else if (background_type == "file" & analyte_type == "metabolites") {
+      userbkg <- read.table(background, header = F)[, 1]
+      backgrounddf <- getCustomPathwayFromAnalyte(userbkg,
+                                                  pathway_definitions,
+                                                  analyte_type = analyte_type
+                                                  )
+      print("Custom background specified, genes will be discarded")
+    }else if(analyte_type == "genes"){
+      # do nothing, it's handled down below in if statements
+    }else{
+      stop("Only custom backgrounds are supported for custom pathway definitions. Please provide a 'list' or 'file' containing the analyte background")
+    } 
+  }
+    
   ## Check that all metabolites of interest are in the background
-  if(background_type != "database"){
+  if (background_type != "database") {
     if (length(setdiff(pathwaydf$rampId, backgrounddf$rampId) != 0)) {
       stop("All analytes in set of interest must also be in background")
     }
@@ -154,15 +193,13 @@ runFisherTest <- function(analytes,
 
   ## Input_RampIds is a table of all analytes included in pathways represented in the user set
   ## "User" refers to significant analytes
-
-  input_RampIds <- buildFrequencyTables(pathwaydf)
+  input_RampIds <- buildFrequencyTables(pathwaydf, pathway_definitions, analyte_type)
 
   if (is.null(input_RampIds)) {
     stop("Data doesn't exist")
   } else {
     segregated_id_list <- segregateDataBySource(input_RampIds)
   }
-
   # Loop through each pathway, build the contingency table, and calculate Fisher's Exact
   # test p-value
   pval <- totinpath <- userinpath <- pidused <- c()
@@ -176,7 +213,7 @@ runFisherTest <- function(analytes,
         user_in_pathway <- 0
       } else {
         user_in_pathway <- length(unique(grep("RAMP_C", ids_inpath, value = TRUE)))
-        if(background_type != "database"){
+        if (background_type != "database") {
           ids_inpath_bg <- backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]
           bg_in_pathway <- length(unique(grep("RAMP_C", ids_inpath_bg, value = TRUE)))
         }
@@ -184,16 +221,12 @@ runFisherTest <- function(analytes,
       inputkegg <- segregated_id_list[[1]][1][[1]]
       inputreact <- segregated_id_list[[1]][2][[1]]
       inputwiki <- segregated_id_list[[1]][3][[1]]
+      inputcustom <- segregated_id_list[[1]][[4]]
       tot_user_analytes <- length(grep("RAMP_C", unique(pathwaydf$rampId)))
-      if(background_type != "database"){
+      if (background_type != "database") {
         tot_bg_analytes <- length(grep("RAMP_C", unique(backgrounddf$rampId)))
       }
-      ## if(background != "database"){
-      ##     inputkegg_bg <- segregated_id_list_bg[[1]][1][[1]]
-      ##     inputreact_bg <- segregated_id_list_bg[[1]][2][[1]]
-      ##     inputwiki_bg <- segregated_id_list_bg[[1]][3][[1]]
-      ## }
-    } else {  # if genes
+    } else { # if genes
       # Check to make sure that this pathway does have genes
       if (length(grep("RAMP_G", ids_inpath)) == 0) {
         user_in_pathway <- 0
@@ -203,10 +236,10 @@ runFisherTest <- function(analytes,
       inputkegg <- segregated_id_list[[2]][1][[1]]
       inputreact <- segregated_id_list[[2]][2][[1]]
       inputwiki <- segregated_id_list[[2]][3][[1]]
+      inputcustom <- segregated_id_list[[2]][[4]]
       tot_user_analytes <- length(grep("RAMP_G", unique(pathwaydf$rampId)))
       ## tot_bg_analytes <- length(grep("RAMP_G", unique(backgrounddf$rampId)))
     }
-
     if ((!is.na(inputkegg$pathwayRampId[1])) && i %in% inputkegg$pathwayRampId) {
       tot_in_pathway <- inputkegg[which(inputkegg[, "pathwayRampId"] == i), "Freq"]
       total_pathway_analytes <- kegg_totanalytes
@@ -216,6 +249,13 @@ runFisherTest <- function(analytes,
     } else if ((!is.na(inputreact$pathwayRampId[1])) && i %in% inputreact$pathwayRampId) {
       tot_in_pathway <- inputreact[which(inputreact[, "pathwayRampId"] == i), "Freq"]
       total_pathway_analytes <- react_totanalytes
+    } else if ((!is.na(inputcustom$pathwayRampId[1])) && i %in% inputcustom$pathwayRampId) {
+      tot_in_pathway <- inputcustom[which(inputcustom[, "pathwayRampId"] == i), "Freq"]
+      if(analyte_type == "metabolites"){
+        total_pathway_analytes <- 0
+      }else{
+        total_pathway_analytes <- kegg_totanalytes
+      }
     } else {
       tot_in_pathway <- 0
     }
@@ -227,7 +267,7 @@ runFisherTest <- function(analytes,
       # fill the rest of the table out
 
       ## user_in_pathway <- length(unique(pathwaydf[which(pathwaydf$pathwayRampId==i),"rampId"]))
-      if(background_type !=  "database"){
+      if (background_type != "database") {
         bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]))
       }
       # EM - Corrected the following line that initially counted all input analytes without regard as to whether
@@ -235,31 +275,22 @@ runFisherTest <- function(analytes,
       # user_out_pathway <- length(unique(pathwaydf$rampId)) - user_in_pathway
       user_out_pathway <- tot_user_analytes - user_in_pathway
 
-      if(background_type != "database"){
+      if (background_type != "database") {
         bg_in_pathway <- length(unique(backgrounddf[which(backgrounddf$pathwayRampId == i), "rampId"]))
         bg_out_pathway <- tot_bg_analytes - bg_in_pathway
       }
 
-      if(background_type == "database"){
-        contingencyTb[1, 1] = tot_in_pathway - user_in_pathway
-      }else{
-        contingencyTb[1, 1] = bg_in_pathway
+      if (background_type == "database") {
+        contingencyTb[1, 1] <- tot_in_pathway - user_in_pathway
+      } else {
+        contingencyTb[1, 1] <- bg_in_pathway
       }
 
-      if(background_type == "database"){
-        contingencyTb[1, 2] = tot_out_pathway - user_out_pathway
-      }else{
-        contingencyTb[1, 2] = bg_out_pathway
+      if (background_type == "database") {
+        contingencyTb[1, 2] <- tot_out_pathway - user_out_pathway
+      } else {
+        contingencyTb[1, 2] <- bg_out_pathway
       }
-
-      ## contingencyTb[1, 1] <- ifelse(background_type == "database",
-      ##   tot_in_pathway - user_in_pathway,
-      ##   bg_in_pathway
-      ## )
-      ## contingencyTb[1, 2] <- ifelse(background_type == "database",
-      ##   tot_out_pathway - user_out_pathway,
-      ##   bg_out_pathway
-      ## )
       contingencyTb[2, 1] <- user_in_pathway
       contingencyTb[2, 2] <- user_out_pathway
       # Put the test into a try catch in case there's an issue, we'll have some details on the contingency matrix
@@ -444,12 +475,17 @@ runFisherTest <- function(analytes,
       Total_In_Path = totinpath[keepers]
     )
   } # End else if MCall (when False)
+  # Remove duplicate pathways between wikipathways and KEGG
+  duplicate_pathways <- find_duplicate_pathways()
+  if (any(out$pathwayRampId %in% duplicate_pathways)) {
+    out <- out[-which(out$pathwayRampId %in% duplicate_pathways), ]
+  }
 
-  print(dim(out))
   out <- out[!duplicated(out), ]
+  print(dim(out))
   print(colnames(out))
   # for user is the output needed, based on what user input
-  return(list(out,pathwaydf))
+  return(list(out, pathwaydf))
 }
 
 #' Do fisher test for only one pathway from search result
@@ -474,6 +510,7 @@ runFisherTest <- function(analytes,
 #' directory); if 'background_type="list"', then 'background' should be a vector of RaMP IDs; if 'backgroud_type="biospecimen"'
 #' then users should specify one of the following: "Blood", "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney",
 #' "Saliva", and "Feces"
+#' @param pathway_definitions If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows. Please supply a .xls or .xlsx file. If supplying pathway definitions for genes and metabolites, ensure that metabolite definitions are on tab 1, and gene definitions are on tab2.
 #' @return a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values
 #' (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway,
 #' and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
@@ -483,10 +520,12 @@ runFisherTest <- function(analytes,
 #'   dbname = "ramp2", username = "root",
 #'   conpass = "", host = "localhost"
 #' )
-#' analyte.list <- c('chebi:15344', 'chebi:10983', 'chebi:15351',
-#'                   'uniprot:Q86V21', 'uniprot:Q02338', 'uniprot:Q9BUT1')
+#' analyte.list <- c(
+#'   "chebi:15344", "chebi:10983", "chebi:15351",
+#'   "uniprot:Q86V21", "uniprot:Q02338", "uniprot:Q9BUT1"
+#' )
 #'
-#' fisher.results <- runCombinedFisherTest(analytes = analyte.list, NameOrIds = 'ids')
+#' fisher.results <- runCombinedFisherTest(analytes = analyte.list, NameOrIds = "ids")
 #' }
 #' @export
 runCombinedFisherTest <- function(analytes,
@@ -498,9 +537,9 @@ runCombinedFisherTest <- function(analytes,
                                   min_path_size = 5,
                                   max_path_size = 150,
                                   includeRaMPids = FALSE,
-				  background_type = "database",
-				  background = "database") {
-
+                                  background_type = "database",
+                                  background = "database",
+                                  pathway_definitions = "RaMP") {
   G <- M <- 0
 
   # Grab pathways that contain metabolites to run Fisher on metabolites
@@ -516,7 +555,8 @@ runCombinedFisherTest <- function(analytes,
     min_path_size = min_path_size,
     max_path_size = max_path_size,
     background_type = background_type,
-    background = background
+    background = background,
+    pathway_definitions = pathway_definitions
   )
   pathwaydf_metab <- outmetab[[2]]
   outmetab <- outmetab[[1]]
@@ -527,7 +567,7 @@ runCombinedFisherTest <- function(analytes,
   # Grab pathways that contain genes to run Fisher on genes
   ## fishgene <- pathwaydf[grep("RAMP_G_", pathwaydf$rampId), ]
   ## Genes are not evaluated if custom background is specified
-  if(background_type == "database"){
+  if (background_type == "database" & pathway_definitions == "RaMP") {
     print("Running Fisher's tests on genes")
     outgene <- runFisherTest(
       analytes = analytes,
@@ -539,19 +579,33 @@ runCombinedFisherTest <- function(analytes,
     )
     pathwaydf_gene <- outgene[[2]]
     outgene <- outgene[[1]]
-  }else{
+  } else if (pathway_definitions != "RaMP"){
+    outgene <- runFisherTest(
+      analytes = analytes,
+      analyte_type = "genes",
+      total_genes = total_genes,
+      MCall = MCall,
+      min_path_size = min_path_size,
+      max_path_size = max_path_size,
+      background_type = background_type,
+      background = background,
+      pathway_definitions = pathway_definitions
+    )
+    pathwaydf_gene <- outgene[[2]]
+    outgene <- outgene[[1]]
+  } else {
     outgene <- NULL
     pathwaydf_gene <- NULL
   }
 
   # if no ids map to pathways, return an empty result.
-  if((is.null(pathwaydf_metab) || nrow(pathwaydf_metab) < 1) &&
-     (is.null(pathwaydf_gene) || nrow(pathwaydf_gene) < 1)) {
+  if ((is.null(pathwaydf_metab) || nrow(pathwaydf_metab) < 1) &&
+    (is.null(pathwaydf_gene) || nrow(pathwaydf_gene) < 1)) {
     print("input analyte names did not map to RaMP pathways. Returning empty result.")
-    return(list(fishresults = data.frame(), analyte_type = 'none_empty_pathway_mapping', result_type = 'pathway_enrichment'))
+    return(list(fishresults = data.frame(), analyte_type = "none_empty_pathway_mapping", result_type = "pathway_enrichment"))
   }
 
-  pathwaydf<-rbind(pathwaydf_metab,pathwaydf_gene)
+  pathwaydf <- rbind(pathwaydf_metab, pathwaydf_gene)
 
   if (!is.null(outgene)) {
     G <- 1
@@ -591,8 +645,8 @@ runCombinedFisherTest <- function(analytes,
       by = "pathwayRampId"
     )
   } else {
-                                        # merge the results if both genes and metabolites were run
-      G <- M <- 1
+    # merge the results if both genes and metabolites were run
+    G <- M <- 1
     allfish <- merge(outmetab, outgene,
       by = "pathwayRampId", all.x = T, all.y = T
     )
@@ -633,13 +687,14 @@ runCombinedFisherTest <- function(analytes,
     ##     which(out$Num_In_Path_Gene >= min_analyte),
     ##     which(is.na(out$Num_In_Path_Gene))
     ##   )
-      ## )
+    ## )
 
-          keepers <- unique(
-              c(which(out$Num_In_Path_Metab >= min_analyte),
-                which(out$Num_In_Path_Gene >= min_analyte)
-                )
-          )
+    keepers <- unique(
+      c(
+        which(out$Num_In_Path_Metab >= min_analyte),
+        which(out$Num_In_Path_Gene >= min_analyte)
+      )
+    )
 
     # Now that p-values are calculated, only return pathways that are in the list
     # of pathways that contain user genes and metabolites
@@ -647,6 +702,9 @@ runCombinedFisherTest <- function(analytes,
     ##   includeRaMPids = TRUE,
     ##   NameOrIds = NameOrIds
     ##   )
+    if(pathway_definitions!="RaMP"){
+      pathwaydf$pathwayName = pathwaydf$pathwayRampId
+    }
     out2 <- merge(
       pathwaydf[, c(
         "pathwayName", "pathwayRampId", "pathwayId",
@@ -675,11 +733,11 @@ runCombinedFisherTest <- function(analytes,
       paste0(collapse = ";")
     return(analytes)
   })
-    if(includeRaMPids){
-        return(list(fishresults = out2, analyte_type = analyte_type, result_type = 'pathway_enrichment'))
-    }else{
-        return(list(fishresults = out2 %>% cleanup(), analyte_type = analyte_type, result_type = 'pathway_enrichment'))
-    }
+  if (includeRaMPids) {
+    return(list(fishresults = out2, analyte_type = analyte_type, result_type = "pathway_enrichment"))
+  } else {
+    return(list(fishresults = out2 %>% cleanup(), analyte_type = analyte_type, result_type = "pathway_enrichment"))
+  }
 }
 
 
@@ -713,9 +771,11 @@ getPathwayFromAnalyte <- function(analytes = "none",
     return(NULL)
   }
 
-  if(!(NameOrIds %in% c("ids","names"))) {
-    warning(paste0("NameOrIds must have a value in c('ids','names')\n",
-                   "Supplied NameOrIds falue = ('", NameOrIds, "')\nAborting getPathwayFromAnlyte()"))
+  if (!(NameOrIds %in% c("ids", "names"))) {
+    warning(paste0(
+      "NameOrIds must have a value in c('ids','names')\n",
+      "Supplied NameOrIds falue = ('", NameOrIds, "')\nAborting getPathwayFromAnlyte()"
+    ))
     return(NULL)
   }
 
@@ -727,14 +787,14 @@ getPathwayFromAnalyte <- function(analytes = "none",
     return(NULL)
   }
 
-    if(NameOrIds == 'ids') {
+  if (NameOrIds == "ids") {
     print("Working on ID List...")
     sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, s.sourceId as inputId, group_concat(distinct s.commonName order by s.commonName separator '; ') as commonName, s.rampId, p.pathwayRampId from
                   source s,
                   analytehaspathway ap,
                   pathway p
                   where
-                  s.sourceId in (",list_metabolite,")
+                  s.sourceId in (", list_metabolite, ")
                   and
                   ap.rampId = s.rampId
                   and
@@ -744,7 +804,7 @@ getPathwayFromAnalyte <- function(analytes = "none",
                   group by inputId, rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId
                   order by pathwayName asc")
   } else {
-      print("Working on analyte name list...")
+    print("Working on analyte name list...")
     sql <- paste0(
       "select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, lower(asyn.Synonym) as inputCommonName, group_concat(distinct s.sourceId order by s.sourceId separator '; ') as sourceIds, s.rampId, p.pathwayRampId
     from
@@ -753,7 +813,7 @@ getPathwayFromAnalyte <- function(analytes = "none",
     analytehaspathway ap,
     pathway p
     where
-    asyn.Synonym in (",list_metabolite,")
+    asyn.Synonym in (", list_metabolite, ")
     and
     s.rampId = asyn.rampId
     and
@@ -772,36 +832,87 @@ getPathwayFromAnalyte <- function(analytes = "none",
   df2 <- RMariaDB::dbGetQuery(con, sql)
 
 
-  if(find_synonym && nrow(df2) > 0) {
-    rampIds <- df2[,'rampId']
+  if (find_synonym && nrow(df2) > 0) {
+    rampIds <- df2[, "rampId"]
 
     rampIds <- sapply(rampIds, shQuote)
     rampIds <- paste(rampIds, collapse = ",")
 
-    sql = paste0("select rampId as rampId, group_concat(distinct Synonym order by Synonym separator '; ')
+    sql <- paste0("select rampId as rampId, group_concat(distinct Synonym order by Synonym separator '; ')
      as synonyms from analytesynonym
-     where rampId in (",rampIds,") group by rampId")
+     where rampId in (", rampIds, ") group by rampId")
 
     synonymsDf <- RMariaDB::dbGetQuery(con, sql)
 
-    if(nrow(synonymsDf)>0) {
-      df2 <- merge(df2,synonymsDf, by='rampId')
+    if (nrow(synonymsDf) > 0) {
+      df2 <- merge(df2, synonymsDf, by = "rampId")
     }
   }
 
   RMariaDB::dbDisconnect(con)
 
-  if(!includeRaMPids && nrow(df2) > 0) {
-    df2 <- subset(df2,select=-c(rampId, pathwayRampId))
+  if (!includeRaMPids && nrow(df2) > 0) {
+    df2 <- subset(df2, select = -c(rampId, pathwayRampId))
   }
 
-  print("finished getPathwaytFromAnalyte()")
-  print(paste0("Found ",nrow(df2)," associated pathways."))
+  print("finished getPathwayFromAnalyte()")
+  print(paste0("Found ", nrow(df2), " associated pathways."))
 
   return(df2)
 }
 
 
+##' @param analytes a vector of analytes (genes or metabolites) that need to be searched
+##' @param pathways If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows
+##' @param analyte_type "genes" or "metabolites"
+##' @return A pathwaydf compatible with runFisherTest
+##' @author Andrew Patt
+getCustomPathwayFromAnalyte <- function(analytes, pathways, analyte_type) {
+  print("Starting getCustomPathwayFromAnalyte()")
+  tryCatch(
+    {
+      if (analyte_type == "metabolites") {
+        pathway_definitions <- readxl::read_excel(pathways, sheet = 1)
+      } else if (analyte_type == "genes") {
+        pathway_definitions <- readxl::read_excel(pathways, sheet = 2)
+      }
+    },
+    error = function(e) {
+      print("Pathway file could not be found or is improperly formatted. Please supply path to GMX file for custom pathway definitions")
+    }
+  )
+
+  pathwaydf <- data.frame(Analyte = character(), Pathway = character())
+
+  for (i in analytes) {
+    for (j in 1:ncol(pathway_definitions)) {
+      if (i %in% unlist(pathway_definitions[, j])) {
+        pathwaydf <- rbind(pathwaydf, data.frame(
+          Analyte = i,
+          Pathway = colnames(pathway_definitions)[j]
+        ))
+      }
+    }
+  }
+
+  print(paste0(
+    "Found ", length(unique(pathwaydf$Analyte)),
+    " out of ", length(unique(analytes)),
+    " input analytes in pathway definitions file"
+  ))
+
+  pathwaydf$pathwayname <- pathwaydf$pathwayId <- pathwaydf$pathwayRampId <- pathwaydf$Pathway
+  pathwaydf$inputId <- pathwaydf$commonName <- pathwaydf$Analyte
+  if (analyte_type == "metabolites") {
+    pathwaydf$rampId <- paste0("RAMP_C_", pathwaydf$inputId)
+  } else if (analyte_type == "genes") {
+    pathwaydf$rampId <- paste0("RAMP_G_", pathwaydf$inputId)
+  }
+  pathwaydf$pathwaySource <- "custom"
+  pathwaydf <- subset(pathwaydf, select = -c(Pathway, Analyte))
+
+  return(pathwaydf)
+}
 
 
 
@@ -835,7 +946,6 @@ getPathwayFromAnalyte <- function(analytes = "none",
 
 findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
                         min_pathway_tocluster = 2, perc_pathway_overlap = 0.5) {
-
   print("Clustering pathways...")
 
   if (perc_analyte_overlap <= 0 || perc_analyte_overlap >= 1 ||
@@ -844,7 +954,7 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
     return(fishers_df)
   }
 
-  if(is.null(fishers_df$fishresults) || nrow(fishers_df$fishresults) < 1) {
+  if (is.null(fishers_df$fishresults) || nrow(fishers_df$fishresults) < 1) {
     warning("The contained input pathway dataframe is empty (fishers_df$fishresults). Returning input result without clustering.")
     return(fishers_df)
   }
@@ -1035,4 +1145,3 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
     return(output)
   }
 }
-
