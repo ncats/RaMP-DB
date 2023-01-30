@@ -4,10 +4,14 @@
 \alias{buildFrequencyTables}
 \title{Return all analytes that map to unique pathways in a pathwaydf}
 \usage{
-buildFrequencyTables(inputdf)
+buildFrequencyTables(inputdf, pathway_definitions, analyte_type)
 }
 \arguments{
 \item{inputdf}{internal df with pathwayramp ids}
+
+\item{pathway_definitions}{If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows}
+
+\item{analyte_type}{"genes" or "metabolites"}
 }
 \value{
 dataframe of all analytes that map to the input pathways

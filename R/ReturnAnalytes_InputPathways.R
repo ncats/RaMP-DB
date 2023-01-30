@@ -41,6 +41,7 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
 
   # Retrieve pathway RaMP ids
   if (match=='exact') {
+
     # return pathway name, pathway type, analyte name, source analyte ids, analyte type/class
     sql = paste0("select
     group_concat(distinct s.commonName order by s.commonName asc separator '; ') as analyteName,
@@ -100,12 +101,13 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
     allout <- df[which(df$`geneOrCompound`=="compound"),]
   } else {
     allout <- df
+
   }
 
   print("Timing ..")
   print(proc.time() - now)
 
-  return(allout)
+    return(allout)
 }
 
 

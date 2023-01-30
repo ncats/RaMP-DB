@@ -2,7 +2,8 @@
 
 # New!  RaMP 2.0!
 
-RaMP 2.0 is now released and includes an updated backend database with expanded annotations for >150,000 metabolites and ~14,000 genes/proteins.  Annotations include biological pathways, chemical classes and structures (for metabolites only), ontologies (metabolites only), and enzyme-metabolite relationships based on chemical reactions. Annotations are drawn from HMDB, KEGG (through HMDB), Lipid-MAPS, WikiPathways, Reactome, and CheBI. 
+RaMP 2.0 is now released and includes an updated backend database with 
+expanded annotations for >150,000 metabolites and ~14,000 genes/proteins.  Annotations include biological pathways, chemical classes and structures (for metabolites only), ontologies (metabolites only), and enzyme-metabolite relationships based on chemical reactions. Annotations are drawn from HMDB, KEGG (through HMDB), Lipid-MAPS, WikiPathways, Reactome, and CheBI. 
 
 This R package includes functions that allow users to interface with this up-do-date and comprehensive resource.  Functionalities include 1) simple and batch queries for pathways, ontologies, chemical annotations, and reaction-level gene-metabolite relationships; 2) pathway and chemical enrichment analyses.
 
@@ -14,7 +15,7 @@ Please [click here to view our preprint](https://www.biorxiv.org/content/10.1101
 Our new revamped web interface can be found at https://rampdb.nih.gov/.  The code is publicly available at https://github.com/ncats/RaMP-Client/.
 
 # APIs
-API access is now available [here](https://ramp-api-alpha.ncats.io/__docs__/).
+API access is now available [here](https://rampdb.nih.gov/api).
 
 # Why RaMP (Relational Database of Metabolomic Pathways)
 
@@ -57,7 +58,11 @@ To access, [click here](https://www.mdpi.com/2218-1989/8/1/16)
 ## Installation Instructions
 In order to use this R package locally, you will need the following:
 * The R code under this repo
+<<<<<<< HEAD
 * The mysql dump file that contains the RaMP database. **[Download here](https://figshare.com/ndownloader/files/38534654).**
+=======
+* The mysql dump file that contains the RaMP database. **[Download here](https://figshare.com/ndownloader/files/36760461).**
+>>>>>>> main
 
 If you would like to know how to build RaMP database from scratch, please check another GitHub site at [RaMP-BackEnd](https://github.com/ncats/RaMP-BackEnd)
 
@@ -84,7 +89,11 @@ mysql> exit;
 
 Here, we are naming the database "ramp" but you can use any name you'd like.  It is worth noting though that the R package assumes that the name of the database is "ramp" by default.  So if you change the name, remember to pass that name as arguments in the R package functions.
 
+<<<<<<< HEAD
 Second, download and unzip the latest RaMP database. **[Download here](https://figshare.com/ndownloader/files/38534654).**
+=======
+Second, download and unzip the latest RaMP database. **[Download here](https://figshare.com/ndownloader/files/36760461).**
+>>>>>>> main
 
 Third, populate the named database with the mysql dump file
 Supply the path and file name to the unzipped sql file that you've downloaded.

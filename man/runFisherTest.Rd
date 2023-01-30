@@ -15,7 +15,8 @@ runFisherTest(
   min_path_size = 5,
   max_path_size = 150,
   background_type = "database",
-  background = "database"
+  background = "database",
+  pathway_definitions = "RaMP"
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ is ignored (default="database"); if parameter 'background_type= "file"', then 'b
 directory); if 'background_type="list"', then 'background' should be a vector of RaMP IDs; if 'backgroud_type="biospecimen"'
 then users should specify one of the following: "Blood", "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney",
 "Saliva", and "Feces"}
+
+\item{pathway_definitions}{If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows}
 }
 \value{
 a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
