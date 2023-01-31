@@ -9,7 +9,7 @@ This R package includes functions that allow users to interface with this up-do-
 
 The code used to build the backend RaMP database is freely available at https://github.com/ncats/RaMP-Backend.
 
-Please [click here to view our preprint](https://www.biorxiv.org/content/10.1101/2022.01.19.476987v1).
+Please [click here to view our latest manuscript](https://pubmed.ncbi.nlm.nih.gov/36373969/).
 
 # Web Interface
 Our new revamped web interface can be found at https://rampdb.nih.gov/.  The code is publicly available at https://github.com/ncats/RaMP-Client/.
