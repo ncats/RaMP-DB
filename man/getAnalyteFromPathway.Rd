@@ -4,7 +4,12 @@
 \alias{getAnalyteFromPathway}
 \title{Use fast search algorithm to find all pathways from given analytes}
 \usage{
-getAnalyteFromPathway(pathway, match = "exact", analyte_type = "both")
+getAnalyteFromPathway(
+  pathway,
+  match = "exact",
+  analyte_type = "both",
+  max_pathway_size = Inf
+)
 }
 \arguments{
 \item{pathway}{a string or a vector of strings that contains pathways of interest}
@@ -12,6 +17,9 @@ getAnalyteFromPathway(pathway, match = "exact", analyte_type = "both")
 \item{match}{type of matching to use, options are "exact" or "fuzzy".  The default is "exact".}
 
 \item{analyte_type}{a string denoting the type of analyte to return ("gene", "metabolite", "both")}
+
+\item{max_pathway_size}{(default Inf), trims returned results to pathways that have fewer than this number
+of genes and metabolites}
 }
 \value{
 a data.frame that contains all search results
@@ -22,11 +30,11 @@ Use fast search algorithm to find all pathways from given analytes
 \examples{
 \dontrun{
 # To query one pathway:
-myanalytes <- getAnalyteFromPathway(pathway="sphingolipid metabolism")
+myanalytes <- getAnalyteFromPathway2(pathway="sphingolipid metabolism")
 
 # To query multiple pathways:
 pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-myanalytes <- getAnalyteFromPathway(pathway=c("De Novo Triacylglycerol Biosynthesis",
+myanalytes <- getAnalyteFromPathway2(pathway=c("De Novo Triacylglycerol Biosynthesis",
 "sphingolipid metabolism"))
 }
 }
