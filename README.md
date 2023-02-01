@@ -9,7 +9,7 @@ This R package includes functions that allow users to interface with this up-do-
 
 The code used to build the backend RaMP database is freely available at https://github.com/ncats/RaMP-Backend.
 
-Please [click here to view our preprint](https://www.biorxiv.org/content/10.1101/2022.01.19.476987v1).
+Please [click here to view our latest manuscript](https://pubmed.ncbi.nlm.nih.gov/36373969/).
 
 # Web Interface
 Our new revamped web interface can be found at https://rampdb.nih.gov/.  The code is publicly available at https://github.com/ncats/RaMP-Client/.
@@ -47,12 +47,12 @@ Detailed instructions for installing RaMP locally are below.  We've also put tog
 
 
 ## Citation
-If you use RaMP, please cite the following work:
+If you use RaMP-DB, please cite the following work:
 
-Zhang, B., et al., RaMP: A Comprehensive Relational Database of Metabolomics Pathways for Pathway Enrichment Analysis of Genes and Metabolites. Metabolites, 2018. 8(1).
+Braisted J, Patt A, Tindall C, Sheils T, Neyra J, Spencer K, Eicher T, Mathé EA. RaMP-DB 2.0: a renovated knowledgebase for deriving biological and chemical insight from metabolites, proteins, and genes. Bioinformatics. 2023 Jan 1;39(1):btac726. doi: 10.1093/bioinformatics/btac726. PMID: 36373969; PMCID: PMC9825745.
+To access, [click here](https://pubmed.ncbi.nlm.nih.gov/36373969/)
 
-PMID: 29470400; PMCID: PMC5876005; DOI: 10.3390/metabo8010016
-
+Zhang, B., et al., RaMP: A Comprehensive Relational Database of Metabolomics Pathways for Pathway Enrichment Analysis of Genes and Metabolites. Metabolites, 2018. 8(1). PMID: 29470400; PMCID: PMC5876005; DOI: 10.3390/metabo8010016
 To access, [click here](https://www.mdpi.com/2218-1989/8/1/16)
 
 ## Installation Instructions
