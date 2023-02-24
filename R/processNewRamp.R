@@ -456,7 +456,7 @@ processData <- function(){
 #
 #
 #   #uncomment usethis::use_data function to create sysdata.rda object
-#   rampdb_version = 'v2.0.6'
+#   rampdb_version = 'v2.2.1'
 #   usethis::use_data(genes_result,
 #                      metabolites_result,
 #                      analyte_result,
