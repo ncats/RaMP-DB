@@ -485,9 +485,12 @@ processData <- function(){
 #username = <username>
 #conpass = <connection_password>
 
+
+
 # run these 3 methods, these generate files in the R RaMP library area
 # if commiting to git, then copy the new files into your R git project inst/extdata
-# pkg.globals <- setConnectionToRaMP(dbname=dbname,username=username,conpass=conpass,host=hostname)
+#pkg.globals <- setConnectionToRaMP(dbname=dbname,username=username,conpass=conpass,host=hostname)
+
 # RaMP:::updateOverlapMatrices(method="balanced" ,all="all")
 # RaMP:::updateOverlapMatrices(method="balanced" ,all="analyte")
 # RaMP:::processData()
