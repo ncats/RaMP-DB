@@ -58,7 +58,7 @@ To access, [click here](https://www.mdpi.com/2218-1989/8/1/16)
 ## Installation Instructions
 In order to use this R package locally, you will need the following:
 * The R code under this repo
-* The mysql dump file that contains the RaMP database. **[Download here](https://figshare.com/ndownloader/files/38534654).**
+* The mysql dump file that contains the RaMP database. **[Download here](https://figshare.com/ndownloader/files/39460683).**
 
 
 If you would like to know how to build RaMP database from scratch, please check another GitHub site at [RaMP-BackEnd](https://github.com/ncats/RaMP-BackEnd)
@@ -86,7 +86,7 @@ mysql> exit;
 
 Here, we are naming the database "ramp" but you can use any name you'd like.  It is worth noting though that the R package assumes that the name of the database is "ramp" by default.  So if you change the name, remember to pass that name as arguments in the R package functions.
 
-Second, download and unzip the latest RaMP database. **[Download here](https://figshare.com/ndownloader/files/38534654).**
+Second, download and unzip the latest RaMP database. **[Download here](https://figshare.com/ndownloader/files/39460683).**
 
 
 Third, populate the named database with the mysql dump file
@@ -166,9 +166,10 @@ mysql> select distinct(IDtype) from source where geneOrCompound ="gene";
 * **Andrew Patt** - andy.patt@nih.gov
 * **Tim Sheils** - tim.sheils@nih.gov
 * **Kyle Spencer** - kyle.spencer@nih.gov
-* **Cole Tindall** - cole.tindall@nih.gov
 
-## Previous Authors
+
+## Previous Authors/Testers
+* **Cole Tindall** - 
 * **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
 * **Shunchao Wang** - 
 * **Rohith Vanam** - 
