@@ -456,7 +456,7 @@ processData <- function(){
 #
 #
 #   #uncomment usethis::use_data function to create sysdata.rda object
-#   rampdb_version = 'v2.0.6'
+#   rampdb_version = 'v2.2.1'
 #   usethis::use_data(genes_result,
 #                      metabolites_result,
 #                      analyte_result,
@@ -489,7 +489,8 @@ processData <- function(){
 
 # run these 3 methods, these generate files in the R RaMP library area
 # if commiting to git, then copy the new files into your R git project inst/extdata
-#pkg.globals <- setConnectionToRaMP(dbname=dbname,username=username,conpass=conpass,host=hostname)
+
+# pkg.globals <- setConnectionToRaMP(dbname=dbname,username=username,conpass=conpass,host=hostname)
 
 # RaMP:::updateOverlapMatrices(method="balanced" ,all="all")
 # RaMP:::updateOverlapMatrices(method="balanced" ,all="analyte")
