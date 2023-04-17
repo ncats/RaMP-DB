@@ -5,6 +5,7 @@
 #' @param analyte_type a string denoting the type of analyte to return ("gene", "metabolite", "both")
 #' @param match type of matching to use, options are "exact" or "fuzzy".  The default is "exact".
 #' @param max_pathway_size (default Inf), trims returned results to pathways that have fewer than this number
+#' @param names_or_ids are the input pathways input as pathway names or as pathway ids
 #' of genes and metabolites
 #' @return a data.frame that contains all search results
 #' @examples
@@ -18,7 +19,7 @@
 #'	"sphingolipid metabolism"))
 #' }
 #' @export
-getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", max_pathway_size = Inf) {
+getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", max_pathway_size = Inf, names_or_ids="names") {
   now <- proc.time()
   print("fired")
   if(is.character(pathway)){
@@ -39,6 +40,12 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
   list_pathway <- sapply(list_pathway,shQuote)
   list_pathway <- paste(list_pathway,collapse = ",")
 
+  pathwayMatchCol = 'pathwayName'
+  if(names_or_ids == 'ids') {
+    pathwayMatchCol = 'sourceId'
+    match = 'exact'
+  }
+
   # Retrieve pathway RaMP ids
   if (match=='exact') {
 
@@ -48,34 +55,35 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
     group_concat(distinct s.sourceId order by s.sourceId asc separator '; ') as sourceAnalyteIDs,
     s.geneOrCompound as geneOrCompound,
     p.pathwayName as pathwayName,
+    p.sourceId as pathwayId,
     p.pathwayCategory as pathwayCategory,
     p.type as pathwayType
     from pathway p, analytehaspathway ap, source s
     where s.rampId = ap.rampID
     and ap.pathwayRampId = p.pathwayRampId
     and (p.pathwayCategory not like 'smpdb%' or p.pathwayCategory is Null)
-    and p.pathwayName in (",list_pathway,") ",
+    and p.",pathwayMatchCol," in (",list_pathway,") ",
     "group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
-    order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;"
-                 )
+    order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;")
     con <- connectToRaMP()
     df <- RMariaDB::dbGetQuery(con,sql)
     RMariaDB::dbDisconnect(con)
   } else if(match == 'fuzzy') {
     df = data.frame(matrix(nrow=0, ncol=6))
-    sql = "select
+    sql = paste0("select
     group_concat(distinct s.commonName order by s.commonName asc separator '; ') as analyteName,
     group_concat(distinct s.sourceId order by s.sourceId asc separator '; ') as sourceAnalyteIDs,
     s.geneOrCompound as geneOrCompound,
     p.pathwayName as pathwayName,
+    p.sourceId as pathwayId,
     p.pathwayCategory as pathwayCategory,
     p.type as pathwayType
     from pathway p, analytehaspathway ap, source s
     where s.rampId = ap.rampID
     and ap.pathwayRampId = p.pathwayRampId
     and (p.pathwayCategory not like 'smpdb%' or p.pathwayCategory is Null)
-    and p.pathwayName like '%[SOME_PW_NAME]%' group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
-    order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;"
+    and p.",pathwayMatchCol,", like '%[SOME_PW_NAME]%' group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
+    order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;")
 
     con <- connectToRaMP()
     for(p in pathway) {
@@ -101,13 +109,12 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
     allout <- df[which(df$`geneOrCompound`=="compound"),]
   } else {
     allout <- df
-
   }
 
   print("Timing ..")
   print(proc.time() - now)
 
-    return(allout)
+  return(allout)
 }
 
 
