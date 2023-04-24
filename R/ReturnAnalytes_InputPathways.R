@@ -82,7 +82,7 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
     where s.rampId = ap.rampID
     and ap.pathwayRampId = p.pathwayRampId
     and (p.pathwayCategory not like 'smpdb%' or p.pathwayCategory is Null)
-    and p.",pathwayMatchCol,", like '%[SOME_PW_NAME]%' group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
+    and p.",pathwayMatchCol," like '%[SOME_PW_NAME]%' group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
     order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;")
 
     con <- connectToRaMP()
