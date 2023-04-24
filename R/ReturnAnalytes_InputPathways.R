@@ -96,9 +96,9 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
 
   # if we have a result and max_pathway size is not Infinite, filter pathway results by pathway size
   if(nrow(df) > 0 && max_pathway_size != Inf) {
-    pwAnalyteCounts <- data.frame(table(df$`Pathway Name`))
-    pwAnalyteCounts <- pwAnalyteCounts[pwAnalyteCounts$Freq < max_pathway_size,]
-    df <- df[df$`Pathway Name` %in% unlist(pwAnalyteCounts$Var1),]
+    pwAnalyteCounts <- data.frame(table(df$`pathwayName`))
+    pwAnalyteCounts <- pwAnalyteCounts[pwAnalyteCounts$Freq <= max_pathway_size,]
+    df <- df[df$`pathwayName` %in% unlist(pwAnalyteCounts$Var1),]
   }
 
   if(analyte_type=="gene") {
