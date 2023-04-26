@@ -75,7 +75,7 @@ runFisherTest <- function(analytes,
                                             NameOrIds = NameOrIds
                                             )
       print("Custom background specified, genes will be discarded")
-      
+
     } else if (background_type=="file" & analyte_type == "metabolites") {
       userbkg <- utils::read.table(background, header=F)[,1]
       backgrounddf <- getPathwayFromAnalyte(userbkg,
@@ -131,9 +131,9 @@ runFisherTest <- function(analytes,
       # do nothing, it's handled down below in if statements
     }else{
       stop("Only custom backgrounds are supported for custom pathway definitions. Please provide a 'list' or 'file' containing the analyte background")
-    } 
+    }
   }
-    
+
   ## Check that all metabolites of interest are in the background
   if (background_type != "database") {
     if (length(setdiff(pathwaydf$rampId, backgrounddf$rampId) != 0)) {
@@ -151,7 +151,8 @@ runFisherTest <- function(analytes,
   list_pid <- paste(list_pid, collapse = ",")
 
   # Get the total number of metabolites that are mapped to pathways in RaMP (that's the default background)
-  query <- "select * from analytehaspathway"
+  # added conditional to not pull hmdb ids
+  query <- "select * from analytehaspathway where pathwaySource != 'hmdb';"
   con <- connectToRaMP()
   allids <- RMariaDB::dbGetQuery(con, query)
 
@@ -318,6 +319,12 @@ runFisherTest <- function(analytes,
     totinpath <- c(totinpath, tot_in_pathway)
     pidused <- c(pidused, i)
   } # end for loop
+
+  print("")
+  print(now - proc.time())
+  print("before optional MCall")
+  print("")
+
   # Now run fisher's tests for all other pids (all pathways not covered in dataset)
   if (MCall == T) {
     # Now run fisher's tests for all other pids
@@ -337,7 +344,8 @@ runFisherTest <- function(analytes,
     restcids <- RMariaDB::dbGetQuery(con, query2) # [[1]]
     RMariaDB::dbDisconnect(con)
 
-    query1 <- paste0("select rampId,pathwayRampId from analytehaspathway;")
+    # modify to not take hmdb pathways
+    query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwaySource != 'hmdb';")
 
     con <- connectToRaMP()
     allcids <- RMariaDB::dbGetQuery(con, query1) # [[1]]
@@ -474,16 +482,20 @@ runFisherTest <- function(analytes,
       Num_In_Path = userinpath[keepers],
       Total_In_Path = totinpath[keepers]
     )
-  } # End else if MCall (when False)
-  # Remove duplicate pathways between wikipathways and KEGG
-  duplicate_pathways <- find_duplicate_pathways()
+  }
+  # End else if MCall (when False)
+
+  # Remove duplicate pathways between wikipathways and reactome, only perfect overlaps
+  # only make the dup list if it doesn't exist from a previous run in the session
+  if( !exists('duplicate_pathways')) {
+    duplicate_pathways <<- findDuplicatePathways()
+  }
   if (any(out$pathwayRampId %in% duplicate_pathways)) {
     out <- out[-which(out$pathwayRampId %in% duplicate_pathways), ]
   }
 
   out <- out[!duplicated(out), ]
-  print(dim(out))
-  print(colnames(out))
+
   # for user is the output needed, based on what user input
   return(list(out, pathwaydf))
 }
@@ -547,6 +559,7 @@ runCombinedFisherTest <- function(analytes,
   ## fishmetab <- pathwaydf[grep("RAMP_C_", pathwaydf$rampId), ]
 
   print("Running Fisher's tests on metabolites")
+
   outmetab <- runFisherTest(
     analytes = analytes,
     analyte_type = "metabolites",
@@ -564,7 +577,8 @@ runCombinedFisherTest <- function(analytes,
     M <- 1
   }
 
-  # Grab pathways that contain genes to run Fisher on genes
+
+  ## Grab pathways that contain genes to run Fisher on genes
   ## fishgene <- pathwaydf[grep("RAMP_G_", pathwaydf$rampId), ]
   ## Genes are not evaluated if custom background is specified
   if (background_type == "database" & pathway_definitions == "RaMP") {
@@ -579,7 +593,7 @@ runCombinedFisherTest <- function(analytes,
     )
     pathwaydf_gene <- outgene[[2]]
     outgene <- outgene[[1]]
-  } else if (pathway_definitions != "RaMP"){
+  } else if (pathway_definitions != "RaMP") {
     outgene <- runFisherTest(
       analytes = analytes,
       analyte_type = "genes",

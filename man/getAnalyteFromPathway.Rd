@@ -8,7 +8,8 @@ getAnalyteFromPathway(
   pathway,
   match = "exact",
   analyte_type = "both",
-  max_pathway_size = Inf
+  max_pathway_size = Inf,
+  names_or_ids = "names"
 )
 }
 \arguments{
@@ -18,7 +19,9 @@ getAnalyteFromPathway(
 
 \item{analyte_type}{a string denoting the type of analyte to return ("gene", "metabolite", "both")}
 
-\item{max_pathway_size}{(default Inf), trims returned results to pathways that have fewer than this number
+\item{max_pathway_size}{(default Inf), trims returned results to pathways that have fewer than this number}
+
+\item{names_or_ids}{are the input pathways input as pathway names or as pathway ids
 of genes and metabolites}
 }
 \value{
