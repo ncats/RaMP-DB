@@ -8,7 +8,7 @@ The returned counts for each class category are for both the metabolite id query
 and for the larger full or user-defined population of metabolite ids.
 This method is used in the exported chemicalClassEnrichment function}
 \usage{
-getTotalFoundInCategories(classData)
+getTotalFoundInCategories(classData, inferIdMapping = FALSE)
 }
 \arguments{
 \item{classData}{Data object returned from a call to chemicalClassSurvey
