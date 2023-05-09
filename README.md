@@ -21,7 +21,7 @@ API access is now available [here](https://rampdb.nih.gov/api).
 
 The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene/protein biological, 
 chemical and other from multiple sources. The database structure and data is available as a MySQL dump file and it can be directly 
-downloaded from Figshare (link below in Installation Instructions) for integration into any tool.
+downloaded from Figshare for integration into any tool. Please see the Installation Instructions for the database download link.
 Please note that this project is in continuous development and we appreciated any feedback. 
 
 ## Contact Info:
