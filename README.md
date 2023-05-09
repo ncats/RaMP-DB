@@ -19,12 +19,15 @@ API access is now available [here](https://rampdb.nih.gov/api).
 
 # Why RaMP (Relational Database of Metabolomic Pathways)
 
-The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene/protein biological, chemical and other from multiple sources. The database is relational and it can be directly downloaded as a MySQL dump (under the folder inst/extdata) for integration into any tools.  Please note that this project is in continuous development and we appreciated any feedback. 
+The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene/protein biological, 
+chemical and other from multiple sources. The database structure and data is available as a MySQL dump file and it can be directly 
+downloaded from Figshare (link below in Installation Instructions) for integration into any tool.
+Please note that this project is in continuous development and we appreciated any feedback. 
 
 ## Contact Info:
-For any questions or feedback, please send us a note at [NCATSRaMP@mail.nih.gov](NCATSRaMP@mail.nih.gov).  
+For any questions or feedback, please send us a note at [NCATSRaMP@mail.nih.gov](NCATSRaMP@mail.nih.gov). 
 
-If you find a bug, please submit an issue through this GitHub repo.   
+If you find a bug, please submit an issue through this GitHub repo. 
 
 ## Basic Features:
 The R packages and associated app perform  the following queries:
@@ -40,7 +43,7 @@ The following analyses are also supported:
 	1. Multi-omic pathway enrichment analysis
 	2. Chemical enrichment analyses
 
-Last date of dump file update: 12/13/2021
+Last date of dump file update: 03/02/2023
 
 ## Vignette
 Detailed instructions for installing RaMP locally are below.  We've also put together a vignette to get you started on the analyses.  Click here for [vignette](https://ncats.github.io/RaMP-DB/RaMP_Vignette.html).
@@ -97,12 +100,11 @@ Supply the path and file name to the unzipped sql file that you've downloaded.
 
 You're done!
 
-Your "ramp" database should contain the following 8 tables:
+Your "ramp" database should contain the following 12 tables:
 1. analyte
 2. analyehasontology
 3. analytehaspathway
 4. analytesynonym
-5. binary_source_matrix_view
 5. catalyzed
 6. chem_props
 7. db_version

@@ -199,214 +199,6 @@ checkIdPrefixes <- function(idList, perc_cutoff=0.9) {
 }
 
 
-#'chemicalClassSurveyRampIdsConn is a helper function that takes a list of metabolite ids, a list of 'population' metabolite ids
-#' and a MariaDB Connection object. The method returns metabolite class information for the metabolite list and a population of all ramp metabolites.
-#' @param mets a list object of prefixed metabolite ids of interest
-#' @param pop a list object of prefixed metabolite ids, representing a larger population of metabolites from which the mets were selected.
-#' @param conn a MariaDB Connection object to support queries
-#' @returns a list object containing three objects 'count_summary', 'met_classes' and 'met_query_report'.
-#' The count_summary is a dataframe containing metabolite classes and number of metabolites in each class.
-#' The met_classes is a detailed listing of compound classes associated with each input metabolite
-#' The met_query_report indicates the number of input metabolites, how many were found in the DB and the list of metabolites not found in RaMP DB.
-chemicalClassSurveyRampIdsConn <- function(mets, pop, conn) {
-
-  mets <- unique(mets)
-
-  checkIdPrefixes(mets)
-
-  pop <- unique(pop)
-
-  checkIdPrefixes(pop)
-
-  result <- list()
-
-  # first handle metabolites of interest
-  metStr <- paste(mets, collapse = "','")
-  metStr <- paste("'" ,metStr, "'", sep = "")
-
-  sql <- paste("select distinct a.ramp_id, b.sourceId, group_concat(distinct b.commonName order by b.commonName asc separator '; ') as common_names, a.class_level_name, a.class_name, a.source from metabolite_class a, source b
-          where b.rampId = a.ramp_id and b.sourceId in (",metStr,")
-               group by b.rampId, a.class_level_name, a.class_name, a.source")
-
-  metsData <- RMariaDB::dbGetQuery(conn, sql)
-
-
-  print(colnames(metsData))
-
-
-  # need to filter for our specific source ids
-  sourceId <- NULL
-  metsData <- subset(metsData, sourceId %in% mets)
-
-  # get query summary
-  metQueryReport <- queryReport(mets, metsData$sourceId)
-
-  metsCountData <- data.frame(table(metsData$class_level_name,metsData$class_name))
-  colnames(metsCountData) <- c("class_level", "class_name", "freq")
-  metsCountData <- metsCountData[metsCountData$freq != 0,]
-  metsCountData <- metsCountData[order(-metsCountData$freq),]
-
-  print("...finished metabolite list query...")
-
-  # Population info
-  popStr <- paste(pop, collapse = "','")
-  popStr <- paste("'" ,popStr, "'", sep = "")
-
-  # sql <- paste("select distinct a.ramp_id, b.sourceId, group_concat(distinct b.commonName order by b.commonName asc separator '; ') as common_names, a.class_level_name, a.class_name, a.source from metabolite_class a, source b
-  #         where b.rampId = a.ramp_id and b.sourceId in (",popStr,") group by a.ramp_Id, b.sourceId, a.class_level_name, a.class_name, a.source")
-
-  sql <- paste("select distinct a.ramp_id, b.sourceId, a.class_level_name, a.class_name, a.source from metabolite_class a, source b
-          where b.rampId = a.ramp_id and b.sourceId in (",popStr,") group by a.ramp_Id, b.sourceId, a.class_level_name, a.class_name, a.source")
-
-  popData <- RMariaDB::dbGetQuery(conn, sql)
-
-  #need to filter for our source ids
-  popData <- subset(popData, sourceId %in% pop)
-
-  # get query summary
-  popQueryReport <- queryReport(pop, popData$sourceId)
-
-  popCountData <- data.frame(table(popData$class_level_name, popData$class_name))
-  colnames(popCountData) <- c("class_level", "class_name", "freq")
-  popCountData <- popCountData[popCountData$freq != 0,]
-
-  print("...finished population list query...")
-  print("...colating data...")
-
-  # merge count data
-  mergeCountData <- merge(popCountData, metsCountData, by=c("class_level", "class_name"), all=TRUE)
-  mergeCountData[is.na(mergeCountData)] <- 0
-  colnames(mergeCountData)[3:4] = c("pop_count", "mets_count")
-  mergeCountData$fract_of_pop <- mergeCountData$mets_count/mergeCountData$pop_count
-  mergeCountData <- mergeCountData[order(-mergeCountData$pop_count),]
-
-  classes <- sort(unique(mergeCountData$class_level))
-  resultSummary <- list()
-
-  for (className in classes) {
-    subTable <- mergeCountData[mergeCountData$class_level == className,]
-    subTable$fract_within_pop <- subTable$pop_count / sum(subTable$pop_count)
-    subTable$fract_within_mets <- subTable$mets_count / sum(subTable$mets_count)
-    resultSummary[[className]] <- subTable
-  }
-
-  print("...creating query efficiency summary...")
-  result <- list()
-  result[["count_summary"]] <- resultSummary
-  result[["met_classes"]] <- metsData
-  result[["pop_classes"]] <- popData
-
-  result[["query_report"]] = list()
-  result[["query_report"]][["met_query_report"]] = metQueryReport
-  result[["query_report"]][["pop_query_report"]] = popQueryReport
-
-  return(result)
-}
-
-
-#'chemicalClassSurveyRampIdsFullPopConn is a helper function that takes a list of metabolite ids and a MariaDB Connection object
-#'and returns metabolite class information for the metabolite list and a population of all ramp metabolites.
-#' @param mets a list object of prefixed metabolite ids of interest
-#' @param conn a MariaDB Connection object to support queries
-#' @returns a list object containing three objects 'count_summary', 'met_classes' and 'met_query_report'.
-#' The count_summary is a dataframe containing metabolite classes and number of metabolites in each class.
-#' The met_classes is a detailed listing of compound classes associated with each input metabolite
-#' The met_query_report indicates the number of input metabolites, how many were found in the DB and the list of metabolites not found in RaMP DB.
-chemicalClassSurveyRampIdsFullPopConn <- function(mets, conn) {
-
-  mets <- unique(mets)
-
-  checkIdPrefixes(mets)
-
-  result <- list()
-
-  # first handle metabolites of interest
-  metStr <- paste(mets, collapse = "','")
-  metStr <- paste("'" ,metStr, "'", sep = "")
-
-  sql <- paste("select distinct a.ramp_id, b.sourceId, group_concat(distinct b.commonName order by b.commonName asc separator '; ') as common_names, a.class_level_name, a.class_name, a.source as source from metabolite_class a, source b
-          where b.rampId = a.ramp_id and b.sourceId in (",metStr,")
-               group by a.ramp_Id, b.sourceId, a.class_level_name, a.class_name, a.source")
-
-
-  metsData <- RMariaDB::dbGetQuery(conn, sql)
-
-  # need to filter for our specific source ids
-  sourceId <- NULL
-  metsData <- subset(metsData, sourceId %in% mets)
-
-  # get query summary
-  metQueryReport <- queryReport(mets, metsData$sourceId)
-
-  emptyMetsResult = FALSE
-
-  if(nrow(metsData) > 0) {
-
-    metsCountData <- data.frame(table(metsData$class_level_name,metsData$class_name))
-
-    colnames(metsCountData) <- c("class_level", "class_name", "freq")
-    metsCountData <- metsCountData[metsCountData$freq != 0,]
-    metsCountData <- metsCountData[order(-metsCountData$freq),]
-
-    print("...finished metabolite list query...")
-
-  } else {
-
-    emptyMetsResult = TRUE
-
-    print("...finished metabolite list query, Warning: NO query term matches in RaMP DB...")
-    # build and empty result for the mets data
-    metsCountData <- data.frame(matrix(ncol=3, nrow=0))
-    colnames(metsCountData) <- c("class_level", "class_name", "freq")
-  }
-
-  sql <- paste("select class_level_name, class_name, count(1) as pop_hits from metabolite_class
-                 group by class_level_name, class_name")
-
-  popCountData <- RMariaDB::dbGetQuery(conn, sql)
-
-  colnames(popCountData) <- c("class_level", "class_name", "freq")
-  popCountData <- popCountData[popCountData$freq != 0,]
-
-  print("...finished DB population query...")
-  print("...colating data...")
-
-  # merge count data
-  mergeCountData <- merge(popCountData, metsCountData, by=c("class_level", "class_name"), all=TRUE)
-  mergeCountData[is.na(mergeCountData)] <- 0
-  colnames(mergeCountData)[3:4] = c("pop_count", "mets_count")
-  mergeCountData$fract_of_pop <- mergeCountData$mets_count/mergeCountData$pop_count
-  mergeCountData <- mergeCountData[order(-mergeCountData$pop_count),]
-
-  classes <- sort(unique(mergeCountData$class_level))
-  resultSummary <- list()
-
-  for (className in classes) {
-    subTable <- mergeCountData[mergeCountData$class_level == className,]
-
-    subTable$fract_within_pop <- subTable$pop_count / sum(subTable$pop_count)
-    subTable$fract_within_mets <- subTable$mets_count / sum(subTable$mets_count)
-
-    # handle NAs more gracefully
-    subTable[is.na(subTable)] <- 0
-
-    # append result for the class category
-    resultSummary[[className]] <- subTable
-  }
-
-
-  print("...creating query efficiency summary...")
-  result <- list()
-  result[["count_summary"]] <- resultSummary
-  result[["met_classes"]] <- metsData
-
-  result[["query_report"]] = list()
-  result[["query_report"]][["met_query_report"]] = metQueryReport
-
-  return(result)
-}
-
-
 #' queryReport is a helper function to report on the number of query items that were found and missed, and the list of missed query values.
 #' @param queryList is a list object that contains all user input query values
 #' @param foundList is a list object of all user input query values that were retrieved during the query
@@ -431,17 +223,43 @@ queryReport <- function(queryList, foundList) {
 #' metabolites in a larger metabolite population.
 #' @returns a list object with two keys, 'mets' and 'pop' that each has a table of metabolite or population
 #' chemical classes and metabolite counts per class. This supports the chemicalClassEnrichment function.
-getTotalFoundInCategories <- function(classData) {
+getTotalFoundInCategories <- function(classData, inferIdMapping=FALSE) {
   counts <- list()
 
-  # met list values for each class category
-  counts[["mets"]] <- table(classData$met_classes$class_level_name)
+  print("Building Class Summary for Stats")
 
+  print("Building Class Summary for Stats")
+  # met list values for each class category
+  if(inferIdMapping) {
+    metsData2 <- classData$met_classes
+    metsData2 <- metsData2[,c('ramp_id','class_level_name', 'class_name', 'directIdClassHits')]
+    metsData2 <- unique(metsData2)
+    # need to sum direct hits on class levels by directIdClassHits
+    metsClassLevelInfo = aggregate(metsData2$directIdClassHits, by=list(metsData2$class_level_name), sum)
+    colnames(metsClassLevelInfo) <- c("Var1","Freq")
+    counts[["mets"]] <- metsClassLevelInfo
+
+  } else {
+    counts[["mets"]] <- data.frame(table(classData$met_classes$class_level_name))
+  }
   # pop list values for each class category
   # two routes depending on wether we have a user provide population or the all-DB population
   if(!is.null(classData$pop_classes)) {
     # if we have a population classes object use 'table' to grab the tally
-    counts[["pop"]] <- table(classData$pop_classes$class_level_name)
+    #counts[["pop"]] <- data.frame(table(classData$pop_classes$class_level_name))
+    print("getting pop class level info")
+
+    if(inferIdMapping) {
+      popData2 <- classData$pop_classes
+      popData2 <- popData2[,c('ramp_id','class_level_name', 'class_name', 'directIdClassHits')]
+      popData2 <- unique(popData2)
+
+      popStats <- aggregate(popData2$directIdClassHits, by=list(popData2$class_level_name),sum)
+    } else {
+      popStats <- data.frame(table(classData$pop_classes$class_level_name))
+    }
+    colnames(popStats) <- c("Var1", "Freq")
+    counts[["pop"]] <- popStats
   } else {
 
     # merge the results for different class categories
@@ -452,11 +270,17 @@ getTotalFoundInCategories <- function(classData) {
       }
     }
 
+    print("getting population totals")
     # use aggregate to get the count tally for each class category (instead of 'table')
-    cSum <- stats::aggregate(cntSum$pop_count, by=list(cntSum$class_level), FUN=sum)
-    cNames <- cSum$Group.1
-    cSum <- data.frame(t(cSum$x))
-    colnames(cSum) <- cNames
+    if(inferIdMapping) {
+      cSum <- stats::aggregate(cntSum$pop_count, by=list(cntSum$class_level), FUN=sum)
+    } else {
+      cSum <- stats::aggregate(cntSum$pop_count, by=list(cntSum$class_level), FUN=sum)
+    }
+    colnames(cSum) <- c("Var1", "Freq")
+    #cNames <- cSum$Group.1
+    #cSum <- data.frame(t(cSum$x))
+    #colnames(cSum) <- cNames
     counts[["pop"]] <- cSum
   }
   return(counts)
@@ -854,34 +678,279 @@ FilterFishersResults <- function(fishers_df, pval_type = 'fdr', pval_cutoff = 0.
 }
 
 
-# mapNamesOrIdsToSourceIdsAndSynonyms <- function(analytes, analyteType, NamesOrIds='ids') {
-#
-#   aList <- concatenateListForSQL(analytes)
-#
-#   if(NamesOrIds == 'names') {
-#     namesQuery <- paste0("select distinct s.sourceId, s.rampId s.pathwayCount, group_concat(distinct syn.Synonym order by syn.Synonym asc separator '; ') as synonyms " +
-#       "from source s, analytesynonyms syn " +
-#       "where syn.Synonym in (",aList,") and s.rampId = syn.rampId group by s.sourceId, s.rampId, s.pathwayCount")
-#     result <- RMariaDB::dbGetQuery(conn, sql)
-#
-#   } else if(NamesOrIds == 'ids') {
-#       idQuery <- paste0("select distinct s.sourceId, s.rampId s.pathwayCount, group_concat(distinct syn.Synonym order by syn.Synonym asc separator '; ') as synonyms " +
-#                            "from source s, analytesynonyms syn " +
-#                            "where syn.Synonym in (",aList,") and s.rampId = syn.rampId group by s.sourceId, s.rampId, s.pathwayCount")
-#       result <- RMariaDB::dbGetQuery(conn, sql)
-#   }
-#
-#   for()
-#
-#   return(result)
-# }
-#
-# concatenateListForSQL <- function(inputList) {
-#   inputList <- unique(inputList)
-#   inputList <- sapply(inputList, shQuote)
-#   inputList <- paste(inputList, collapse = ",")
-# }
+#'chemicalClassSurveyRampIdsConn2 is a helper function that takes a list of metabolite ids, a list of 'population' metabolite ids
+#' and a MariaDB Connection object. The method returns metabolite class information for the metabolite list and a population of all ramp metabolites.
+#' @param mets a list object of prefixed metabolite ids of interest
+#' @param pop a list object of prefixed metabolite ids, representing a larger population of metabolites from which the mets were selected.
+#' @param conn a MariaDB Connection object to support queries
+#' @param inferIdMapping if FALSE, the survey only reports on class annotations made directly on the input ids.
+#' If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to related ids that contain metabolite class annotations.
+#' The default is TRUE.
+#' @returns a list object containing three objects 'count_summary', 'met_classes' and 'met_query_report'.
+#' The count_summary is a dataframe containing metabolite classes and number of metabolites in each class.
+#' The met_classes is a detailed listing of compound classes associated with each input metabolite
+#' The met_query_report indicates the number of input metabolites, how many were found in the DB and the list of metabolites not found in RaMP DB.
+chemicalClassSurveyRampIdsConn <- function(mets, pop, conn, inferIdMapping=TRUE) {
+
+  mets <- unique(mets)
+
+  checkIdPrefixes(mets)
+
+  pop <- unique(pop)
+
+  checkIdPrefixes(pop)
+
+  result <- list()
+
+  # first handle metabolites of interest
+  metStr <- paste(mets, collapse = "','")
+  metStr <- paste("'" ,metStr, "'", sep = "")
 
 
+  # if inferring ID mapping, the query goes through the source table to map input id to ramp id, then map to related ids having chem class annotations
+  # if not ID mapping, then the match is directly on the input source ids. HMDB and LipidMaps IDs are supported directly, May 2023.
+  if(inferIdMapping) {
+    sql <- paste("select distinct a.ramp_id, b.sourceId, group_concat(distinct b.commonName order by b.commonName asc separator '; ') as common_names,
+                  a.class_level_name, a.class_name, a.source as source, count(distinct(a.class_source_id)) as directIdClassHits from metabolite_class a, source b
+                  where b.rampId = a.ramp_id and b.sourceId in (",metStr,")
+                  group by a.ramp_Id, b.sourceId, a.class_level_name, a.class_name, a.source")
+  } else {
+    sql = paste("select distinct c.ramp_id, c.class_source_id, group_concat(distinct s.commonName order by s.commonName asc separator '; ') as common_names,
+                 c.class_level_name, c.class_name, c.source as source, count(distinct(c.class_source_id)) as directIdClassHits
+                 from metabolite_class c, source s
+                 where c.class_source_id in (",metStr,") and s.sourceId = c.class_source_id
+                 group by c.class_source_id, c.class_level_name, c.class_name")
+  }
+
+  metsData <- RMariaDB::dbGetQuery(conn, sql)
+
+  # need to filter for our specific source ids
+  # ID mapping uses a subset to report on found additional source ids, else matches on class_source_id (source ids directly mapped to chem class)
+  if(inferIdMapping) {
+    metsData2 <- subset(metsData, sourceId %in% mets)
+    metsData <- metsData2
+  } else {
+    metsData <- subset(metsData, class_source_id %in% mets)
+  }
+
+  # get query summary
+  metQueryReport <- queryReport(mets, metsData$sourceId)
+
+  if(inferIdMapping) {
+    # if inferring mapping through ramp ids, the count has to be reduced to only counting source ids from the metabolite_class table
+    metsData2 <- unique(metsData[,c("ramp_id","class_level_name","class_name","directIdClassHits")])
+    metsCountData <- aggregate(metsData2$directIdClassHits, by=list(metsData2$class_level_name, metsData2$class_name), sum)
+    colnames(metsCountData) <- c("class_level", "class_name", "freq")
+  } else {
+    metsCountData <- data.frame(table(metsData$class_level_name,metsData$class_name))
+    colnames(metsCountData) <- c("class_level", "class_name", "freq")
+    metsCountData <- metsCountData[metsCountData$freq != 0,]
+    metsCountData <- metsCountData[order(-metsCountData$freq),]
+  }
+
+  print("...finished metabolite list query...")
+
+  # Population info
+  popStr <- paste(pop, collapse = "','")
+  popStr <- paste("'" ,popStr, "'", sep = "")
+
+  # a similar query on population ids, id mapping matches on mapped source ids, no id mapping matches input ids directly on annotated ids
+  if(inferIdMapping) {
+    sql <- paste("select distinct a.ramp_id, b.sourceId, a.class_level_name, a.class_name, a.source,
+                  count(distinct(a.class_source_id)) as directIdClassHits
+                  from metabolite_class a, source b
+                  where b.rampId = a.ramp_id and b.sourceId in (",popStr,")
+                 group by a.ramp_Id, b.sourceId, a.class_level_name, a.class_name, a.source")
+  } else {
+    sql <- paste("select distinct c.ramp_id, c.class_source_id, c.class_level_name, c.class_name, c.source,
+                 count(distinct(c.class_source_id)) as directIdClassHits
+                 from metabolite_class c
+                 where c.class_source_id in (",popStr,")
+                 group by c.class_source_id, c.class_level_name, c.class_name")
+  }
+
+  popData <- RMariaDB::dbGetQuery(conn, sql)
+
+  if(inferIdMapping) {
+    popData <- subset(popData, sourceId %in% pop)
+  } else {
+    popData <- subset(popData, class_source_id %in% pop)
+  }
+
+  #need to filter for our source ids
+  # popData <- subset(popData, sourceId %in% pop)
+
+  # get query summary
+  popQueryReport <- queryReport(pop, popData$sourceId)
+
+
+  if(inferIdMapping) {
+    # if inferring mapping through ramp ids, the count has to be reduced to only counting source ids from the metabolite_class table
+    popData2 <- unique(popData[,c("ramp_id","class_level_name","class_name","directIdClassHits")])
+    popCountData <- aggregate(popData2$directIdClassHits, by=list(popData2$class_level_name, popData2$class_name), sum)
+  } else {
+    popCountData <- data.frame(table(popData$class_level_name,popData$class_name))
+  }
+
+  # popCountData <- data.frame(table(popData$class_level_name, popData$class_name))
+  colnames(popCountData) <- c("class_level", "class_name", "freq")
+  popCountData <- popCountData[popCountData$freq != 0,]
+
+  print("...finished population list query...")
+  print("...collating data...")
+
+  # merge count data
+  mergeCountData <- merge(popCountData, metsCountData, by=c("class_level", "class_name"), all=TRUE)
+  mergeCountData[is.na(mergeCountData)] <- 0
+  colnames(mergeCountData)[3:4] = c("pop_count", "mets_count")
+  mergeCountData$fract_of_pop <- mergeCountData$mets_count/mergeCountData$pop_count
+  mergeCountData <- mergeCountData[order(-mergeCountData$pop_count),]
+
+  classes <- sort(unique(mergeCountData$class_level))
+  resultSummary <- list()
+
+  for (className in classes) {
+    subTable <- mergeCountData[mergeCountData$class_level == className,]
+    subTable$fract_within_pop <- subTable$pop_count / sum(subTable$pop_count)
+    subTable$fract_within_mets <- subTable$mets_count / sum(subTable$mets_count)
+    resultSummary[[className]] <- subTable
+  }
+
+  print("...creating query efficiency summary...")
+  result <- list()
+  result[["count_summary"]] <- resultSummary
+  result[["met_classes"]] <- metsData
+  result[["pop_classes"]] <- popData
+
+  result[["query_report"]] = list()
+  result[["query_report"]][["met_query_report"]] = metQueryReport
+  result[["query_report"]][["pop_query_report"]] = popQueryReport
+
+  return(result)
+}
+
+
+#'chemicalClassSurveyRampIdsFullPopConn2 is a helper function that takes a list of metabolite ids and a MariaDB Connection object
+#'and returns metabolite class information for the metabolite list and a population of all ramp metabolites.
+#' @param mets a list object of prefixed metabolite ids of interest
+#' @param conn a MariaDB Connection object to support queries
+#' @param inferIdMapping if FALSE, the survey only reports on class annotations made directly on the input ids.
+#' If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to related ids that contain metabolite class annotations.
+#' The default is TRUE.
+#' @returns a list object containing three objects 'count_summary', 'met_classes' and 'met_query_report'.
+#' The count_summary is a dataframe containing metabolite classes and number of metabolites in each class.
+#' The met_classes is a detailed listing of compound classes associated with each input metabolite
+#' The met_query_report indicates the number of input metabolites, how many were found in the DB and the list of metabolites not found in RaMP DB.
+chemicalClassSurveyRampIdsFullPopConn <- function(mets, conn, inferIdMapping=TRUE) {
+
+  mets <- unique(mets)
+
+  checkIdPrefixes(mets)
+
+  result <- list()
+
+  # first handle metabolites of interest
+  metStr <- paste(mets, collapse = "','")
+  metStr <- paste("'" ,metStr, "'", sep = "")
+
+  # Id mapping matches on source ids mapped via ramp ids in the source table. No id mapping matches on input ids directly.
+  if(inferIdMapping) {
+  sql <- paste("select distinct a.ramp_id, b.sourceId, group_concat(distinct b.commonName order by b.commonName asc separator '; ') as common_names,
+     a.class_level_name, a.class_name, a.source as source, count(distinct(a.class_source_id)) as directIdClassHits from metabolite_class a, source b
+          where b.rampId = a.ramp_id and b.sourceId in (",metStr,")
+               group by a.ramp_Id, b.sourceId, a.class_level_name, a.class_name, a.source")
+  } else {
+    sql = paste("select distinct c.ramp_id, c.class_source_id, group_concat(distinct s.commonName order by s.commonName asc separator '; ') as common_names,
+                c.class_level_name, c.class_name, c.source, count(distinct(c.class_source_id)) as directIdClassHits from metabolite_class c, source s
+          where c.class_source_id in (",metStr,") and s.sourceId = c.class_source_id group by c.class_source_id, c.class_level_name, c.class_name")
+  }
+
+  metsData <- RMariaDB::dbGetQuery(conn, sql)
+
+  # need to filter for our specific source ids
+  if(inferIdMapping) {
+    metsData2 <- subset(metsData, sourceId %in% mets)
+    metsData <- metsData2
+  } else {
+    metsData <- subset(metsData, class_source_id %in% mets)
+  }
+
+  # get query summary
+  metQueryReport <- queryReport(mets, metsData$sourceId)
+
+  emptyMetsResult = FALSE
+
+  if(nrow(metsData) > 0) {
+
+    if(inferIdMapping) {
+      # if inferring mapping through ramp ids, the count has to be reduced to only counting source ids from the metabolite_class table
+      metsData2 <- unique(metsData[,c("ramp_id","class_level_name","class_name","directIdClassHits")])
+      metsCountData <- aggregate(metsData2$directIdClassHits, by=list(metsData2$class_level_name, metsData2$class_name), sum)
+    } else {
+      metsCountData <- data.frame(table(metsData$class_level_name,metsData$class_name))
+    }
+
+    colnames(metsCountData) <- c("class_level", "class_name", "freq")
+    metsCountData <- metsCountData[metsCountData$freq != 0,]
+    metsCountData <- metsCountData[order(-metsCountData$freq),]
+
+    print("...finished metabolite list query...")
+
+  } else {
+
+    emptyMetsResult = TRUE
+
+    print("...finished metabolite list query, Warning: NO query term matches in RaMP DB...")
+    # build and empty result for the mets data
+    metsCountData <- data.frame(matrix(ncol=3, nrow=0))
+    colnames(metsCountData) <- c("class_level", "class_name", "freq")
+  }
+
+  # get full population counts for all classes
+  sql <- paste("select class_level_name, class_name, count(1) as pop_hits from metabolite_class
+                 group by class_level_name, class_name")
+
+  popCountData <- RMariaDB::dbGetQuery(conn, sql)
+
+  colnames(popCountData) <- c("class_level", "class_name", "freq")
+  popCountData <- popCountData[popCountData$freq != 0,]
+
+  print("...finished DB population query...")
+  print("...collating data...")
+
+  # merge count data
+  mergeCountData <- merge(popCountData, metsCountData, by=c("class_level", "class_name"), all=TRUE)
+  mergeCountData[is.na(mergeCountData)] <- 0
+  colnames(mergeCountData)[3:4] = c("pop_count", "mets_count")
+  mergeCountData$fract_of_pop <- mergeCountData$mets_count/mergeCountData$pop_count
+  mergeCountData <- mergeCountData[order(-mergeCountData$pop_count),]
+
+  classes <- sort(unique(mergeCountData$class_level))
+  resultSummary <- list()
+
+  for (className in classes) {
+    subTable <- mergeCountData[mergeCountData$class_level == className,]
+
+    subTable$fract_within_pop <- subTable$pop_count / sum(subTable$pop_count)
+    subTable$fract_within_mets <- subTable$mets_count / sum(subTable$mets_count)
+
+    # handle NAs more gracefully
+    subTable[is.na(subTable)] <- 0
+
+    # append result for the class category
+    resultSummary[[className]] <- subTable
+  }
+
+
+  print("...creating query efficiency summary...")
+  result <- list()
+  result[["count_summary"]] <- resultSummary
+  result[["met_classes"]] <- metsData
+
+  result[["query_report"]] = list()
+  result[["query_report"]][["met_query_report"]] = metQueryReport
+
+  return(result)
+}
 
 
