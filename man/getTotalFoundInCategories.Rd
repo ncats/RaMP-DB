@@ -14,6 +14,10 @@ getTotalFoundInCategories(classData, inferIdMapping = FALSE)
 \item{classData}{Data object returned from a call to chemicalClassSurvey
 This input contains lists of chemical classes that pertain to a query list of metabolites and pertaining to
 metabolites in a larger metabolite population.}
+
+\item{inferIdMapping}{if FALSE, the survey only reports on class annotations made directly on the input ids.
+If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to related ids that contain metabolite class annotations.
+The default is FALSE. Note that this utility method is typcally used within chemical class enrichment and is passed the value of this parameter.}
 }
 \value{
 a list object with two keys, 'mets' and 'pop' that each has a table of metabolite or population

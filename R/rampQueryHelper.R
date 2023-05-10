@@ -221,6 +221,9 @@ queryReport <- function(queryList, foundList) {
 #' @param classData Data object returned from a call to chemicalClassSurvey
 #' This input contains lists of chemical classes that pertain to a query list of metabolites and pertaining to
 #' metabolites in a larger metabolite population.
+#' @param inferIdMapping if FALSE, the survey only reports on class annotations made directly on the input ids.
+#' If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to related ids that contain metabolite class annotations.
+#' The default is FALSE. Note that this utility method is typcally used within chemical class enrichment and is passed the value of this parameter.
 #' @returns a list object with two keys, 'mets' and 'pop' that each has a table of metabolite or population
 #' chemical classes and metabolite counts per class. This supports the chemicalClassEnrichment function.
 getTotalFoundInCategories <- function(classData, inferIdMapping=FALSE) {
@@ -234,7 +237,7 @@ getTotalFoundInCategories <- function(classData, inferIdMapping=FALSE) {
     metsData2 <- metsData2[,c('ramp_id','class_level_name', 'class_name', 'directIdClassHits')]
     metsData2 <- unique(metsData2)
     # need to sum direct hits on class levels by directIdClassHits
-    metsClassLevelInfo = aggregate(metsData2$directIdClassHits, by=list(metsData2$class_level_name), sum)
+    metsClassLevelInfo = stats::aggregate(metsData2$directIdClassHits, by=list(metsData2$class_level_name), sum)
     colnames(metsClassLevelInfo) <- c("Var1","Freq")
     counts[["mets"]] <- metsClassLevelInfo
 
@@ -251,7 +254,7 @@ getTotalFoundInCategories <- function(classData, inferIdMapping=FALSE) {
       popData2 <- popData2[,c('ramp_id','class_level_name', 'class_name', 'directIdClassHits')]
       popData2 <- unique(popData2)
 
-      popStats <- aggregate(popData2$directIdClassHits, by=list(popData2$class_level_name),sum)
+      popStats <- stats::aggregate(popData2$directIdClassHits, by=list(popData2$class_level_name),sum)
     } else {
       popStats <- data.frame(table(classData$pop_classes$class_level_name))
     }
@@ -736,7 +739,7 @@ chemicalClassSurveyRampIdsConn <- function(mets, pop, conn, inferIdMapping=TRUE)
   if(inferIdMapping) {
     # if inferring mapping through ramp ids, the count has to be reduced to only counting source ids from the metabolite_class table
     metsData2 <- unique(metsData[,c("ramp_id","class_level_name","class_name","directIdClassHits")])
-    metsCountData <- aggregate(metsData2$directIdClassHits, by=list(metsData2$class_level_name, metsData2$class_name), sum)
+    metsCountData <- stats::aggregate(metsData2$directIdClassHits, by=list(metsData2$class_level_name, metsData2$class_name), sum)
     colnames(metsCountData) <- c("class_level", "class_name", "freq")
   } else {
     metsCountData <- data.frame(table(metsData$class_level_name,metsData$class_name))
@@ -790,7 +793,7 @@ chemicalClassSurveyRampIdsConn <- function(mets, pop, conn, inferIdMapping=TRUE)
   if(inferIdMapping) {
     # if inferring mapping through ramp ids, the count has to be reduced to only counting source ids from the metabolite_class table
     popData2 <- unique(popData[,c("ramp_id","class_level_name","class_name","directIdClassHits")])
-    popCountData <- aggregate(popData2$directIdClassHits, by=list(popData2$class_level_name, popData2$class_name), sum)
+    popCountData <- stats::aggregate(popData2$directIdClassHits, by=list(popData2$class_level_name, popData2$class_name), sum)
   } else {
     popCountData <- data.frame(table(popData$class_level_name,popData$class_name))
   }
@@ -888,7 +891,7 @@ chemicalClassSurveyRampIdsFullPopConn <- function(mets, conn, inferIdMapping=TRU
     if(inferIdMapping) {
       # if inferring mapping through ramp ids, the count has to be reduced to only counting source ids from the metabolite_class table
       metsData2 <- unique(metsData[,c("ramp_id","class_level_name","class_name","directIdClassHits")])
-      metsCountData <- aggregate(metsData2$directIdClassHits, by=list(metsData2$class_level_name, metsData2$class_name), sum)
+      metsCountData <- stats::aggregate(metsData2$directIdClassHits, by=list(metsData2$class_level_name, metsData2$class_name), sum)
     } else {
       metsCountData <- data.frame(table(metsData$class_level_name,metsData$class_name))
     }
