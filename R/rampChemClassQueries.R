@@ -292,12 +292,6 @@ chemicalClassEnrichment <- function(mets, background = "database", background_ty
           contingencyMat[2,2] <- totPopCnt - contingencyMat[2,1] - contingencyMat[1,2]
           className <- categoryData[i,'class_name']
 
-          if(className == "Steroid esters") {
-            print(category)
-            print(className)
-            print(contingencyMat)
-          }
-
           p <- stats::fisher.test(contingencyMat, alternative = "greater")
           p <- p$p.value
 

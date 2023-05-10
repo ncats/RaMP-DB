@@ -774,12 +774,10 @@ chemicalClassSurveyRampIdsConn <- function(mets, pop, conn, inferIdMapping=TRUE)
 
   popData <- RMariaDB::dbGetQuery(conn, sql)
 
-  z = 0
   if(inferIdMapping) {
     popData <- subset(popData, sourceId %in% pop)
   } else {
     popData <- subset(popData, class_source_id %in% pop)
-    z=0
   }
 
   #need to filter for our source ids
