@@ -226,9 +226,8 @@ queryReport <- function(queryList, foundList) {
 getTotalFoundInCategories <- function(classData, inferIdMapping=FALSE) {
   counts <- list()
 
-  print("Building Class Summary for Stats")
+  print("check total summary")
 
-  print("Building Class Summary for Stats")
   # met list values for each class category
   if(inferIdMapping) {
     metsData2 <- classData$met_classes
@@ -246,8 +245,6 @@ getTotalFoundInCategories <- function(classData, inferIdMapping=FALSE) {
   # two routes depending on wether we have a user provide population or the all-DB population
   if(!is.null(classData$pop_classes)) {
     # if we have a population classes object use 'table' to grab the tally
-    #counts[["pop"]] <- data.frame(table(classData$pop_classes$class_level_name))
-    print("getting pop class level info")
 
     if(inferIdMapping) {
       popData2 <- classData$pop_classes
@@ -769,12 +766,20 @@ chemicalClassSurveyRampIdsConn <- function(mets, pop, conn, inferIdMapping=TRUE)
                  group by c.class_source_id, c.class_level_name, c.class_name")
   }
 
+  # ("select distinct c.ramp_id, c.class_source_id, group_concat(distinct s.commonName order by s.commonName asc separator '; ') as common_names,
+  # c.class_level_name, c.class_name, c.source as source, count(distinct(c.class_source_id)) as directIdClassHits
+  # from metabolite_class c, source s
+  # where c.class_source_id in (",metStr,") and s.sourceId = c.class_source_id
+  # group by c.class_source_id, c.class_level_name, c.class_name")
+
   popData <- RMariaDB::dbGetQuery(conn, sql)
 
+  z = 0
   if(inferIdMapping) {
     popData <- subset(popData, sourceId %in% pop)
   } else {
     popData <- subset(popData, class_source_id %in% pop)
+    z=0
   }
 
   #need to filter for our source ids
@@ -940,7 +945,6 @@ chemicalClassSurveyRampIdsFullPopConn <- function(mets, conn, inferIdMapping=TRU
     # append result for the class category
     resultSummary[[className]] <- subTable
   }
-
 
   print("...creating query efficiency summary...")
   result <- list()

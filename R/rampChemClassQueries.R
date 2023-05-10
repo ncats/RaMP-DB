@@ -112,8 +112,16 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
 
     print(paste0("Biospecimen background specified: ", background))
 
-    query <- paste0("select distinct s.rampId, s.sourceId from source s, analytehasontology ao, ontology o
-    where o.commonName in ('", background, "') and o.rampOntologyId=ao.rampOntologyId and s.rampId = ao.rampCompoundId")
+    # if we id map, then we go through and extend the soruce ids via ramp ids
+    # else, we just pick up hmdb ids from the ao table.
+    if(inferIdMapping) {
+      query <- paste0("select distinct s.rampId, s.sourceId from source s, analytehasontology ao, ontology o
+      where o.commonName in ('", background, "') and o.rampOntologyId=ao.rampOntologyId and s.rampId = ao.rampCompoundId")
+    } else {
+      # how do we keep the direct mapping on the source HMDB ids? We don't capture that.
+      query <- paste0("select distinct s.rampId, s.sourceId from source s, analytehasontology ao, ontology o
+      where o.commonName in ('", background, "') and o.rampOntologyId=ao.rampOntologyId and s.rampId = ao.rampCompoundId")
+    }
     con <- connectToRaMP()
     bg <- RMariaDB::dbGetQuery(con, query)
     RMariaDB::dbDisconnect(con)
@@ -137,7 +145,8 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
     }
 
     # try to make a set of source ids assoicated with unique rampids
-    bg <- bg[!duplicated(bg$rampId),]
+    # drop this, as it limits the source ids such that there is only one random soruce id per ramp id
+    # bg <- bg[!duplicated(bg$rampId),]
 
     # use unique list of source ids for the biospecimen type
     # note that rampId counts will be used downstream for statistics, reducing redundancy
@@ -155,9 +164,9 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
   # note that for enrichment analysis the inferIdMapping for the class survey is set to FALSE
   # This means that only ids that have direct id-to-class annotations will contribute to results.
   if(background_type == "database"){
-    res <- chemicalClassSurveyRampIdsFullPopConn(mets, conn, inferIdMapping=inferIdMapping)
+    res <- chemicalClassSurveyRampIdsFullPopConn(mets=mets, conn=conn, inferIdMapping=inferIdMapping)
   } else {
-    res <- chemicalClassSurveyRampIdsConn(mets, bkgrnd, conn, inferIdMapping=inferIdMapping)
+    res <- chemicalClassSurveyRampIdsConn(mets=mets, pop=bkgrnd, conn=conn, inferIdMapping=inferIdMapping)
   }
 
   RMariaDB::dbDisconnect(conn)
@@ -283,9 +292,11 @@ chemicalClassEnrichment <- function(mets, background = "database", background_ty
           contingencyMat[2,2] <- totPopCnt - contingencyMat[2,1] - contingencyMat[1,2]
           className <- categoryData[i,'class_name']
 
-          print(category)
-          print(className)
-          print(contingencyMat)
+          if(className == "Steroid esters") {
+            print(category)
+            print(className)
+            print(contingencyMat)
+          }
 
           p <- stats::fisher.test(contingencyMat, alternative = "greater")
           p <- p$p.value
