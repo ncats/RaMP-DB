@@ -21,7 +21,7 @@
 #' @export
 getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", max_pathway_size = Inf, names_or_ids="names") {
   now <- proc.time()
-  print("fired")
+  print("fired!")
   if(is.character(pathway)){
     if(grepl("\n",pathway)[1]){
       list_pathway <- strsplit(pathway,"\n")
