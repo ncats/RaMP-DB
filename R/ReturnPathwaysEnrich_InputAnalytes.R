@@ -956,7 +956,7 @@ getCustomPathwayFromAnalyte <- function(analytes, pathways, analyte_type) {
 #' fisher.results <- runCombinedFisherTest(pathwaydf = pathwaydf)
 #' clustered.fisher.results <- findCluster(fisher.results)
 #' }
-#' @export
+#' @exportcluster_list
 
 findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
                         min_pathway_tocluster = 2, perc_pathway_overlap = 0.5) {
@@ -1078,7 +1078,22 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
         clusters_to_merge <- unique(t(apply(clusters_to_merge, 1, sort)))
 
         for (i in 1:nrow(clusters_to_merge)) {
-          if (!is.na(cluster_list[[clusters_to_merge[i, 1]]]) && !is.na(cluster_list[[clusters_to_merge[i, 2]]])) {
+          # print(" ")
+          # if(length(!is.na(cluster_list[[clusters_to_merge[i, 1]]])) > 1) {
+          #   print(paste0("cluster list 1 is greater than 1 ", length(!is.na(cluster_list[[clusters_to_merge[i, 1]]]))))
+          #   print(cluster_list[[clusters_to_merge[i, 1]]])
+          # } else {
+          #   print("cluster list 1 length is 1")
+          # }
+          #
+          # if(length(!is.na(cluster_list[[clusters_to_merge[i, 1]]])) > 1) {
+          #   print(paste0("cluster list 2 is greater than 1 ", length(!is.na(cluster_list[[clusters_to_merge[i, 2]]]))))
+          #   print(cluster_list[[clusters_to_merge[i, 2]]])
+          # } else {
+          #   print("cluster list 2 length is 1")
+          # }
+
+          if (all(!is.na(cluster_list[[clusters_to_merge[i, 1]]])) && all(!is.na(cluster_list[[clusters_to_merge[i, 2]]]))) {
             cluster_list[[clusters_to_merge[i, 1]]] <- unique(unlist(cluster_list[c(clusters_to_merge[i, 1], clusters_to_merge[i, 2])]))
             cluster_list[[clusters_to_merge[i, 2]]] <- NA
           }
