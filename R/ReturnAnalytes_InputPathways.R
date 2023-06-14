@@ -21,7 +21,7 @@
 #' @export
 getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", max_pathway_size = Inf, names_or_ids="names") {
   now <- proc.time()
-  print("fired")
+  print("fired!")
   if(is.character(pathway)){
     if(grepl("\n",pathway)[1]){
       list_pathway <- strsplit(pathway,"\n")
@@ -69,7 +69,9 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
     df <- RMariaDB::dbGetQuery(con,sql)
     RMariaDB::dbDisconnect(con)
   } else if(match == 'fuzzy') {
-    df = data.frame(matrix(nrow=0, ncol=6))
+    df = data.frame(matrix(nrow=0, ncol=7))
+    colnames(df) <- c('analyteName', 'sourceAnalyteIDs', 'geneOrCompound',
+                      'pathwayName', 'pathwayId', 'pathwayCategory', 'pathwayType')
     sql = paste0("select
     group_concat(distinct s.commonName order by s.commonName asc separator '; ') as analyteName,
     group_concat(distinct s.sourceId order by s.sourceId asc separator '; ') as sourceAnalyteIDs,
@@ -87,9 +89,11 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
 
     con <- connectToRaMP()
     for(p in pathway) {
-      currSQL = gsub(pattern = '[SOME_PW_NAME]', replacement = p, x= sql, fixed = T )
-      subdf <- RMariaDB::dbGetQuery(con,currSQL)
-      df <- rbind(df, subdf)
+      if(nchar(p)>2) {
+        currSQL = gsub(pattern = '[SOME_PW_NAME]', replacement = p, x= sql, fixed = T )
+        subdf <- RMariaDB::dbGetQuery(con,currSQL)
+        df <- rbind(df, subdf)
+      }
     }
     RMariaDB::dbDisconnect(con)
   }

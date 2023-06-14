@@ -1,3 +1,4 @@
+
 # queries to retrieve and analyze chemical classes
 
 #' Returns chemical class information comparing a metabolite subset to a larger metabolite population.
@@ -11,7 +12,10 @@
 #' or 'file' in which case the background parameter will be a file path, or 'biospecimen' where the specified background parameter is
 #' a RaMP HMDB metabolite ontology term (see background parameter, above, for the most common biospecimen background values).
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
-#' @return Returns chemcial class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
+#' @param inferIdMapping if FALSE, the survey only reports on class annotations made directly on the input ids.
+#' If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to related ids that contain metabolite class annotations.
+#' The default is TRUE.
+#' @return Returns chemical class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
 #' metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolved and listing those metabolite ids
 #' that are not found in the database.
 #'
@@ -66,9 +70,8 @@
 #' metClassResult$query_report
 #'}
 #' @export
-chemicalClassSurvey <- function(mets, background = "database", background_type="database", includeRaMPids = FALSE){
+chemicalClassSurvey <- function(mets, background = "database", background_type="database", includeRaMPids = FALSE, inferIdMapping = TRUE){
 
-  
   conn <- connectToRaMP()
   print("Starting Chemical Class Survey")
 
@@ -109,8 +112,16 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
 
     print(paste0("Biospecimen background specified: ", background))
 
-    query <- paste0("select s.rampId, s.sourceId from source s, analytehasontology ao, ontology o
-    where o.commonName in ('", background, "') and o.rampOntologyId=ao.rampOntologyId and s.rampId = ao.rampCompoundId")
+    # if we id map, then we go through and extend the soruce ids via ramp ids
+    # else, we just pick up hmdb ids from the ao table.
+    if(inferIdMapping) {
+      query <- paste0("select distinct s.rampId, s.sourceId from source s, analytehasontology ao, ontology o
+      where o.commonName in ('", background, "') and o.rampOntologyId=ao.rampOntologyId and s.rampId = ao.rampCompoundId")
+    } else {
+      # how do we keep the direct mapping on the source HMDB ids? We don't capture that.
+      query <- paste0("select distinct s.rampId, s.sourceId from source s, analytehasontology ao, ontology o
+      where o.commonName in ('", background, "') and o.rampOntologyId=ao.rampOntologyId and s.rampId = ao.rampCompoundId")
+    }
     con <- connectToRaMP()
     bg <- RMariaDB::dbGetQuery(con, query)
     RMariaDB::dbDisconnect(con)
@@ -134,7 +145,8 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
     }
 
     # try to make a set of source ids assoicated with unique rampids
-    bg <- bg[!duplicated(bg$rampId),]
+    # drop this, as it limits the source ids such that there is only one random soruce id per ramp id
+    # bg <- bg[!duplicated(bg$rampId),]
 
     # use unique list of source ids for the biospecimen type
     # note that rampId counts will be used downstream for statistics, reducing redundancy
@@ -149,11 +161,14 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
     stop("background_type was not specified correctly. Please specify one of the following options: 'database', 'file', 'list', or 'biospecimen'.")
   }
 
+  # note that for enrichment analysis the inferIdMapping for the class survey is set to FALSE
+  # This means that only ids that have direct id-to-class annotations will contribute to results.
   if(background_type == "database"){
-      res <- chemicalClassSurveyRampIdsFullPopConn(mets, conn)
+    res <- chemicalClassSurveyRampIdsFullPopConn(mets=mets, conn=conn, inferIdMapping=inferIdMapping)
   } else {
-    res <- chemicalClassSurveyRampIdsConn(mets, bkgrnd, conn)
+    res <- chemicalClassSurveyRampIdsConn(mets=mets, pop=bkgrnd, conn=conn, inferIdMapping=inferIdMapping)
   }
+
   RMariaDB::dbDisconnect(conn)
 
   print("Finished Chemical Class Survey")
@@ -192,6 +207,10 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
 #' @param background_type one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
 #' or 'file' in which case the background parameter will be a file path, or 'biospecimen' where the specified background parameter is
 #' a RaMP HMDB metabolite ontology term (see background parameter, above. for the most common biospecimen background values).
+#' @param inferIdMapping if FALSE, the method only reports on class annotations made directly on the input ids.
+#' If inferIdMapping is set to TRUE, the input ids are cross-referenced or mapped to other existing ids that contain metabolite class annotations.
+#' Following id cross references can expand coverage if the input type is other than HMDB ids or LIPIDMAPS ids.
+#' The default value is FALSE.
 #' @return a list of dataframes, each holding chemical classs enrichment statistics for specific chemical classification systems,
 #' such as HMDB Classyfire class categories and LIPIDMAPS class categories.  The results list chemical classes, metabolite hits counts,
 #' Fisher Exact p-values and Benjamini-Hochberg corrected p-values (FDR estimates)
@@ -220,13 +239,16 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
 #' enrichedClassStats <- chemicalClassEnrichment(mets = metList)
 #'}
 #' @export
-chemicalClassEnrichment <- function(mets, background = "database", background_type = "database") {
+chemicalClassEnrichment <- function(mets, background = "database", background_type = "database", inferIdMapping=F) {
   print("Starting Chemical Class Enrichment")
 
+  # note that inferIdMapping is set to FALSE
+  # enrichment will only be reported for input ids that have
+  # a direct association with the chemical class.
   classData <- chemicalClassSurvey(mets = mets,
                                    background = background,
                                    background_type = background_type,
-                                   includeRaMPids = TRUE)
+                                   includeRaMPids = TRUE, inferIdMapping = inferIdMapping)
 
   # Quit if empty survey result
   if(is.null(classData) || length(classData) < 1) {
@@ -236,9 +258,8 @@ chemicalClassEnrichment <- function(mets, background = "database", background_ty
 
   enrichmentStat <- list()
 
-  totalCountInfo <- getTotalFoundInCategories(classData)
-
-  breakPoint <- TRUE
+  # helper method to summarize information on classes based on chemical class survey
+  totalCountInfo <- getTotalFoundInCategories(classData, inferIdMapping = inferIdMapping)
 
   for (category in names(classData$count_summary)) {
 
@@ -246,19 +267,26 @@ chemicalClassEnrichment <- function(mets, background = "database", background_ty
 
     # only run if we have data for that class category
     # ANNNND we have that category represented in $mets
-    if(nrow(categoryData) > 0 && category %in% names(totalCountInfo$mets)) {
+    if(nrow(categoryData) > 0 && category %in% totalCountInfo$mets$Var1) {
       resultRow <- 1
 
-      category <- category
-      totMetCnt <- totalCountInfo$mets[[category]]
-      totPopCnt <- as.integer(totalCountInfo$pop[[category]])
+      metsInfo <- totalCountInfo$mets
+      popInfo <- totalCountInfo$pop
+
+      # some summary methods returned Integer64, cast as integer
+      # these values are the counts for the annotation category for the metabolite set and the population
+      totMetCnt <- as.integer(metsInfo[metsInfo$Var1 == category,2])
+      totPopCnt <- as.integer(popInfo[popInfo$Var1 == category,2])
+
       contingencyMat <- matrix(nrow=2, ncol=2)
       resultMat <- data.frame(matrix(ncol=7))
       colnames(resultMat) <- c("category", "class_name", "met_hits", "pop_hits",
                                "met_size", "pop_size", "p-value")
+
       for (i in 1:nrow(categoryData)) {
         if(categoryData[i,'mets_count'] >= 1) {
-          contingencyMat[1,1] <- categoryData[i,'mets_count']
+
+          contingencyMat[1,1] <- as.integer(categoryData[i,'mets_count'])
           contingencyMat[1,2] <- totMetCnt - contingencyMat[1,1]
           contingencyMat[2,1] <- as.integer(categoryData[i,'pop_count']) - contingencyMat[1,1]
           contingencyMat[2,2] <- totPopCnt - contingencyMat[2,1] - contingencyMat[1,2]
@@ -275,19 +303,18 @@ chemicalClassEnrichment <- function(mets, background = "database", background_ty
           resultRow <- resultRow + 1
         }
       }
-      resultMat
+
       resultMat <- bhCorrect(resultMat)
       enrichmentStat[[as.character(category)]] <- resultMat
-    } else {
-      # just append an empty data frame place holder for that category type.
-      resultMat <- data.frame(matrix(ncol=7, nrow=0))
-      colnames(resultMat) <- c("category", "class_name", "met_hits", "pop_hits",
-                               "met_size", "pop_size", "p-value")
-      enrichmentStat[[as.character(category)]] <- resultMat
+
     }
   }
   enrichmentStat[['result_type']] <- 'chemical_class_enrichment'
   print("Finished Chemical Class Enrichment")
   return(enrichmentStat)
 }
+
+
+
+
 
