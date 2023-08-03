@@ -956,8 +956,7 @@ getCustomPathwayFromAnalyte <- function(analytes, pathways, analyte_type) {
 #' fisher.results <- runCombinedFisherTest(pathwaydf = pathwaydf)
 #' clustered.fisher.results <- findCluster(fisher.results)
 #' }
-#' @exportcluster_list
-
+#' @export
 findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
                         min_pathway_tocluster = 2, perc_pathway_overlap = 0.5) {
   print("Clustering pathways...")
