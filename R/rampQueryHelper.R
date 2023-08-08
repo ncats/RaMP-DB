@@ -29,24 +29,29 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
   list_metabolite <- unique(list_metabolite)
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
-  query <- paste0("select Synonym as origins,rampId from analytesynonym where Synonym in(",
+
+  query <- paste0("select Synonym as origins, rampId from analytesynonym where Synonym in (",
                   list_metabolite,
                   ");")
-  con <- connectToRaMP()
 
-  df1 <- RMariaDB::dbGetQuery(con,query)
-  RMariaDB::dbDisconnect(con)
+  if(get("is_sqlite", pkg.globals)) {
+    query <- paste0("select Synonym as origins, rampId from analytesynonym where Synonym COLLATE NOCASE in (",
+                    list_metabolite,
+                    ");")
+  }
 
-  if(!return_rampIds || nrow(df1) < 1){
+  df1 <- RaMP::runQuery(query)
+
+  if(return_rampIds || nrow(df1) < 1) {
       return(df1)
-  }else{
+  } else {
       rampid <- df1$rampId
       rampid <- sapply(rampid,shQuote)
       rampid <- paste(rampid,collapse = ",")
-      query <- paste0("select * from analytesynonym where rampId in(",rampid,");")
-      con <- connectToRaMP()
-      df2 <- RMariaDB::dbGetQuery(con,query)
-      RMariaDB::dbDisconnect(con)
+      query <- paste0("select * from analytesynonym where rampId in (",rampid,");")
+
+      df2 <- RaMP::runQuery(query)
+
       df2 <- merge(df1,df2)
       if(full){
           return(df2)
@@ -84,10 +89,11 @@ rampFindSourceFromId <- function(rampId = "",full = TRUE){
   list_id <- unique(list_id)
   list_id <- sapply(list_id,shQuote)
   list_id <- paste(list_id,collapse = ",")
+
   query <- paste0("select * from source where rampId in (",list_id,");")
-  con <- connectToRaMP()
-  df <- RMariaDB::dbGetQuery(con,query)
-  RMariaDB::dbDisconnect(con)
+
+  df <- RaMP::runQuery(query)
+
   if(full){
     return(df)
   } else{
@@ -114,9 +120,9 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE){
   list_metabolite <- paste(list_metabolite,collapse = ",")
   query1 <- paste0("select * from source where sourceid in (",
                    list_metabolite,");")
-  con <- connectToRaMP()
-  df1<- RMariaDB::dbGetQuery(con,query1)
-  RMariaDB::dbDisconnect(con)
+
+  df1 <- RaMP::runQuery(query1)
+
   colnames(df1)[1] <-"sourceId2"
   #return(df1)
   rampid <- df1$rampId
@@ -124,9 +130,9 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE){
   rampid <- paste(rampid,collapse = ",")
   query2 <- paste0("select * from analytehaspathway where
                    rampId in (",rampid,");")
-  con <- connectToRaMP()
-  df2 <- RMariaDB::dbGetQuery(con,query2)
-  RMariaDB::dbDisconnect(con)
+
+  df2 <- RaMP::runQuery(query2)
+
   #return(df2)
   id_list <- unique(df2$pathwayRampId)
   id_list <- sapply(id_list,shQuote)
@@ -134,10 +140,9 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE){
   print(id_list)
   query3 <- paste0("select * from pathway where pathwayRampId in (",
                    id_list,");")
-  con <- connectToRaMP()
-  df3 <- RMariaDB::dbGetQuery(con,query3)
-  RMariaDB::dbDisconnect(con)
-  #return(df3)
+
+  df3 <- RaMP::runQuery(query3)
+
   mdf <- merge(df3,df2,all.x=T)
   mdf <- merge(mdf,df1,all.x = T)
   mdf <- unique(mdf)
@@ -145,6 +150,8 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE){
   print(proc.time()- now)
   return(unique(mdf[,c(6,4,3,7)]))
 }
+
+
 #' Find rampId from given source ID
 #' The rampId can be plugged in other functions to continue query
 #' @param sourceId a data frame or string separated by comma or string
@@ -170,10 +177,10 @@ rampFindSourceRampId <- function(sourceId){
   }
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
-  con <- connectToRaMP()
+
   query <- paste0("select sourceId,IDtype as analytesource, rampId from source where sourceId in (",list_metabolite,");")
-  df <- RMariaDB::dbGetQuery(con,query)
-  RMariaDB::dbDisconnect(con)
+  df <- RaMP::runQuery(query)
+
   return(df)
 }
 
@@ -311,10 +318,11 @@ rampFindClassInfoFromSourceId<-function(sourceIds){
     })
     idsToCheck <- paste(idsToCheck, collapse = "','")
     idsToCheck <- paste("'" ,idsToCheck, "'", sep = "")
-    conn <- connectToRaMP()
+
     sql <- paste("select * from source where sourceId in (",idsToCheck,")")
 
-    potentialMultiMappings <- RMariaDB::dbGetQuery(conn, sql)
+    potentialMultiMappings <- RaMP::runQuery(sql)
+
     potentialMultiMappings <- potentialMultiMappings %>%
         dplyr::select("sourceId","rampId") %>%
         dplyr::distinct()
@@ -333,17 +341,13 @@ rampFindClassInfoFromSourceId<-function(sourceIds){
     metStr <- paste(sourceIds, collapse = "','")
     metStr <- paste("'" ,metStr, "'", sep = "")
 
-    conn <- connectToRaMP()
-
     sql <- paste("select distinct a.ramp_id, b.sourceId, a.class_level_name, a.class_name, a.source from metabolite_class a, source b
           where b.rampId = a.ramp_id and b.sourceId in (",metStr,")")
 
-    metsData <- RMariaDB::dbGetQuery(conn, sql)
+    metsData <- RaMP::runQuery(sql)
 
-                                        # need to filter for our specific source ids
     metsData <- subset(metsData, "sourceId" %in% sourceIds)
 
-    RMariaDB::dbDisconnect(conn)
     return(metsData)
 }
 
@@ -407,10 +411,7 @@ buildFrequencyTables<-function(inputdf, pathway_definitions, analyte_type){
     query <- paste0("select * from analytehaspathway where pathwayRampId in (",
                      list_pid,")")
 
-    con <- connectToRaMP()
-
-    input_RampIds <- RMariaDB::dbGetQuery(con,query)
-    RMariaDB::dbDisconnect(con)
+    input_RampIds <- RaMP::runQuery(query)
 
     return(input_RampIds)
   }else{
@@ -514,9 +515,8 @@ find_duplicate_pathways <- function(){
     }
   }
   query <- "select * from analytehaspathway where pathwaySource != 'hmdb';"
-  con <- connectToRaMP()
-  allpids <- RMariaDB::dbGetQuery(con, query)
-  RMariaDB::dbDisconnect(con)
+
+  allpids <- RaMP::runQuery(query)
 
   duplicate_pathways <- apply(duplicate_pairs, 1, function(x){
     path1 <- x[1]
@@ -544,10 +544,10 @@ find_duplicate_pathways <- function(){
 ##' @return List of duplicate Wikipathway IDs from Reactome.
 ##' @author John Braisted
 findDuplicatePathways <- function() {
+
   query <- "select pathwayRampId from pathway where type = 'reactome';"
-  con <- connectToRaMP()
-  reactomePIDs <- RMariaDB::dbGetQuery(con, query)
-  RMariaDB::dbDisconnect(con)
+
+  reactomePIDs <- RaMP::runQuery(query)
 
   ar <- RaMP:::analyte_result
   diag(ar) <- 0.0
@@ -690,7 +690,7 @@ FilterFishersResults <- function(fishers_df, pval_type = 'fdr', pval_cutoff = 0.
 #' The count_summary is a dataframe containing metabolite classes and number of metabolites in each class.
 #' The met_classes is a detailed listing of compound classes associated with each input metabolite
 #' The met_query_report indicates the number of input metabolites, how many were found in the DB and the list of metabolites not found in RaMP DB.
-chemicalClassSurveyRampIdsConn <- function(mets, pop, conn, inferIdMapping=TRUE) {
+chemicalClassSurveyRampIdsConn <- function(mets, pop, inferIdMapping=TRUE) {
 
   mets <- unique(mets)
 
@@ -707,22 +707,40 @@ chemicalClassSurveyRampIdsConn <- function(mets, pop, conn, inferIdMapping=TRUE)
   metStr <- paste("'" ,metStr, "'", sep = "")
 
 
+  isSQLite <- get("is_sqlite", pkg.globals)
+
   # if inferring ID mapping, the query goes through the source table to map input id to ramp id, then map to related ids having chem class annotations
   # if not ID mapping, then the match is directly on the input source ids. HMDB and LipidMaps IDs are supported directly, May 2023.
   if(inferIdMapping) {
     sql <- paste("select distinct a.ramp_id, b.sourceId, group_concat(distinct b.commonName order by b.commonName asc separator '; ') as common_names,
+                   a.class_level_name, a.class_name, a.source as source, count(distinct(a.class_source_id)) as directIdClassHits from metabolite_class a, source b
+                   where b.rampId = a.ramp_id and b.sourceId in (",metStr,")
+                   group by a.ramp_Id, b.sourceId, a.class_level_name, a.class_name, a.source")
+
+    if(isSQLite) {
+      sql <- paste("select distinct a.ramp_id, b.sourceId, group_concat(distinct b.commonName COLLATE NOCASE) as common_names,
                   a.class_level_name, a.class_name, a.source as source, count(distinct(a.class_source_id)) as directIdClassHits from metabolite_class a, source b
                   where b.rampId = a.ramp_id and b.sourceId in (",metStr,")
                   group by a.ramp_Id, b.sourceId, a.class_level_name, a.class_name, a.source")
+    }
   } else {
     sql = paste("select distinct c.ramp_id, c.class_source_id, group_concat(distinct s.commonName order by s.commonName asc separator '; ') as common_names,
                  c.class_level_name, c.class_name, c.source as source, count(distinct(c.class_source_id)) as directIdClassHits
                  from metabolite_class c, source s
                  where c.class_source_id in (",metStr,") and s.sourceId = c.class_source_id
                  group by c.class_source_id, c.class_level_name, c.class_name")
+
+    if(isSQLite) {
+      sql = paste("select distinct c.ramp_id, c.class_source_id, group_concat(distinct s.commonName COLLATE NOCASE) as common_names,
+                 c.class_level_name, c.class_name, c.source as source, count(distinct(c.class_source_id)) as directIdClassHits
+                 from metabolite_class c, source s
+                 where c.class_source_id in (",metStr,") and s.sourceId = c.class_source_id
+                 group by c.class_source_id, c.class_level_name, c.class_name")
+    }
+
   }
 
-  metsData <- RMariaDB::dbGetQuery(conn, sql)
+  metsData <- RaMP::runQuery(sql)
 
   # need to filter for our specific source ids
   # ID mapping uses a subset to report on found additional source ids, else matches on class_source_id (source ids directly mapped to chem class)
@@ -775,7 +793,7 @@ chemicalClassSurveyRampIdsConn <- function(mets, pop, conn, inferIdMapping=TRUE)
   # where c.class_source_id in (",metStr,") and s.sourceId = c.class_source_id
   # group by c.class_source_id, c.class_level_name, c.class_name")
 
-  popData <- RMariaDB::dbGetQuery(conn, sql)
+  popData <- RaMP::runQuery(sql)
 
   if(inferIdMapping) {
     popData <- subset(popData, sourceId %in% pop)
@@ -859,19 +877,33 @@ chemicalClassSurveyRampIdsFullPopConn <- function(mets, conn, inferIdMapping=TRU
   metStr <- paste(mets, collapse = "','")
   metStr <- paste("'" ,metStr, "'", sep = "")
 
+  isSQLite = get("is_sqlite", pkg.globals)
+
   # Id mapping matches on source ids mapped via ramp ids in the source table. No id mapping matches on input ids directly.
   if(inferIdMapping) {
-  sql <- paste("select distinct a.ramp_id, b.sourceId, group_concat(distinct b.commonName order by b.commonName asc separator '; ') as common_names,
+    sql <- paste("select distinct a.ramp_id, b.sourceId, group_concat(distinct b.commonName order by b.commonName asc separator '; ') as common_names,
      a.class_level_name, a.class_name, a.source as source, count(distinct(a.class_source_id)) as directIdClassHits from metabolite_class a, source b
           where b.rampId = a.ramp_id and b.sourceId in (",metStr,")
                group by a.ramp_Id, b.sourceId, a.class_level_name, a.class_name, a.source")
+    if(isSQLite) {
+      sql <- paste("select distinct a.ramp_id, b.sourceId, group_concat(distinct(b.commonName) COLLATE NOCASE) as common_names,
+          a.class_level_name, a.class_name, a.source as source, count(distinct(a.class_source_id)) as directIdClassHits from metabolite_class a, source b
+          where b.rampId = a.ramp_id and b.sourceId in (",metStr,")
+          group by a.ramp_Id, b.sourceId, a.class_level_name, a.class_name, a.source")
+    }
   } else {
     sql = paste("select distinct c.ramp_id, c.class_source_id, group_concat(distinct s.commonName order by s.commonName asc separator '; ') as common_names,
-                c.class_level_name, c.class_name, c.source, count(distinct(c.class_source_id)) as directIdClassHits from metabolite_class c, source s
-          where c.class_source_id in (",metStr,") and s.sourceId = c.class_source_id group by c.class_source_id, c.class_level_name, c.class_name")
+               c.class_level_name, c.class_name, c.source, count(distinct(c.class_source_id)) as directIdClassHits from metabolite_class c, source s
+               where c.class_source_id in (",metStr,") and s.sourceId = c.class_source_id group by c.class_source_id, c.class_level_name, c.class_name")
+
+    if(isSQLite) {
+      sql = paste("select distinct c.ramp_id, c.class_source_id, group_concat(distinct(s.commonName) COLLATE NOCASE) as common_names,
+                  c.class_level_name, c.class_name, c.source, count(distinct(c.class_source_id)) as directIdClassHits from metabolite_class c, source s
+                  where c.class_source_id in (",metStr,") and s.sourceId = c.class_source_id group by c.class_source_id, c.class_level_name, c.class_name")
+    }
   }
 
-  metsData <- RMariaDB::dbGetQuery(conn, sql)
+  metsData <- RaMP::runQuery(sql)
 
   # need to filter for our specific source ids
   if(inferIdMapping) {
@@ -916,7 +948,7 @@ chemicalClassSurveyRampIdsFullPopConn <- function(mets, conn, inferIdMapping=TRU
   sql <- paste("select class_level_name, class_name, count(1) as pop_hits from metabolite_class
                  group by class_level_name, class_name")
 
-  popCountData <- RMariaDB::dbGetQuery(conn, sql)
+  popCountData <- RaMP::runQuery(sql)
 
   colnames(popCountData) <- c("class_level", "class_name", "freq")
   popCountData <- popCountData[popCountData$freq != 0,]

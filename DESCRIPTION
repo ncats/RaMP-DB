@@ -29,6 +29,7 @@ Imports:
     visNetwork,
     properties,
     stringi,
+    RSQLite,
     RMariaDB,
     DBI,
     jsonlite,

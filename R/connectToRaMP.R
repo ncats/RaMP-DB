@@ -15,7 +15,7 @@ setConnectionToRaMP <- function(dbname="ramp",
                        username = "root",
                        conpass = "",
                        host ="localhost",
-		       socket = ""){
+		       socket = "", is_sqlite = F, sqlite_file_path = ""){
   pkg.globals <- new.env()
   pkg.globals$dbname=dbname
   pkg.globals$username=username
@@ -26,8 +26,15 @@ setConnectionToRaMP <- function(dbname="ramp",
   }else{
       pkg.globals$socket = socket
   }
+
+  if(is_sqlite) {
+    pkg.globals$is_sqlite = T
+    pkg.globals$sqlite_file_path = sqlite_file_path
+  }
+
   return(pkg.globals)
 }
+
 
 #' Connect to RaMP database (requires mysql password when running locally)
 #'
@@ -40,27 +47,33 @@ setConnectionToRaMP <- function(dbname="ramp",
 #' @export
 connectToRaMP <- function() {
   if(!exists("pkg.globals")) {
-	stop("Be sure the run the setConnectionToRaMP() and assign it to pkg.globals");
+    stop("Be sure the run the setConnectionToRaMP() and assign it to pkg.globals");
   }
-  if(!is.null(get("socket",pkg.globals))) {
-  	con <- RMariaDB::dbConnect(
-	    drv = RMariaDB::MariaDB(),
-	    dbname = get("dbname",pkg.globals),
-	    username = get("username",pkg.globals),
-	    password = get("conpass",pkg.globals),
-	    host = get("host",pkg.globals),
-	    unix.socket = get("socket",pkg.globals)
-	)
+
+  if(get("is_sqlite",pkg.globals)) {
+    db = RSQLite::SQLite()
+    con = RSQLite::dbConnect(db, get("sqlite_file_path", pkg.globals))
   } else {
-       con <- RMariaDB::dbConnect(
-            drv = RMariaDB::MariaDB(),
-            dbname = get("dbname",pkg.globals),
-            username = get("username",pkg.globals),
-            password = get("conpass",pkg.globals),
-            host = get("host",pkg.globals)
-	)
-   }
- return(con)
+    if(!is.null(get("socket",pkg.globals))) {
+      con <- RMariaDB::dbConnect(
+        drv = RMariaDB::MariaDB(),
+        dbname = get("dbname",pkg.globals),
+        username = get("username",pkg.globals),
+        password = get("conpass",pkg.globals),
+        host = get("host",pkg.globals),
+        unix.socket = get("socket",pkg.globals)
+      )
+    } else {
+      con <- RMariaDB::dbConnect(
+        drv = RMariaDB::MariaDB(),
+        dbname = get("dbname",pkg.globals),
+        username = get("username",pkg.globals),
+        password = get("conpass",pkg.globals),
+        host = get("host",pkg.globals)
+      )
+    }
+  }
+  return(con)
 }
 
 
