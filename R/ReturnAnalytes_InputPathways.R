@@ -46,6 +46,8 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
     match = 'exact'
   }
 
+  isSQLite = get("is_sqlite", pkg.globals)
+
   # Retrieve pathway RaMP ids
   if (match=='exact') {
 
@@ -63,11 +65,29 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
     and ap.pathwayRampId = p.pathwayRampId
     and (p.pathwayCategory not like 'smpdb%' or p.pathwayCategory is Null)
     and p.",pathwayMatchCol," in (",list_pathway,") ",
-    "group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
+                 "group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
     order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;")
-    con <- connectToRaMP()
-    df <- RMariaDB::dbGetQuery(con,sql)
-    RMariaDB::dbDisconnect(con)
+
+    if(isSQLite) {
+      sql = paste0("select
+    group_concat(distinct s.commonName COLLATE NOCASE) as analyteName,
+    group_concat(distinct s.sourceId COLLATE NOCASE) as sourceAnalyteIDs,
+    s.geneOrCompound as geneOrCompound,
+    p.pathwayName as pathwayName,
+    p.sourceId as pathwayId,
+    p.pathwayCategory as pathwayCategory,
+    p.type as pathwayType
+    from pathway p, analytehaspathway ap, source s
+    where s.rampId = ap.rampID
+    and ap.pathwayRampId = p.pathwayRampId
+    and (p.pathwayCategory not like 'smpdb%' or p.pathwayCategory is Null)
+    and p.",pathwayMatchCol," in (",list_pathway,") ",
+                   "group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
+    order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;")
+    }
+
+    df <- RaMP::runQuery(sql)
+
   } else if(match == 'fuzzy') {
     df = data.frame(matrix(nrow=0, ncol=7))
     colnames(df) <- c('analyteName', 'sourceAnalyteIDs', 'geneOrCompound',
@@ -87,15 +107,31 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
     and p.",pathwayMatchCol," like '%[SOME_PW_NAME]%' group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
     order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;")
 
-    con <- connectToRaMP()
+    if(isSQLite) {
+      sql = paste0("select
+    group_concat(distinct s.commonName COLLATE NOCASE) as analyteName,
+    group_concat(distinct s.sourceId COLLATE NOCASE) as sourceAnalyteIDs,
+    s.geneOrCompound as geneOrCompound,
+    p.pathwayName as pathwayName,
+    p.sourceId as pathwayId,
+    p.pathwayCategory as pathwayCategory,
+    p.type as pathwayType
+    from pathway p, analytehaspathway ap, source s
+    where s.rampId = ap.rampID
+    and ap.pathwayRampId = p.pathwayRampId
+    and (p.pathwayCategory not like 'smpdb%' or p.pathwayCategory is Null)
+    and p.",pathwayMatchCol," COLLATE NOCASE like '%[SOME_PW_NAME]%' group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
+    order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;")
+    }
+
     for(p in pathway) {
       if(nchar(p)>2) {
         currSQL = gsub(pattern = '[SOME_PW_NAME]', replacement = p, x= sql, fixed = T )
-        subdf <- RMariaDB::dbGetQuery(con,currSQL)
+        subdf <- RaMP::runQuery(currSQL)
         df <- rbind(df, subdf)
       }
     }
-    RMariaDB::dbDisconnect(con)
+
   }
 
   # if we have a result and max_pathway size is not Infinite, filter pathway results by pathway size

@@ -35,7 +35,7 @@
 #'}
 #' @export
 getChemicalProperties <- function(mets, propertyList = 'all'){
-  conn <- connectToRaMP()
+
   message("Starting Chemical Property Query")
 
   mets <- unique(mets)
@@ -47,8 +47,7 @@ getChemicalProperties <- function(mets, propertyList = 'all'){
   metStr <- paste("'" ,metStr, "'", sep = "")
 
   if(length(grep("all",propertyList))==1) {
-    sql <- paste("select * from chem_props",
-          "where chem_source_id in (",metStr,")")
+    sql <- paste0("select * from chem_props where chem_source_id in (",metStr,")")
   } else {
       propList <- buildPropertyList(propertyList);
       if(startsWith(propList, "Error")) {
@@ -59,7 +58,7 @@ getChemicalProperties <- function(mets, propertyList = 'all'){
                    "where chem_source_id in (",metStr,")")
   }
 
-  metsData <- RMariaDB::dbGetQuery(conn, sql)
+  metsData <- RaMP:::runQuery(sql)
   foundMets <- unique(metsData$chem_source_id)
 
   result[['chem_props']] <- metsData
@@ -69,9 +68,13 @@ getChemicalProperties <- function(mets, propertyList = 'all'){
   result[['query_report']] <- queryNotes
 
   result[['chem_props']] <- result[['chem_props']] %>% cleanup
-  
-  RMariaDB::dbDisconnect(conn)
+
   if(!is.null(result)) message("Finished Chemical Property Query")
+
+  # if(typeof(result) == 'list') {
+  #   result <- data.frame(result)
+  # }
+
   return(result)
 }
 
@@ -80,12 +83,22 @@ getChemicalProperties <- function(mets, propertyList = 'all'){
 buildPropertyList <- function(propList) {
 
   # validate that all properties are valid
-#  validProperties <- c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name')
-   con <- connectToRaMP()
-   ramptypes <- RMariaDB::dbGetQuery(con,"describe chem_props;")
-   RMariaDB::dbDisconnect(con)
+  #  validProperties <- c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name')
 
-   validProperties <- setdiff(ramptypes$Field,c("ramp_id", "chem_data_source", "chem_source_id"))
+  if(get("is_sqlite", pkg.globals)) {
+    sql = 'pragma table_info(chem_props)'
+    ramptypes <- RaMP:::runQuery(sql)
+    ramptypes <- unlist(ramptypes$name)
+  } else {
+    sql = 'describe chem_props'
+    ramptypes <- RaMP:::runQuery(sql)
+    ramptypes <- unlist(ramptypes$Field)
+  }
+
+
+
+
+  validProperties <- setdiff(ramptypes, c("ramp_id", "chem_data_source", "chem_source_id"))
 
 
   haveInvalidProps = FALSE
@@ -113,8 +126,8 @@ buildPropertyList <- function(propList) {
 
   propStr <- paste(propList, collapse = ",")
 
-#  propStr <- gsub("smiles", "iso_smiles", propStr)
-#  propStr <- gsub("formula", "mol_formula", propStr)
+  #  propStr <- gsub("smiles", "iso_smiles", propStr)
+  #  propStr <- gsub("formula", "mol_formula", propStr)
 
   propStr <- paste("chem_source_id, ramp_id,",propStr)
 

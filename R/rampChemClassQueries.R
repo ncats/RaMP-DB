@@ -72,7 +72,6 @@
 #' @export
 chemicalClassSurvey <- function(mets, background = "database", background_type="database", includeRaMPids = FALSE, inferIdMapping = TRUE){
 
-  conn <- connectToRaMP()
   print("Starting Chemical Class Survey")
 
   if(background_type == "file") {
@@ -122,9 +121,8 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
       query <- paste0("select distinct s.rampId, s.sourceId from source s, analytehasontology ao, ontology o
       where o.commonName in ('", background, "') and o.rampOntologyId=ao.rampOntologyId and s.rampId = ao.rampCompoundId")
     }
-    con <- connectToRaMP()
-    bg <- RMariaDB::dbGetQuery(con, query)
-    RMariaDB::dbDisconnect(con)
+
+    bg = RaMP::runQuery(query)
 
     # cases check if bg is empty (suggest to query for biospecimen types in ramp)
     if(is.null(bg) || nrow(bg) == 0) {
@@ -164,12 +162,10 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
   # note that for enrichment analysis the inferIdMapping for the class survey is set to FALSE
   # This means that only ids that have direct id-to-class annotations will contribute to results.
   if(background_type == "database"){
-    res <- chemicalClassSurveyRampIdsFullPopConn(mets=mets, conn=conn, inferIdMapping=inferIdMapping)
+    res <- chemicalClassSurveyRampIdsFullPopConn(mets=mets, inferIdMapping=inferIdMapping)
   } else {
-    res <- chemicalClassSurveyRampIdsConn(mets=mets, pop=bkgrnd, conn=conn, inferIdMapping=inferIdMapping)
+    res <- chemicalClassSurveyRampIdsConn(mets=mets, pop=bkgrnd, inferIdMapping=inferIdMapping)
   }
-
-  RMariaDB::dbDisconnect(conn)
 
   print("Finished Chemical Class Survey")
 
