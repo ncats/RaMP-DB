@@ -5,18 +5,18 @@
 \title{chemicalClassSurveyRampIdsConn2 is a helper function that takes a list of metabolite ids, a list of 'population' metabolite ids
 and a MariaDB Connection object. The method returns metabolite class information for the metabolite list and a population of all ramp metabolites.}
 \usage{
-chemicalClassSurveyRampIdsConn(mets, pop, conn, inferIdMapping = TRUE)
+chemicalClassSurveyRampIdsConn(mets, pop, inferIdMapping = TRUE)
 }
 \arguments{
 \item{mets}{a list object of prefixed metabolite ids of interest}
 
 \item{pop}{a list object of prefixed metabolite ids, representing a larger population of metabolites from which the mets were selected.}
 
-\item{conn}{a MariaDB Connection object to support queries}
-
 \item{inferIdMapping}{if FALSE, the survey only reports on class annotations made directly on the input ids.
 If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to related ids that contain metabolite class annotations.
 The default is TRUE.}
+
+\item{conn}{a MariaDB Connection object to support queries}
 }
 \value{
 a list object containing three objects 'count_summary', 'met_classes' and 'met_query_report'.
