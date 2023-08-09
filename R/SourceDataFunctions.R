@@ -9,14 +9,12 @@
 #' }
 #' @export
 getCurrentRaMPVersion<-function(justVersion=T){
-  con<-connectToRaMP()
   if(justVersion) {
     query<-"select ramp_version from db_version where load_timestamp order by load_timestamp desc limit 1"
   } else {
     query<-"select ramp_version, load_timestamp, version_notes, db_sql_url  from db_version where load_timestamp order by load_timestamp desc limit 1"
   }
-  results<-RMariaDB::dbGetQuery(con,query)
-  RMariaDB::dbDisconnect(con)
+  results <- RaMP::runQuery(query)
   return(results)
 }
 
@@ -29,10 +27,8 @@ getCurrentRaMPVersion<-function(justVersion=T){
 #' }
 #' @export
 getCurrentRaMPSourceDBVersions<-function(){
-  con <- connectToRaMP()
   query1<- "select * from version_info where status = 'current'"
-  results<- RMariaDB::dbGetQuery(con,query1)
-  RMariaDB::dbDisconnect(con)
+  results<- RaMP::runQuery(query1)
   return(results)
 }
 
@@ -46,10 +42,8 @@ getCurrentRaMPSourceDBVersions<-function(){
 #' @export
 getEntityCountsFromSourceDBs<-function(){
   entity_source_name <- entity_count <- c()
-  con<-connectToRaMP()
   query1<-"select * from entity_status_info"
-  results<-RMariaDB::dbGetQuery(con,query1)
-  RMariaDB::dbDisconnect(con)
+  results<- RaMP::runQuery(query1)
   results<-results[,-2]
   results<-results %>% tidyr::spread(unique(entity_source_name),entity_count)
   results[is.na(results)]=0
@@ -86,9 +80,8 @@ getRaMPAnalyteIntersections<-function(analyteType='metabolites', format='json', 
     #return an empty dataframe
     return(data.frame())
   }
-  con<-connectToRaMP()
-  results<-RMariaDB::dbGetQuery(con,query)
-  RMariaDB::dbDisconnect(con)
+
+  results<-RaMP::runQuery(query)
 
   if(format == 'json') {
     if(nrow(results)>0) {
@@ -135,10 +128,8 @@ getRaMPAnalyteIntersections<-function(analyteType='metabolites', format='json', 
 #' }
 #' @export
 getPathwayNameList <- function(){
-  con<-connectToRaMP()
   query1<-"select pathwayName from pathway;"
-  results<-RMariaDB::dbGetQuery(con,query1)
-  RMariaDB::dbDisconnect(con)
+  results<-RaMP::runQuery(query1)
   return(sort(unique(results$pathwayName)))
 }
 

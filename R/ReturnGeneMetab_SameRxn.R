@@ -43,13 +43,13 @@ rampFastCata <- function(analytes="none", NameOrIds="ids") {
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
 
-  #print(list_metabolite)
-
-  con <- connectToRaMP()
+  isSQLite = get("is_sqlite", pkg.globals)
 
   if(NameOrIds == 'ids') {
 
     print("Analyte ID-based reaction partner query.")
+
+    # Ugghhh... SQLite specific query changes...
 
     metQuery <- paste0("select c.sourceId as input_analyte, group_concat(distinct c.commonName order by c.commonName asc separator '; ') as input_common_names,
   group_concat(distinct g.commonName order by g.commonName asc separator '; ') as rxn_partner_common_name,
@@ -59,11 +59,22 @@ rampFastCata <- function(analytes="none", NameOrIds="ids") {
   join source c on r.rampCompoundId = c.rampId
   where c.sourceId in (",list_metabolite,") group by g.rampId, c.sourceId")
 
+    if(isSQLite) {
+    metQuery <- paste0("select c.sourceId as input_analyte, group_concat(distinct c.commonName COLLATE NOCASE) as input_common_names,
+  group_concat(distinct g.commonName COLLATE NOCASE) as rxn_partner_common_name,
+  group_concat(distinct g.sourceId COLLATE NOCASE) as rxn_partner_ids,
+  g.rampId from catalyzed r
+  join source g on r.rampGeneId = g.rampId
+  join source c on r.rampCompoundId = c.rampId
+  where c.sourceId in (",list_metabolite,") group by g.rampId, c.sourceId")
+    }
+
     print("Building metabolite to gene relations.")
 
-    df1 <- RMariaDB::dbGetQuery(con, metQuery)
+    df1 <- RaMP::runQuery(metQuery)
 
     print(paste0("Number of met2gene relations: ",(nrow(df1))))
+
 
     geneQuery <- paste0("select g.sourceId as input_analyte, group_concat(distinct g.commonName order by g.commonName asc separator '; ') as input_common_names,
   group_concat(distinct c.commonName order by c.commonName asc separator '; ') as rxn_partner_common_name,
@@ -73,9 +84,19 @@ rampFastCata <- function(analytes="none", NameOrIds="ids") {
   join source c on r.rampCompoundId = c.rampId
   where g.sourceId in (", list_metabolite,") group by c.rampId, g.sourceId")
 
+    if(isSQLite) {
+    geneQuery <- paste0("select g.sourceId as input_analyte, group_concat(distinct g.commonName COLLATE NOCASE) as input_common_names,
+  group_concat(distinct c.commonName COLLATE NOCASE) as rxn_partner_common_name,
+  group_concat(distinct c.sourceId COLLATE NOCASE) as rxn_partner_ids,
+  c.rampId from catalyzed r
+  join source g on r.rampGeneId = g.rampId
+  join source c on r.rampCompoundId = c.rampId
+  where g.sourceId in (", list_metabolite,") group by c.rampId, g.sourceId")
+    }
     print("Building gene to metabolite relations.")
 
-    df2 <- RMariaDB::dbGetQuery(con, geneQuery)
+    df2 <- RaMP::runQuery(geneQuery)
+
   } else {
 
     # working on 'names' query
@@ -92,9 +113,20 @@ rampFastCata <- function(analytes="none", NameOrIds="ids") {
   join analytesynonym s on s.rampId = r.rampCompoundId
   where s.Synonym in (",list_metabolite,") group by g.rampId, s.Synonym")
 
+    if(isSQLite) {
+      metQuery <- paste0("select s.Synonym as input_analyte, group_concat(distinct c.commonName COLLATE NOCASE) as input_common_names,
+  group_concat(distinct g.commonName COLLATE NOCASE) as rxn_partner_common_name,
+  group_concat(distinct g.sourceId COLLATE NOCASE) as rxn_partner_ids,
+  g.rampId from catalyzed r
+  join source g on r.rampGeneId = g.rampId
+  join source c on r.rampCompoundId = c.rampId
+  join analytesynonym s on s.rampId = r.rampCompoundId
+  where s.Synonym in (",list_metabolite,") group by g.rampId, s.Synonym")
+    }
+
     print("Building metabolite to gene relations.")
 
-    df1 <- RMariaDB::dbGetQuery(con, metQuery)
+    df1 <- RaMP::runQuery(metQuery)
 
     print(paste0("Number of met2gene relations: ",(nrow(df1))))
 
@@ -107,15 +139,22 @@ rampFastCata <- function(analytes="none", NameOrIds="ids") {
   join analytesynonym s on s.rampId = r.rampGeneId
   where s.Synonym in (", list_metabolite,") group by c.rampId, s.Synonym")
 
+    if(isSQLite) {
+      geneQuery <- paste0("select s.Synonym as input_analyte, group_concat(distinct g.commonName COLLATE NOCASE) as input_common_names,
+  group_concat(distinct c.commonName COLLATE NOCASE) as rxn_partner_common_name,
+  group_concat(distinct c.sourceId COLLATE NOCASE) as rxn_partner_ids,
+  c.rampId from catalyzed r
+  join source g on r.rampGeneId = g.rampId
+  join source c on r.rampCompoundId = c.rampId
+  join analytesynonym s on s.rampId = r.rampGeneId
+  where s.Synonym in (", list_metabolite,") group by c.rampId, s.Synonym")
+    }
     print("Building gene to metabolite relations.")
 
-    df2 <- RMariaDB::dbGetQuery(con, geneQuery)
+    df2 <- RaMP::runQuery(geneQuery)
 
     print(paste0("Number of gene2met relations: ",(nrow(df2))))
   }
-
-
-  RMariaDB::dbDisconnect(con)
 
   if(!is.null(df1) && nrow(df1) > 0) {
     df1$query_relation <- 'met2gene'
@@ -196,7 +235,6 @@ rampFastCataOriginal <- function(analytes="none", NameOrIds="ids") {
   #  print(list_metabolite)
 
   # Retrieve RaMP analyte ids
-  con <- connectToRaMP()
   if (NameOrIds == 'names'){
     #    query1 <- paste0("select Synonym as analyte1,rampId,geneOrCompound as type1 from analytesynonym where Synonym in (",list_metabolite,");")
     query1 <- paste0("select rampId,geneOrCompound as type1,Synonym as InputAnalyte from analytesynonym where Synonym in (",list_metabolite,");")
@@ -206,8 +244,7 @@ rampFastCataOriginal <- function(analytes="none", NameOrIds="ids") {
   }
 
   # Retrieves Name, RaMPID and type (gene or compound) for input
-  df1<- RMariaDB::dbGetQuery(con,query1)
-  RMariaDB::dbDisconnect(con)
+  df1 <- RaMP::runQuery(query1)
 
   #print(df1$rampId)
   df_c <- df_g <- NULL
@@ -230,9 +267,8 @@ rampFastCataOriginal <- function(analytes="none", NameOrIds="ids") {
       query_c <- paste0("select rampCompoundId as rampId,rampGeneId as rampId2 from catalyzed where rampCompoundId in (",c_id,");")
       print("Geting gene Id from Compound Id ...")
 
-      con <- connectToRaMP()
-      df_c2 <- RMariaDB::dbGetQuery(con,query_c)
-      RMariaDB::dbDisconnect(con)
+      df_c2 <- RaMP::runQuery(query_c)
+
       if(nrow(df_c2) == 0){
         message("No genes found in same reaction as input metabolite")
         mdf_cfin2 <- NULL
@@ -244,9 +280,8 @@ rampFastCataOriginal <- function(analytes="none", NameOrIds="ids") {
         # Get names for metabolite ids
         query2 <- paste0("select * from source
              		where rampId in (",analyte2_list,");")
-	con <- connectToRaMP()
-        df_c3 <- RMariaDB::dbGetQuery(con,query2)
-        RMariaDB::dbDisconnect(con)
+
+        df_c3 <- RaMP::runQuery(query2)
 
         if(nrow(df_c3) == 0){
           message("Cannot retrieve names for those metabolites")
@@ -300,9 +335,9 @@ rampFastCataOriginal <- function(analytes="none", NameOrIds="ids") {
     } else {
       # Get rampID for genes and catalyzed metabolites
       query_g <- paste0("select * from catalyzed where rampGeneId in (",g_id,");")
-      con <- connectToRaMP()
-      df_g2 <- RMariaDB::dbGetQuery(con,query_g)
-      RMariaDB::dbDisconnect(con)
+
+      df_g2 <- RaMP::runQuery(con,query_g)
+
       if(nrow(df_g2) == 0){
         message("Could not find metabolites in same reaction as input genes")
         mdf_gfin2=c()
@@ -313,9 +348,9 @@ rampFastCataOriginal <- function(analytes="none", NameOrIds="ids") {
 
         # Get names for metabolite IDs
         query2 <- paste0("select * from source where rampId in (",analyte2_list,");")
-	con <- connectToRaMP()
-        df_g3 <-RMariaDB::dbGetQuery(con,query2)
-        RMariaDB::dbDisconnect(con)
+
+        df_g3 <-RaMP::runQuery(query2)
+
         if(nrow(df_g3) == 0){
           message("Cannot retrieve names for those genes")
           mdf_gfin2 <- NULL

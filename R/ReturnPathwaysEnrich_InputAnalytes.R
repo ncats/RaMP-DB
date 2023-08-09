@@ -94,12 +94,13 @@ runFisherTest <- function(analytes,
         biospecimen,
         "') and ontology.rampOntologyId = analytehasontology.rampOntologyId and analytehasontology.rampCompoundId = analytehaspathway.rampId"
       )
-      con <- connectToRaMP()
-      backgrounddf <- RMariaDB::dbGetQuery(con, query)
-      RMariaDB::dbDisconnect(con)
+
+      backgrounddf <- RaMP::runQuery(query)
+
       if (nrow(backgrounddf) == 0) {
         stop("Biospecimen background not found. Choices are 'Blood', 'Adipose', 'Heart', 'Urine', 'Brain', 'Liver', 'Kidney', 'Saliva', and 'Feces'")
       }
+
       # only keep the input metabolites (converted into pathwaydf in line above) that are in the biospecimen type specified
       pathwaydf <- with(pathwaydf, {
         pathwaydf %>%
@@ -153,13 +154,9 @@ runFisherTest <- function(analytes,
   # Get the total number of metabolites that are mapped to pathways in RaMP (that's the default background)
   # added conditional to not pull hmdb ids
   query <- "select * from analytehaspathway where pathwaySource != 'hmdb';"
-  con <- connectToRaMP()
-  allids <- RMariaDB::dbGetQuery(con, query)
 
-  # Close connection, then deduplicate id list
-  RMariaDB::dbDisconnect(con)
+  allids <- RaMP::runQuery(query)
   allids <- allids[!duplicated(allids), ]
-
 
   if ((analyte_type == "metabolites")) {
 
@@ -329,9 +326,9 @@ runFisherTest <- function(analytes,
   if (MCall == T) {
     # Now run fisher's tests for all other pids
     query <- "select distinct(pathwayRampId) from analytehaspathway where pathwaySource != 'hmdb';"
-    con <- connectToRaMP()
-    allpids <- RMariaDB::dbGetQuery(con, query)
-    RMariaDB::dbDisconnect(con)
+
+    allpids <- RaMP::runQuery(query)
+
     pidstorun <- setdiff(allpids[, 1], pid)
     pidstorunlist <- sapply(pidstorun, shQuote)
     pidstorunlist <- paste(pidstorunlist, collapse = ",")
@@ -340,16 +337,13 @@ runFisherTest <- function(analytes,
       "select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
       pidstorunlist, ")"
     )
-    con <- connectToRaMP()
-    restcids <- RMariaDB::dbGetQuery(con, query2) # [[1]]
-    RMariaDB::dbDisconnect(con)
+
+    restcids <- RaMP::runQuery(con, query2) # [[1]]
 
     # modify to not take hmdb pathways
     query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwaySource != 'hmdb';")
 
-    con <- connectToRaMP()
-    allcids <- RMariaDB::dbGetQuery(con, query1) # [[1]]
-    RMariaDB::dbDisconnect(con)
+    allcids <- RaMP::runQuery(query1) # [[1]]
 
     # We're collecting p-values for all pathways, now those with no analyte support at all - JCB:?
 
@@ -801,8 +795,11 @@ getPathwayFromAnalyte <- function(analytes = "none",
     return(NULL)
   }
 
+  isSQLite = get("is_sqlite", pkg.globals)
+
   if (NameOrIds == "ids") {
     print("Working on ID List...")
+
     sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, s.sourceId as inputId, group_concat(distinct s.commonName order by s.commonName separator '; ') as commonName, s.rampId, p.pathwayRampId from
                   source s,
                   analytehaspathway ap,
@@ -817,6 +814,24 @@ getPathwayFromAnalyte <- function(analytes = "none",
                   p.type != 'hmdb'
                   group by inputId, rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId
                   order by pathwayName asc")
+
+    if(isSQLite) {
+      sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, s.sourceId as inputId, group_concat(distinct s.commonName COLLATE NOCASE) as commonName, s.rampId, p.pathwayRampId from
+                  source s,
+                  analytehaspathway ap,
+                  pathway p
+                  where
+                  s.sourceId in (", list_metabolite, ")
+                  and
+                  ap.rampId = s.rampId
+                  and
+                  p.pathwayRampId = ap.pathwayRampId
+                  and
+                  p.type != 'hmdb'
+                  group by inputId, s.rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId
+                  order by pathwayName asc")
+    }
+
   } else {
     print("Working on analyte name list...")
     sql <- paste0(
@@ -840,10 +855,35 @@ getPathwayFromAnalyte <- function(analytes = "none",
     order by pathwayName asc
   "
     )
+
+    if(isSQLite) {
+      sql <- paste0(
+        "select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, lower(asyn.Synonym) as inputCommonName, group_concat(distinct s.sourceId COLLATE NOCASE) as sourceIds, s.rampId, p.pathwayRampId
+    from
+    source s,
+    analytesynonym asyn,
+    analytehaspathway ap,
+    pathway p
+    where
+    asyn.Synonym in (", list_metabolite, ")
+    and
+    s.rampId = asyn.rampId
+    and
+    ap.rampId = s.rampId
+    and
+    p.pathwayRampId = ap.pathwayRampId
+    and
+    p.type != 'hmdb'
+    group by inputCommonName, s.rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId
+    order by pathwayName asc
+  "
+      )
+
+    }
+
   }
 
-  con <- connectToRaMP()
-  df2 <- RMariaDB::dbGetQuery(con, sql)
+  df2 <- RaMP::runQuery(sql)
 
 
   if (find_synonym && nrow(df2) > 0) {
@@ -856,14 +896,12 @@ getPathwayFromAnalyte <- function(analytes = "none",
      as synonyms from analytesynonym
      where rampId in (", rampIds, ") group by rampId")
 
-    synonymsDf <- RMariaDB::dbGetQuery(con, sql)
+    synonymsDf <- RaNO::getQuery(sql)
 
     if (nrow(synonymsDf) > 0) {
       df2 <- merge(df2, synonymsDf, by = "rampId")
     }
   }
-
-  RMariaDB::dbDisconnect(con)
 
   if (!includeRaMPids && nrow(df2) > 0) {
     df2 <- subset(df2, select = -c(rampId, pathwayRampId))
@@ -982,8 +1020,8 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
     list_pathways,
     ")"
   )
-  con <- connectToRaMP()
-  idkey <- RMariaDB::dbGetQuery(con, query) %>%
+
+  idkey <- RaMP::runQuery(query) %>%
     dplyr::rename("pathwayId" = "sourceId") ##  %>%
   ## dplyr::rename("rampId" = "pathwayRampId")
 
@@ -995,8 +1033,6 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
     })
     return(out)
   }
-
-  RMariaDB::dbDisconnect(con)
 
   fishers_df <-
     fishers_df %>%
