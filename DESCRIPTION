@@ -35,9 +35,11 @@ Imports:
     jsonlite,
     readxl,
     methods,
-    tibble
+    tibble,
+    BiocFileCache
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Config_ramp_db_url: https://github.com/ncats/RaMP-DB/raw/sqlite/db/RaMP_SQLite_v2.3.0.sqlite.gz
