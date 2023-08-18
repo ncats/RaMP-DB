@@ -20,8 +20,8 @@
     cid <- names(path)
     R.utils::gunzip(path, remove=F)
     newpath <- gsub(".gz", "", path)
-    bfcremove(bfc, cid)
-    bfcadd(bfc, newpath, fname='exact')
+    BiocFileCache::bfcremove(bfc, cid)
+    BiocFileCache::bfcadd(bfc, newpath, fname='exact')
   } else {
     print(paste0("RaMP DB found in BiocFileCache, SQLite File: ",cacheInfo$rpath[1]))
   }
