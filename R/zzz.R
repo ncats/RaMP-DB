@@ -18,7 +18,7 @@
     print("One time retrieval of RaMP Database Cache. This will take about 1 minute to download and unzip.")
     path <- BiocFileCache::bfcadd(bfc, url, fname='exact')
     cid <- names(path)
-    gunzip(path, remove=F)
+    R.utils::gunzip(path, remove=F)
     newpath <- gsub(".gz", "", path)
     bfcremove(bfc, cid)
     bfcadd(bfc, newpath, fname='exact')
