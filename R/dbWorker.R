@@ -65,14 +65,14 @@ setupRdata <- function() {
 
     sql = "select data_key, data_blob from ramp_data_object"
 
-    objs <- runQuery(sql)
+    objs <- RaMP:::runQuery(sql)
 
     for(i in 1:nrow(objs)) {
       varName = objs[i,1]
       blob = objs[i,2]
       blob = blob[[1]]
       obj = memDecompress(from=blob, type = 'gzip', asChar = T)
-      data = data.frame(data.table::fread(obj, sep="\t"), row.names = 1)
+      data = data.frame(data.table::fread(obj, sep="\t"), row.names=1)
       assign(varName, data, envir = .GlobalEnv)
     }
   }
