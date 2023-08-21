@@ -69,6 +69,8 @@ setupRdata <- function() {
 
     for(i in 1:nrow(objs)) {
       varName = objs[i,1]
+      print("Initializing var")
+      print(varName)
       blob = objs[i,2]
       blob = blob[[1]]
       obj = memDecompress(from=blob, type = 'gzip', asChar = T)
