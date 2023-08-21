@@ -15,8 +15,8 @@ setConnectionToRaMP <- function(dbname="ramp",
                        username = "root",
                        conpass = "",
                        host ="localhost",
-		       socket = "", is_sqlite = F, sqlite_file_path = ""){
-  pkg.globals <- new.env()
+		       socket = "", is_sqlite = F){
+  pkg.globals <<- new.env()
   pkg.globals$dbname=dbname
   pkg.globals$username=username
   pkg.globals$conpass=conpass
@@ -29,10 +29,16 @@ setConnectionToRaMP <- function(dbname="ramp",
 
   if(is_sqlite) {
     pkg.globals$is_sqlite = T
-    pkg.globals$sqlite_file_path = sqlite_file_path
+
+    # Verify SQLCache, this will set the path and download file if needed.
+    verifySQLite()
+    #pkg.globals$sqlite_file_path = sqlite_file_path
   }
 
-  return(pkg.globals)
+  message("Setting up in-memory data cache.")
+  setupRdata()
+  message("RaMP Initialized")
+
 }
 
 
