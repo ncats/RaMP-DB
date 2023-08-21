@@ -31,25 +31,50 @@ getRampDbType <- function() {
   return(dbType)
 }
 
+verifySQLite <- function() {
 
-fetchSQLiteDB <- function() {
-  getRaMP
+  message("Checking for existing BiocFileCache entry for the RaMP SQLite Database.")
+  bfc <- BiocFileCache::BiocFileCache(cache = BiocFileCache::getBFCOption("CACHE"), ask=F)
+  cacheInfo <- BiocFileCache::bfcinfo()
+  cacheInfo <- cacheInfo[grepl("RaMP", cacheInfo$rname),]
 
-  url = 'https://github.com/ncats/RaMP-DB/commit/054daa67a1a108436d2a22354cc3a7499913c516'
-
+  if(nrow(cacheInfo) < 1) {
+    message("")
+    message("RaMP Database is not in file cache. Performing a one-time SQLite file download.")
+    url = packageDescription("RaMP")$Config_ramp_db_url
+    message("One time retrieval of RaMP Database Cache. This will take about 1 minute to download and unzip.")
+    path <- BiocFileCache::bfcadd(bfc, url, fname='exact')
+    cid <- names(path)
+    R.utils::gunzip(path, remove=F)
+    newpath <- gsub(".gz", "", path)
+    BiocFileCache::bfcremove(bfc, cid)
+    bfcEntry = BiocFileCache::bfcadd(bfc, newpath, fname='exact')
+    pkg.globals$sqlite_file_path = bfcEntry
+    message("SQLite has been initialized. Using file cache entry:")
+    message(bfcEntry)
+  } else {
+    message("RaMP DB found in BiocFileCache, SQLite File:")
+    message(cacheInfo$rpath[1])
+    pkg.globals$sqlite_file_path = cacheInfo$rpath[1]
+  }
 }
 
 
-getRaMPLibDir <- function() {
-  paths <- .libPaths()
-  rampPath = NULL
-  for(path in paths) {
-    rampPath = paste0(path, "/RaMP")
-    if(file.exists(rampPath)) {
-      print("Hey got the ramp path")
-      break
+setupRdata <- function() {
+  if(!exists("kegg_gene")) {
+
+    sql = "select data_key, data_blob from ramp_data_object"
+
+    objs <- runQuery(sql)
+
+    for(i in 1:nrow(objs)) {
+      varName = objs[i,1]
+      blob = objs[i,2]
+      blob = blob[[1]]
+      obj = memDecompress(from=blob, type = 'gzip', asChar = T)
+      data = data.table::fread(obj, sep="\t")
+      assign(varName, data, envir = .GlobalEnv)
     }
   }
-  print(rampPath)
-  return(rampPath)
 }
+
