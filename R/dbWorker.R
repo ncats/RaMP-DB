@@ -72,7 +72,7 @@ setupRdata <- function() {
       blob = objs[i,2]
       blob = blob[[1]]
       obj = memDecompress(from=blob, type = 'gzip', asChar = T)
-      data = data.frame(data.table::fread(obj, sep="\t"))
+      data = data.frame(data.table::fread(obj, sep="\t"), row.names = 1)
       assign(varName, data, envir = .GlobalEnv)
     }
   }
