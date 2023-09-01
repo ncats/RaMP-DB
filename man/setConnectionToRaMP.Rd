@@ -10,8 +10,7 @@ setConnectionToRaMP(
   conpass = "",
   host = "localhost",
   socket = "",
-  is_sqlite = F,
-  sqlite_file_path = ""
+  is_sqlite = F
 )
 }
 \arguments{

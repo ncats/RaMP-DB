@@ -1,38 +1,94 @@
-#' @importClassesFrom DBI DBIConnection
-#'
 #' @importFrom methods setClassUnion
 #' 
+#' @importClassesFrom DBI DBIDriver
+#'
 #' @noRd
-setClassUnion("DBIConnectionOrNULL", c("DBIConnection", "NULL"))
+setClassUnion("DBIDriverOrNULL", c("DBIDriver", "NULL"))
 
+#' Maybe have an additional slot of type `list` with additional information/
+#' metadata retrieved from the database?
+#'
+#' @noRd
 setClass(
     "RaMP",
     slots = c(
-        dbcon = "DBIConnectionOrNULL",
-        ramp_version = "character"
+        driver = "DBIDriverOrNULL",
+        dbname = "character",
+        username = "character",
+        conpass = "character",
+        host = "character",
+        port = "integer"
     ),
     prototype = prototype(
-        dbcon = NULL,
-        ramp_version = NA_character_
+        driver = NULL,
+        dbname = character(),
+        username = character(),
+        conpass = character(),
+        host = character(),
+        port = integer()
     ))
 
+#' Helper function to return the connection to the database, defined by the
+#' internal settings of the RaMP object.
+#'
+#' @param x `RaMP` object.
+#'
+#' @return a DB connection object.
+#'
+#' @noRd
 .dbcon <- function(x) {
-    x@dbcon
+    con <- dbConnect(x@driver, dbname = .dbname(x), user = .username(x),
+                     password = .conpass(x), host = .host(x), port = .port(x))
+}
+
+.dbname <- function(x) {
+    if (length(x@dbname)) x@dbname
+    else NULL
+}
+
+.username <- function(x) {
+    if (length(x@username)) x@username
+    else NULL
+}
+
+.conpass <- function(x) {
+    if (length(x@conpass)) x@conpass
+    else NULL
+}
+
+.host <- function(x) {
+    if (length(x@host)) x@host
+    else NULL
+}
+
+.port <- function(x) {
+    if (length(x@port)) x@port
+    else NULL
+}
+
+#' Helper function to check if the connection is/will be to a
+#' SQLite database
+#'
+#' @noRd
+.is_sqlite <- function(x) {
+    inherits(x@driver, "SQLiteDriver")
 }
 
 #' @importMethodsFrom methods show
 #'
+#' @importFrom DBI dbDisconnect
+#' 
 #' @exportMethod show
 #'
 #' @rdname RaMP
 setMethod("show", "RaMP", function(object) {
-    if (!is.null(.dbcon(object))) {
-        cat(class(object), "release", object@ramp_version, "\n")
-        ## Maybe get some additional information from the database with e.g.
-        ## number of analytes or versions and list them.
-    } else {
-        cat("RaMP object without connection to a database")
-    }
+    if (is.null(object@driver))
+        cat("Empty RaMP object")
+    con <- .dbcon(object)
+    on.exit(dbDisconnect(con))
+    cat(class(object), "\n")
+    ## Maybe get some additional information from the database with e.g.
+    ## number of analytes or versions and list them.
 })
 
 #' @title Connection to a RaMP database
@@ -62,9 +118,6 @@ setMethod("show", "RaMP", function(object) {
 #'     default (`version = character()`), the most recent release will be
 #'     used.
 #'
-#' @param dbcon optional `DBIConnection` with the direct connection to the
-#'     database.
-#'
 #' @param local `logical(1)` for `listRaMPVersion`: whether remote
 #'     (`local = FALSE`, default) or locally (`local = TRUE`) available RaMP
 #'     versions should be listed.
@@ -78,27 +131,41 @@ setMethod("show", "RaMP", function(object) {
 #' @importFrom DBI dbConnect
 #' 
 #' @export
-RaMP <- function(version = character(), dbcon = NULL) {
-    if (is.null(dbcon)) {
-        db_local <- listRaMPVersions(local = TRUE)
-        if (!length(version)) {
-            ## Get most recent remote version
-            db_remote <- listRaMPVersions(local = FALSE)
-            if (!length(db_remote))
-                stop("Error getting available remote versions")
-            version <- db_remote[length(db_remote)]
-        }
-        if (!version %in% db_local) {
-            ## Only check for remote versions if database not already cached
-            db_remote <- listRaMPVersions(local = FALSE)
-            if (!version %in% db_remote)
-                stop("RaMP version '", version,"' not available. Use ",
-                     "'listRaMPVersions()' to list available versions.")
-        }
-        dbcon <- dbConnect(SQLite(), .get_ramp_db(version))
+RaMP <- function(version = character()) {
+    db_local <- listRaMPVersions(local = TRUE)
+    if (!length(version)) {
+        ## Get most recent remote version
+        db_remote <- listRaMPVersions(local = FALSE)
+        if (!length(db_remote))
+            stop("Error getting available remote versions")
+        version <- db_remote[length(db_remote)]
     }
-    .valid_ramp_database(dbcon, error = TRUE)
-    new("RaMP", dbcon = dbcon, ramp_version = version)
+    if (!version %in% db_local) {
+        ## Only check for remote versions if database not already cached
+        db_remote <- listRaMPVersions(local = FALSE)
+        if (!version %in% db_remote)
+            stop("RaMP version '", version,"' not available. Use ",
+                 "'listRaMPVersions()' to list available versions.")
+    }
+    db <- .RaMP(SQLite(), dbname = .get_ramp_db(version))
+    con <- .dbcon(db)
+    ## Maybe retrieve additional tables or information from the database
+    ## and cache/store that in a slot within the RaMP object?
+    on.exit(dbDisconnect(con))
+    .valid_ramp_database(con, error = TRUE)
+    db
+}
+
+#' Internal constructor - to also support MySQL/MariaDB connections.
+#'
+#' @importFrom RSQLite SQLite
+#'
+#' @noRd
+.RaMP <- function(driver = SQLite(), dbname = character(),
+                  username = character(), conpass = character(),
+                  host = character(), port = integer()) {
+    new("RaMP", driver = driver, dbname = dbname, username = username,
+        conpass = conpass, host = host, port = port)
 }
 
 #' simple validator function checking for validity of a RaMP database.
