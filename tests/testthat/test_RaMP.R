@@ -33,3 +33,21 @@ test_that("RaMP works", {
     ## skip too, unless we can maybe add a stripped down version of the database
     ## into the package.
 })
+
+test_that(".RaMP and accessors work", {
+    dbf <- tempfile()
+    res <- .RaMP(dbname = dbf)
+    expect_s4_class(res, "RaMP")
+    expect_identical(.host(res), NULL)
+    expect_identical(.username(res), NULL)
+    expect_identical(.port(res), NULL)
+    expect_identical(.conpass(res), NULL)
+
+    expect_identical(.dbname(res), dbf)
+
+    expect_output(show(res), "RaMP")
+
+    con <- .dbcon(res)
+    expect_s4_class(con, "SQLiteConnection")
+    dbDisconnect(con)
+})
