@@ -38,7 +38,8 @@ Imports:
     readxl,
     methods,
     tibble,
-    BiocFileCache
+    BiocFileCache,
+    R.utils
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 Suggests: 
