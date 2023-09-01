@@ -354,8 +354,7 @@ runFisherTest <- function(analytes,
     wiki_gene <- wiki_gene
     reactome_metab <- reactome_metab
     reactome_gene <- reactome_gene
-    hmdb_metab <- hmdb_metab
-    hmdb_gene <- hmdb_gene
+
     count <- 1
     pval2 <- userinpath2 <- totinpath2 <- c()
 
@@ -375,9 +374,6 @@ runFisherTest <- function(analytes,
         } else if (i %in% reactome_metab$pathwayRampId) {
           tot_in_pathway <- reactome_metab[which(reactome_metab[, "pathwayRampId"] == i), "Freq"]
           total_analytes <- react_totanalytes
-        } else if (i %in% hmdb_metab$pathwayRampId) {
-          tot_in_pathway <- hmdb_metab[which(hmdb_metab[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- NULL
         } else {
           tot_in_pathway <- 0
           total_analytes <- NULL
@@ -392,9 +388,6 @@ runFisherTest <- function(analytes,
         } else if (i %in% reactome_gene$pathwayRampId) {
           tot_in_pathway <- reactome_gene[which(reactome_gene[, "pathwayRampId"] == i), "Freq"]
           total_analytes <- react_totanalytes
-        } else if (i %in% hmdb_gene$pathwayRampId) {
-          tot_in_pathway <- hmdb_gene[which(hmdb_gene[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- NULL
         } else {
           tot_in_pathway <- 0
           total_analytes <- NULL
