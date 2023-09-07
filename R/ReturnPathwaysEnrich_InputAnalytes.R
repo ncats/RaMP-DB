@@ -88,12 +88,22 @@ runFisherTest <- function(analytes,
       if (biospecimen == "Adipose") {
         biospecimen <- "Adipose tissue"
       }
+
+      # we don't need all fields from all tables joined
       # Get metabolites that belong to a specific biospecimen
+      # query <- paste0(
+      #   "SELECT analytehasontology.*, ontology.*, analytehaspathway.* from analytehasontology, ontology, analytehaspathway where ontology.commonName in ('",
+      #   biospecimen,
+      #   "') and ontology.rampOntologyId = analytehasontology.rampOntologyId and analytehasontology.rampCompoundId = analytehaspathway.rampId"
+      # )
+
+      # less data pull back
       query <- paste0(
-        "SELECT analytehasontology.*, ontology.*, analytehaspathway.* from analytehasontology, ontology, analytehaspathway where ontology.commonName in ('",
+        "SELECT analytehaspathway.* from analytehasontology, ontology, analytehaspathway where ontology.commonName in ('",
         biospecimen,
-        "') and ontology.rampOntologyId = analytehasontology.rampOntologyId and analytehasontology.rampCompoundId = analytehaspathway.rampId"
+        "') and analytehasontology.rampOntologyId = ontology.rampOntologyId and analytehasontology.rampCompoundId = analytehaspathway.rampId"
       )
+
       con <- connectToRaMP()
       backgrounddf <- RMariaDB::dbGetQuery(con, query)
       RMariaDB::dbDisconnect(con)
@@ -152,7 +162,7 @@ runFisherTest <- function(analytes,
 
   # Get the total number of metabolites that are mapped to pathways in RaMP (that's the default background)
   # added conditional to not pull hmdb ids
-  query <- "select * from analytehaspathway where pathwaySource != 'hmdb';"
+  query <- "select distinct rampId, pathwaySource from analytehaspathway where pathwaySource != 'hmdb';"
   con <- connectToRaMP()
   allids <- RMariaDB::dbGetQuery(con, query)
 
@@ -204,9 +214,13 @@ runFisherTest <- function(analytes,
   # Loop through each pathway, build the contingency table, and calculate Fisher's Exact
   # test p-value
   pval <- totinpath <- userinpath <- pidused <- c()
+
+  pidCount = 0
+
   for (i in pid) {
     ids_inpath <- pathwaydf[which(pathwaydf$pathwayRampId == i), "rampId"]
 
+    pidCount = pidCount + 1
 
     if (analyte_type == "metabolites") {
       # Check to make sure that this pathway does have metabolites
@@ -219,13 +233,15 @@ runFisherTest <- function(analytes,
           bg_in_pathway <- length(unique(grep("RAMP_C", ids_inpath_bg, value = TRUE)))
         }
       }
-      inputkegg <- segregated_id_list[[1]][1][[1]]
-      inputreact <- segregated_id_list[[1]][2][[1]]
-      inputwiki <- segregated_id_list[[1]][3][[1]]
-      inputcustom <- segregated_id_list[[1]][[4]]
-      tot_user_analytes <- length(grep("RAMP_C", unique(pathwaydf$rampId)))
-      if (background_type != "database") {
-        tot_bg_analytes <- length(grep("RAMP_C", unique(backgrounddf$rampId)))
+      if(pidCount == 1) {
+        inputkegg <- segregated_id_list[[1]][1][[1]]
+        inputreact <- segregated_id_list[[1]][2][[1]]
+        inputwiki <- segregated_id_list[[1]][3][[1]]
+        inputcustom <- segregated_id_list[[1]][[4]]
+        tot_user_analytes <- length(grep("RAMP_C", unique(pathwaydf$rampId)))
+        if (background_type != "database") {
+          tot_bg_analytes <- length(grep("RAMP_C", unique(backgrounddf$rampId)))
+        }
       }
     } else { # if genes
       # Check to make sure that this pathway does have genes
@@ -234,11 +250,13 @@ runFisherTest <- function(analytes,
       } else {
         user_in_pathway <- length(unique(grep("RAMP_G", ids_inpath, value = TRUE)))
       }
-      inputkegg <- segregated_id_list[[2]][1][[1]]
-      inputreact <- segregated_id_list[[2]][2][[1]]
-      inputwiki <- segregated_id_list[[2]][3][[1]]
-      inputcustom <- segregated_id_list[[2]][[4]]
-      tot_user_analytes <- length(grep("RAMP_G", unique(pathwaydf$rampId)))
+      if(pidCount == 1) {
+        inputkegg <- segregated_id_list[[2]][1][[1]]
+        inputreact <- segregated_id_list[[2]][2][[1]]
+        inputwiki <- segregated_id_list[[2]][3][[1]]
+        inputcustom <- segregated_id_list[[2]][[4]]
+        tot_user_analytes <- length(grep("RAMP_G", unique(pathwaydf$rampId)))
+      }
       ## tot_bg_analytes <- length(grep("RAMP_G", unique(backgrounddf$rampId)))
     }
     if ((!is.na(inputkegg$pathwayRampId[1])) && i %in% inputkegg$pathwayRampId) {
