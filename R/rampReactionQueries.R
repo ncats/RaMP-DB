@@ -159,8 +159,9 @@ getReactionsForRaMPCompoundIds <- function(rampCompoundIds, onlyHumanMets=F, hum
     query <- paste0(query, " and rxn.is_transport = 0")
   }
 
-  df <- RaMP::runQuery(query)
-
+  conn <- connectToRaMP()
+  df <- RMariaDB::dbGetQuery(conn,query)
+  RMariaDB::dbDisconnect(conn=conn)
   return(df)
 }
 
@@ -204,8 +205,9 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
     query <- paste0(query, " and rxn.is_transport = 0")
   }
 
-  df <- RaMP::runQuery(query)
-
+  conn <- connectToRaMP()
+  df <- RMariaDB::dbGetQuery(conn,query)
+  RMariaDB::dbDisconnect(conn=conn)
   return(df)
 }
 
@@ -232,7 +234,9 @@ getRampSourceInfoFromAnalyteIDs <- function(analytes) {
 
   query = paste("select distinct sourceId, rampId, geneOrCompound from source where sourceId in (",analyteStr,")")
 
-  df <- RaMP::runQuery(query)
+  conn <- connectToRaMP()
+  df <- RMariaDB::dbGetQuery(conn,query)
+  RMariaDB::dbDisconnect(conn=conn)
 
   return(df)
 }
