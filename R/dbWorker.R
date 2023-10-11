@@ -13,25 +13,16 @@
 #'     (`db = RaMP()`) a connection to the most recent version is established,
 #'     which will be downloaded first if it does not already exist in the local
 #'     cache.
-#' 
+#'
 #' @return The result from the query.
 #'
 #' @importMethodsFrom DBI dbGetQuery
-#' 
+#'
 #' @export
 runQuery <- function(sql, db = RaMP()) {
     con <- .dbcon(db)
     on.exit(dbDisconnect(con))
     dbGetQuery(con, sql)
-  ##   conn = RaMP::connectToRaMP()
-  ## if(get("is_sqlite",pkg.globals)) {
-  ##   rs <- RSQLite::dbGetQuery(conn, sql)
-  ##   RSQLite::dbDisconnect(conn)
-  ## } else {
-  ##   rs <- RMariaDB::dbGetQuery(conn, sql)
-  ##   RMariaDB::dbDisconnect(conn)
-  ## }
-  ## return(rs)
 }
 
 
@@ -78,21 +69,24 @@ verifySQLite <- function() {
 }
 
 
-setupRdata <- function() {
-  if(!exists("kegg_gene")) {
+setupRdata <- function(db = RaMP()) {
 
-    sql = "select data_key, data_blob from ramp_data_object"
+  sql = "select data_key, data_blob from ramp_data_object"
 
-    objs <- RaMP:::runQuery(sql)
+  objs <- RaMP:::runQuery(sql, db)
 
-    for(i in 1:nrow(objs)) {
-      varName = objs[i,1]
-      blob = objs[i,2]
-      blob = blob[[1]]
-      obj = memDecompress(from=blob, type = 'gzip', asChar = T)
-      data = data.frame(data.table::fread(obj, sep="\t"), row.names = 1)
-      assign(varName, data, envir = .GlobalEnv)
-    }
+  dbSummaryData = list()
+
+  for(i in 1:nrow(objs)) {
+    varName = objs[i,1]
+    blob = objs[i,2]
+    blob = blob[[1]]
+    obj = memDecompress(from=blob, type = 'gzip', asChar = T)
+    data = data.frame(data.table::fread(obj, sep="\t"), row.names = 1)
+    dbSummaryData[[varName]] <- data
+    # assign(varName, data, envir = .GlobalEnv)
   }
+
+  return(dbSummaryData)
 }
 

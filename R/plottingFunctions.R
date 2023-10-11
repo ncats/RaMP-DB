@@ -65,10 +65,10 @@ plotCataNetwork <- function(catalyzedf = "") {
 #' @param sig_cutoff Aesthetic, shows pvalue cutoff for significant pathways
 #' @param interactive If TRUE, return interactive plotly object instead of ggplot object
 #' @export
-pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.2,
+pathwayResultsPlot <- function(db = RaMP(), pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.2,
                                  perc_pathway_overlap = 0.2, min_pathway_tocluster = 3,
                                  text_size = 16, sig_cutoff = 0.05, interactive=FALSE) {
-    fishClustering <- findCluster(pathwaysSig,
+    fishClustering <- findCluster(db = db, pathwaysSig,
                                   perc_analyte_overlap = perc_analyte_overlap,
                                   perc_pathway_overlap = perc_pathway_overlap,
                                   min_pathway_tocluster = min_pathway_tocluster

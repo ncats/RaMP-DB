@@ -19,7 +19,7 @@
 #'	"sphingolipid metabolism"))
 #' }
 #' @export
-getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", max_pathway_size = Inf, names_or_ids="names") {
+getAnalyteFromPathway <- function(db = RaMP(), pathway, match="exact", analyte_type="both", max_pathway_size = Inf, names_or_ids="names") {
   now <- proc.time()
   print("fired!")
   if(is.character(pathway)){
@@ -46,7 +46,7 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
     match = 'exact'
   }
 
-  isSQLite = get("is_sqlite", pkg.globals)
+  isSQLite = .is_sqlite(db)
 
   # Retrieve pathway RaMP ids
   if (match=='exact') {
@@ -86,7 +86,7 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
     order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;")
     }
 
-    df <- RaMP::runQuery(sql)
+    df <- RaMP::runQuery(sql, db)
 
   } else if(match == 'fuzzy') {
     df = data.frame(matrix(nrow=0, ncol=7))
@@ -127,7 +127,7 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", m
     for(p in pathway) {
       if(nchar(p)>2) {
         currSQL = gsub(pattern = '[SOME_PW_NAME]', replacement = p, x= sql, fixed = T )
-        subdf <- RaMP::runQuery(currSQL)
+        subdf <- RaMP::runQuery(currSQL, db)
         df <- rbind(df, subdf)
       }
     }

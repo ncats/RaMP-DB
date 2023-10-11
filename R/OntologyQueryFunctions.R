@@ -11,7 +11,7 @@
 #' getOntoFromMeta("hmdb:HMDB0071437")
 #' }
 #' @export
-getOntoFromMeta <- function(analytes, NameOrIds = "ids") {
+getOntoFromMeta <- function(db = RaMP(), analytes, NameOrIds = "ids") {
   if (!(NameOrIds %in% c("ids", "name"))) {
     stop("Specifiy the type of given data to 'ids' or 'name'")
   }
@@ -41,7 +41,7 @@ getOntoFromMeta <- function(analytes, NameOrIds = "ids") {
     cat(file = stderr(), "query sql in Package call with -- ", sql, "\n")
   }
 
-  df <- RaMP::runQuery(sql)
+  df <- RaMP::runQuery(sql, db)
 
   if (nrow(df) == 0) {
     message("This source id
@@ -58,7 +58,7 @@ getOntoFromMeta <- function(analytes, NameOrIds = "ids") {
     rampid, ");"
   )
 
-  df2 <- RaMP::runQuery(sql)
+  df2 <- RaMP::runQuery(sql, db)
 
   if (nrow(df2) == 0) {
     message("No searching result because these metabolites are not linked to ontology")
@@ -73,7 +73,7 @@ getOntoFromMeta <- function(analytes, NameOrIds = "ids") {
     rampontoid, ");"
   )
 
-  df3 <- RaMP::runQuery(sql)
+  df3 <- RaMP::runQuery(sql, db)
 
   mdf <- unique(merge(df3, df2, all.x = T))
   mdf <- unique(merge(mdf, df,
@@ -105,7 +105,7 @@ getOntoFromMeta <- function(analytes, NameOrIds = "ids") {
 #' }
 #' @importFrom rlang .data
 #' @export
-getMetaFromOnto <- function(ontology) {
+getMetaFromOnto <- function(db = RaMP(), ontology) {
 
   print("Retreiving Metabolites for input ontology terms.")
   now <- proc.time()
@@ -155,7 +155,7 @@ getMetaFromOnto <- function(ontology) {
           group by o.commonName, s.rampId, o.HMDBOntologyType")
     }
 
-    mdf_final <- RaMP::runQuery(sql)
+    mdf_final <- RaMP::runQuery(sql, db)
 
     mdf_final <- unique(mdf_final)
     mdf_final <- mdf_final[,c(4,5,3,2)]

@@ -34,7 +34,7 @@
 #' head(chemProps$chem_props)
 #'}
 #' @export
-getChemicalProperties <- function(mets, propertyList = 'all'){
+getChemicalProperties <- function(db = RaMP(), mets, propertyList = 'all'){
 
   message("Starting Chemical Property Query")
 
@@ -49,7 +49,7 @@ getChemicalProperties <- function(mets, propertyList = 'all'){
   if(length(grep("all",propertyList))==1) {
     sql <- paste0("select * from chem_props where chem_source_id in (",metStr,")")
   } else {
-      propList <- buildPropertyList(propertyList);
+      propList <- buildPropertyList(db, propertyList);
       if(startsWith(propList, "Error")) {
         message(propList)
         return(NULL)
@@ -58,7 +58,7 @@ getChemicalProperties <- function(mets, propertyList = 'all'){
                    "where chem_source_id in (",metStr,")")
   }
 
-  metsData <- RaMP:::runQuery(sql)
+  metsData <- RaMP:::runQuery(sql, db)
   foundMets <- unique(metsData$chem_source_id)
 
   result[['chem_props']] <- metsData
@@ -80,18 +80,18 @@ getChemicalProperties <- function(mets, propertyList = 'all'){
 
 # Internal function to validate property list
 # @param propList an optional list of specific properties to extract.  Options include 'all' (default),  'iso_smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'.
-buildPropertyList <- function(propList) {
+buildPropertyList <- function(db = RaMP(), propList) {
 
   # validate that all properties are valid
   #  validProperties <- c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name')
 
-  if(get("is_sqlite", pkg.globals)) {
+  if(.is_sqlite(db)) {
     sql = 'pragma table_info(chem_props)'
-    ramptypes <- RaMP:::runQuery(sql)
+    ramptypes <- RaMP:::runQuery(sql, db)
     ramptypes <- unlist(ramptypes$name)
   } else {
     sql = 'describe chem_props'
-    ramptypes <- RaMP:::runQuery(sql)
+    ramptypes <- RaMP:::runQuery(sql, db)
     ramptypes <- unlist(ramptypes$Field)
   }
 

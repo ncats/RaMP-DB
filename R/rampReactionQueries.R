@@ -14,14 +14,14 @@
 #' @export
 #'
 #' @examples
-getReactionsForAnalytes <- function(analytes, analyteType='metabolites', namesOrIds='ids', onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN")) {
+getReactionsForAnalytes <- function(db = RaMP(), analytes, analyteType='metabolites', namesOrIds='ids', onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN")) {
 
   genes <- data.frame()
   metabolites <- data.frame()
   mdf <- data.frame()
   gdf <- data.frame()
   if(namesOrIds == 'ids') {
-    analyteSourceInfo <- getRampSourceInfoFromAnalyteIDs(analytes)
+    analyteSourceInfo <- getRampSourceInfoFromAnalyteIDs(db = db, analytes = analytes)
     resultGenes <- analyteSourceInfo[analyteSourceInfo$geneOrCompound == 'gene',]
     resultMets <- analyteSourceInfo[analyteSourceInfo$geneOrCompound == 'compound',]
 
@@ -31,7 +31,7 @@ getReactionsForAnalytes <- function(analytes, analyteType='metabolites', namesOr
 
       mets <- resultMets[,c('sourceId', 'rampId')]
       rampIds <- unique(unlist(mets$rampId))
-      mdf <- getReactionsForRaMPCompoundIds(rampCompoundIds=rampIds, onlyHumanMets=onlyHumanMets, humanProtein=humanProtein, includeTransportRxns=includeTransportRxns, rxnDirs=rxnDirs)
+      mdf <- getReactionsForRaMPCompoundIds(db = db, rampCompoundIds=rampIds, onlyHumanMets=onlyHumanMets, humanProtein=humanProtein, includeTransportRxns=includeTransportRxns, rxnDirs=rxnDirs)
       if(nrow(mdf) > 0) {
         mdf <- merge(mets, mdf, by.x='rampId', by.y='ramp_cmpd_id')
       }
@@ -131,7 +131,7 @@ getReactionsForAnalytes <- function(analytes, analyteType='metabolites', namesOr
 #' @return returns a dataframe of reaction information for each ramp compound id
 #'
 #' @examples
-getReactionsForRaMPCompoundIds <- function(rampCompoundIds, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN")) {
+getReactionsForRaMPCompoundIds <- function(db = RaMP(), rampCompoundIds, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN")) {
 
   idStr <- listToQueryString(rampCompoundIds)
   query <- paste0("select mr.ramp_rxn_id, mr.ramp_cmpd_id, mr.met_source_id, mr.substrate_product, mr.is_cofactor, mr.met_name,
@@ -159,7 +159,7 @@ getReactionsForRaMPCompoundIds <- function(rampCompoundIds, onlyHumanMets=F, hum
     query <- paste0(query, " and rxn.is_transport = 0")
   }
 
-  df <- RaMP::runQuery(query)
+  df <- RaMP::runQuery(query, db)
 
   return(df)
 }
@@ -176,7 +176,7 @@ getReactionsForRaMPCompoundIds <- function(rampCompoundIds, onlyHumanMets=F, hum
 #' @return returns a dataframe of reaction information for each ramp compound id
 #'
 #' @examples
-getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN")) {
+getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN")) {
 
   idStr <- listToQueryString(rampGeneIds)
   query <- paste0("select gr.ramp_rxn_id, gr.ramp_gene_id, gr.uniprot, gr.protein_name,
@@ -204,7 +204,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
     query <- paste0(query, " and rxn.is_transport = 0")
   }
 
-  df <- RaMP::runQuery(query)
+  df <- RaMP::runQuery(query, db)
 
   return(df)
 }
@@ -226,13 +226,13 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
 #' @return returns a dataframe of ramp analyte source information
 #'
 #' @examples
-getRampSourceInfoFromAnalyteIDs <- function(analytes) {
+getRampSourceInfoFromAnalyteIDs <- function(db = RaMP(), analytes) {
 
   analyteStr <- listToQueryString(analytes)
 
   query = paste("select distinct sourceId, rampId, geneOrCompound from source where sourceId in (",analyteStr,")")
 
-  df <- RaMP::runQuery(query)
+  df <- RaMP::runQuery(query, db)
 
   return(df)
 }

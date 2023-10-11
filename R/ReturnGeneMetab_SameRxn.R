@@ -15,7 +15,7 @@
 #' rampFastCata(analytes="creatine",NameOrIds="names")
 #' }
 #' @export
-rampFastCata <- function(analytes="none", NameOrIds="ids") {
+rampFastCata <- function(db = RaMP(), analytes="none", NameOrIds="ids") {
 
   rampId <- pathwayRampId <- c()
   if(length(analytes)==1){
@@ -43,7 +43,7 @@ rampFastCata <- function(analytes="none", NameOrIds="ids") {
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
 
-  isSQLite = get("is_sqlite", pkg.globals)
+  isSQLite = .is_sqlite(db)
 
   if(NameOrIds == 'ids') {
 
@@ -71,7 +71,7 @@ rampFastCata <- function(analytes="none", NameOrIds="ids") {
 
     print("Building metabolite to gene relations.")
 
-    df1 <- RaMP::runQuery(metQuery)
+    df1 <- RaMP::runQuery(metQuery, db)
 
     print(paste0("Number of met2gene relations: ",(nrow(df1))))
 
@@ -95,7 +95,7 @@ rampFastCata <- function(analytes="none", NameOrIds="ids") {
     }
     print("Building gene to metabolite relations.")
 
-    df2 <- RaMP::runQuery(geneQuery)
+    df2 <- RaMP::runQuery(geneQuery, db)
 
   } else {
 
@@ -126,7 +126,7 @@ rampFastCata <- function(analytes="none", NameOrIds="ids") {
 
     print("Building metabolite to gene relations.")
 
-    df1 <- RaMP::runQuery(metQuery)
+    df1 <- RaMP::runQuery(metQuery, db)
 
     print(paste0("Number of met2gene relations: ",(nrow(df1))))
 
@@ -151,7 +151,7 @@ rampFastCata <- function(analytes="none", NameOrIds="ids") {
     }
     print("Building gene to metabolite relations.")
 
-    df2 <- RaMP::runQuery(geneQuery)
+    df2 <- RaMP::runQuery(geneQuery, db)
 
     print(paste0("Number of gene2met relations: ",(nrow(df2))))
   }
@@ -206,7 +206,7 @@ rampFastCata <- function(analytes="none", NameOrIds="ids") {
 #' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
 #' rampFastCata(analytes="creatine",NameOrIds="names")
 #' }
-rampFastCataOriginal <- function(analytes="none", NameOrIds="ids") {
+rampFastCataOriginal <- function(db = RaMP(), analytes="none", NameOrIds="ids") {
     if(length(analytes)==1){
         if(analytes=="none"){
     stop("Please provide input analytes")}}
@@ -244,7 +244,7 @@ rampFastCataOriginal <- function(analytes="none", NameOrIds="ids") {
   }
 
   # Retrieves Name, RaMPID and type (gene or compound) for input
-  df1 <- RaMP::runQuery(query1)
+  df1 <- RaMP::runQuery(query1, db)
 
   #print(df1$rampId)
   df_c <- df_g <- NULL
@@ -267,7 +267,7 @@ rampFastCataOriginal <- function(analytes="none", NameOrIds="ids") {
       query_c <- paste0("select rampCompoundId as rampId,rampGeneId as rampId2 from catalyzed where rampCompoundId in (",c_id,");")
       print("Geting gene Id from Compound Id ...")
 
-      df_c2 <- RaMP::runQuery(query_c)
+      df_c2 <- RaMP::runQuery(query_c, db)
 
       if(nrow(df_c2) == 0){
         message("No genes found in same reaction as input metabolite")
@@ -281,7 +281,7 @@ rampFastCataOriginal <- function(analytes="none", NameOrIds="ids") {
         query2 <- paste0("select * from source
              		where rampId in (",analyte2_list,");")
 
-        df_c3 <- RaMP::runQuery(query2)
+        df_c3 <- RaMP::runQuery(query2, db)
 
         if(nrow(df_c3) == 0){
           message("Cannot retrieve names for those metabolites")
@@ -336,7 +336,7 @@ rampFastCataOriginal <- function(analytes="none", NameOrIds="ids") {
       # Get rampID for genes and catalyzed metabolites
       query_g <- paste0("select * from catalyzed where rampGeneId in (",g_id,");")
 
-      df_g2 <- RaMP::runQuery(con,query_g)
+      df_g2 <- RaMP::runQuery(con,query_g, db)
 
       if(nrow(df_g2) == 0){
         message("Could not find metabolites in same reaction as input genes")
@@ -349,7 +349,7 @@ rampFastCataOriginal <- function(analytes="none", NameOrIds="ids") {
         # Get names for metabolite IDs
         query2 <- paste0("select * from source where rampId in (",analyte2_list,");")
 
-        df_g3 <-RaMP::runQuery(query2)
+        df_g3 <-RaMP::runQuery(query2, db)
 
         if(nrow(df_g3) == 0){
           message("Cannot retrieve names for those genes")
