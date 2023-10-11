@@ -8,13 +8,13 @@
 #' getCurrentRaMPVersion()
 #' }
 #' @export
-getCurrentRaMPVersion<-function(justVersion=T){
+getCurrentRaMPVersion<-function(db = RaMP(), justVersion=T){
   if(justVersion) {
     query<-"select ramp_version from db_version where load_timestamp order by load_timestamp desc limit 1"
   } else {
     query<-"select ramp_version, load_timestamp, version_notes, db_sql_url  from db_version where load_timestamp order by load_timestamp desc limit 1"
   }
-  results <- RaMP::runQuery(query)
+  results <- RaMP::runQuery(query, db)
   return(results)
 }
 
@@ -26,9 +26,9 @@ getCurrentRaMPVersion<-function(justVersion=T){
 #' getCurrentRaMPDBVersions()
 #' }
 #' @export
-getCurrentRaMPSourceDBVersions<-function(){
+getCurrentRaMPSourceDBVersions<-function(db = RaMP()){
   query1<- "select * from version_info where status = 'current'"
-  results<- RaMP::runQuery(query1)
+  results<- RaMP::runQuery(query1, db)
   return(results)
 }
 
@@ -40,10 +40,10 @@ getCurrentRaMPSourceDBVersions<-function(){
 #' getEntityCountsFromSourceDBs()
 #' }
 #' @export
-getEntityCountsFromSourceDBs<-function(){
+getEntityCountsFromSourceDBs<-function(db = RaMP()){
   entity_source_name <- entity_count <- c()
   query1<-"select * from entity_status_info"
-  results<- RaMP::runQuery(query1)
+  results<- RaMP::runQuery(query1, db)
   results<-results[,-2]
   results<-results %>% tidyr::spread(unique(entity_source_name),entity_count)
   results[is.na(results)]=0
@@ -62,7 +62,7 @@ getEntityCountsFromSourceDBs<-function(){
 #' jsonResult <- getRaMPAnalyteIntersections(analyteType='genes', format='json')
 #' }
 #' @export
-getRaMPAnalyteIntersections<-function(analyteType='metabolites', format='json', scope='mapped-to-pathway'){
+getRaMPAnalyteIntersections<-function(db = RaMP(), analyteType='metabolites', format='json', scope='mapped-to-pathway'){
   if(analyteType == 'metabolites') {
     if(scope == 'global') {
       query<-"select met_intersects_json from db_version where load_timestamp order by load_timestamp desc limit 1"
@@ -81,7 +81,7 @@ getRaMPAnalyteIntersections<-function(analyteType='metabolites', format='json', 
     return(data.frame())
   }
 
-  results<-RaMP::runQuery(query)
+  results<-RaMP::runQuery(query, db)
 
   if(format == 'json') {
     if(nrow(results)>0) {
@@ -127,9 +127,9 @@ getRaMPAnalyteIntersections<-function(analyteType='metabolites', format='json', 
 #' getPathwayNameList()
 #' }
 #' @export
-getPathwayNameList <- function(){
+getPathwayNameList <- function(db = RaMP()){
   query1<-"select pathwayName from pathway;"
-  results<-RaMP::runQuery(query1)
+  results<-RaMP::runQuery(query1, db)
   return(sort(unique(results$pathwayName)))
 }
 

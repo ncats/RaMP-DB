@@ -1,5 +1,5 @@
 #' @importFrom methods setClassUnion
-#' 
+#'
 #' @importClassesFrom DBI DBIDriver
 #'
 #' @noRd
@@ -17,7 +17,8 @@ setClass(
         username = "character",
         conpass = "character",
         host = "character",
-        port = "integer"
+        port = "integer",
+        dbSummaryObjCache = "list"
     ),
     prototype = prototype(
         driver = NULL,
@@ -25,7 +26,8 @@ setClass(
         username = character(),
         conpass = character(),
         host = character(),
-        port = integer()
+        port = integer(),
+        dbSummaryObjCache = list()
     ))
 
 #' Helper function to return the connection to the database, defined by the
@@ -37,8 +39,8 @@ setClass(
 #'
 #' @noRd
 .dbcon <- function(x) {
-    con <- dbConnect(x@driver, dbname = .dbname(x), user = .username(x),
-                     password = .conpass(x), host = .host(x), port = .port(x))
+  con <- dbConnect(drv = x@driver, dbname = .dbname(x), username = .username(x),
+                            password = .conpass(x), host = .host(x), port = .port(x))
 }
 
 .dbname <- function(x) {
@@ -77,7 +79,7 @@ setClass(
 #' @importMethodsFrom methods show
 #'
 #' @importFrom DBI dbDisconnect
-#' 
+#'
 #' @exportMethod show
 #'
 #' @rdname RaMP
@@ -94,7 +96,7 @@ setMethod("show", "RaMP", function(object) {
 #' @title Connection to a RaMP database
 #'
 #' @aliases show
-#' 
+#'
 #' @description
 #'
 #' Connections to a *RaMP* database can be established and managed with the
@@ -111,7 +113,7 @@ setMethod("show", "RaMP", function(object) {
 #'   it will be downloaded and cached. Use `listRaMPVersions()` to list
 #'   available local or remote databases. Alternatively, the connection to a
 #'   RaMP database can be directly provided through parameter `dbcon`.
-#' 
+#'
 #' - `listRaMPVersions`: list available local or remote RaMP database releases.
 #'
 #' @param version `character(1)` specifying the RaMP version to load. By
@@ -121,7 +123,7 @@ setMethod("show", "RaMP", function(object) {
 #' @param local `logical(1)` for `listRaMPVersion`: whether remote
 #'     (`local = FALSE`, default) or locally (`local = TRUE`) available RaMP
 #'     versions should be listed.
-#' 
+#'
 #' @name RaMP
 #'
 #' @importFrom methods new
@@ -129,7 +131,7 @@ setMethod("show", "RaMP", function(object) {
 #' @importFrom RSQLite SQLite
 #'
 #' @importFrom DBI dbConnect
-#' 
+#'
 #' @export
 RaMP <- function(version = character()) {
     db_local <- listRaMPVersions(local = TRUE)
@@ -151,6 +153,10 @@ RaMP <- function(version = character()) {
     con <- .dbcon(db)
     ## Maybe retrieve additional tables or information from the database
     ## and cache/store that in a slot within the RaMP object?
+
+    # add the cache of summary data objects for enrichment
+    db@dbSummaryObjCache <- setupRdata(db)
+
     on.exit(dbDisconnect(con))
     .valid_ramp_database(con, error = TRUE)
     db
@@ -165,13 +171,13 @@ RaMP <- function(version = character()) {
                   username = character(), conpass = character(),
                   host = character(), port = integer()) {
     new("RaMP", driver = driver, dbname = dbname, username = username,
-        conpass = conpass, host = host, port = port)
+        conpass = conpass, host = host, port = port, dbSummaryObjCache = list())
 }
 
 #' simple validator function checking for validity of a RaMP database.
 #'
 #' @importFrom DBI dbListTables
-#' 
+#'
 #' @noRd
 .valid_ramp_database <- function(con, error = FALSE) {
     .required_tables <- c("db_version", "version_info", "analyte")
@@ -211,10 +217,10 @@ listRaMPVersions <- function(local = FALSE) {
 #' @importFrom BiocFileCache BiocFileCache getBFCOption bfcinfo bfcadd bfcremove
 #'
 #' @description
-#' 
+#'
 #' Check if a RaMP-DB for the specific version is available and download it
 #' otherwise.
-#' 
+#'
 #' @noRd
 .get_ramp_db <- function(version) {
     bfc <- BiocFileCache(cache = getBFCOption("CACHE"), ask = FALSE)
