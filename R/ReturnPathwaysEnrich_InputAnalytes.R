@@ -893,12 +893,14 @@ getPathwayFromAnalyte <- function(analytes = "none",
   return(df2)
 }
 
-
-##' @param analytes a vector of analytes (genes or metabolites) that need to be searched
-##' @param pathways If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows
-##' @param analyte_type "genes" or "metabolites"
-##' @return A pathwaydf compatible with runFisherTest
-##' @author Andrew Patt
+#' Reads an excel file containing metabolite and gene annotations and filters pathways
+#' to those pathways represented by the input analytes.
+#'
+#' @param analytes a vector of analytes (genes or metabolites) that need to be searched
+#' @param pathways If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows
+#' @param analyte_type "genes" or "metabolites"
+#' @return A pathwaydf compatible with runFisherTest
+#' @author Andrew Patt
 getCustomPathwayFromAnalyte <- function(analytes, pathways, analyte_type) {
   print("Starting getCustomPathwayFromAnalyte()")
   tryCatch(
