@@ -348,12 +348,12 @@ runFisherTest <- function(db = RaMP(), analytes,
     # We're collecting p-values for all pathways, now those with no analyte support at all - JCB:?
 
     # calculating p-values for all other pathways
-    kegg_metab <- kegg_metab
-    kegg_gene <- kegg_gene
-    wiki_metab <- wiki_metab
-    wiki_gene <- wiki_gene
-    reactome_metab <- reactome_metab
-    reactome_gene <- reactome_gene
+    kegg_metab <- db@dbSummaryObjCache$kegg_metab
+    kegg_gene <- db@dbSummaryObjCache$kegg_metab
+    wiki_metab <- db@dbSummaryObjCache$wiki_metab
+    wiki_gene <- db@dbSummaryObjCache$wiki_gene
+    reactome_metab <- db@dbSummaryObjCache$reactome_metab
+    reactome_gene <- db@dbSummaryObjCache$reactome_gene
 
     count <- 1
     pval2 <- userinpath2 <- totinpath2 <- c()
@@ -1048,9 +1048,9 @@ findCluster <- function(db = RaMP(), fishers_df, perc_analyte_overlap = 0.5,
     return(output)
   } else {
     # similarity_matrix_list<-loadOverlapMatrices()
-    similarity_matrix_gene <- genes_result
-    similarity_matrix_analyte <- analyte_result
-    similarity_matrix_metab <- metabolites_result
+    similarity_matrix_gene <- db@dbSummaryObjCache$genes_result
+    similarity_matrix_analyte <- db@dbSummaryObjCache$analyte_result
+    similarity_matrix_metab <- db@dbSummaryObjCache$metabolites_result
     if (analyte_type == "both") {
       # similarity_matrix = similarity_matrix_list[["analyte"]]
       similarity_matrix <- similarity_matrix_analyte

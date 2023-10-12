@@ -43,7 +43,7 @@ getReactionsForAnalytes <- function(db = RaMP(), analytes, analyteType='metaboli
 
       genes <- resultGenes[,c('sourceId', 'rampId')]
       rampIds <- unique(unlist(genes$rampId))
-      gdf <- getReactionsForRaMPGeneIds(rampGeneIds=rampIds, onlyHumanMets=onlyHumanMets, humanProtein=humanProtein, includeTransportRxns)
+      gdf <- getReactionsForRaMPGeneIds(db = db, rampGeneIds=rampIds, onlyHumanMets=onlyHumanMets, humanProtein=humanProtein, includeTransportRxns)
       if(nrow(gdf) > 0) {
         gdf <- merge(genes, gdf, by.x='rampId', by.y='ramp_gene_id')
       }
@@ -179,10 +179,10 @@ getReactionsForRaMPCompoundIds <- function(db = RaMP(), rampCompoundIds, onlyHum
 getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN")) {
 
   idStr <- listToQueryString(rampGeneIds)
-  query <- paste0("select gr.ramp_rxn_id, gr.ramp_gene_id, gr.uniprot, gr.protein_name,
-  gr.ramp_rxn_id, rxn.rxn_source_id, rxn.is_transport, rxn.label, rxn.direction, rxn.equation, rxn.html_equation, rxn.ec_num, rxn.has_human_prot, rxn.only_human_mets
-  from reaction2protein gr, reaction rxn
-  where gr.ramp_gene_id in (",idStr,") and rxn.ramp_rxn_id = gr.ramp_rxn_id")
+  query <- paste0("select gr.ramp_rxn_id, gr.ramp_gene_id, gr.uniprot, gr.protein_name, gr.ramp_rxn_id, rxn.rxn_source_id,
+                  rxn.is_transport, rxn.label, rxn.direction, rxn.equation, rxn.html_equation,
+                  rxn.ec_num, rxn.has_human_prot, rxn.only_human_mets from reaction2protein gr,
+                  reaction rxn where gr.ramp_gene_id in (",idStr,") and rxn.ramp_rxn_id = gr.ramp_rxn_id")
 
   if(length(rxnDirs) == 1) {
     query <- paste0(query, " and rxn.direction = '",rxnDirs[1],"'")

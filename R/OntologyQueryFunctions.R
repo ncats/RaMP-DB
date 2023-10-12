@@ -125,8 +125,7 @@ getMetaFromOnto <- function(db = RaMP(), ontology) {
 
   list_ontology <- unique(list_ontology)
 
-
-  allontos <- getOntologies()
+  allontos <- getOntologies(db = db)
   matched_ontos <- unlist(lapply(list_ontology,
                                  function(x) grep(paste0("^",x,"$"), allontos$commonName)))
 
@@ -145,7 +144,7 @@ getMetaFromOnto <- function(db = RaMP(), ontology) {
           and o.rampOntologyId = ao.rampOntologyId and s.rampId = ao.rampCompoundId
           group by o.commonName, s.rampId, o.HMDBOntologyType")
 
-    if(get("is_sqlite", pkg.globals)) {
+    if(RaMP:::.is_sqlite(db)) {
       sql = paste0("select rampId,
           group_concat(distinct s.sourceId COLLATE NOCASE) as source_ids,
           group_concat(distinct s.commonName COLLATE NOCASE) as common_names, o.commonName, o.HMDBOntologyType

@@ -551,7 +551,8 @@ findDuplicatePathways <- function(db = RaMP()) {
 
   reactomePIDs <- RaMP::runQuery(query, db)
 
-  ar <- RaMP:::analyte_result
+  # ar <- RaMP:::analyte_result
+  ar <- db@dbSummaryObjCache$analyte_result
   diag(ar) <- 0.0
   ar[ar != 1.0] <- 0.0
   colHits <- colnames(ar)[colSums(ar) >= 1.0]
