@@ -82,7 +82,11 @@ setupRdata <- function(db = RaMP()) {
     blob = objs[i,2]
     blob = blob[[1]]
     obj = memDecompress(from=blob, type = 'gzip', asChar = T)
+    #if(grepl('result', varName)) {
     data = data.frame(data.table::fread(obj, sep="\t"), row.names = 1)
+    #} else {
+    #  data = data.frame(data.table::fread(obj, sep="\t"))
+    #}
     dbSummaryData[[varName]] <- data
     # assign(varName, data, envir = .GlobalEnv)
   }
