@@ -7,8 +7,8 @@
 pathwayResultsPlot(
   pathwaysSig,
   pval = "FDR",
-  perc_analyte_overlap = 0.2,
-  perc_pathway_overlap = 0.2,
+  perc_analyte_overlap = 0.5,
+  perc_pathway_overlap = 0.5,
   min_pathway_tocluster = 3,
   text_size = 16,
   sig_cutoff = 0.05,
