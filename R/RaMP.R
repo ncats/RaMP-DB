@@ -151,8 +151,6 @@ RaMP <- function(version = character()) {
     }
     db <- .RaMP(SQLite(), dbname = .get_ramp_db(version))
     con <- .dbcon(db)
-    ## Maybe retrieve additional tables or information from the database
-    ## and cache/store that in a slot within the RaMP object?
 
     # add the cache of summary data objects for enrichment
     db@dbSummaryObjCache <- setupRdata(db)
@@ -170,8 +168,13 @@ RaMP <- function(version = character()) {
 .RaMP <- function(driver = SQLite(), dbname = character(),
                   username = character(), conpass = character(),
                   host = character(), port = integer()) {
-    new("RaMP", driver = driver, dbname = dbname, username = username,
+    rampObj <- new("RaMP", driver = driver, dbname = dbname, username = username,
         conpass = conpass, host = host, port = port, dbSummaryObjCache = list())
+
+    # creates the cache of R data objects
+    rampObj@dbSummaryObjCache <- setupRdataCache(db = rampObj)
+
+    return(rampObj)
 }
 
 #' simple validator function checking for validity of a RaMP database.

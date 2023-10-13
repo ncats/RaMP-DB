@@ -69,7 +69,7 @@ verifySQLite <- function() {
 }
 
 
-setupRdata <- function(db = RaMP()) {
+setupRdataCache <- function(db = RaMP()) {
 
   sql = "select data_key, data_blob from ramp_data_object"
 
