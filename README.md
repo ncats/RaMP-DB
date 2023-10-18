@@ -71,10 +71,10 @@ library(RaMP)
 # initialize the RaMP database object, downloading and caching the latest SQLite database.
 rampDB <- RaMP()
 
-# note that you can use the following method to check database version hosted in your local cache and in our remote repository.
+# note that you can use the following method to check database versions hosted in your local cache and in our remote repository.
 RaMP::listRaMPDbVersions()
 
-# using that list of available version, one can specify the database version to use
+# using that list of available versions, one can specify the database version to use
 # if the selected version is in our remote repository at GitHub, the SQLite DB file will be automatically downloaded into local file cache
 rampDB <- RaMP(version = "2.3.1")
 
