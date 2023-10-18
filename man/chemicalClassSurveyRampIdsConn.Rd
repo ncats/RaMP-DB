@@ -5,7 +5,7 @@
 \title{chemicalClassSurveyRampIdsConn2 is a helper function that takes a list of metabolite ids, a list of 'population' metabolite ids
 and a MariaDB Connection object. The method returns metabolite class information for the metabolite list and a population of all ramp metabolites.}
 \usage{
-chemicalClassSurveyRampIdsConn(mets, pop, inferIdMapping = TRUE)
+chemicalClassSurveyRampIdsConn(db = RaMP(), mets, pop, inferIdMapping = TRUE)
 }
 \arguments{
 \item{mets}{a list object of prefixed metabolite ids of interest}

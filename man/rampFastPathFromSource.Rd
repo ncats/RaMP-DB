@@ -4,7 +4,7 @@
 \alias{rampFastPathFromSource}
 \title{Fast search given a list of metabolites source Id}
 \usage{
-rampFastPathFromSource(sourceid, find_synonym = FALSE)
+rampFastPathFromSource(db = RaMP(), sourceid, find_synonym = FALSE)
 }
 \arguments{
 \item{sourceid}{a vector of synonym that need to be searched}

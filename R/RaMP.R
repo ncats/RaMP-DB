@@ -145,15 +145,25 @@ RaMP <- function(version = character()) {
     if (!version %in% db_local) {
         ## Only check for remote versions if database not already cached
         db_remote <- listRaMPVersions(local = FALSE)
-        if (!version %in% db_remote)
-            stop("RaMP version '", version,"' not available. Use ",
-                 "'listRaMPVersions()' to list available versions.")
+        if (!version %in% db_remote) {
+            print(paste0("RaMP version '", version,"' not available. Use ",
+                 "'listRaMPVersions()' to list available versions."))
+            print(paste0("Checking for version '", version, "' on remote server."))
+              avail <- RaMP:::.is_version_in_remote_lfs(version)
+            if(!avail) {
+              print("The spcified RaMP Database version is not avalilable locally in remote cache")
+              return(NULL)
+            } else {
+              print(paste0("Retrieving RaMP SQLite DB version '", version, "' from remote server."))
+              .get_ramp_db(version)
+              }
+        }
     }
     db <- .RaMP(SQLite(), dbname = .get_ramp_db(version))
     con <- .dbcon(db)
 
     # add the cache of summary data objects for enrichment
-    db@dbSummaryObjCache <- setupRdata(db)
+    db@dbSummaryObjCache <- setupRdataCache(db)
 
     on.exit(dbDisconnect(con))
     .valid_ramp_database(con, error = TRUE)
@@ -258,4 +268,95 @@ listRaMPVersions <- function(local = FALSE) {
     if (v == x)
         v <- ""
     v
+}
+
+#' @importFrom httr HEAD
+#'
+#' @description
+#'
+#' Tests if a version exists in remote github LFS
+#'
+#' @noRd
+.is_version_in_remote_lfs <- function(version) {
+  db_url <- paste0(
+    "https://github.com/ncats/RaMP-DB/raw/sqlite/db/RaMP_SQLite_v",
+    version, ".sqlite.gz")
+  resp <- HEAD(db_url)
+  return(resp$status_code == 200)
+}
+
+#'
+#' @description returns the lists of RaMP db versions available
+#'
+#' @noRd
+.get_local_db_version_list <- function() {
+  localVersions = c()
+  bfc <- BiocFileCache(cache = getBFCOption("CACHE"), ask = FALSE)
+  cacheInfo <- bfcinfo()
+  suppressWarnings( {
+    cacheInfo <- cacheInfo[grepl("RaMP_SQLite_v", cacheInfo$rname), ]$rname
+    if(length(cacheInfo) > 0) {
+      localVersions <- unlist(lapply(cacheInfo, FUN=RaMP:::.version_from_db_file))
+    }
+  })
+  return(localVersions)
+}
+
+#' @importFrom httr HEAD GET
+#'
+#' @description returns the list of RaMP db versions available
+#'
+#' @noRd
+.get_remote_db_version_list <- function() {
+
+  # a bit of a hack to parse html... and a regexpr could be cleaner...
+  remoteURL = "https://github.com/ncats/RaMP-DB/raw/sqlite/db/"
+  filenames = GET(remoteURL, ftp.use.epsv = FALSE, dirlistonly = TRUE)
+  filenames <- rawToChar(filenames$content)
+  filelocs <- unlist(gregexpr(pattern = 'SQLite_v', filenames))
+  filelocs <- filelocs + 8
+  fileEnds <- filelocs + 18
+  versions <- c()
+  for(i in 1:length(filelocs)) {
+    versions <- c(versions, substr(filenames, filelocs[i], fileEnds[i]))
+  }
+  versions <- substr(versions, 1, unlist(gregexpr(".sqlite", versions))-1)
+
+  remoteVersions <- sort(versions, decreasing=T)
+  remoteVersions <- unique(versions)
+
+  return(remoteVersions)
+}
+
+#' @description
+#' Lists local and remotely available RaMP SQLite DB versions and propts with message to download a new version if one exists.
+#'
+#' @export
+#'
+listAvailableRaMPDbVersions <- function() {
+
+  localVersions <- RaMP:::.get_local_db_version_list()
+  remoteVersions <- RaMP:::.get_remote_db_version_list()
+
+  newVersions <- setdiff(remoteVersions, localVersions)
+  haveLocalVersions <- (length(localVersions)>0)
+
+  print("Locally available versions of RaMP SQLite DB, currently on your computer:")
+  if(haveLocalVersions) {
+    print(localVersions)
+  } else {
+    print("No local versions of the RaMP Database were found.")
+    print("Please use the command 'db <- RaMP()' to download the latest version.")
+    print("Alternatively you can use the command db <- RaMP(version = <remote_version_number>) using one of the versions listed below.")
+  }
+
+  print("Available remote RaMP SQLite DB versions for download:")
+  print(remoteVersions)
+
+  if(length(newVersions) > 0 && haveLocalVersions) {
+    print("The following RaMP Database versions are available for download:")
+    print(newVersions)
+    print("Use the command db <- RaMP(<new_version_number>) to download the specified version.")
+  }
+
 }

@@ -4,7 +4,7 @@
 \alias{rampFastCata}
 \title{Retrieves analytes that involved in same reaction as input metabolite}
 \usage{
-rampFastCata(analytes = "none", NameOrIds = "ids")
+rampFastCata(db = RaMP(), analytes = "none", NameOrIds = "ids")
 }
 \arguments{
 \item{analytes}{a vector of analytes that need to be searched}

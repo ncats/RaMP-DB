@@ -4,7 +4,7 @@
 \alias{getPrefixesFromAnalytes}
 \title{Query to retrieve database ID prefixes for analyte types}
 \usage{
-getPrefixesFromAnalytes(analyteType = "gene")
+getPrefixesFromAnalytes(db = RaMP(), analyteType = "gene")
 }
 \arguments{
 \item{analyteType}{value to indicate the desired analyte type. Value one of 'gene' or 'metabolite'}

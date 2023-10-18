@@ -4,7 +4,7 @@
 \alias{getChemicalProperties}
 \title{Returns chemical properties given a metabolite list}
 \usage{
-getChemicalProperties(mets, propertyList = "all")
+getChemicalProperties(db = RaMP(), mets, propertyList = "all")
 }
 \arguments{
 \item{mets}{a list object of source prepended metaboite ids, representing a metabolite set of interest}

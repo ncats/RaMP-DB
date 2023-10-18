@@ -5,6 +5,7 @@
 \title{Retrieve RaMP Analyte Source Intersections, these indicate the level of analyte overlaps between our sources}
 \usage{
 getRaMPAnalyteIntersections(
+  db = RaMP(),
   analyteType = "metabolites",
   format = "json",
   scope = "mapped-to-pathway"

@@ -5,6 +5,7 @@
 \title{Returns chemical class information comparing a metabolite subset to a larger metabolite population.}
 \usage{
 chemicalClassSurvey(
+  db = RaMP(),
   mets,
   background = "database",
   background_type = "database",
