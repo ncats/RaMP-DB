@@ -68,14 +68,17 @@ install_github("ncats/RAMP-DB")
 # Load the package
 library(RaMP)
 
-# initialize the RaMP database object, downloading and caching the latest SQLite database.
+# initializes the RaMP database object, downloading and caching the latest SQLite database
+# if no version already exists in local cache.
 rampDB <- RaMP()
 
 # note that you can use the following method to check database versions hosted in your local cache and in our remote repository.
-RaMP::listRaMPDbVersions()
+RaMP::listAvailableRaMPDbVersions()
 
-# using that list of available versions, one can specify the database version to use
-# if the selected version is in our remote repository at GitHub, the SQLite DB file will be automatically downloaded into local file cache
+# using that list of available RaMP DB versions, one can specify the database version to use
+# if the selected version is not available on your computer, but is in our remote repository at GitHub,
+# the SQLite DB file will be automatically downloaded into local file cache.
+# RaMP is using the BiocFileCache package to manage a local file cache.
 rampDB <- RaMP(version = "2.3.1")
 
 ```
