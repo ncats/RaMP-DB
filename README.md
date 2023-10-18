@@ -72,7 +72,8 @@ library(RaMP)
 # if no version already exists in local cache.
 rampDB <- RaMP()
 
-# note that you can use the following method to check database versions hosted in your local cache and in our remote repository.
+# note that you can use the following method to check database versions hosted in your
+# computer's local cache and databases that are available to download in our remote repository.
 RaMP::listAvailableRaMPDbVersions()
 
 # using that list of available RaMP DB versions, one can specify the database version to use
@@ -92,10 +93,11 @@ When gene or metabolite ids are input for queries, IDs should be prepended with 
 | Metabolites | hmdb, pubchem, chebi, chemspider, kegg, CAS, LIPIDMAPS, swisslipids, lipidbank, wikidata, plantfa, kegg_glycan |
 | Genes/Proteins | ensembl, entrez, gene_symbol, uniprot, hmdb, ncbiprotein, EN, wikidata, chebi
 
-
+The following RaMP functions can be used to list all represented id prefix types.
 ```
-select distinct(IDtype) from source where geneOrCompound ="compound";
-mysql> select distinct(IDtype) from source where geneOrCompound ="gene";
+rampDB <- RaMP()
+RaMP::getPrefixesFromAnalytes(db = rampDB, analyteType = 'metabolite')
+RaMP::getPrefixesFromAnalytes(db = rampDB, analyteType = 'gene')
 ```
 
 ## Current Authors and Testers
