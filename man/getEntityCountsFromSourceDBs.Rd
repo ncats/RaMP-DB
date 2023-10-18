@@ -4,7 +4,7 @@
 \alias{getEntityCountsFromSourceDBs}
 \title{Retrieve counts of entitites (e.g. Metabolites, Pathways, Metabolite-Pathway associations, etc.) for RaMP source databases}
 \usage{
-getEntityCountsFromSourceDBs()
+getEntityCountsFromSourceDBs(db = RaMP())
 }
 \value{
 database sources and entity counts associated with each data source

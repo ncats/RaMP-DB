@@ -4,7 +4,7 @@
 \alias{getMetabClassDataSources}
 \title{Returns class data sources for metabolites}
 \usage{
-getMetabClassDataSources()
+getMetabClassDataSources(db = RaMP())
 }
 \value{
 Returns list of data sources for metabolites

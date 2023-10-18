@@ -4,7 +4,7 @@
 \alias{getPathwayNameList}
 \title{Retrieve list of pathway names}
 \usage{
-getPathwayNameList()
+getPathwayNameList(db = RaMP())
 }
 \value{
 vector of unique pathway names (alphabetically ordered)

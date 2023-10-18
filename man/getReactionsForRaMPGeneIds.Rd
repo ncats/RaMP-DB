@@ -5,6 +5,7 @@
 \title{getReactionsForRaMPGeneIds returns reactions for a collection of ramp compound ids}
 \usage{
 getReactionsForRaMPGeneIds(
+  db = RaMP(),
   rampGeneIds,
   onlyHumanMets = F,
   humanProtein = F,

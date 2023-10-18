@@ -4,7 +4,7 @@
 \alias{getCurrentRaMPVersion}
 \title{Retrieve RaMP version}
 \usage{
-getCurrentRaMPVersion(justVersion = T)
+getCurrentRaMPVersion(db = RaMP(), justVersion = T)
 }
 \arguments{
 \item{justVersion}{boolean value indicating if the method should just return the version id (default, justVersion = T),

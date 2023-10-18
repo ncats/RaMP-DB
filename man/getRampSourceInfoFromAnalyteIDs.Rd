@@ -4,7 +4,7 @@
 \alias{getRampSourceInfoFromAnalyteIDs}
 \title{getRampSourceInfoFromAnalyteIDs Utility method to extract source table information from analyte ids}
 \usage{
-getRampSourceInfoFromAnalyteIDs(analytes)
+getRampSourceInfoFromAnalyteIDs(db = RaMP(), analytes)
 }
 \arguments{
 \item{analytes}{list of analyte ids}

@@ -4,7 +4,7 @@
 \alias{rampFindClassInfoFromSourceId}
 \title{Get class info for an input of metabolite source Ids}
 \usage{
-rampFindClassInfoFromSourceId(sourceIds)
+rampFindClassInfoFromSourceId(db = RaMP(), sourceIds)
 }
 \arguments{
 \item{sourceIds}{a vector of analytes (genes or metabolites) that need to be searched}

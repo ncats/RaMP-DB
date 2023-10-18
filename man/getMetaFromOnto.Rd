@@ -4,7 +4,7 @@
 \alias{getMetaFromOnto}
 \title{function that query database to find analytes in given ontologies}
 \usage{
-getMetaFromOnto(ontology)
+getMetaFromOnto(db = RaMP(), ontology)
 }
 \arguments{
 \item{ontology}{a vector of ontology or ontologies delimited by new line character}

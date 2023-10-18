@@ -6,6 +6,7 @@
 clicked on highchart}
 \usage{
 runCombinedFisherTest(
+  db = RaMP(),
   analytes,
   NameOrIds = "ids",
   total_genes = 20000,

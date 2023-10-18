@@ -5,6 +5,7 @@
 \title{getReactionsForAnalytes}
 \usage{
 getReactionsForAnalytes(
+  db = RaMP(),
   analytes,
   analyteType = "metabolites",
   namesOrIds = "ids",

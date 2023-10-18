@@ -542,9 +542,6 @@ runCombinedFisherTest <- function(
     background = "database",
     pathway_definitions = "RaMP") {
 
-  # queries R data objects from the current database
-  setupRdata(db)
-
   G <- M <- 0
 
   # Grab pathways that contain metabolites to run Fisher on metabolites
