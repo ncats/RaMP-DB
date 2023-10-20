@@ -36,7 +36,7 @@ setConnectionToRaMP <- function(dbname="ramp",
   }
 
   message("Setting up in-memory data cache.")
-  setupRdata()
+  setupRdataCache()
   message("RaMP Initialized")
 
 }

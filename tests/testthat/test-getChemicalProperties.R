@@ -1,13 +1,9 @@
 test_that("chem props returns correctly formatted output for metabolites of interest, ChemicalProperties", {
-  library(properties)
-  dbpass <- properties::read.properties('../../dbprops.txt')
-  pkg.globals <- setConnectionToRaMP(host=dbpass$hostname, dbname=dbpass$dbname, username=dbpass$username, conpass=dbpass$conpass)
-  assign("pkg.globals", pkg.globals, envir = .GlobalEnv)
 
   mets = c('hmdb:HMDB0000056',
            'hmdb:HMDB0000439'
            )
-  chemProps <- getChemicalProperties(mets=mets,propertyList = c('iso_smiles'))
+  chemProps <- getChemicalProperties(db = rampDB, mets=mets,propertyList = c('iso_smiles'))
 
   cn <- c('chem_source_id', 'iso_smiles')
   data <-

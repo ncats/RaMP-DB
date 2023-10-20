@@ -178,6 +178,7 @@ RaMP <- function(version = character()) {
 .RaMP <- function(driver = SQLite(), dbname = character(),
                   username = character(), conpass = character(),
                   host = character(), port = integer()) {
+
     rampObj <- new("RaMP", driver = driver, dbname = dbname, username = username,
         conpass = conpass, host = host, port = port, dbSummaryObjCache = list())
 

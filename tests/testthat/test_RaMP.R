@@ -35,7 +35,6 @@ test_that("RaMP works", {
 })
 
 test_that(".RaMP and accessors work", {
-    dbf <- tempfile()
     res <- .RaMP(dbname = dbf)
     expect_s4_class(res, "RaMP")
     expect_identical(.host(res), NULL)
