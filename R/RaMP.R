@@ -140,7 +140,9 @@ RaMP <- function(version = character()) {
         db_remote <- listRaMPVersions(local = FALSE)
         if (!length(db_remote))
             stop("Error getting available remote versions")
-        version <- db_remote[length(db_remote)]
+
+        # remote versions are returned in decreasing version order, take first.
+        version <- db_remote[1]
     }
     if (!version %in% db_local) {
         ## Only check for remote versions if database not already cached
@@ -220,11 +222,7 @@ listRaMPVersions <- function(local = FALSE) {
         ramps <- ci$rname[grepl("RaMP", ci$rname)]
         sort(unname(vapply(ramps, .version_from_db_file, character(1))))
     } else {
-        ## Get all available (and supported versions) from e.g. figshare,
-        ## zenodo, github?
-        ## Placeholder until we figure out how to get available online
-        ## version
-        "2.3.0"
+       .get_remote_db_version_list()
     }
 }
 
