@@ -88,11 +88,19 @@ runFisherTest <- function(db = RaMP(), analytes,
       if (biospecimen == "Adipose") {
         biospecimen <- "Adipose tissue"
       }
+
       # Get metabolites that belong to a specific biospecimen
+      # query <- paste0(
+      #   "SELECT analytehasontology.*, ontology.*, analytehaspathway.* from analytehasontology, ontology, analytehaspathway where ontology.commonName in ('",
+      #   biospecimen,
+      #   "') and ontology.rampOntologyId = analytehasontology.rampOntologyId and analytehasontology.rampCompoundId = analytehaspathway.rampId"
+      # )
+
+      # less data pull back, less data pull-back
       query <- paste0(
-        "SELECT analytehasontology.*, ontology.*, analytehaspathway.* from analytehasontology, ontology, analytehaspathway where ontology.commonName in ('",
+        "SELECT analytehaspathway.* from analytehasontology, ontology, analytehaspathway where ontology.commonName in ('",
         biospecimen,
-        "') and ontology.rampOntologyId = analytehasontology.rampOntologyId and analytehasontology.rampCompoundId = analytehaspathway.rampId"
+        "') and analytehasontology.rampOntologyId = ontology.rampOntologyId and analytehasontology.rampCompoundId = analytehaspathway.rampId"
       )
 
       backgrounddf <- RaMP::runQuery(query, db)
@@ -198,12 +206,15 @@ runFisherTest <- function(db = RaMP(), analytes,
   } else {
     segregated_id_list <- segregateDataBySource(input_RampIds)
   }
+
   # Loop through each pathway, build the contingency table, and calculate Fisher's Exact
   # test p-value
+  pidCount <- 0
   pval <- totinpath <- userinpath <- pidused <- c()
   for (i in pid) {
     ids_inpath <- pathwaydf[which(pathwaydf$pathwayRampId == i), "rampId"]
 
+    pidCount <- pidCount + 1
 
     if (analyte_type == "metabolites") {
       # Check to make sure that this pathway does have metabolites
@@ -216,14 +227,18 @@ runFisherTest <- function(db = RaMP(), analytes,
           bg_in_pathway <- length(unique(grep("RAMP_C", ids_inpath_bg, value = TRUE)))
         }
       }
-      inputkegg <- segregated_id_list[[1]][1][[1]]
-      inputreact <- segregated_id_list[[1]][2][[1]]
-      inputwiki <- segregated_id_list[[1]][3][[1]]
-      inputcustom <- segregated_id_list[[1]][[4]]
-      tot_user_analytes <- length(grep("RAMP_C", unique(pathwaydf$rampId)))
-      if (background_type != "database") {
-        tot_bg_analytes <- length(grep("RAMP_C", unique(backgrounddf$rampId)))
+
+      if(pidCount == 1) {
+        inputkegg <- segregated_id_list[[1]][1][[1]]
+        inputreact <- segregated_id_list[[1]][2][[1]]
+        inputwiki <- segregated_id_list[[1]][3][[1]]
+        inputcustom <- segregated_id_list[[1]][[4]]
+        tot_user_analytes <- length(grep("RAMP_C", unique(pathwaydf$rampId)))
+        if (background_type != "database") {
+          tot_bg_analytes <- length(grep("RAMP_C", unique(backgrounddf$rampId)))
+        }
       }
+
     } else { # if genes
       # Check to make sure that this pathway does have genes
       if (length(grep("RAMP_G", ids_inpath)) == 0) {
@@ -231,12 +246,17 @@ runFisherTest <- function(db = RaMP(), analytes,
       } else {
         user_in_pathway <- length(unique(grep("RAMP_G", ids_inpath, value = TRUE)))
       }
-      inputkegg <- segregated_id_list[[2]][1][[1]]
-      inputreact <- segregated_id_list[[2]][2][[1]]
-      inputwiki <- segregated_id_list[[2]][3][[1]]
-      inputcustom <- segregated_id_list[[2]][[4]]
-      tot_user_analytes <- length(grep("RAMP_G", unique(pathwaydf$rampId)))
-      ## tot_bg_analytes <- length(grep("RAMP_G", unique(backgrounddf$rampId)))
+
+      pidCount <- pidCount + 1
+
+      if(pidCount == 1) {
+        inputkegg <- segregated_id_list[[2]][1][[1]]
+        inputreact <- segregated_id_list[[2]][2][[1]]
+        inputwiki <- segregated_id_list[[2]][3][[1]]
+        inputcustom <- segregated_id_list[[2]][[4]]
+        tot_user_analytes <- length(grep("RAMP_G", unique(pathwaydf$rampId)))
+        ## tot_bg_analytes <- length(grep("RAMP_G", unique(backgrounddf$rampId)))
+      }
     }
     if ((!is.na(inputkegg$pathwayRampId[1])) && i %in% inputkegg$pathwayRampId) {
       tot_in_pathway <- inputkegg[which(inputkegg[, "pathwayRampId"] == i), "Freq"]
