@@ -247,8 +247,6 @@ runFisherTest <- function(db = RaMP(), analytes,
         user_in_pathway <- length(unique(grep("RAMP_G", ids_inpath, value = TRUE)))
       }
 
-      pidCount <- pidCount + 1
-
       if(pidCount == 1) {
         inputkegg <- segregated_id_list[[2]][1][[1]]
         inputreact <- segregated_id_list[[2]][2][[1]]

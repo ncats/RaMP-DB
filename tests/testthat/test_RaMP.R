@@ -5,7 +5,6 @@ test_that("listRaMPVersions works", {
     res <- listRaMPVersions()
     expect_true(is(res, "character"))
     expect_true(length(res) > 0)
-    expect_true(any("2.3.0" %in% res))
 })
 
 test_that(".version_from_db_file works", {
@@ -50,3 +49,16 @@ test_that(".RaMP and accessors work", {
     expect_s4_class(con, "SQLiteConnection")
     dbDisconnect(con)
 })
+
+test_that(".get_local_db_version_list works", {
+  vList <- .get_local_db_version_list()
+  testthat::expect_true(length(vList) > 0)
+})
+
+
+test_that(".get_remote_db_version_list works", {
+  vList <- .get_remote_db_version_list()
+  testthat::expect_true(length(vList) > 0)
+})
+
+

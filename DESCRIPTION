@@ -38,7 +38,8 @@ Imports:
     methods,
     tibble,
     BiocFileCache,
-    R.utils
+    R.utils,
+    httr
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 Suggests: 

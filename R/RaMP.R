@@ -283,7 +283,7 @@ listRaMPVersions <- function(local = FALSE) {
   db_url <- paste0(
     "https://github.com/ncats/RaMP-DB/raw/sqlite/db/RaMP_SQLite_v",
     version, ".sqlite.gz")
-  resp <- HEAD(db_url)
+  resp <- httr::HEAD(db_url)
   return(resp$status_code == 200)
 }
 
@@ -313,7 +313,7 @@ listRaMPVersions <- function(local = FALSE) {
 
   # a bit of a hack to parse html... and a regexpr could be cleaner...
   remoteURL = "https://github.com/ncats/RaMP-DB/raw/sqlite/db/"
-  filenames = GET(remoteURL, ftp.use.epsv = FALSE, dirlistonly = TRUE)
+  filenames = httr::GET(remoteURL, ftp.use.epsv = FALSE, dirlistonly = TRUE)
   filenames <- rawToChar(filenames$content)
   filelocs <- unlist(gregexpr(pattern = 'SQLite_v', filenames))
   filelocs <- filelocs + 8
