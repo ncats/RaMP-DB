@@ -6,7 +6,8 @@ rampDB <- NULL
 
 if(grepl("SQLite", dbpass$dbname)) {
   print("Testing SQLite DB")
-  rampDB <- RaMP()
+  v <- gsub("SQLite_v", "", dbpass$dbname)
+  rampDB <- RaMP(v)
 } else {
   print("Testing MySQL DB")
   rampDB <- RaMP:::.RaMP(
