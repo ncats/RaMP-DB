@@ -48,6 +48,8 @@ library(magrittr)
 RaMP::listAvailableRaMPDbVersions()
 
 # load a local RaMP database or download the latest RaMP database version from the repository.
+# If the version is not specified, the latest local version will be used.
+# If there are not local database cached, then the latest remote version will be downloaded.
 rampDB <- RaMP()
 ```
 
