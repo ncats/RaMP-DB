@@ -63,7 +63,7 @@ You can install this package directly from GitHub using the install_github() fun
 # Locally install RaMP
 install.packages("devtools")
 library(devtools)
-install_github("ncats/RAMP-DB")
+install_github("ncats/RAMP-DB", ref="sqlite")
 
 # Load the package
 library(RaMP)
