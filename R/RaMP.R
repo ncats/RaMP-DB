@@ -301,6 +301,10 @@ listRaMPVersions <- function(local = FALSE) {
       localVersions <- unlist(lapply(cacheInfo, FUN=RaMP:::.version_from_db_file))
     }
   })
+
+  localVersions <- unique(localVersions)
+  localVersions <- sort(localVersions, decreasing = T)
+
   return(localVersions)
 }
 
