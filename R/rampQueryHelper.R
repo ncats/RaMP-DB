@@ -868,7 +868,7 @@ chemicalClassSurveyRampIdsFullPopConn <- function(mets, conn, inferIdMapping=TRU
   } else {
     sql = paste("select distinct c.ramp_id, c.class_source_id, group_concat(distinct s.commonName order by s.commonName asc separator '; ') as common_names,
                 c.class_level_name, c.class_name, c.source, count(distinct(c.class_source_id)) as directIdClassHits from metabolite_class c, source s
-          where c.class_source_id in (",metStr,") and s.sourceId = c.class_source_id group by c.class_source_id, c.class_level_name, c.class_name")
+          where c.class_source_id in (",metStr,") and s.sourceId = c.class_source_id group by c.class_source_id, c.class_level_name, c.class_name, c.source, c.ramp_id")
   }
 
   metsData <- RMariaDB::dbGetQuery(conn, sql)
