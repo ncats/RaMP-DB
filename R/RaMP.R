@@ -325,7 +325,7 @@ listRaMPVersions <- function(local = FALSE) {
   versions <- substr(versions, 1, unlist(gregexpr(".sqlite", versions))-1)
 
   remoteVersions <- sort(versions, decreasing=T)
-  remoteVersions <- unique(versions)
+  remoteVersions <- unique(remoteVersions)
 
   return(remoteVersions)
 }
