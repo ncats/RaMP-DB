@@ -39,7 +39,7 @@ Supported enrichment analyses are:
 Once installed, first load the package. The first call is to list available database version within your local file cache and in our remote repository. 
 Initialize RaMP database object. This method will reference a RaMP DB version in local file cache for your current session, or will download the latest version of the RaMP database.
 Note that this RaMP() method can accept a version argument with a format like, version='2.3.2', for instance. The supplied version should be one of the versions shown after listing available versions.
-```{r message=F, suppressWarnings=T}
+```{r message=F, warning=F}
 library(RaMP)
 library(DT) # for prettier tables in vignette
 library(dplyr)
