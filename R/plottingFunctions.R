@@ -12,9 +12,12 @@
 #' @export
 plotCataNetwork <- function(catalyzedf = "") {
 
-        if(catalyzedf == "" ||
-        (length(intersect(c("input_analyte","rxn_partner_common_name",
-                "rxn_partner_ids"),colnames(catalyzedf)))!=3)) {
+        if(nrow(catalyzedf) == 0) {
+          message("The input dataframe has 0 rows. plotCataNetwork function is returning without generating a plot.")
+          return()
+        }
+
+        if (length(intersect(c("input_analyte","rxn_partner_common_name", "rxn_partner_ids"),colnames(catalyzedf)))!=3) {
                 stop("Please make sure that the input is the resulting data.frame returned by the rampFastCata() function")
         }
 
