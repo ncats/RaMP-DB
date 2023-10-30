@@ -229,7 +229,7 @@ listRaMPVersions <- function(local = FALSE) {
     }
 }
 
-#' @importFrom BiocFileCache BiocFileCache getBFCOption bfcinfo bfcadd bfcremove
+#' @importFrom BiocFileCache BiocFileCache getBFCOption bfcinfo bfcadd bfcremove bfcnew
 #'
 #' @description
 #'
@@ -247,18 +247,18 @@ listRaMPVersions <- function(local = FALSE) {
         db_url <- paste0(
             "https://github.com/ncats/RaMP-DB/raw/sqlite/db/RaMP_SQLite_v",
             version, ".sqlite.gz")
-        path <- bfcadd(bfc, db_url, fname = "exact")
+        path <- bfcadd(bfc, db_url, fname = "exact", archiveMethod='unzip')
         dbf <- sub(".gz", "", path, fixed = TRUE)
         if (file.exists(dbf))
             file.remove(dbf)
-        R.utils::gunzip(path, remove = FALSE)
+        R.utils::gunzip(path, remove = TRUE)
         bfcremove(bfc, names(path))
-        db_file <- bfcadd(bfc, dbf, fname = "exact")
+        db_file <- bfcnew(bfc, dbf)
     } else {
         message("Loading RaMP-DB version ", version, " from cache.")
-        db_file <- cacheInfo$rname[1L]
+        dbf <- cacheInfo$rname[1L]
     }
-    db_file
+    dbf
 }
 
 #' Extract the version from a RaMP SQLite file name. Expected format:
