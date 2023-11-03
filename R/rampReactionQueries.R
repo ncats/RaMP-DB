@@ -13,7 +13,6 @@
 #' @return a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and common reactions
 #' @export
 #'
-#' @examples
 getReactionsForAnalytes <- function(db = RaMP(), analytes, analyteType='metabolites', namesOrIds='ids', onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN")) {
 
   genes <- data.frame()
@@ -130,7 +129,6 @@ getReactionsForAnalytes <- function(db = RaMP(), analytes, analyteType='metaboli
 #'
 #' @return returns a dataframe of reaction information for each ramp compound id
 #'
-#' @examples
 getReactionsForRaMPCompoundIds <- function(db = RaMP(), rampCompoundIds, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN")) {
 
   idStr <- listToQueryString(rampCompoundIds)
@@ -175,7 +173,6 @@ getReactionsForRaMPCompoundIds <- function(db = RaMP(), rampCompoundIds, onlyHum
 #'
 #' @return returns a dataframe of reaction information for each ramp compound id
 #'
-#' @examples
 getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN")) {
 
   idStr <- listToQueryString(rampGeneIds)
@@ -225,7 +222,6 @@ getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F
 #'
 #' @return returns a dataframe of ramp analyte source information
 #'
-#' @examples
 getRampSourceInfoFromAnalyteIDs <- function(db = RaMP(), analytes) {
 
   analyteStr <- listToQueryString(analytes)
@@ -244,7 +240,6 @@ getRampSourceInfoFromAnalyteIDs <- function(db = RaMP(), analytes) {
 #'
 #' @return comma separated list of single quoted analyte ids or names
 #'
-#' @examples
 listToQueryString <- function(analytes) {
   analyteStr <- paste0("'", paste0(analytes, collapse = "','"), "'", sep="")
   return (analyteStr)
