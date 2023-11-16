@@ -5,6 +5,7 @@
 \title{Cluster and plot significant pathways by FDR-adjusted pval}
 \usage{
 pathwayResultsPlot(
+  db = RaMP(),
   pathwaysSig,
   pval = "FDR",
   perc_analyte_overlap = 0.2,

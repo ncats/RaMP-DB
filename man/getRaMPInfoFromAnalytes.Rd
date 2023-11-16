@@ -4,7 +4,12 @@
 \alias{getRaMPInfoFromAnalytes}
 \title{Internal function for extracting annotations, used by pathway and chemical enrichment test functions}
 \usage{
-getRaMPInfoFromAnalytes(analytes, NameOrIds = "ids", PathOrChem = "path")
+getRaMPInfoFromAnalytes(
+  db = RaMP(),
+  analytes,
+  NameOrIds = "ids",
+  PathOrChem = "path"
+)
 }
 \arguments{
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}

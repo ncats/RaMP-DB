@@ -6,6 +6,7 @@
 identified by Fisher's test}
 \usage{
 findCluster(
+  db = RaMP(),
   fishers_df,
   perc_analyte_overlap = 0.5,
   min_pathway_tocluster = 2,

@@ -7,7 +7,7 @@
 #' @param GC the analytes type that is either "C" for compound or "G" for gene
 #' @param n minimum analytes of which pathway to considered computing overlap
 #' @return A list with pathway rampID as name, a vector of analytes from this pathway as content.
-findAnalyteHasPathway <- function(pathwayRampId,GC = "C",n = 10){
+findAnalyteHasPathway <- function(db = RaMP(), pathwayRampId,GC = "C",n = 10){
 
   con <- connectToRaMP()
   on.exit(RMariaDB::dbDisconnect(con))
@@ -456,7 +456,7 @@ processData <- function(){
 #
 #
 #   #uncomment usethis::use_data function to create sysdata.rda object
-#   rampdb_version = 'v2.2.1'
+#   rampdb_version = 'v2.3,0'
 #   usethis::use_data(genes_result,
 #                      metabolites_result,
 #                      analyte_result,

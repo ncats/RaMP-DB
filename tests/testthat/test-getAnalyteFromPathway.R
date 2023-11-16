@@ -1,41 +1,33 @@
 test_that("Table returned shows correct output for single pathway ,getAnalyteFromPathway",
           {
-            library(properties)
-            dbpass <- properties::read.properties('../../dbprops.txt')
-            pkg.globals <- setConnectionToRaMP(host=dbpass$hostname, dbname=dbpass$dbname, username=dbpass$username, conpass=dbpass$conpass)
-            assign("pkg.globals", pkg.globals, envir = .GlobalEnv)
 
-            my_analytes <- getAnalyteFromPathway('sphingolipid metabolism')
+            my_analytes <- getAnalyteFromPathway(db = rampDB, pathway='sphingolipid metabolism')
 
             expect_true(
               !is.null(my_analytes)
-              )
+            )
             expect_true(
               NROW(my_analytes) != 0)
-            })
+          })
 
 
 
 test_that("Table returned shows correct output for multiple pathways ,getAnalyteFromPathway",
-       {
-         library(properties)
-         dbpass <- properties::read.properties('../../dbprops.txt')
-         pkg.globals <- setConnectionToRaMP(host=dbpass$hostname, dbname=dbpass$dbname, username=dbpass$username, conpass=dbpass$conpass)
-         assign("pkg.globals", pkg.globals, envir = .GlobalEnv)
+          {
 
-        my_analytes <-
-          getAnalyteFromPathway(c(
-            'sphingolipid metabolism',
-            "De Novo Triacylglycerol Biosynthesis",
-            "Creatine metabolism"
-          ))
+            my_analytes <-
+              getAnalyteFromPathway(db = rampDB, pathway=c(
+                'sphingolipid metabolism',
+                "De Novo Triacylglycerol Biosynthesis",
+                "Creatine metabolism"
+              ))
 
-        expect_true(
-          !is.null(my_analytes)
-        )
-        expect_true(
-          NROW(my_analytes) != 0)
-      })
+            expect_true(
+              !is.null(my_analytes)
+            )
+            expect_true(
+              NROW(my_analytes) != 0)
+          })
 
 
 
@@ -44,14 +36,8 @@ test_that("Table returned shows correct output for multiple pathways ,getAnalyte
 test_that("Fuzzy match test for TCA and Creatine",
           {
 
-            library(properties)
-            dbpass <- properties::read.properties('../../dbprops.txt')
-
-            pkg.globals <- setConnectionToRaMP(host=dbpass$hostname, dbname=dbpass$dbname, username=dbpass$username, conpass=dbpass$conpass)
-            assign("pkg.globals", pkg.globals, envir = .GlobalEnv)
-
             my_analytes <-
-              getAnalyteFromPathway(pathway=c(
+              getAnalyteFromPathway(db = rampDB, pathway=c(
                 "TCA",
                 "Creatine"
               ), match="fuzzy")
@@ -65,19 +51,4 @@ test_that("Fuzzy match test for TCA and Creatine",
             expect_true(
               NROW(my_analytes) != 0)
           })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -6,6 +6,7 @@
 returns associated pathways}
 \usage{
 getPathwayFromAnalyte(
+  db = RaMP(),
   analytes = "none",
   find_synonym = FALSE,
   NameOrIds = "ids",

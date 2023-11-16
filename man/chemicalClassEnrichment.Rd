@@ -6,9 +6,11 @@
 enrichment p-values and FDR values.}
 \usage{
 chemicalClassEnrichment(
+  db = RaMP(),
   mets,
   background = "database",
-  background_type = "database"
+  background_type = "database",
+  inferIdMapping = F
 )
 }
 \arguments{
@@ -22,6 +24,11 @@ one id per column (no file header row) or a specificed biospecimen type (availab
 \item{background_type}{one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
 or 'file' in which case the background parameter will be a file path, or 'biospecimen' where the specified background parameter is
 a RaMP HMDB metabolite ontology term (see background parameter, above. for the most common biospecimen background values).}
+
+\item{inferIdMapping}{if FALSE, the method only reports on class annotations made directly on the input ids.
+If inferIdMapping is set to TRUE, the input ids are cross-referenced or mapped to other existing ids that contain metabolite class annotations.
+Following id cross references can expand coverage if the input type is other than HMDB ids or LIPIDMAPS ids.
+The default value is FALSE.}
 }
 \value{
 a list of dataframes, each holding chemical classs enrichment statistics for specific chemical classification systems,

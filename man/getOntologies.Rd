@@ -4,7 +4,7 @@
 \alias{getOntologies}
 \title{Returns list of available ontologies from database}
 \usage{
-getOntologies()
+getOntologies(db = RaMP())
 }
 \value{
 Returns ontologies listed in database

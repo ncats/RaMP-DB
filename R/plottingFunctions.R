@@ -12,9 +12,12 @@
 #' @export
 plotCataNetwork <- function(catalyzedf = "") {
 
-        if(catalyzedf == "" ||
-        (length(intersect(c("input_analyte","rxn_partner_common_name",
-                "rxn_partner_ids"),colnames(catalyzedf)))!=3)) {
+        if(nrow(catalyzedf) == 0) {
+          message("The input dataframe has 0 rows. plotCataNetwork function is returning without generating a plot.")
+          return()
+        }
+
+        if (length(intersect(c("input_analyte","rxn_partner_common_name", "rxn_partner_ids"),colnames(catalyzedf)))!=3) {
                 stop("Please make sure that the input is the resulting data.frame returned by the rampFastCata() function")
         }
 
@@ -65,10 +68,10 @@ plotCataNetwork <- function(catalyzedf = "") {
 #' @param sig_cutoff Aesthetic, shows pvalue cutoff for significant pathways
 #' @param interactive If TRUE, return interactive plotly object instead of ggplot object
 #' @export
-pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.2,
+pathwayResultsPlot <- function(db = RaMP(), pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.2,
                                  perc_pathway_overlap = 0.2, min_pathway_tocluster = 3,
                                  text_size = 16, sig_cutoff = 0.05, interactive=FALSE) {
-    fishClustering <- findCluster(pathwaysSig,
+    fishClustering <- findCluster(db = db, pathwaysSig,
                                   perc_analyte_overlap = perc_analyte_overlap,
                                   perc_pathway_overlap = perc_pathway_overlap,
                                   min_pathway_tocluster = min_pathway_tocluster

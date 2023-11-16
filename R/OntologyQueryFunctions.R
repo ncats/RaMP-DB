@@ -11,7 +11,7 @@
 #' getOntoFromMeta("hmdb:HMDB0071437")
 #' }
 #' @export
-getOntoFromMeta <- function(analytes, NameOrIds = "ids") {
+getOntoFromMeta <- function(db = RaMP(), analytes, NameOrIds = "ids") {
   if (!(NameOrIds %in% c("ids", "name"))) {
     stop("Specifiy the type of given data to 'ids' or 'name'")
   }
@@ -33,36 +33,38 @@ getOntoFromMeta <- function(analytes, NameOrIds = "ids") {
   list_metabolite <- unique(list_metabolite)
   list_metabolite <- sapply(list_metabolite, shQuote)
   list_metabolite <- paste(list_metabolite, collapse = ",")
-  con <- connectToRaMP()
+
   if (NameOrIds == "ids") {
     sql <- paste0("select * from source where sourceId in (", list_metabolite, ");")
   } else if (NameOrIds == "name") {
     sql <- paste0("select * from source where rampId in (select * from (select rampId from analytesynonym where Synonym in (", list_metabolite, ")) as subquery);")
     cat(file = stderr(), "query sql in Package call with -- ", sql, "\n")
   }
-  df <- RMariaDB::dbGetQuery(con, sql)
-  # print(colnames(df))
-  RMariaDB::dbDisconnect(con)
+
+  df <- RaMP::runQuery(sql, db)
+
   if (nrow(df) == 0) {
     message("This source id
             does not exist in the source table")
     return(NULL)
   }
+
   rampid <- unique(df$rampId)
   rampid <- sapply(rampid, shQuote)
   rampid <- paste(rampid, collapse = ",")
-  con <- connectToRaMP()
 
   sql <- paste0(
     "select * from analytehasontology where rampCompoundId in (",
     rampid, ");"
   )
-  df2 <- RMariaDB::dbGetQuery(con, sql)
+
+  df2 <- RaMP::runQuery(sql, db)
+
   if (nrow(df2) == 0) {
     message("No searching result because these metabolites are not linked to ontology")
     return(NULL)
   }
-  RMariaDB::dbDisconnect(con)
+
   rampontoid <- unique(df2$rampOntologyId)
   rampontoid <- sapply(rampontoid, shQuote)
   rampontoid <- paste(rampontoid, collapse = ",")
@@ -70,10 +72,9 @@ getOntoFromMeta <- function(analytes, NameOrIds = "ids") {
     "select * from ontology where rampOntologyId in (",
     rampontoid, ");"
   )
-  con <- connectToRaMP()
-  df3 <- RMariaDB::dbGetQuery(con, sql)
-  # print(colnames(df3))
-  RMariaDB::dbDisconnect(con)
+
+  df3 <- RaMP::runQuery(sql, db)
+
   mdf <- unique(merge(df3, df2, all.x = T))
   mdf <- unique(merge(mdf, df,
     all.x = T, by.x = "rampCompoundId",
@@ -104,7 +105,7 @@ getOntoFromMeta <- function(analytes, NameOrIds = "ids") {
 #' }
 #' @importFrom rlang .data
 #' @export
-getMetaFromOnto <- function(ontology) {
+getMetaFromOnto <- function(db = RaMP(), ontology) {
 
   print("Retreiving Metabolites for input ontology terms.")
   now <- proc.time()
@@ -124,8 +125,7 @@ getMetaFromOnto <- function(ontology) {
 
   list_ontology <- unique(list_ontology)
 
-
-  allontos <- getOntologies()
+  allontos <- getOntologies(db = db)
   matched_ontos <- unlist(lapply(list_ontology,
                                  function(x) grep(paste0("^",x,"$"), allontos$commonName)))
 
@@ -144,9 +144,18 @@ getMetaFromOnto <- function(ontology) {
           and o.rampOntologyId = ao.rampOntologyId and s.rampId = ao.rampCompoundId
           group by o.commonName, s.rampId, o.HMDBOntologyType")
 
-    con <- connectToRaMP()
-    mdf_final <- RMariaDB::dbGetQuery(con,sql)
-    RMariaDB::dbDisconnect(con)
+    if(RaMP:::.is_sqlite(db)) {
+      sql = paste0("select rampId,
+          group_concat(distinct s.sourceId COLLATE NOCASE) as source_ids,
+          group_concat(distinct s.commonName COLLATE NOCASE) as common_names, o.commonName, o.HMDBOntologyType
+          from source s, analytehasontology ao, ontology o where ao.rampOntologyId in (
+          select distinct rampOntologyId from ontology where commonName in (",ontologyList,"))
+          and o.rampOntologyId = ao.rampOntologyId and s.rampId = ao.rampCompoundId
+          group by o.commonName, s.rampId, o.HMDBOntologyType")
+    }
+
+    mdf_final <- RaMP::runQuery(sql, db)
+
     mdf_final <- unique(mdf_final)
     mdf_final <- mdf_final[,c(4,5,3,2)]
     colnames(mdf_final) <- c('ontologyTerm', 'ontologyCategory', 'metNames', 'metIds')

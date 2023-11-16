@@ -5,7 +5,7 @@
 \title{Find rampId from given source ID
 The rampId can be plugged in other functions to continue query}
 \usage{
-rampFindSourceRampId(sourceId)
+rampFindSourceRampId(db = RaMP(), sourceId)
 }
 \arguments{
 \item{sourceId}{a data frame or string separated by comma or string

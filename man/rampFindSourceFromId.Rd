@@ -4,7 +4,7 @@
 \alias{rampFindSourceFromId}
 \title{Find all source from given list of RaMP Ids}
 \usage{
-rampFindSourceFromId(rampId = "", full = TRUE)
+rampFindSourceFromId(db = RaMP(), rampId = "", full = TRUE)
 }
 \arguments{
 \item{rampId}{could be a data frame return by rampFindSynonymFromSynonym

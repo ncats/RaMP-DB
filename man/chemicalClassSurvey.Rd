@@ -5,10 +5,12 @@
 \title{Returns chemical class information comparing a metabolite subset to a larger metabolite population.}
 \usage{
 chemicalClassSurvey(
+  db = RaMP(),
   mets,
   background = "database",
   background_type = "database",
-  includeRaMPids = FALSE
+  includeRaMPids = FALSE,
+  inferIdMapping = TRUE
 )
 }
 \arguments{
@@ -24,9 +26,13 @@ or 'file' in which case the background parameter will be a file path, or 'biospe
 a RaMP HMDB metabolite ontology term (see background parameter, above, for the most common biospecimen background values).}
 
 \item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
+
+\item{inferIdMapping}{if FALSE, the survey only reports on class annotations made directly on the input ids.
+If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to related ids that contain metabolite class annotations.
+The default is TRUE.}
 }
 \value{
-Returns chemcial class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
+Returns chemical class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
 metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolved and listing those metabolite ids
 that are not found in the database.
 
