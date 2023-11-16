@@ -1076,9 +1076,8 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
 
         clusters_to_merge <- which(cluster_similarity_mod == max(cluster_similarity_mod), arr.ind = TRUE)
         clusters_to_merge <- unique(t(apply(clusters_to_merge, 1, sort)))
-
         for (i in 1:nrow(clusters_to_merge)) {
-          if (!is.na(cluster_list[[clusters_to_merge[i, 1]]]) && !is.na(cluster_list[[clusters_to_merge[i, 2]]])) {
+          if (all(c(!is.na(cluster_list[[clusters_to_merge[i, 1]]]), !is.na(cluster_list[[clusters_to_merge[i, 2]]])))) {
             cluster_list[[clusters_to_merge[i, 1]]] <- unique(unlist(cluster_list[c(clusters_to_merge[i, 1], clusters_to_merge[i, 2])]))
             cluster_list[[clusters_to_merge[i, 2]]] <- NA
           }
