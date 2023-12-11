@@ -19,15 +19,17 @@
 #' then users should specify one of the following: "Blood", "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney",
 #' "Saliva", and "Feces"
 #' @param pathway_definitions If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows
+#' @param include_smpdb Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant
 #' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
 
 runFisherTest <- function(db = RaMP(), analytes,
                           total_genes = 20000,
                           NameOrIds = "ids",
                           analyte_type = "metabolites",
-                          MCall = F, alternative = "less", min_path_size = 5, max_path_size = 150,
+                          MCall = F, alternative = "less",
+                          min_path_size = 5, max_path_size = 150,
                           background_type = "database", background = "database",
-                          pathway_definitions = "RaMP") {
+                          pathway_definitions = "RaMP", include_smpdb = FALSE) {
   if(analyte_type == "genes"){
     background_type = "database"
     print("Using database background for genes")
@@ -43,7 +45,8 @@ runFisherTest <- function(db = RaMP(), analytes,
     pathwaydf <- getPathwayFromAnalyte(db = db, analytes = analytes,
       includeRaMPids = TRUE,
       NameOrIds = NameOrIds,
-      find_synonym = FALSE
+      find_synonym = FALSE,
+      include_smpdb = include_smpdb
     )
   }
 
@@ -72,7 +75,8 @@ runFisherTest <- function(db = RaMP(), analytes,
     if (background_type == "list" & analyte_type == "metabolites") {
       backgrounddf <- getPathwayFromAnalyte(db = db, background,
                                             includeRaMPids = TRUE,
-                                            NameOrIds = NameOrIds
+                                            NameOrIds = NameOrIds,
+                                            include_smpdb = include_smpdb
                                             )
       print("Custom background specified, genes will be discarded")
 
@@ -80,7 +84,8 @@ runFisherTest <- function(db = RaMP(), analytes,
       userbkg <- utils::read.table(background, header=F)[,1]
       backgrounddf <- getPathwayFromAnalyte(db = db, analytes = userbkg,
                                             includeRaMPids = TRUE,
-                                            NameOrIds = NameOrIds
+                                            NameOrIds = NameOrIds,
+                                            include_smpdb = include_smpdb
                                             )
       print("Custom background specified, genes will be discarded")
     } else if (background_type == "biospecimen" & analyte_type == "metabolites") {
@@ -161,38 +166,37 @@ runFisherTest <- function(db = RaMP(), analytes,
 
   # Get the total number of metabolites that are mapped to pathways in RaMP (that's the default background)
   # added conditional to not pull hmdb ids
-  query <- "select * from analytehaspathway where pathwaySource != 'hmdb';"
-
+  if(!include_smpdb){
+    query <- "select * from analytehaspathway where pathwaySource != 'hmdb';"
+  }else{
+    query <- "select * from analytehaspathway;"
+  }
   allids <- RaMP::runQuery(query, db)
   allids <- allids[!duplicated(allids), ]
 
   if ((analyte_type == "metabolites")) {
 
-    # JCB replaced these lines. Reducing to a source, extracting compound indices, then applying to the full set of rampIds
-    # caused an error in the tally of analytes
-    #
-    # wiki_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="wiki"),"rampId"])]))
-    # react_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="reactome"),"rampId"])]))
-    # kegg_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="kegg"),"rampId"])]))
-
     # first extract source-specific ids, then select for compound ids from the source-specific ids
-    sourceIds <- allids[which(allids$pathwaySource == "wiki"), "rampId"]
-    wiki_totanalytes <- length(unique(sourceIds[grep("RAMP_C", sourceIds)]))
+    ## sourceIds <- allids[which(allids$pathwaySource == "wiki"), "rampId"]
+    ## wiki_totanalytes <- length(unique(sourceIds[grep("RAMP_C", sourceIds)]))
 
-    sourceIds <- allids[which(allids$pathwaySource == "reactome"), "rampId"]
-    react_totanalytes <- length(unique(sourceIds[grep("RAMP_C", sourceIds)]))
+    ## sourceIds <- allids[which(allids$pathwaySource == "reactome"), "rampId"]
+    ## react_totanalytes <- length(unique(sourceIds[grep("RAMP_C", sourceIds)]))
 
-    ## sourceIds <- allids[which(allids$pathwaySource=="kegg"),"rampId"]
-    ## kegg_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
-
-    sourceIds <- allids[which(allids$pathwaySource == "kegg"), "rampId"]
-    kegg_totanalytes <- length(unique(sourceIds[grep("RAMP_C", sourceIds)]))
+    ## sourceIds <- allids[which(allids$pathwaySource == "kegg"), "rampId"]
+    ## kegg_totanalytes <- length(unique(sourceIds[grep("RAMP_C", sourceIds)]))
+    totanalytes <- lapply(unique(allids$pathwaySource), function(x){
+      return(allids %>% dplyr::filter(pathwaySource==x) %>% nrow)
+    })
+    names(totanalytes) <- unique(allids$pathwaySource)
   } else if (analyte_type == "genes") {
 
     # for now we're using a fixed population size for genes
     # this can be enhanced to take a list of all measured genes
     # or use a subset of genes having pathway annotations within each source
-    wiki_totanalytes <- react_totanalytes <- kegg_totanalytes <- total_genes
+    ## wiki_totanalytes <- react_totanalytes <- kegg_totanalytes <- total_genes
+    totanalytes <- as.list(rep(total_genes,length(unique(allids$pathwaySource))))
+    names(totanalytes) <- unique(allids$pathwaySource)
   } else {
     print("analyte_type must be 'metabolites' or 'genes'")
   }
@@ -205,6 +209,11 @@ runFisherTest <- function(db = RaMP(), analytes,
     stop("Data doesn't exist")
   } else {
     segregated_id_list <- segregateDataBySource(input_RampIds)
+    if(analyte_type=="metabolites"){
+      segregated_id_list <- segregated_id_list$metab
+    }else{
+      segregated_id_list <- segregated_id_list$gene
+    }
   }
 
   # Loop through each pathway, build the contingency table, and calculate Fisher's Exact
@@ -229,10 +238,10 @@ runFisherTest <- function(db = RaMP(), analytes,
       }
 
       if(pidCount == 1) {
-        inputkegg <- segregated_id_list[[1]][1][[1]]
-        inputreact <- segregated_id_list[[1]][2][[1]]
-        inputwiki <- segregated_id_list[[1]][3][[1]]
-        inputcustom <- segregated_id_list[[1]][[4]]
+        ## inputkegg <- segregated_id_list[[1]][1][[1]]
+        ## inputreact <- segregated_id_list[[1]][2][[1]]
+        ## inputwiki <- segregated_id_list[[1]][3][[1]]
+        ## inputcustom <- segregated_id_list[[1]][[4]]
         tot_user_analytes <- length(grep("RAMP_C", unique(pathwaydf$rampId)))
         if (background_type != "database") {
           tot_bg_analytes <- length(grep("RAMP_C", unique(backgrounddf$rampId)))
@@ -248,34 +257,40 @@ runFisherTest <- function(db = RaMP(), analytes,
       }
 
       if(pidCount == 1) {
-        inputkegg <- segregated_id_list[[2]][1][[1]]
-        inputreact <- segregated_id_list[[2]][2][[1]]
-        inputwiki <- segregated_id_list[[2]][3][[1]]
-        inputcustom <- segregated_id_list[[2]][[4]]
+        ## inputkegg <- segregated_id_list[[2]][1][[1]]
+        ## inputreact <- segregated_id_list[[2]][2][[1]]
+        ## inputwiki <- segregated_id_list[[2]][3][[1]]
+        ## inputcustom <- segregated_id_list[[2]][[4]]
         tot_user_analytes <- length(grep("RAMP_G", unique(pathwaydf$rampId)))
         ## tot_bg_analytes <- length(grep("RAMP_G", unique(backgrounddf$rampId)))
       }
     }
-    if ((!is.na(inputkegg$pathwayRampId[1])) && i %in% inputkegg$pathwayRampId) {
-      tot_in_pathway <- inputkegg[which(inputkegg[, "pathwayRampId"] == i), "Freq"]
-      total_pathway_analytes <- kegg_totanalytes
-    } else if ((!is.na(inputwiki$pathwayRampId[1])) && i %in% inputwiki$pathwayRampId) {
-      tot_in_pathway <- inputwiki[which(inputwiki[, "pathwayRampId"] == i), "Freq"]
-      total_pathway_analytes <- wiki_totanalytes
-    } else if ((!is.na(inputreact$pathwayRampId[1])) && i %in% inputreact$pathwayRampId) {
-      tot_in_pathway <- inputreact[which(inputreact[, "pathwayRampId"] == i), "Freq"]
-      total_pathway_analytes <- react_totanalytes
-    } else if ((!is.na(inputcustom$pathwayRampId[1])) && i %in% inputcustom$pathwayRampId) {
-      tot_in_pathway <- inputcustom[which(inputcustom[, "pathwayRampId"] == i), "Freq"]
-      if(analyte_type == "metabolites"){
-        total_pathway_analytes <- 0
-      }else{
-        total_pathway_analytes <- kegg_totanalytes
-      }
-    } else {
-      tot_in_pathway <- 0
+    pathway_index <- names(segregated_id_list)[which(sapply(segregated_id_list, function(x) i %in% x$pathwayRampId))]
+    if(is.na(pathway_index)){
+      total_pathway_analytes = 0
+    }else{
+      total_pathway_analytes = totanalytes[[pathway_index]]
+      tot_in_pathway <- segregated_id_list[[pathway_index]] %>% dplyr::filter(`pathwayRampId`==i) %>% pull(`Freq`)
     }
-
+    ## if ((!is.na(inputkegg$pathwayRampId[1])) && i %in% inputkegg$pathwayRampId) {
+    ##   tot_in_pathway <- inputkegg[which(inputkegg[, "pathwayRampId"] == i), "Freq"]
+    ##   total_pathway_analytes <- kegg_totanalytes
+    ## } else if ((!is.na(inputwiki$pathwayRampId[1])) && i %in% inputwiki$pathwayRampId) {
+    ##   tot_in_pathway <- inputwiki[which(inputwiki[, "pathwayRampId"] == i), "Freq"]
+    ##   total_pathway_analytes <- wiki_totanalytes
+    ## } else if ((!is.na(inputreact$pathwayRampId[1])) && i %in% inputreact$pathwayRampId) {
+    ##   tot_in_pathway <- inputreact[which(inputreact[, "pathwayRampId"] == i), "Freq"]
+    ##   total_pathway_analytes <- react_totanalytes
+    ## } else if ((!is.na(inputcustom$pathwayRampId[1])) && i %in% inputcustom$pathwayRampId) {
+    ##   tot_in_pathway <- inputcustom[which(inputcustom[, "pathwayRampId"] == i), "Freq"]
+    ##   if(analyte_type == "metabolites"){
+    ##     total_pathway_analytes <- 0
+    ##   }else{
+    ##     total_pathway_analytes <- kegg_totanalytes
+    ##   }
+    ## } else {
+    ##   tot_in_pathway <- 0
+    ## }
     if (tot_in_pathway == 0 || user_in_pathway == 0) {
       pval <- c(pval, NA)
     } else {
@@ -385,13 +400,13 @@ runFisherTest <- function(db = RaMP(), analytes,
       if (analyte_type == "metabolites") {
         if (i %in% kegg_metab$pathwayRampId) {
           tot_in_pathway <- kegg_metab[which(kegg_metab[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- kegg_totanalytes
+          total_analytes <- totanalytes[["kegg"]]
         } else if (i %in% wiki_metab$pathwayRampId) {
           tot_in_pathway <- wiki_metab[which(wiki_metab[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- wiki_totanalytes
+          total_analytes <- totanalytes[["wiki"]]
         } else if (i %in% reactome_metab$pathwayRampId) {
           tot_in_pathway <- reactome_metab[which(reactome_metab[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- react_totanalytes
+          total_analytes <- totanalytes[["reactome"]]
         } else {
           tot_in_pathway <- 0
           total_analytes <- NULL
@@ -399,13 +414,13 @@ runFisherTest <- function(db = RaMP(), analytes,
       } else {
         if (i %in% kegg_gene$pathwayRampId) {
           tot_in_pathway <- kegg_gene[which(kegg_gene[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- kegg_totanalytes
+          total_analytes <- totanalytes[["kegg"]]
         } else if (i %in% wiki_gene$pathwayRampId) {
           tot_in_pathway <- wiki_gene[which(wiki_gene[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- wiki_totanalytes
+          total_analytes <- totanalytes[["wiki"]]
         } else if (i %in% reactome_gene$pathwayRampId) {
           tot_in_pathway <- reactome_gene[which(reactome_gene[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- react_totanalytes
+          total_analytes <- totanalytes[["reactome"]]
         } else {
           tot_in_pathway <- 0
           total_analytes <- NULL
@@ -528,6 +543,7 @@ runFisherTest <- function(db = RaMP(), analytes,
 #' then users should specify one of the following: "Blood", "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney",
 #' "Saliva", and "Feces"
 #' @param pathway_definitions If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows. Please supply a .xls or .xlsx file. If supplying pathway definitions for genes and metabolites, ensure that metabolite definitions are on tab 1, and gene definitions are on tab2.
+#' @param include_smpdb Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant
 #' @return a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values
 #' (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway,
 #' and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
@@ -558,7 +574,8 @@ runCombinedFisherTest <- function(
     includeRaMPids = FALSE,
     background_type = "database",
     background = "database",
-    pathway_definitions = "RaMP") {
+    pathway_definitions = "RaMP",
+    include_smpdb = FALSE) {
 
   G <- M <- 0
 
@@ -578,7 +595,8 @@ runCombinedFisherTest <- function(
     max_path_size = max_path_size,
     background_type = background_type,
     background = background,
-    pathway_definitions = pathway_definitions
+    pathway_definitions = pathway_definitions,
+    include_smpdb=include_smpdb
   )
   pathwaydf_metab <- outmetab[[2]]
   outmetab <- outmetab[[1]]
@@ -599,7 +617,8 @@ runCombinedFisherTest <- function(
       total_genes = total_genes,
       MCall = MCall,
       min_path_size = min_path_size,
-      max_path_size = max_path_size
+      max_path_size = max_path_size,
+      include_smpdb=include_smpdb
     )
     pathwaydf_gene <- outgene[[2]]
     outgene <- outgene[[1]]
@@ -614,7 +633,8 @@ runCombinedFisherTest <- function(
       max_path_size = max_path_size,
       background_type = background_type,
       background = background,
-      pathway_definitions = pathway_definitions
+      pathway_definitions = pathway_definitions,
+      include_smpdb=include_smpdb
     )
     pathwaydf_gene <- outgene[[2]]
     outgene <- outgene[[1]]
@@ -773,6 +793,7 @@ runCombinedFisherTest <- function(
 #' @param find_synonym find all synonyms or just return same synonym (T/F)
 #' @param NameOrIds whether input is "names" or "ids" (default is "ids")
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
+#' @param include_smpdb Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant
 #' @return a list contains all metabolites as name and pathway inside.
 #' @examples
 #' \dontrun{
@@ -786,7 +807,8 @@ runCombinedFisherTest <- function(
 getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
                                   find_synonym = FALSE,
                                   NameOrIds = "ids",
-                                  includeRaMPids = FALSE) {
+                                  includeRaMPids = FALSE,
+                                  include_smpdb = FALSE) {
 
   rampId <- pathwayRampId <- c()
 
@@ -827,8 +849,6 @@ getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
                   ap.rampId = s.rampId
                   and
                   p.pathwayRampId = ap.pathwayRampId
-                  and
-                  p.type != 'hmdb'
                   group by inputId, rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId
                   order by pathwayName asc")
 
@@ -843,8 +863,6 @@ getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
                   ap.rampId = s.rampId
                   and
                   p.pathwayRampId = ap.pathwayRampId
-                  and
-                  p.type != 'hmdb'
                   group by inputId, s.rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId
                   order by pathwayName asc")
     }
@@ -866,8 +884,6 @@ getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
     ap.rampId = s.rampId
     and
     p.pathwayRampId = ap.pathwayRampId
-    and
-    p.type != 'hmdb'
     group by inputCommonName, s.rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId
     order by pathwayName asc
   "
@@ -889,8 +905,6 @@ getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
     ap.rampId = s.rampId
     and
     p.pathwayRampId = ap.pathwayRampId
-    and
-    p.type != 'hmdb'
     group by inputCommonName, s.rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId
     order by pathwayName asc
   "
@@ -901,7 +915,9 @@ getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
   }
 
   df2 <- RaMP::runQuery(sql, db)
-
+  if(!include_smpdb){
+    df2 <- df2 %>% dplyr::filter(`pathwaySource` != "hmdb")
+  }
   if (find_synonym && nrow(df2) > 0) {
     rampIds <- df2[, "rampId"]
 

@@ -10,7 +10,8 @@ getPathwayFromAnalyte(
   analytes = "none",
   find_synonym = FALSE,
   NameOrIds = "ids",
-  includeRaMPids = FALSE
+  includeRaMPids = FALSE,
+  include_smpdb = FALSE
 )
 }
 \arguments{
@@ -21,6 +22,8 @@ getPathwayFromAnalyte(
 \item{NameOrIds}{whether input is "names" or "ids" (default is "ids")}
 
 \item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
+
+\item{include_smpdb}{Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant}
 }
 \value{
 a list contains all metabolites as name and pathway inside.
@@ -35,6 +38,6 @@ pkg.globals <- setConnectionToRaMP(
   dbname = "ramp2", username = "root",
   conpass = "", host = "localhost"
 )
-mypath <- getPathwayFromAnalyteV2(analytes = c("2-hydroxyglutarate", "glutamate"))
+mypath <- getPathwayFromAnalyte(analytes = c("2-hydroxyglutarate", "glutamate"))
 }
 }

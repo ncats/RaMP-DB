@@ -18,7 +18,8 @@ runCombinedFisherTest(
   includeRaMPids = FALSE,
   background_type = "database",
   background = "database",
-  pathway_definitions = "RaMP"
+  pathway_definitions = "RaMP",
+  include_smpdb = FALSE
 )
 }
 \arguments{
@@ -54,6 +55,8 @@ then users should specify one of the following: "Blood", "Adipose tissue", "Hear
 "Saliva", and "Feces"}
 
 \item{pathway_definitions}{If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows. Please supply a .xls or .xlsx file. If supplying pathway definitions for genes and metabolites, ensure that metabolite definitions are on tab 1, and gene definitions are on tab2.}
+
+\item{include_smpdb}{Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant}
 }
 \value{
 a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values
