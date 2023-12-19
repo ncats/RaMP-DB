@@ -7,7 +7,6 @@
 getReactionsForAnalytes(
   db = RaMP(),
   analytes,
-  analyteType = "metabolites",
   namesOrIds = "ids",
   onlyHumanMets = F,
   humanProtein = F,
@@ -16,9 +15,9 @@ getReactionsForAnalytes(
 )
 }
 \arguments{
-\item{analytes}{list of analytes}
+\item{db}{a RaMP databse object}
 
-\item{analyteType}{analyte type, 'metabolites' (default), 'genes' or 'both'}
+\item{analytes}{list of analytes}
 
 \item{namesOrIds}{indicates if input analyte list contains identifiers or analyte names}
 
@@ -29,6 +28,8 @@ getReactionsForAnalytes(
 \item{includeTransportRxns}{if TRUE, returns metabolic and transport reactions}
 
 \item{rxnDirs}{character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", "BD", "ALL"), default = c("UN").}
+
+\item{analyteType}{analyte type, 'metabolites' (default), 'genes' or 'both'}
 }
 \value{
 a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and common reactions

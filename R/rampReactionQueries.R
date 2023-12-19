@@ -326,79 +326,8 @@ getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F
   return(result)
 }
 
-combineStringLists <- function(x, y, sep=",") {
-  reactions <- c()
-  rxn_count <- c()
-  for(i in 1:length(x)) {
-    data <- paste0(x[i], ",", y[i])
-    dataSplit <- strsplit(data, split=sep)
-    dataSplit <- unlist(unique(dataSplit))
-    #dataSplit <- sort(dataSplit)
 
-    size = length(dataSplit)
-    data <- paste0(dataSplit, collapse=", ")
-    reactions <- c(reactions, data)
-    rxn_count <- c(rxn_count, size)
-  }
-  return(data.frame(rxn_count, reactions))
-}
 
-getReactionClassesForAnalytesOld <- function(db = RaMP(), analytes) {
-  reactions <- getReactionsForAnalytes(db=db, analytes=analytes, humanProtein=T)
-
-  rxnIds <- getReactionSourceIdsFromReactionQuery(reactions)
-  rxnIds <- paste(sQuote(rxnIds, "'"), collapse = ',')
-  sql = paste0('select * from reaction_ec_class where rxn_source_id in (',rxnIds,')')
-  rxnClasses <- RaMP::runQuery(sql=sql, db=db)
-  rxnClasses <- unique(rxnClasses)
-
-  ecLevel = 1
-  if(!is.null(rxnClasses) && nrow(rxnClasses) > 0) {
-    level1 <- rxnClasses[rxnClasses$ec_level == ecLevel,]
-
-    rxn2MetCounts <- NULL
-    rxn2ProteinCounts <- NULL
-
-    # thought experiment...
-    # map rxn_class to original result met2rxn,
-    # then each metabolite will have a collection of reaction classes
-    # take just metabolite id (ramp id?) and class
-    # make that table unique (pairs of id and class)
-    # Use 'table' to count distinct metabolites per class.
-    # then merge that reaction_class to metabolite count in the constructed result.
-
-    if(!is.null(reactions$met2rxn) && nrow(reactions$met2rxn) > 0) {
-      rxn2MetCounts <- data.frame(table(reactions$met2rxn$rxn_source_id))
-      colnames(rxn2MetCounts) <- c('rxn_id','metabolite_count')
-
-      level1 <- merge(level1, rxn2MetCounts, by.x='rxn_source_id', by.y='rxn_id', all.x=T)
-      level1$metabolite_count[is.na(level1$metabolite_count)] <- 0
-    } else {
-      level1$metabolite_count <- 0
-    }
-
-    if(!is.null(reactions$protein2rxn) && nrow(reactions$protein2rxn) > 0) {
-      rxn2ProteinCounts <- data.frame(table(reactions$prot2rxn$rxn_source_id))
-      colnames(rxn2ProteinCounts) <- c('rxn_id','protein_count')
-      level1 <- merge(level1, rxn2ProteinCounts, by.x='rxn_source_id', by.y='rxn_id', all.x=T)
-      level1$protein_count[is.na(level1$protein_count)] <- 0
-    } else {
-      level$protein_count <- 0
-    }
-
-    # get reaction counts per class
-    rxnCounts <- data.frame(table(level1$rxn_class))
-    colnames(rxnCounts) <- c('rxn_class', 'reaction_count')
-    rxnCounts <- merge(x=rxnCounts, y=unique(level1[,c('rxn_class','rxn_class_ec')]), by.x = 'rxn_class', by.y='rxn_class')
-    class2Rxn <- aggregate(level1[,c('rxn_class', 'rxn_source_id')], by=list(level1$rxn_class), FUN = paste0)
-    rxnCounts <- merge(x=rxnCounts, y=class2Rxn[,c('Group.1', 'rxn_source_id')], by.x='rxn_class', by.y='Group.1')
-
-    # get rxn_class to met_count from level1
-    temp <- unique(level1[,c('rxn_class', 'metabolite_count')])
-    aggregate(x=temp[,c('metabolite_count')], by=temp['rxn_class'], FUN = sum)
-
-  }
-}
 
 
 
@@ -409,6 +338,27 @@ getReactionClassesForAnalytesOld <- function(db = RaMP(), analytes) {
 #
 ##
 
+ #' Utility method to combine two list to tally unique counts and combine lists into a string.
+ #' This utility script specifically supports accounting in reaction class queries.
+ combineStringLists <- function(x, y, sep=",") {
+   reactions <- c()
+   rxn_count <- c()
+   for(i in 1:length(x)) {
+     if(x[i] != "") {
+       data <- paste0(x[i], ",", y[i])
+     } else {
+       data <- y[i]
+     }
+     dataSplit <- strsplit(data, split=sep)
+     dataSplit <- unlist(unique(dataSplit))
+
+     size = length(dataSplit)
+     data <- paste0(dataSplit, collapse=", ")
+     reactions <- c(reactions, data)
+     rxn_count <- c(rxn_count, size)
+   }
+   return(data.frame(rxn_count, reactions))
+ }
 
 #' getRampSourceInfoFromAnalyteIDs Utility method to extract source table information from analyte ids
 #'
