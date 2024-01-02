@@ -327,8 +327,41 @@ getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F
 }
 
 
+#' getProteinsForReactions returns protein information for a list of reaction ids.
+#' This utility methed can help extend information from previous queries.
+#' For instance, if a user queries for reactions related to a list of metabolites,
+#' this method can be used to return proteins on some subset of reaction ids to find related proteins.
+#'
+#' @param db a RaMP databse object
+#' @param reactionList list of reaction ids
+#'
+#' @return returns a dataframe object with reaction to protein mappings.
+#' @export
+getProteinsForReactions <- function(db = RaMP(), reactionList = c()) {
+  reactionListStr <- listToQueryString(reactionList)
+  sql = paste0('select rxn_source_id, uniprot, protein_name from reaction2protein where rxn_source_id in (', reactionListStr,");")
 
+  result <- runQuery(sql = sql, db=db)
+  return(result)
+}
 
+#' getReactionDetails returns general reaction information for a list of reaction ids.
+#' This utility methed can help extend information from previous queries.
+#' For instance, if a user queries for reactions related to a list of analytes, or filtered on reactions,
+#' this method can be used to return general reaction info on some subset of reaction ids of interest.
+#'
+#' @param db a RaMP databse object
+#' @param reactionList list of reaction ids
+#'
+#' @return returns a dataframe object with reaction information.
+#' @export
+getReactionDetails <- function(db = RaMP(), reactionList = c()) {
+  reactionListStr <- listToQueryString(reactionList)
+  sql = paste0('select rxn_source_id, direction, is_transport, has_human_prot, ec_num, label, equation, html_equation from reaction where rxn_source_id in (', reactionListStr,");")
+
+  result <- runQuery(sql = sql, db=db)
+  return(result)
+}
 
 
 #####################################################
