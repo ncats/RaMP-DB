@@ -18,6 +18,7 @@ before_install:
 # - Rscript -e '.libPaths("/home/travis/R/Library")'
 - Rscript -e 'update.packages(ask = FALSE)'
 
+
 os:
   - linux
 r_packages:
