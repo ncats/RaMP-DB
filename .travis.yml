@@ -16,8 +16,8 @@ r_check_args: --no-build-vignettes --no-manual --as-cran
 
 before_install:
 # - Rscript -e '.libPaths("/home/travis/R/Library")'
-- Rscript -e 'update.packages(ask = FALSE)'
-
+- mkdir ~/R/library
+- Rscript -e 'update.packages(ask = FALSE, lib="~/R/library")'
 
 os:
   - linux
