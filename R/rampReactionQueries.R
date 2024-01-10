@@ -327,21 +327,66 @@ getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F
 }
 
 
-#' getProteinsForReactions returns protein information for a list of reaction ids.
-#' This utility methed can help extend information from previous queries.
+#' getReactionParticipants returns protein information for a list of reaction ids.
+#' This utility method can help extend information from previous queries.
 #' For instance, if a user queries for reactions related to a list of metabolites,
 #' this method can be used to return proteins on some subset of reaction ids to find related proteins.
 #'
 #' @param db a RaMP databse object
 #' @param reactionList list of reaction ids
 #'
-#' @return returns a dataframe object with reaction to protein mappings.
+#' @return returns a dataframe object with reaction to reaction participant mappings.
 #' @export
-getProteinsForReactions <- function(db = RaMP(), reactionList = c()) {
+getReactionParticipants <- function(db = RaMP(), reactionList = c()) {
   reactionListStr <- listToQueryString(reactionList)
-  sql = paste0('select rxn_source_id, uniprot, protein_name from reaction2protein where rxn_source_id in (', reactionListStr,");")
 
-  result <- runQuery(sql = sql, db=db)
+
+  sql = paste0('select rm.rxn_source_id as reaction_id, rm.met_source_id as participant_id, rm.met_name as participant_name, rm.is_cofactor as is_cofactor, rm.substrate_product as is_product, cp.iso_smiles as iso_smiles ',
+               'from reaction2met rm, chem_props cp ',
+               'where rxn_source_id in (', reactionListStr,") and cp.chem_source_id = rm.met_source_id;")
+
+  metResult <- runQuery(sql = sql, db=db)
+  metResult$participant_role <- 'substrate'
+  metResult$participant_role_id <- 3
+  metResult$participant_role[metResult$is_product == 1] <- 'product'
+  metResult$participant_role_id[metResult$is_product == 1] <- 4
+  metResult$participant_role[metResult$is_cofactor == 1] <- 'cofactor'
+  metResult$participant_role_id[metResult$is_cofactor == 1] <- 2
+
+  metResult$reaction_type <- 'biochemical'
+
+  sql = paste0('select rxn_source_id as reaction_id, uniprot as participant_id, protein_name as participant_name from reaction2protein where rxn_source_id in (', reactionListStr,");")
+
+  proteinResult <- runQuery(sql = sql, db=db)
+  proteinResult$is_cofactor <- NA
+  proteinResult$is_product <- NA
+  proteinResult$iso_smiles <- NA
+  proteinResult$participant_role <- 'enzyme'
+  proteinResult$participant_role_id <- '1'
+
+  proteinResult$reaction_type <- 'biochemical'
+
+  sql = paste0('select rxn_source_id, is_transport from reaction where rxn_source_id in (',reactionListStr,') and is_transport = 1')
+
+  rxnResult <- runQuery(sql = sql, db=db)
+
+  if(nrow(rxnResult) > 0) {
+    transportRxns <- unique(unlist(rxnResult$rxn_source_id))
+    proteinResult$participant_role[proteinResult$reaction_id %in% transportRxns] <- 'transporter'
+
+    # set reaction type
+    proteinResult$reaction_type[proteinResult$reaction_id %in% transportRxns] <- 'transport'
+    metResult$reaction_type[metResult$reaction_id %in% transportRxns] <- 'transport'
+  }
+
+  result <- rbind(metResult, proteinResult)
+
+  result <- result[with(result, order(reaction_id, participant_role_id)),]
+
+  # reorder columns
+  colOrder <- c(1,9, 7, 2, 3, 6)
+  result <- result[,colOrder]
+
   return(result)
 }
 
