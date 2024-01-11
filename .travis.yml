@@ -16,6 +16,13 @@ r_check_args: --no-build-vignettes --no-manual --as-cran
 
 before_install:
 - Rscript -e '.libPaths("/home/travis/R/Library")'
+- Rscript -e 'install.packages("dbplyr")'
+- Rscript -e 'install.packages("dplyr")'
+- Rscript -e 'install.packages("RSQLite")'
+- Rscript -e 'install.packages("DBI")'
+- Rscript -e 'install.packages("filelock")'
+- Rscript -e 'install.packages("curl")'
+- Rscript -e 'install.packages("httr")'
 - Rscript -e 'install.packages("https://bioconductor.org/packages/release/bioc/src/contrib/BiocFileCache_2.10.1.tar.gz", repos=NULL, method="libcurl", dep=T)'
 
 os:
