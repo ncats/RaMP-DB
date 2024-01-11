@@ -23,9 +23,6 @@ before_script:
 - Rscript -e 'install.packages("filelock")'
 - Rscript -e 'install.packages("https://bioconductor.org/packages/release/bioc/src/contrib/BiocFileCache_2.10.1.tar.gz", repos=NULL, method="libcurl", dependencies=TRUE)'
 
-script:
-- Rscript -e 'devtools::test()'
-  
 os:
   - linux
 r_packages:
@@ -34,3 +31,4 @@ after_success:
 - Rscript -e 'packageVersion("BiocFileCache")'
 - Rscript -e 'packageVersion("dbplyr")'
 - Rscript -e 'library(covr); codecov()'
+- Rscript -e 'devtools::test()'
