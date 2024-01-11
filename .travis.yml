@@ -16,12 +16,13 @@ r_check_args: --no-build-vignettes --no-manual --as-cran
 
 before_install:
 - Rscript -e '.libPaths("/home/travis/R/Library")'
-- Rscript -e 'packageVersion("BiocFileCache")'
-- Rscript -e 'packageVersion("dbplyr")'
+- Rscript -e 'install.packages("https://bioconductor.org/packages/release/bioc/src/contrib/BiocFileCache_2.10.1.tar.gz", repos=NULL, method="libcurl")'
 
 os:
   - linux
 r_packages:
   - covr
 after_success:
+- Rscript -e 'packageVersion("BiocFileCache")'
+- Rscript -e 'packageVersion("dbplyr")'
 - Rscript -e 'library(covr); codecov()'
