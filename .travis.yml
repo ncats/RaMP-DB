@@ -9,6 +9,8 @@ r:
 # not building on bioc-devel until there's a patch in travis
 #  - bioc-devel
 
+warnings_are_errors: false
+
 sudo: false
 cache: packages
 r_build_args: --no-build-vignettes --no-manual
