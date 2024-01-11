@@ -3,7 +3,7 @@
 language: r
 bioc_required: true
 r:
-  - bioc-devel
+  - bioc-release
 
 # Note: 11/19/2020 travis is not installing R 4.1 which is required for bioc-dev 3.13
 # not building on bioc-devel until there's a patch in travis
@@ -16,7 +16,8 @@ r_check_args: --no-build-vignettes --no-manual --as-cran
 
 before_install:
 - Rscript -e '.libPaths("/home/travis/R/Library")'
-- Rscript -e 'update.packages(ask = FALSE, lib="/home/travis/R/Library")'
+- Rscript -e packageVersion('BiocFileCache') 
+- Rscript -e packageVersion('dbplyr') 
 
 os:
   - linux
