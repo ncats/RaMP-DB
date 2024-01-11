@@ -40,7 +40,7 @@ runFisherTest <- function(db = RaMP(), analytes,
     pathwaydf <- getCustomPathwayFromAnalyte(analytes,
       pathway_definitions,
       analyte_type = analyte_type
-    )
+      )
   } else {
     pathwaydf <- getPathwayFromAnalyte(db = db, analytes = analytes,
       includeRaMPids = TRUE,
@@ -1094,7 +1094,7 @@ findCluster <- function(db = RaMP(), fishers_df, perc_analyte_overlap = 0.5,
     } else {
       stop("analyte_type should be 'genes' or metabolites'")
     }
-    pathway_list <- fishers_df[, "pathwayRampId"]
+    pathway_list <- fishers_df[, "pathwayRampId.x"]
 
     pathway_indices <- match(pathway_list, rownames(similarity_matrix))
 
@@ -1197,7 +1197,7 @@ findCluster <- function(db = RaMP(), fishers_df, perc_analyte_overlap = 0.5,
     # return(cluster_list)
 
     # Reformat cluster list to embed into results file
-    rampids <- as.vector(fishers_df$pathwayRampId)
+    rampids <- as.vector(fishers_df$pathwayRampId.x)
     # fishers_df$pathwayRampId<-NULL
 
     if (length(cluster_list) > 1) {
