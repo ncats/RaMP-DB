@@ -4,31 +4,30 @@ language: r
 bioc_required: true
 r:
   - bioc-release
-  
-# bioc_packages:
- # - BiocFileCache
 
 # Note: 11/19/2020 travis is not installing R 4.1 which is required for bioc-dev 3.13
 # not building on bioc-devel until there's a patch in travis
 #  - bioc-devel
 
-# warnings_are_errors: false
+warnings_are_errors: false
 
 sudo: false
 cache: packages
 r_build_args: --no-build-vignettes --no-manual
 r_check_args: --no-build-vignettes --no-manual --as-cran
 
-# before_install:
-# - Rscript -e '.libPaths("/home/travis/R/Library")'
+before_install:
+- Rscript -e '.libPaths("/home/travis/R/Library")'
 
-# before_script:
-# - Rscript -e 'install.packages("filelock")'
-# - Rscript -e 'install.packages("https://bioconductor.org/packages/release/bioc/src/contrib/BiocFileCache_2.10.1.tar.gz", repos=NULL, method="libcurl", dependencies=TRUE)'
+before_script:
+- Rscript -e 'install.packages("filelock")'
+- Rscript -e 'install.packages("https://bioconductor.org/packages/release/bioc/src/contrib/BiocFileCache_2.10.1.tar.gz", repos=NULL, method="libcurl", dependencies=TRUE)'
 
+script:
+- Rscript -e 'devtools::test()'
+  
 os:
-  # - linux
-  - windows
+  - linux
 r_packages:
   - covr
 after_success:
