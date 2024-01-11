@@ -16,8 +16,8 @@ r_check_args: --no-build-vignettes --no-manual --as-cran
 
 before_install:
 - Rscript -e '.libPaths("/home/travis/R/Library")'
-- Rscript -e packageVersion('BiocFileCache') 
-- Rscript -e packageVersion('dbplyr') 
+- Rscript -e 'packageVersion("BiocFileCache")'
+- Rscript -e 'packageVersion("dbplyr")'
 
 os:
   - linux
