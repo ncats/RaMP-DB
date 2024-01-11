@@ -18,7 +18,8 @@ before_install:
 - Rscript -e '.libPaths("/home/travis/R/Library")'
 
 before_script:
-- Rscript -e 'install.packages("https://bioconductor.org/packages/release/bioc/src/contrib/BiocFileCache_2.10.1.tar.gz", repos=NULL, method="libcurl", dep=T)'
+- Rscript -e 'install.packages("filelock")'
+- Rscript -e 'install.packages("https://bioconductor.org/packages/release/bioc/src/contrib/BiocFileCache_2.10.1.tar.gz", repos=NULL, method="libcurl", dependencies=TRUE)'
 
 os:
   - linux
