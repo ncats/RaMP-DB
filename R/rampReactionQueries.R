@@ -228,14 +228,20 @@ getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F
   if(multiRxnParticipantCount > 1) {
 
     analyte2Rxn = RaMP::getReactionsForAnalytes(db=db, analytes=analytes, humanProtein = humanProtein)
-    rxnParticipantData <- RaMP::getReactionParticpantCounts(analyte2Rxn, multiRxnParticipantCount)
+    rxnParticipantData <- RaMP:::getReactionParticpantCounts(analyte2Rxn, multiRxnParticipantCount)
 
     if(rxnParticipantData[['total_rxns_retained']] == 0) {
 
       message("The input analytes map to ", rxnParticipantData$total_mapped_rxns," reactions.")
       message("The input analytes to reaction mapping do not support the multiRxnParticipantCount cutoff of ",multiRxnParticipantCount, ".")
-      message("Returing NULL result. Check input id prefix format and possibley reduce multiRxnParticipantCount cutoff.")
-      return(NULL)
+      message("Returing empty result. Check input id prefix format and possibley reduce multiRxnParticipantCount cutoff.")
+
+      if(concatResults) {
+        return(data.frame())
+      }
+      else {
+        return(list())
+      }
     }
 
     # reaction list is already filtered
@@ -257,7 +263,7 @@ getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F
           where s.sourceId in (",analytesStr,") and r.rxn_source_id in (",keeperRxnStr,")
           and r.ramp_gene_id = s.rampId
           and c.rxn_source_id = r.rxn_source_id
-          group by c.rxn_class_hierarchy, x.rxn_class, c.rxn_class_ec, c.ec_level
+          group by c.rxn_class_hierarchy, c.rxn_class, c.rxn_class_ec, c.ec_level
           order by ec_level asc, rxn_count desc")
 
     proteinResult <- RaMP::runQuery(sql=proteinQuery, db=db)
@@ -292,6 +298,19 @@ getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F
   mergedRxnData <- merge(x=metRxns, y=proteinRxns, by.x='rxn_class_hierarchy', by.y='rxn_class_hierarchy', all.x=T, all.y=T)
   mergedRxnData$met_reactions[is.na(mergedRxnData$met_reactions)] <- ""
   mergedRxnData$protein_reactions[is.na(mergedRxnData$protein_reactions)] <- ""
+
+  if(nrow(mergedRxnData) == 0) {
+
+    message("The input analytes map to 0 reactions.")
+    message("Returing empty result. Check input id prefix format.")
+
+    if(concatResults) {
+      return(data.frame())
+    }
+    else {
+      return(list())
+    }
+  }
 
   mergedRxnData$rxn_count <- 0
 
