@@ -30,7 +30,7 @@ getReactionsForAnalytes <- function(db = RaMP(), analytes, namesOrIds='ids', onl
       mdf <- getReactionsForRaMPCompoundIds(db = db, rampCompoundIds=rampIds, onlyHumanMets=onlyHumanMets, humanProtein=humanProtein, includeTransportRxns=includeTransportRxns, rxnDirs=rxnDirs)
       if(nrow(mdf) > 0) {
         mdf <- merge(mets, mdf, by.x='rampId', by.y='ramp_cmpd_id')
-        mdf <- subset(mdf, select=-c(rampId, ramp_rxn_id.1))
+        mdf <- subset(mdf, select=-c(rampId, ramp_rxn_id))
       }
     } else {
       # name-based queries
@@ -42,7 +42,7 @@ getReactionsForAnalytes <- function(db = RaMP(), analytes, namesOrIds='ids', onl
       gdf <- getReactionsForRaMPGeneIds(db = db, rampGeneIds=rampIds, onlyHumanMets=onlyHumanMets, humanProtein=humanProtein, includeTransportRxns)
       if(nrow(gdf) > 0) {
         gdf <- merge(genes, gdf, by.x='rampId', by.y='ramp_gene_id')
-        gdf <- subset(gdf, select=-c(rampId, ramp_rxn_id.1))
+        gdf <- subset(gdf, select=-c(rampId, ramp_rxn_id))
       }
     }
 
@@ -62,12 +62,12 @@ getReactionsForAnalytes <- function(db = RaMP(), analytes, namesOrIds='ids', onl
 
   # find common reactions
   if(nrow(mdf) > 0 && nrow(gdf) > 0) {
-    mRampRxnIds <- unlist(mdf$ramp_rxn_id)
-    gRampRxnIds <- unlist(gdf$ramp_rxn_id)
+    mRampRxnIds <- unlist(mdf$rxn_source_id)
+    gRampRxnIds <- unlist(gdf$rxn_source_id)
     commonRxnIds <- intersect(mRampRxnIds, gRampRxnIds)
     if(length(commonRxnIds) > 0) {
-      mRxn <- mdf[mdf$ramp_rxn_id %in% commonRxnIds,]
-      gRxn <- gdf[gdf$ramp_rxn_id %in% commonRxnIds,]
+      mRxn <- mdf[mdf$rxn_source_id %in% commonRxnIds,]
+      gRxn <- gdf[gdf$rxn_source_id %in% commonRxnIds,]
 
       # one row per reaction, include concat mets, concat proteins
       # probably a more streamlined way to do this...
@@ -86,22 +86,22 @@ getReactionsForAnalytes <- function(db = RaMP(), analytes, namesOrIds='ids', onl
       rxnDir <- c()
       for(rxn in commonRxnIds) {
         commonRampRxnList <- c(commonRampRxnList, rxn)
-        commonRxnList <- c(commonRxnList, paste0(unique(mRxn$rxn_source_id[mRxn$ramp_rxn_id == rxn]), collapse = ','))
-        mRxnSourceIds <- c(mRxnSourceIds, paste0(unique(mRxn$sourceId[mRxn$ramp_rxn_id == rxn]), collapse = ','))
-        mRxnSourceNames <- c(mRxnSourceNames, paste0(unique(mRxn$met_name[mRxn$ramp_rxn_id == rxn]), collapse = ','))
+        commonRxnList <- c(commonRxnList, paste0(unique(mRxn$rxn_source_id[mRxn$rxn_source_id == rxn]), collapse = ','))
+        mRxnSourceIds <- c(mRxnSourceIds, paste0(unique(mRxn$sourceId[mRxn$rxn_source_id == rxn]), collapse = ','))
+        mRxnSourceNames <- c(mRxnSourceNames, paste0(unique(mRxn$met_name[mRxn$rxn_source_id == rxn]), collapse = ','))
 
-        gRxnSourceIds <- c(gRxnSourceIds, paste0(unique(gRxn$sourceId[gRxn$ramp_rxn_id == rxn]), collapse = ','))
-        gRxnUniprot <- c(gRxnUniprot, paste0(unique(gRxn$uniprot[gRxn$ramp_rxn_id == rxn]), collapse = ','))
-        gRxnSourceName <- c(gRxnSourceName, paste0(unique(gRxn$protein_name[gRxn$ramp_rxn_id == rxn]), collapse = ','))
+        gRxnSourceIds <- c(gRxnSourceIds, paste0(unique(gRxn$sourceId[gRxn$rxn_source_id == rxn]), collapse = ','))
+        gRxnUniprot <- c(gRxnUniprot, paste0(unique(gRxn$uniprot[gRxn$rxn_source_id == rxn]), collapse = ','))
+        gRxnSourceName <- c(gRxnSourceName, paste0(unique(gRxn$protein_name[gRxn$rxn_source_id == rxn]), collapse = ','))
 
-        rxnDir <- c(rxnDir, paste0(unique(mRxn$direction[mRxn$ramp_rxn_id == rxn]), collapse = ','))
+        rxnDir <- c(rxnDir, paste0(unique(mRxn$direction[mRxn$rxn_source_id == rxn]), collapse = ','))
 
-        commonRxnLabel <- c(commonRxnLabel, paste0(unique(mRxn$label[mRxn$ramp_rxn_id == rxn]), collapse = ','))
-        commonRxnHTMLEq <- c(commonRxnHTMLEq, paste0(unique(mRxn$html_equation[mRxn$ramp_rxn_id == rxn]), collapse = ','))
+        commonRxnLabel <- c(commonRxnLabel, paste0(unique(mRxn$label[mRxn$rxn_source_id == rxn]), collapse = ','))
+        commonRxnHTMLEq <- c(commonRxnHTMLEq, paste0(unique(mRxn$html_equation[mRxn$rxn_source_id == rxn]), collapse = ','))
 
-        isTransport <- c(isTransport, paste0(unique(mRxn$is_transport[mRxn$ramp_rxn_id == rxn]), collapse = ','))
-        hasHumanProtein <- c(hasHumanProtein, paste0(unique(mRxn$has_human_prot[mRxn$ramp_rxn_id == rxn]), collapse = ','))
-        onlyHumanMets <- c(onlyHumanMets, paste0(unique(mRxn$only_human_mets[mRxn$ramp_rxn_id == rxn]), collapse = ','))
+        isTransport <- as.integer(c(isTransport, paste0(unique(mRxn$is_transport[mRxn$rxn_source_id == rxn]), collapse = ',')))
+        hasHumanProtein <- as.integer(c(hasHumanProtein, paste0(unique(mRxn$has_human_prot[mRxn$rxn_source_id == rxn]), collapse = ',')))
+        onlyHumanMets <- as.integer(c(onlyHumanMets, paste0(unique(mRxn$only_human_mets[mRxn$rxn_source_id == rxn]), collapse = ',')))
       }
       commonReactions <- data.frame(list('metabolites' = mRxnSourceIds, 'met_names' = mRxnSourceNames ,'genes' = gRxnSourceIds,
                                          'uniprot' = gRxnUniprot, 'proteinNames' = gRxnSourceName,
@@ -131,7 +131,7 @@ getReactionsForRaMPCompoundIds <- function(db = RaMP(), rampCompoundIds, onlyHum
 
   idStr <- listToQueryString(rampCompoundIds)
   query <- paste0("select mr.ramp_rxn_id, mr.ramp_cmpd_id, mr.met_source_id, mr.substrate_product, mr.is_cofactor, mr.met_name,
-  mr.ramp_rxn_id, rxn.rxn_source_id, rxn.is_transport, rxn.label, rxn.direction, rxn.equation, rxn.html_equation, rxn.ec_num, rxn.has_human_prot, rxn.only_human_mets
+  rxn.rxn_source_id, rxn.is_transport, rxn.label, rxn.direction, rxn.equation, rxn.html_equation, rxn.ec_num, rxn.has_human_prot, rxn.only_human_mets
   from reaction2met mr, reaction rxn
   where mr.ramp_cmpd_id in (",idStr,") and rxn.ramp_rxn_id = mr.ramp_rxn_id")
 
@@ -174,7 +174,7 @@ getReactionsForRaMPCompoundIds <- function(db = RaMP(), rampCompoundIds, onlyHum
 getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN")) {
 
   idStr <- listToQueryString(rampGeneIds)
-  query <- paste0("select gr.ramp_rxn_id, gr.ramp_gene_id, gr.uniprot, gr.protein_name, gr.ramp_rxn_id, rxn.rxn_source_id,
+  query <- paste0("select gr.ramp_rxn_id, gr.ramp_gene_id, gr.uniprot, gr.protein_name, rxn.rxn_source_id,
                   rxn.is_transport, rxn.label, rxn.direction, rxn.equation, rxn.html_equation,
                   rxn.ec_num, rxn.has_human_prot, rxn.only_human_mets from reaction2protein gr,
                   reaction rxn where gr.ramp_gene_id in (",idStr,") and rxn.ramp_rxn_id = gr.ramp_rxn_id")
