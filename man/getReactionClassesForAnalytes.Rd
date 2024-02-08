@@ -8,13 +8,19 @@ getReactionClassesForAnalytes(
   db = RaMP(),
   analytes,
   multiRxnParticipantCount = 1,
-  humanProtein = F
+  humanProtein = TRUE,
+  concatResults = F,
+  includeReactionIDs = F
 )
 }
 \arguments{
-\item{db}{a RaMP databse object}
+\item{db}{a RaMP database object}
 
 \item{analytes}{list of analyte ids}
+
+\item{multiRxnParticipantCount}{minimum number of analytes to report a reaction class, default = 1}
+
+\item{humanProtein}{require reactions to have a human protein (enzyme or transporter), default True}
 }
 \value{
 returns a three dataframes of reaction EC classe information, one for each EC level

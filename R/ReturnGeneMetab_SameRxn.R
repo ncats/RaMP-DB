@@ -175,7 +175,6 @@ rampFastCata <- function(db = RaMP(), analytes="none", NameOrIds="ids") {
     }
   }
 
-
   # remove rampId column
   result <- subset(result, select=-c(rampId))
   # move relation first
@@ -183,7 +182,13 @@ rampFastCata <- function(db = RaMP(), analytes="none", NameOrIds="ids") {
 
   print(paste0("Total Relation Count: ", (nrow(result))))
 
-  return(result)
+  rheaResult <- RaMP::getRheaAnalyteReactionAssociations(db=db, analytes=analytes, includeRheaRxnDetails = F, humanProteins = T)
+
+  resultList <- list()
+  resultList[["HMDB_Analyte_Associations"]] <- result
+  resultList[["Rhea_Analyte_Associations"]] <- rheaResult
+
+  return(resultList)
 }
 
 
