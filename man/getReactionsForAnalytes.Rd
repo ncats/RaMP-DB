@@ -7,7 +7,6 @@
 getReactionsForAnalytes(
   db = RaMP(),
   analytes,
-  namesOrIds = "ids",
   onlyHumanMets = F,
   humanProtein = F,
   includeTransportRxns = F,
@@ -20,8 +19,6 @@ getReactionsForAnalytes(
 
 \item{analytes}{list of analytes}
 
-\item{namesOrIds}{indicates if input analyte list contains identifiers or analyte names}
-
 \item{onlyHumanMets}{boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)}
 
 \item{humanProtein}{boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)}
@@ -29,6 +26,8 @@ getReactionsForAnalytes(
 \item{includeTransportRxns}{if TRUE, returns metabolic and transport reactions}
 
 \item{rxnDirs}{character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", "BD", "ALL"), default = c("UN").}
+
+\item{namesOrIds}{indicates if input analyte list contains identifiers or analyte names}
 }
 \value{
 a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and common reactions
