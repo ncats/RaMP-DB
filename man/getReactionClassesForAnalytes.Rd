@@ -10,7 +10,8 @@ getReactionClassesForAnalytes(
   multiRxnParticipantCount = 1,
   humanProtein = TRUE,
   concatResults = F,
-  includeReactionIDs = F
+  includeReactionIDs = F,
+  useIdMapping = F
 )
 }
 \arguments{
@@ -21,6 +22,12 @@ getReactionClassesForAnalytes(
 \item{multiRxnParticipantCount}{minimum number of analytes to report a reaction class, default = 1}
 
 \item{humanProtein}{require reactions to have a human protein (enzyme or transporter), default True}
+
+\item{concatResults}{returns all reaction class levels in one dataframe rather than a list of 3 dataframes}
+
+\item{includeReactionIDs}{adds the list of reaction ids for each reaction class}
+
+\item{useIdMapping}{allows one to fuzzy match input ids to chebi and uniprot to support reaction queries.}
 }
 \value{
 returns a three dataframes of reaction EC classe information, one for each EC level
