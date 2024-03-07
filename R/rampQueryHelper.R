@@ -710,7 +710,7 @@ chemicalClassSurveyRampIdsConn <- function(db = RaMP(), mets, pop, inferIdMappin
   metStr <- paste("'" ,metStr, "'", sep = "")
 
 
-  isSQLite <- .is_sqlite(db)
+  isSQLite <- RaMP:::.is_sqlite(db)
 
   # if inferring ID mapping, the query goes through the source table to map input id to ramp id, then map to related ids having chem class annotations
   # if not ID mapping, then the match is directly on the input source ids. HMDB and LipidMaps IDs are supported directly, May 2023.
@@ -879,7 +879,7 @@ chemicalClassSurveyRampIdsFullPopConn <- function(db = RaMP(), mets, inferIdMapp
   metStr <- paste(mets, collapse = "','")
   metStr <- paste("'" ,metStr, "'", sep = "")
 
-  isSQLite = .is_sqlite(db)
+  isSQLite = RaMP:::.is_sqlite(db)
 
   # Id mapping matches on source ids mapped via ramp ids in the source table. No id mapping matches on input ids directly.
   if(inferIdMapping) {
@@ -991,5 +991,41 @@ chemicalClassSurveyRampIdsFullPopConn <- function(db = RaMP(), mets, inferIdMapp
 
   return(result)
 }
+
+
+#' listToQueryString utility method to convert an id list to a comma separate string, with single quoted values.
+#'
+#' @param analytes list of analytes (can be names or ids)
+#'
+#' @return comma separated list of single quoted analyte ids or names
+#'
+listToQueryString <- function(analytes) {
+  analyteStr <- paste0("'", paste0(analytes, collapse = "','"), "'", sep="")
+  return (analyteStr)
+}
+
+
+#' filterPathwaysByAnalytCount utility method filtered a dataframe based on the number of analytes associated with rampPathwayIds contained in the dataframe.
+#' Like fisher exact code, this one retains pathways with analyte count >= min_path_size, and having analyte_count < max_path_size
+#'
+#' @param db a RaMP databse object
+#' @param pathway_dataframe a dataframe containing at least one column that contains rampPathwayIds
+#' @param pathway_ramp_id_col_name the column name containing the rampPathwayIds
+#' @param min_path_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
+#' @param max_path_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
+filterPathwaysByAnalytCount <- function(db = RaMP(), pathway_dataframe, pathway_ramp_id_col_name = 'pathwayRampId', min_path_size = 5, max_path_size = 150) {
+  pwIds <- unlist(pathway_dataframe[[pathway_ramp_id_col_name]])
+  pwIdsStr <- listToQueryString(pwIds)
+
+  sql <- paste0("select pathwayRampId, count(distinct(rampId)) as analyte_count from analytehaspathway where pathwayRampId in (", pwIdsStr,") group by pathwayRampId")
+
+  res <- RaMP::runQuery(sql, db=db)
+  res <- res[res$analyte_count >= min_path_size & res$analyte_count < max_path_size,]
+  keeperPW <- unlist(res$pathwayRampId)
+  pathway_dataframe <- pathway_dataframe[pathway_dataframe[[pathway_ramp_id_col_name]] %in% keeperPW, ]
+  return(pathway_dataframe)
+}
+
+
 
 

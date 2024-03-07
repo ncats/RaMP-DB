@@ -21,6 +21,8 @@ runFisherTest(
 )
 }
 \arguments{
+\item{db}{a RaMP databse object}
+
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
