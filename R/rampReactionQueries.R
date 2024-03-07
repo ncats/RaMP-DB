@@ -348,10 +348,10 @@ getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F
   analytesStr <- RaMP:::listToQueryString(analytes)
 
   # base reaction stats, reactions per reaction class
-  rxnClassStats <- RaMP:::getReactionClassStats(db)
+  rxnClassStats <- RaMP:::getReactionClassStats(db, humanProtein)
 
   # base reaction stats for analytes, distinct analyte counts (proteins or mets) per reaction class
-  analyteClassStats <- RaMP:::getReactionClassStatsOnAnalytes(db)
+  analyteClassStats <- RaMP:::getReactionClassStatsOnAnalytes(db, humanProtein)
 
   # need to be careful to enforce request for only reactions with a human protein
   humanProteinArg = ''
@@ -944,17 +944,6 @@ getRampSourceInfoFromAnalyteIDs <- function(db = RaMP(), analytes) {
 }
 
 
-#' listToQueryString utility method to convert an id list to a comma separate string, with single quoted values.
-#'
-#' @param analytes list of analytes (can be names or ids)
-#'
-#' @return comma separated list of single quoted analyte ids or names
-#'
-listToQueryString <- function(analytes) {
-  analyteStr <- paste0("'", paste0(analytes, collapse = "','"), "'", sep="")
-  return (analyteStr)
-}
-
 
 #' Utility method that evalutates the mapping counts for analytes to reaction ids
 #'
@@ -1021,11 +1010,20 @@ getReactionSourceIdsFromReactionQuery <- function(reactions) {
 #' Utility method that returns the number of rhea reaction count in each reaction class.
 #'
 #' @param reactions input result from the getReactionsForAnalytes
+#' @param humanProtein boolean value indicating if reactions should be constrained to those having human proteins
 #'
-getReactionClassStats <- function(db=RaMP()) {
+getReactionClassStats <- function(db=RaMP(), humanProtein=T) {
 
-  sql = "select rxn_class, rxn_class_hierarchy, ec_level as stat_ec_level, rxn_class_ec as stat_class_ec, count(distinct(rxn_source_id)) as Total_Rxns_in_Class from reaction_ec_class
-  group by rxn_class, ec_level, rxn_class_ec"
+  humanProteinArg = ''
+  if(humanProtein) {
+    humanProteinArg = ' and r.has_human_prot = 1'
+  }
+
+  sql = paste0("select rc.rxn_class, rc.rxn_class_hierarchy, rc.ec_level as stat_ec_level, rc.rxn_class_ec as stat_class_ec, count(distinct(rc.rxn_source_id)) as Total_Rxns_in_Class
+  from reaction_ec_class rc, reaction r
+  where rc.rxn_source_id = r.rxn_source_id ",
+  humanProteinArg,
+  " group by rxn_class, ec_level, rxn_class_ec")
 
   result <- runQuery(sql=sql, db=db)
 
@@ -1034,21 +1032,31 @@ getReactionClassStats <- function(db=RaMP()) {
 
 #' Utility method that returns the number of rhea reaction count in each reaction class.
 #'
-#' @param reactions input result from the getReactionsForAnalytes
+#' @param db RaMP Object
+#' @param humanProtein boolean value indicating if reactions should be constrained to those having human proteins
 #'
-getReactionClassStatsOnAnalytes <- function(db=RaMP()) {
+getReactionClassStatsOnAnalytes <- function(db=RaMP(), humanProtein=T) {
 
-  sql = "select rc.rxn_class, rc.rxn_class_hierarchy, rc.ec_level as stat_ec_level, rc.rxn_class_ec as stat_class_ec, count(distinct(rm.met_source_id)) as Total_in_RxnClass_Metab
-  from reaction_ec_class rc, reaction2met rm
+  humanProteinArg = ''
+  if(humanProtein) {
+    humanProteinArg = ' and r.has_human_prot = 1'
+  }
+
+  sql = paste0("select rc.rxn_class, rc.rxn_class_hierarchy, rc.ec_level as stat_ec_level, rc.rxn_class_ec as stat_class_ec, count(distinct(rm.met_source_id)) as Total_in_RxnClass_Metab
+  from reaction_ec_class rc, reaction2met rm, reaction r
   where rm.rxn_source_id = rc.rxn_source_id
-  group by rc.rxn_class, rc.ec_level, rc.rxn_class_ec"
+  and rc.rxn_source_id = r.rxn_source_id ",
+  humanProteinArg
+  , " group by rc.rxn_class, rc.ec_level, rc.rxn_class_ec")
 
   metRes <- runQuery(sql=sql, db=db)
 
-  sql = "select rc.rxn_class, rc.rxn_class_hierarchy, rc.ec_level as stat_ec_level, rc.rxn_class_ec as stat_class_ec,  count(distinct(rp.uniprot)) as Total_in_RxnClass_Protein
-  from reaction_ec_class rc, reaction2protein rp
+  sql = paste0("select rc.rxn_class, rc.rxn_class_hierarchy, rc.ec_level as stat_ec_level, rc.rxn_class_ec as stat_class_ec,  count(distinct(rp.uniprot)) as Total_in_RxnClass_Protein
+  from reaction_ec_class rc, reaction2protein rp, reaction r
   where rp.rxn_source_id = rc.rxn_source_id
-  group by rc.rxn_class, rc.ec_level, rc.rxn_class_ec"
+  and rc.rxn_source_id = r.rxn_source_id ",
+  humanProteinArg,
+  " group by rc.rxn_class, rc.ec_level, rc.rxn_class_ec")
 
   protRes <- runQuery(sql=sql, db=db)
 

@@ -22,6 +22,8 @@ runCombinedFisherTest(
 )
 }
 \arguments{
+\item{db}{a RaMP databse object}
+
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
 \item{NameOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
