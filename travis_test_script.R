@@ -26,8 +26,6 @@ if (length(failures) > 0) {
   q("no", status = 1)
 }
 
-# Wait for four minutes (240 seconds) - for database to be ready
-Sys.sleep(240)
 Sys.setenv(MYSQL_TEST = "true")
 test_results <- devtools::test()
 
