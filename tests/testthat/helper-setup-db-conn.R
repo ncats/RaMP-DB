@@ -1,7 +1,12 @@
 library(properties)
 
+if (Sys.getenv("MYSQL_TEST") == "true") {
+    dbpass <- properties::read.properties('../../local_mysql.dbprops.txt')
+} else {
+    dbpass <- properties::read.properties('../../dbprops.txt')
+}
+
 # get db props
-dbpass <- properties::read.properties('../../dbprops.txt')
 rampDB <- NULL
 
 if(grepl("SQLite", dbpass$dbname)) {

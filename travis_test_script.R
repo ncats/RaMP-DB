@@ -21,7 +21,28 @@ failures <- test_results[indices]
 
 # Check if any tests failed and exit with an error if true
 if (length(failures) > 0) {
-  message("Some tests failed. Exiting with an error.")
+  message("Some tests failed using the sqlite database. Exiting with an error.")
+  print(failures)
+  q("no", status = 1)
+}
+
+# Wait for four minutes (240 seconds) - for database to be ready
+Sys.sleep(240)
+Sys.setenv(MYSQL_TEST = "true")
+test_results <- devtools::test()
+
+# Get indices where the condition is true
+indices <- sapply(1:length(test_results), function(i) {
+  class_value <- class(test_results[[i]][[7]][[1]])[[1]]
+  class_value == 'expectation_failure'
+})
+
+# Filter test_results based on the condition
+failures <- test_results[indices]
+
+# Check if any tests failed and exit with an error if true
+if (length(failures) > 0) {
+  message("Some tests failed using the mysql database. Exiting with an error.")
   print(failures)
   q("no", status = 1)
 } else {
