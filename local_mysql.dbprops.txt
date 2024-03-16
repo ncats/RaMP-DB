@@ -1,4 +1,4 @@
-hostname=localhost
+hostname=local_mysql
 dbname=ramp
 username=root
 conpass=root_password
