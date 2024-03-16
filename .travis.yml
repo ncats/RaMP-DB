@@ -5,4 +5,4 @@ script:
   - docker build -t local_mysql -f local_mysql.Dockerfile .
   - docker run -p 3306:3306 local_mysql &
   - docker build -t ramp_db -f travis.Dockerfile .
-  - docker run --network="service:local_mysql" --privileged=true ramp_db
+  - docker run --network=host --privileged=true ramp_db
