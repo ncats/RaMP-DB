@@ -33,8 +33,10 @@ run_tests <- function(database_type) {
   failures <- test_results[indices]
 
   # Check if any tests failed and exit with an error if true
-  if (nrow(failures) > 0) {
+  if (!is.null(failures) && nrow(failures) > 0) {
     return(failures)
+  } else {
+    return(NULL)
   }
 }
 
