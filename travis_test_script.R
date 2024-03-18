@@ -34,7 +34,7 @@ run_tests <- function(database_type) {
 
   # Check if any tests failed and exit with an error if true
   if (!is.null(failures)) {
-    return failures
+    return(failures)
   }
 }
 
