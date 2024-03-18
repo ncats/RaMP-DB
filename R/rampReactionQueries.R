@@ -652,9 +652,10 @@ getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F
     result[['class_ec_level_1']] <- combo[combo$classLevel == 1,]
     result[['class_ec_level_2']] <- combo[combo$classLevel == 2,]
     result[['class_ec_level_3']] <- combo[combo$classLevel == 3,]
+    result[['class_ec_level_4']] <- combo[combo$classLevel == 4,]
   } else {
     result = combo
-    result = result[order(result$classLevel, -result$rxn_count),]
+    result = result[with(result, order(classLevel, -reactionCount)),]
   }
 
   print("Completed reaction class query...")
