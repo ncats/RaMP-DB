@@ -8,42 +8,53 @@ library(highcharter)
 library(RMariaDB)
 remotes::install_deps()
 
-test_results <- devtools::test()
+# Define a function to run tests with a given database type
+run_tests <- function(database_type) {
+  if (database_type == "sqlite") {
+    Sys.unsetenv("MYSQL_TEST")
+    message("Running tests with the sqlite database.")
+  } else if (database_type == "mysql") {
+    Sys.setenv(MYSQL_TEST = "true")
+    message("Running tests with the mysql database.")
+  } else {
+    stop("Invalid database type specified.")
+  }
 
-# Get indices where the condition is true
-indices <- sapply(1:length(test_results), function(i) {
-  class_value <- class(test_results[[i]][[7]][[1]])[[1]]
-  class_value == 'expectation_failure'
-})
+  # Run tests
+  test_results <- devtools::test()
 
-# Filter test_results based on the condition
-failures <- test_results[indices]
+  # Get indices where the condition is true
+  indices <- sapply(1:length(test_results), function(i) {
+    class_value <- class(test_results[[i]][[7]][[1]])[[1]]
+    class_value == 'expectation_failure'
+  })
 
-# Check if any tests failed and exit with an error if true
-if (length(failures) > 0) {
-  message("Some tests failed using the sqlite database. Exiting with an error.")
-  print(failures)
-  q("no", status = 1)
+  # Filter test_results based on the condition
+  failures <- test_results[indices]
+
+  # Check if any tests failed and exit with an error if true
+  if (!is.null(failures)) {
+    return failures
+  }
 }
 
-Sys.setenv(MYSQL_TEST = "true")
-test_results <- devtools::test()
+# Run tests with sqlite database
+failures <- run_tests("sqlite")
 
-# Get indices where the condition is true
-indices <- sapply(1:length(test_results), function(i) {
-  class_value <- class(test_results[[i]][[7]][[1]])[[1]]
-  class_value == 'expectation_failure'
-})
-
-# Filter test_results based on the condition
-failures <- test_results[indices]
-
-# Check if any tests failed and exit with an error if true
-if (length(failures) > 0) {
-  message("Some tests failed using the mysql database. Exiting with an error.")
-  print(failures)
-  q("no", status = 1)
-} else {
-  message("All tests passed successfully.")
-  q("yes", status = 0)
+if (!is.null(failures)) {
+    message("Some tests failed. Exiting with an error.")
+    print(failures)
+    q("no", status = 1)
 }
+
+# Run tests with mysql database
+failures <- run_tests("mysql")
+
+if (!is.null(failures)) {
+    message("Some tests failed. Exiting with an error.")
+    print(failures)
+    q("no", status = 1)
+}
+
+message("All tests passed successfully.")
+q("yes", status = 0)
