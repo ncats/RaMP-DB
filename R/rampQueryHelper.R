@@ -1005,7 +1005,7 @@ listToQueryString <- function(analytes) {
 }
 
 
-#' filterPathwaysByAnalytCount utility method filtered a dataframe based on the number of analytes associated with rampPathwayIds contained in the dataframe.
+#' filterPathwaysByAnalyteCount utility method filtered a dataframe based on the number of analytes associated with rampPathwayIds contained in the dataframe.
 #' Like fisher exact code, this one retains pathways with analyte count >= min_path_size, and having analyte_count < max_path_size
 #'
 #' @param db a RaMP databse object
@@ -1013,7 +1013,7 @@ listToQueryString <- function(analytes) {
 #' @param pathway_ramp_id_col_name the column name containing the rampPathwayIds
 #' @param min_path_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
 #' @param max_path_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
-filterPathwaysByAnalytCount <- function(db = RaMP(), pathway_dataframe, pathway_ramp_id_col_name = 'pathwayRampId', min_path_size = 5, max_path_size = 150) {
+filterPathwaysByAnalyteCount <- function(db = RaMP(), pathway_dataframe, pathway_ramp_id_col_name = 'pathwayRampId', min_path_size = 5, max_path_size = 150) {
   pwIds <- unlist(pathway_dataframe[[pathway_ramp_id_col_name]])
   pwIdsStr <- listToQueryString(pwIds)
 
