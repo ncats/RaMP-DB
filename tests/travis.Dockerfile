@@ -15,4 +15,4 @@ COPY . /ramp-db
 
 RUN echo "dbname=SQLite_v2.4.3" > dbprops.txt
 #CMD ["bash"]
-CMD ["Rscript", "./travis_test_script.R"]
+CMD ["Rscript", "./tests/travis_test_script.R"]

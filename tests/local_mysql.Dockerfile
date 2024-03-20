@@ -1,7 +1,7 @@
 # Use the official MySQL 8.0 image from Docker Hub
 FROM mysql:8.0
 
-COPY local_mysql.cnf /etc/mysql/conf.d/my.cnf
+COPY tests/local_mysql.cnf /etc/mysql/conf.d/my.cnf
 
 # these should match what's in local_mysql.dbprops.txt
 ENV MYSQL_ROOT_PASSWORD=root_password
