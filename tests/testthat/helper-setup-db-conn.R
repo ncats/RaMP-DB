@@ -1,7 +1,7 @@
 library(properties)
 
 if (Sys.getenv("MYSQL_TEST") == "true") {
-    dbpass <- properties::read.properties('../../local_mysql.dbprops.txt')
+    dbpass <- properties::read.properties('../../tests/local_mysql.dbprops.txt')
 } else {
     dbpass <- properties::read.properties('../../dbprops.txt')
 }
