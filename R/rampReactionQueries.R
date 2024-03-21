@@ -13,7 +13,7 @@
 #' @return a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and common reactions
 #' @export
 #'
-getReactionsForAnalytes <- function(db = RaMP(), analytes, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN"), includeRxnURLs=F) {
+getReactionsForAnalytes <- function(db = RaMP(), analytes, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN"), includeRxnURLs=F) {
 
   message("Running getReactionsForAnalytes()")
 
