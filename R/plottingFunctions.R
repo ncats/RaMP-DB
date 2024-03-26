@@ -70,18 +70,25 @@ plotCataNetwork <- function(catalyzedf = "") {
 #' @export
 pathwayResultsPlot <- function(db = RaMP(), pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.2,
                                  perc_pathway_overlap = 0.2, min_pathway_tocluster = 3,
-                                 text_size = 16, sig_cutoff = 0.05, interactive=FALSE) {
+                                 text_size = 8, sig_cutoff = 0.05, interactive=FALSE) {
+
+  if( !('cluster_assignment' %in% colnames(pathwaysSig$fishresult))) {
     fishClustering <- findCluster(db = db, pathwaysSig,
                                   perc_analyte_overlap = perc_analyte_overlap,
                                   perc_pathway_overlap = perc_pathway_overlap,
                                   min_pathway_tocluster = min_pathway_tocluster
-                                  )
+    )
+  } else {
+    message("The input pathway result has already been clustered. Defaulting to existing clustering.")
+    fishresult <- pathwaysSig$fishresults
+  }
+
   fishresult <- fishClustering$fishresults
   if (pathwaysSig$analyte_type == "genes" | pathwaysSig$analyte_type == "metabolites") {
     inPath <- fishresult$Num_In_Path
     totPath <- fishresult$Total_In_Path
   } else {
-      inPath <- apply(fishresult, 1, function(x) {
+    inPath <- apply(fishresult, 1, function(x) {
       if (is.na(x["Num_In_Path_Metab"])) {
         return(as.numeric(x["Num_In_Path_Gene"]))
       } else if (is.na(x["Num_In_Path_Gene"])) {
@@ -155,13 +162,13 @@ pathwayResultsPlot <- function(db = RaMP(), pathwaysSig, pval = "FDR", perc_anal
     paste0(y," (", pathwaysource,")")
   })
   p <- clusterDF %>%
-      dplyr::mutate("pathway.db" =
-                        with(clusterDF,{tidytext::reorder_within(pathway.db,
-                                                 x,
-                                                 cluster)})) %>%
-      ggplot2::ggplot(
-    ggplot2::aes_string(y = "x", x = "pathway.db")
-  ) +
+    dplyr::mutate("pathway.db" =
+                    with(clusterDF,{tidytext::reorder_within(pathway.db,
+                                                             x,
+                                                             cluster)})) %>%
+    ggplot2::ggplot(
+      ggplot2::aes_string(y = "x", x = "pathway.db")
+    ) +
     ggplot2::geom_segment(ggplot2::aes_string(xend = "pathway.db", y = 0, yend = "x")) +
     suppressWarnings(ggplot2::geom_point(
       stat = "identity",
@@ -184,9 +191,9 @@ pathwayResultsPlot <- function(db = RaMP(), pathwaysSig, pval = "FDR", perc_anal
       panel.background = ggplot2::element_blank(),
       strip.text.y = ggplot2::element_text(angle = 0),
       axis.text = ggplot2::element_text(face = "bold")
-      ) +
+    ) +
     with(clusterDF, {
-            ggplot2::facet_grid(cluster ~ ., space = "free", scales = "free")
+      ggplot2::facet_grid(cluster ~ ., space = "free", scales = "free")
     }) +
     ggplot2::guides(colour = ggplot2::guide_legend(
       override.aes =
@@ -196,13 +203,13 @@ pathwayResultsPlot <- function(db = RaMP(), pathwaysSig, pval = "FDR", perc_anal
     ggplot2::scale_size_area(
       breaks = c(2, 4, 6, 8, 10),
       name = "# of Altered Analytes in Pathway"
-      )
+    )
 
   if(interactive){
-      return(plotly::ggplotly(p, tooltip="text"))
+    return(plotly::ggplotly(p, tooltip="text"))
   }else if (!interactive){
-      return(p)
+    return(p)
   }else{
-      stop("'interactive' must be a boolean")
+    stop("'interactive' must be a boolean")
   }
 }
