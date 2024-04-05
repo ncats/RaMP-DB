@@ -213,3 +213,87 @@ pathwayResultsPlot <- function(db = RaMP(), pathwaysSig, pval = "FDR", perc_anal
     stop("'interactive' must be a boolean")
   }
 }
+
+#' Plots an interactive sunburst plot of reaction class
+#' @importFrom Polychrome %>%
+#' @importFrom plotly %>%
+#'
+#' @param reactionClassesResults output of getReactionClassesForAnalytes()
+#' @return  An interactive HTML sunburst plot that allows the user to pan/zoom into reaction classes of interest.
+#' @export
+
+plotReactionClasses <- function(reactionClassesResults = "") {
+  if(sum(reactionClassesResults$class_ec_level_1$reactionCount) == 0) {
+    message("The input dataframe has no reaction results. plotCataNetwork function is returning without generating a plot.")
+    return()
+  }
+
+  if (length(intersect(c("class_ec_level_1","class_ec_level_2", "class_ec_level_3", "class_ec_level_4"),names(reactionClassesResults)))!=4) {
+    stop("Please make sure that the input is the resulting list of dataframes returned by the getReactionClassesForAnalytes() function")
+  }
+
+  sunburst_ontology_reactionclass <- buildReactionClassesSunburstDatafarme(reactionClassesResults)
+
+  fig <- plotly::plot_ly(
+    color = I("black"),
+    marker = list(colors = ~ sunburst_ontology_reactionclass$color)
+  )
+  fig <- fig %>%
+    plotly::add_trace(
+      ids = sunburst_ontology_reactionclass$ids,
+      labels = sunburst_ontology_reactionclass$labels,
+      parents = sunburst_ontology_reactionclass$parents,
+      hovertemplate = sunburst_ontology_reactionclass$hovertemplate,
+      type = 'sunburst',
+      maxdepth = 2,
+      domain = list(column = 1),
+      name = ""
+    )
+  fig <- fig %>%
+    plotly::layout(
+      margin = list(
+        l = 0,
+        r = 0,
+        b = 0,
+        t = 0
+      ),
+      marker = list(colors = list(sunburst_ontology_reactionclass$color)),
+      extendsunburstcolors = TRUE
+    )
+
+  return(fig)
+
+}
+
+#' Plots an interactive upset plot of overlapping input compounds at reaction class level 1
+#' @importFrom upsetjs %>%
+#' @importFrom dplyr %>%
+#'
+#' @param reactionsResults output of getReactionsForAnalytes()
+#' @param includeCofactorMets include metabolites labeled at cofactors within ChEBI (Default = FALSE)
+#' @return  An interactive HTML upset plot that allows the user to visualize the overlap in the number of input compounds across level 1 of reaction classes.
+#' @export
+
+plotAnalyteOverlapPerRxnLevel <- function(reactionsResults = "", includeCofactorMets = FALSE) {
+  if(nrow(reactionsResults$met2rxn) ==0 && nrow(reactionsResults$prot2rxn) == 0) {
+    message("The input has no reaction results. plotCataNetwork function is returning without generating a plot.")
+    return()
+  }
+
+  if (length(intersect(c("met2rxn","prot2rxn", "metProteinCommonReactions"),names(reactionsResults)))!=3) {
+    stop("Please make sure that the input is the resulting list of dataframes returned by the getReactionsForAnalytes() function")
+  }
+
+  input2reactions_list <- buildAnalyteOverlapPerRxnLevelUpsetDatafarme(reactionsResults = reactionsResults, includeCofactorMets = includeCofactorMets)
+
+  fig <- upsetjs::upsetjs() %>%
+    upsetjs::fromList(input2reactions_list) %>%
+    upsetjs::generateDistinctIntersections() %>% interactiveChart() %>%
+    upsetjs::chartLabels(set.name = "Number of Reactions") %>%
+    upsetjs::chartLayout(width.ratios = c(0.15,0.2,0.65),
+                         height.ratios = c(0.6,.4)) %>%
+    upsetjs::chartFontSizes(set.label = "13px", chart.label = "14px")
+
+  return(fig)
+
+}
