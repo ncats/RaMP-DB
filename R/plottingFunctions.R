@@ -215,8 +215,6 @@ pathwayResultsPlot <- function(db = RaMP(), pathwaysSig, pval = "FDR", perc_anal
 }
 
 #' Plots an interactive sunburst plot of reaction class
-#' @importFrom Polychrome %>%
-#' @importFrom plotly %>%
 #'
 #' @param reactionClassesResults output of getReactionClassesForAnalytes()
 #' @return  An interactive HTML sunburst plot that allows the user to pan/zoom into reaction classes of interest.
@@ -266,8 +264,6 @@ plotReactionClasses <- function(reactionClassesResults = "") {
 }
 
 #' Plots an interactive upset plot of overlapping input compounds at reaction class level 1
-#' @importFrom upsetjs %>%
-#' @importFrom dplyr %>%
 #'
 #' @param reactionsResults output of getReactionsForAnalytes()
 #' @param includeCofactorMets include metabolites labeled at cofactors within ChEBI (Default = FALSE)

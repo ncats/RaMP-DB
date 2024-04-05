@@ -1246,7 +1246,7 @@ buildAnalyteOverlapPerRxnLevelUpsetDatafarme <- function(reactionsResults = "", 
 
   if(nrow(reactionsResults$met2rxn)>0)
   {
-    reactionsResults$met2rxn <- reactionsResults$met2rxn %>% filter(!dplyr::if_any(ecNumber, is.na))
+    reactionsResults$met2rxn <- reactionsResults$met2rxn %>% dplyr::filter(!dplyr::if_any(ecNumber, is.na))
     EC_number_split_met <- unlist(strsplit(reactionsResults$met2rxn$ecNumber,split="\\."))
 
     input2reactions_mets <- cbind(
@@ -1257,11 +1257,11 @@ buildAnalyteOverlapPerRxnLevelUpsetDatafarme <- function(reactionsResults = "", 
   }
   if (includeCofactorMets == FALSE)
   {
-    reactionsResults$met2rxn <- reactionsResults$met2rxn %>% filter(isCofactor == 0)
+    reactionsResults$met2rxn <- reactionsResults$met2rxn %>% dplyr::filter(isCofactor == 0)
   }
   if(nrow(reactionsResults$prot2rxn)>0)
   {
-    reactionsResults$prot2rxn <- reactionsResults$prot2rxn %>% filter(!if_any(ecNumber, is.na))
+    reactionsResults$prot2rxn <- reactionsResults$prot2rxn %>% dplyr::filter(!dplyr::if_any(ecNumber, is.na))
     EC_number_split_prot <- unlist(strsplit(reactionsResults$prot2rxn$ecNumber,split="\\."))
 
     input2reactions_prot <- cbind(
