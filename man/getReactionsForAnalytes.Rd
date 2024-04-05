@@ -8,7 +8,7 @@ getReactionsForAnalytes(
   db = RaMP(),
   analytes,
   onlyHumanMets = F,
-  humanProtein = F,
+  humanProtein = T,
   includeTransportRxns = F,
   rxnDirs = c("UN"),
   includeRxnURLs = F

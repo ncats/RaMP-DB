@@ -821,7 +821,7 @@ getRheaEnzymesAndTransportersForMetabolites <- function(db = RaMP(), analytes, i
     result <- merge(x=rxns, y=rxnParticipants, by.x="reactionId", by.y="reactionId", all.x=T, all.y=T)
 
     if(!includeRheaRxnDetails) {
-      keeperCols = c('metId', 'metName', 'participantName', 'participantId')
+      keeperCols = c('metSourceId', 'metName', 'participantName', 'participantId')
       result <- result[, keeperCols]
       result$relation <- "met2protein"
       result <- result[,c(5,1,2,4,3)]
