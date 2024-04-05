@@ -1246,7 +1246,7 @@ buildAnalyteOverlapPerRxnLevelUpsetDatafarme <- function(reactionsResults = "", 
 
   if(nrow(reactionsResults$met2rxn)>0)
   {
-    reactionsResults$met2rxn <- reactionsResults$met2rxn %>% filter(!if_any(ecNumber, is.na))
+    reactionsResults$met2rxn <- reactionsResults$met2rxn %>% filter(!dplyr::if_any(ecNumber, is.na))
     EC_number_split_met <- unlist(strsplit(reactionsResults$met2rxn$ecNumber,split="\\."))
 
     input2reactions_mets <- cbind(
