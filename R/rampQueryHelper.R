@@ -1265,7 +1265,7 @@ buildAnalyteOverlapPerRxnLevelUpsetDatafarme <- function(reactionsResults = "", 
     EC_number_split_prot <- unlist(strsplit(reactionsResults$prot2rxn$ecNumber,split="\\."))
 
     input2reactions_prot <- cbind(
-      c(reactionsResults$prot2rxn$metSourceId),
+      c(reactionsResults$prot2rxn$uniprot),
       c(reactionsResults$prot2rxn$ecNumber),
       c(paste0(EC_number_split_prot[seq(1, length(EC_number_split_prot), 4)]))
     )

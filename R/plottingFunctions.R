@@ -288,7 +288,7 @@ plotAnalyteOverlapPerRxnLevel <- function(reactionsResults = "", includeCofactor
 
   fig <- upsetjs::upsetjs() %>%
     upsetjs::fromList(input2reactions_list) %>%
-    upsetjs::generateDistinctIntersections() %>% interactiveChart() %>%
+    upsetjs::generateDistinctIntersections() %>% upsetjs::interactiveChart() %>%
     upsetjs::chartLabels(set.name = "Number of Reactions") %>%
     upsetjs::chartLayout(width.ratios = c(0.15,0.2,0.65),
                          height.ratios = c(0.6,.4)) %>%
