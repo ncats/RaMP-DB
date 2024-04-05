@@ -1028,4 +1028,309 @@ filterPathwaysByAnalyteCount <- function(db = RaMP(), pathway_dataframe, pathway
 
 
 
+#' Creates the input dataframe for the sunburst plot created in 'plotReactionClasses'
+#'
+#' @param reactionClassesResults output of getReactionClassesForAnalytes()
 
+buildReactionClassesSunburstDatafarme <- function(reactionClassesResults = "") {
+
+  #create empty table for sunburst information
+  sunburst_ontology_reactionclass <- data.frame(matrix(ncol = 3, nrow = 0))
+  colnames(sunburst_ontology_reactionclass) <- c("ids", "labels", "parents")
+
+  #dataframe of EC Level 1 information
+  level1 <- data.frame(
+    "ids" = reactionClassesResults$class_ec_level_1$ecNumber,
+    "labels" = paste((reactionClassesResults$class_ec_level_1$rxnClass),
+                     paste("EC Number:", reactionClassesResults$class_ec_level_1$ecNumber),
+                     sep = "\n"),
+    "parents" = "",
+    "hovertemplate" = paste((reactionClassesResults$class_ec_level_1$rxnClass),
+                            paste("EC Number:", reactionClassesResults$class_ec_level_1$ecNumber),
+                            paste(
+                              reactionClassesResults$class_ec_level_1$metCount,
+                              "input metabolites out of",
+                              reactionClassesResults$class_ec_level_1$totalMetsInRxnClass ,
+                              "total"
+                            ),
+                            paste(
+                              reactionClassesResults$class_ec_level_1$proteinCount,
+                              "input proteins out of",
+                              reactionClassesResults$class_ec_level_1$totalProteinsInRxnClass ,
+                              "total"
+                            ),
+                            paste(
+                              reactionClassesResults$class_ec_level_1$reactionCount,
+                              "reactions hit out of",
+                              reactionClassesResults$class_ec_level_1$totalRxnsInClass ,
+                              "total"
+                            ),
+                            sep = "\n"))
+
+
+  #dataframe of EC Level 2 information
+  EC_number_split <- unlist(strsplit(reactionClassesResults$class_ec_level_2$ecNumber, split = "\\."))
+
+  level2 <- data.frame(
+    "ids" = paste0(
+      paste0(EC_number_split[seq(1, length(EC_number_split), 4)], ".-.-.-"), #Level 1 of EC_number
+      "-", #split notation
+      reactionClassesResults$class_ec_level_2$ecNumber), #Level 2 EC_number
+    "labels" = paste(
+      reactionClassesResults$class_ec_level_2$rxnClass,
+      paste("EC Number:", reactionClassesResults$class_ec_level_2$ecNumber),
+      sep = "\n"),
+    "parents" = paste0(EC_number_split[seq(1, length(EC_number_split), 4)], ".-.-.-"), #Level 1 of EC_number
+    "hovertemplate" = paste(
+      reactionClassesResults$class_ec_level_2$rxnClass,
+      paste("EC Number:", reactionClassesResults$class_ec_level_2$ecNumber),
+      paste(
+        reactionClassesResults$class_ec_level_2$metCount,
+        "input metabolites out of",
+        reactionClassesResults$class_ec_level_2$totalMetsInRxnClass ,
+        "total"),
+      paste(
+        reactionClassesResults$class_ec_level_2$proteinCount,
+        "input proteins out of",
+        reactionClassesResults$class_ec_level_2$totalProteinsInRxnClass ,
+        "total"),
+      paste(
+        reactionClassesResults$class_ec_level_2$reactionCount,
+        "reactions hit out of",
+        reactionClassesResults$class_ec_level_2$totalRxnsInClass ,
+        "total"),
+      sep = "\n")
+  )
+
+  EC_number_split <-unlist(strsplit(reactionClassesResults$class_ec_level_3$ecNumber, split = "\\."))
+
+  level3 <- data.frame(
+    "ids" = paste0(
+      paste0(EC_number_split[seq(1, length(EC_number_split), 4)],
+             ".",
+             EC_number_split[seq(2, length(EC_number_split), 4)], ".-.-"), #Level 2 of EC_number
+      "-",
+      reactionClassesResults$class_ec_level_3$ecNumber), #Level 3 of EC_number
+    "labels" = paste(
+      reactionClassesResults$class_ec_level_3$rxnClass,
+      paste("EC Number:", reactionClassesResults$class_ec_level_3$ecNumber),
+      sep = "\n"),
+    "parents" = paste0(
+      paste0(EC_number_split[seq(1, length(EC_number_split), 4)], ".-.-.-"), #Level 1 of EC_number
+      "-",
+      paste0(EC_number_split[seq(1, length(EC_number_split), 4)], ".", EC_number_split[seq(2, length(EC_number_split), 4)], ".-.-")), #Level 2 of EC_number
+    "hovertemplate" = paste(
+      reactionClassesResults$class_ec_level_3$rxnClass,
+      paste("EC Number:", reactionClassesResults$class_ec_level_3$ecNumber),
+      paste(
+        reactionClassesResults$class_ec_level_3$metCount,
+        "input metabolites out of",
+        reactionClassesResults$class_ec_level_3$totalMetsInRxnClass ,
+        "total"),
+      paste(
+        reactionClassesResults$class_ec_level_3$proteinCount,
+        "input proteins out of",
+        reactionClassesResults$class_ec_level_3$totalProteinsInRxnClass ,
+        "total"),
+      paste(
+        reactionClassesResults$class_ec_level_3$reactionCount,
+        "reactions hit out of",
+        reactionClassesResults$class_ec_level_3$totalRxnsInClass ,
+        "total"),
+      sep = "\n")
+  )
+
+  EC_number_split <- unlist(strsplit(reactionClassesResults$class_ec_level_4$ecNumber, split = "\\."))
+
+  level4 <- data.frame(
+    "ids" = paste0(
+      paste0(
+        EC_number_split[seq(1, length(EC_number_split), 4)],
+        ".",
+        EC_number_split[seq(2, length(EC_number_split), 4)],
+        ".",
+        EC_number_split[seq(3, length(EC_number_split), 4)],
+        ".-"), #Level 3 of EC_number
+      "-",
+      reactionClassesResults$class_ec_level_4$ecNumber), #Level 4 of EC_number
+    "labels" = paste(
+      reactionClassesResults$class_ec_level_4$rxnClass,
+      paste(reactionClassesResults$class_ec_level_4$ecNumber),
+      paste(
+        "EC Number:",
+        "Metabolite Count:",
+        reactionClassesResults$class_ec_level_4$metCount),
+      sep = "\n"),
+    "parents" = paste0(
+      paste0(
+        EC_number_split[seq(1, length(EC_number_split), 4)],
+        ".",
+        EC_number_split[seq(2, length(EC_number_split), 4)],
+        ".-.-"), #Level 2 of EC_number
+      "-",
+      paste0(
+        EC_number_split[seq(1, length(EC_number_split), 4)],
+        ".",
+        EC_number_split[seq(2, length(EC_number_split), 4)],
+        ".",
+        EC_number_split[seq(3, length(EC_number_split), 4)],
+        ".-")), #Level 3 of EC_number
+    "hovertemplate" = paste(
+      reactionClassesResults$class_ec_level_4$rxnClass,
+      paste("EC Number:",reactionClassesResults$class_ec_level_4$ecNumber),
+      paste(
+        reactionClassesResults$class_ec_level_4$metCount,
+        "input metabolites out of",
+        reactionClassesResults$class_ec_level_4$totalMetsInRxnClass ,
+        "total"),
+      paste(
+        reactionClassesResults$class_ec_level_4$proteinCount,
+        "input proteins out of",
+        reactionClassesResults$class_ec_level_4$totalProteinsInRxnClass ,
+        "total"),
+      paste(
+        reactionClassesResults$class_ec_level_4$reactionCount,
+        "reactions hit out of",
+        reactionClassesResults$class_ec_level_4$totalRxnsInClass ,
+        "total"),
+      sep = "\n")
+  )
+
+  sunburst_ontology_reactionclass <- rbind(level1, level2, level3, level4)
+
+  colors_sunburst <- Polychrome::sortByLuminance(Polychrome::light.colors())[c(6, 7, 8, 9, 10, 11, 12)]
+
+  for (i in 1:nrow(sunburst_ontology_reactionclass))
+  {
+    num_of_dashes <-
+      length(which(
+        strsplit(sunburst_ontology_reactionclass$labels[i], split = "\\.")[[1]] == "-"
+      ))
+    if (num_of_dashes == 3)
+    {
+      sunburst_ontology_reactionclass$color[i] <-
+        adjustcolor(colors_sunburst[as.numeric(strsplit(sunburst_ontology_reactionclass$ids[i], split =
+                                                          "\\.")[[1]][1])], alpha.f = 0.8)
+    }
+    if (num_of_dashes == 2)
+    {
+      sunburst_ontology_reactionclass$color[i] <-
+        adjustcolor(colors_sunburst[as.numeric(strsplit(sunburst_ontology_reactionclass$ids[i], split =
+                                                          "\\.")[[1]][1])], alpha.f = 0.6)
+    }
+    if (num_of_dashes == 1)
+    {
+      sunburst_ontology_reactionclass$color[i] <-
+        adjustcolor(colors_sunburst[as.numeric(strsplit(sunburst_ontology_reactionclass$ids[i], split =
+                                                          "\\.")[[1]][1])], alpha.f = 0.4)
+    }
+    if (num_of_dashes == 0)
+    {
+      sunburst_ontology_reactionclass$color[i] <-
+        adjustcolor(colors_sunburst[as.numeric(strsplit(sunburst_ontology_reactionclass$ids[i], split =
+                                                          "\\.")[[1]][1])], alpha.f = 0.2)
+    }
+  }
+  return(sunburst_ontology_reactionclass)
+
+}
+
+
+
+
+#' Creates the input dataframe for the upset plot created in 'plotAnalyteOverlapPerRxnLevel'
+#'
+#' @param reactionClassesResults output of getReactionClassesForAnalytes()
+
+buildAnalyteOverlapPerRxnLevelUpsetDatafarme <- function(reactionsResults = "", includeCofactorMets = FALSE) {
+
+  if(nrow(reactionsResults$met2rxn)>0)
+  {
+    reactionsResults$met2rxn <- reactionsResults$met2rxn %>% filter(!if_any(ecNumber, is.na))
+    EC_number_split_met <- unlist(strsplit(reactionsResults$met2rxn$ecNumber,split="\\."))
+
+    input2reactions_mets <- cbind(
+      c(reactionsResults$met2rxn$metSourceId),
+      c(reactionsResults$met2rxn$ecNumber),
+      c(paste0(EC_number_split_met[seq(1, length(EC_number_split_met), 4)]))
+    )
+  }
+  if (includeCofactorMets == FALSE)
+  {
+    reactionsResults$met2rxn <- reactionsResults$met2rxn %>% filter(isCofactor == 0)
+  }
+  if(nrow(reactionsResults$prot2rxn)>0)
+  {
+    reactionsResults$prot2rxn <- reactionsResults$prot2rxn %>% filter(!if_any(ecNumber, is.na))
+    EC_number_split_prot <- unlist(strsplit(reactionsResults$prot2rxn$ecNumber,split="\\."))
+
+    input2reactions_prot <- cbind(
+      c(reactionsResults$prot2rxn$metSourceId),
+      c(reactionsResults$prot2rxn$ecNumber),
+      c(paste0(EC_number_split_prot[seq(1, length(EC_number_split_prot), 4)]))
+    )
+  }
+
+  if(exists("input2reactions_mets") && exists("input2reactions_prot"))
+  {
+    input2reactions <- as.data.frame(
+      rbind(input2reactions_mets, input2reactions_prot))
+  }
+  else if (exists("input2reactions_mets"))
+  {
+    input2reactions <- as.data.frame(input2reactions_mets)
+  }
+  else if (exists("input2reactions_prot"))
+  {
+    input2reactions <- as.data.frame(input2reactions_prot)
+  }
+
+  input2reactions_list <- split(input2reactions$V1, input2reactions$V3)
+
+  if (length(input2reactions_list) != 7)
+  {
+    seq <- 1:7
+    missing_ecNum <- as.character(seq[!seq %in% as.numeric(names(input2reactions_list))])
+
+    for(i in 1:length(missing_ecNum))
+    {
+      input2reactions_list <- c(input2reactions_list, i = list(NULL))
+      names(input2reactions_list)[(length(input2reactions_list))] <- missing_ecNum[i]
+    }
+
+  }
+
+  for (i in 1:7)
+  {
+    if(names(input2reactions_list)[i] == "1")
+    {
+      names(input2reactions_list)[i] = "Oxidoreductases: 1.-.-.- "
+    }
+    else if(names(input2reactions_list)[i] == "2")
+    {
+      names(input2reactions_list)[i] = "Transferases: 2.-.-.-"
+    }
+    else if(names(input2reactions_list)[i] == "3")
+    {
+      names(input2reactions_list)[i] = "Hydrolases: 3.-.-.-"
+    }
+    else if(names(input2reactions_list)[i] == "4")
+    {
+      names(input2reactions_list)[i] = "Lyases: 4.-.-.-"
+    }
+    else if(names(input2reactions_list)[i] == "5")
+    {
+      names(input2reactions_list)[i] = "Isomerases: 5.-.-.-"
+    }
+    else if(names(input2reactions_list)[i] == "6")
+    {
+      names(input2reactions_list)[i] = "Ligases: 6.-.-.-"
+    }
+    else if(names(input2reactions_list)[i] == "7")
+    {
+      names(input2reactions_list)[i] = "Translocases: 7.-.-.-"
+    }
+  }
+
+  return(input2reactions_list)
+}

@@ -35,11 +35,12 @@ Imports:
     RMariaDB,
     jsonlite,
     readxl,
-    methods,
     tibble,
     BiocFileCache,
     R.utils,
-    httr
+    httr,
+    upsetjs,
+    Polychrome
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 Suggests: 
