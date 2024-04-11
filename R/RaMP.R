@@ -410,8 +410,8 @@ removeLocalRampDB <- function(version = 'none') {
 
         hits <- grepl(version, cacheInfo$rname)
         ids <- unlist(cacheInfo$rid[hits])
-        if(length(id) == 1) {
-          bfcremove(rids = ids[1])
+        if(length(ids) == 1) {
+          BiocFileCache::bfcremove(rids = ids[1])
           message("Local RaMP database version removed: ", version)
         }
       }

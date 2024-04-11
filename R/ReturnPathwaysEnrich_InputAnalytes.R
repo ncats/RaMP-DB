@@ -1,5 +1,7 @@
 #' Do fisher test for only one pathway from search result
 #' clicked on highchart
+#'
+#' @param db a RaMP databse object
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
 #' @param NameOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
@@ -522,6 +524,7 @@ runFisherTest <- function(db = RaMP(), analytes,
 
 #' Do fisher test for only one pathway from search result
 #' clicked on highchart
+#' @param db a RaMP databse object
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
 #' @param NameOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
@@ -789,11 +792,14 @@ runCombinedFisherTest <- function(
 #' Function that search analytes (gene or compounds)  or a list of analytes and
 #' returns associated pathways
 #'
+#' @param db a RaMP databse object
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
 #' @param find_synonym find all synonyms or just return same synonym (T/F)
 #' @param NameOrIds whether input is "names" or "ids" (default is "ids")
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
 #' @param include_smpdb Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant
+#' @param min_path_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
+#' @param max_path_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
 #' @return a list contains all metabolites as name and pathway inside.
 #' @examples
 #' \dontrun{
@@ -809,6 +815,8 @@ getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
                                   NameOrIds = "ids",
                                   includeRaMPids = FALSE,
                                   include_smpdb = FALSE) {
+                                  min_path_size = 5,
+                                  max_path_size = 150) {
 
   rampId <- pathwayRampId <- c()
 
@@ -834,7 +842,7 @@ getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
     return(NULL)
   }
 
-  isSQLite = .is_sqlite(db)
+  isSQLite = RaMP:::.is_sqlite(db)
 
   if (NameOrIds == "ids") {
     print("Working on ID List...")
@@ -934,6 +942,10 @@ getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
       df2 <- merge(df2, synonymsDf, by = "rampId")
     }
   }
+
+  # filter by pathway size criteria
+
+  df2 <- filterPathwaysByAnalyteCount(db, pathway_dataframe=df2, pathway_ramp_id_col_name = 'pathwayRampId', min_path_size = min_path_size, max_path_size = max_path_size)
 
   if (!includeRaMPids && nrow(df2) > 0) {
     df2 <- subset(df2, select = -c(rampId, pathwayRampId))
@@ -1095,7 +1107,7 @@ findCluster <- function(db = RaMP(), fishers_df, perc_analyte_overlap = 0.5,
     } else {
       stop("analyte_type should be 'genes' or metabolites'")
     }
-    pathway_list <- fishers_df[, "pathwayRampId.x"]
+    pathway_list <- fishers_df[, "pathwayRampId"]
 
     pathway_indices <- match(pathway_list, rownames(similarity_matrix))
 
@@ -1199,7 +1211,7 @@ findCluster <- function(db = RaMP(), fishers_df, perc_analyte_overlap = 0.5,
     # return(cluster_list)
 
     # Reformat cluster list to embed into results file
-    rampids <- as.vector(fishers_df$pathwayRampId.x)
+    rampids <- as.vector(fishers_df$pathwayRampId)
     # fishers_df$pathwayRampId<-NULL
 
     if (length(cluster_list) > 1) {

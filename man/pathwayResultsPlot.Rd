@@ -11,7 +11,7 @@ pathwayResultsPlot(
   perc_analyte_overlap = 0.2,
   perc_pathway_overlap = 0.2,
   min_pathway_tocluster = 3,
-  text_size = 16,
+  text_size = 8,
   sig_cutoff = 0.05,
   interactive = FALSE
 )

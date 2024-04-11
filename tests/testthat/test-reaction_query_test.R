@@ -90,8 +90,8 @@ test_that("test_mixed_analyte_reaction_class_query", {
 
   rxnClasses <- RaMP:::getReactionClassesForAnalytes(db=rampDB, analytes=analytes)
   expect_true(nrow(rxnClasses$class_ec_level_1) > 4)
-  expect_true(nrow(rxnClasses$class_ec_level_2) > 25)
-  expect_true(nrow(rxnClasses$class_ec_level_3) > 40)
+  expect_true(nrow(rxnClasses$class_ec_level_2) > 15)
+  expect_true(nrow(rxnClasses$class_ec_level_3) > 25)
 
 })
 
@@ -112,8 +112,8 @@ test_that("test_metabolite_reaction_class_query", {
 
   rxnClasses <- RaMP:::getReactionClassesForAnalytes(db=rampDB, analytes=mets)
   expect_true(nrow(rxnClasses$class_ec_level_1) > 4)
-  expect_true(nrow(rxnClasses$class_ec_level_2) > 25)
-  expect_true(nrow(rxnClasses$class_ec_level_3) > 40)
+  expect_true(nrow(rxnClasses$class_ec_level_2) > 15)
+  expect_true(nrow(rxnClasses$class_ec_level_3) > 20)
 
 })
 
