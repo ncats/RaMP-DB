@@ -1126,7 +1126,8 @@ findCluster <- function(db = RaMP(), fishers_df, perc_analyte_overlap = 0.5,
       for (i in 1:length(unmerged_clusters)) {
         for (j in 1:length(unmerged_clusters)) {
           cluster_similarity[i, j] <- length(intersect(unmerged_clusters[[i]], unmerged_clusters[[j]])) /
-            length(unique(c(unmerged_clusters[[i]], unmerged_clusters[[j]])))
+             ## length(unique(c(unmerged_clusters[[i]], unmerged_clusters[[j]])))
+             min(c(length(unmerged_clusters[[i]]),length(unmerged_clusters[[j]])))
         }
       }
       colnames(cluster_similarity) <- rownames(cluster_similarity) <- names(unmerged_clusters)
