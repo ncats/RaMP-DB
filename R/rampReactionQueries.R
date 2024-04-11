@@ -811,12 +811,13 @@ getRheaEnzymesAndTransportersForMetabolites <- function(db = RaMP(), analytes, i
 
   rxns <- getReactionsForAnalytes(db=db, analytes=chebiIds, humanProtein = humanProteins, includeTransportRxns = T)
 
+
   if(nrow(rxns$met2rxn) > 0) {
     reactions <- unique(unlist(rxns$met2rxn$reactionId))
     rxnParticipants <- getReactionParticipants(db=db, reactionList = reactions)
     rxnParticipants <- rxnParticipants[rxnParticipants$participantRole %in% c("enzyme", "transporter"),]
 
-    rxns <- rxns$met2rxn[,c(2, 3, 4, 5,6, 2, 1, 8)]
+    rxns <- rxns$met2rxn[,c(2, 3, 4, 5,6, 1, 8)]
 
     result <- merge(x=rxns, y=rxnParticipants, by.x="reactionId", by.y="reactionId", all.x=T, all.y=T)
 
@@ -829,7 +830,7 @@ getRheaEnzymesAndTransportersForMetabolites <- function(db = RaMP(), analytes, i
       result <- unique(result)
     } else {
       result$relation <- "met2protein"
-      result <- result[,c(14, 4,5,11,12,10,6, 1,9,8)]
+      result <- result[,c(13, 3, 4, 10, 11, 9, 5, 1, 8, 7)]
       colnames(result) <- c("relation","inputId", "inputCommonName", "reactionPartnerId", "reactionPartnerCommonName", "partnerRole", "substrateProductFlag", "reactionId", "reactionType", "rxnEquation")
       result <- result[order(result$inputId, result$reactionPartnerCommonName, result$substrateProductFlag),]
       result <- unique(result)
@@ -880,19 +881,20 @@ getRheaMetabolitesForProteins <- function(db = RaMP(), analytes, includeRheaRxnD
       result <- result[, keeperCols]
       result$relation <- "protein2met"
       result <- result[,c(5,1,2,4,3)]
-      colnames(result) <- c("query_relation", "input_analyte", "input_common_names", "rxn_partner_common_name", "rxn_partner_ids")
+      colnames(result) <- c("query_relation", "input_analyte", "input_common_names", "rxn_partner_ids", "rxn_partner_common_name")
       result <- unique(result)
     } else {
       result$relation <- "protein2met"
       result$partnerRole <- "metabolite"
-      result <- result[,c(13,3,4,11,12,14,10,1,9,6)]
+      result <- result[,c(13,2,3,11,12,14,10,1,9,5)]
 
-      colnames(result) <- c("relation","inputId", "inputCommonName", "reactionPartnerId", "reactionPartnerCommonName", "partnerRole", "substrateProductFlag", "reactionId", "reactionType", "rxnEquation")
+      colnames(result) <- c("relation","inputId", "inputCommonName", "reactionPartnerId", "reactionPartnerCommonName", "partnerRole", "substrateProductCofactor", "reactionId", "reactionType", "rxnEquation")
 
-      result$substrateProductFlag[result$substrateProductFlag == 'substrate'] <- 0
-      result$substrateProductFlag[result$substrateProductFlag == 'product'] <- 1
-      result$substrateProductFlag[result$substrateProductFlag == 'cofactor'] <- -1
-      result <- result[order(result$inputId, result$reactionPartnerCommonName, result$substrateProductFlag),]
+      # keep substrateProductCofator descriptive, not integer flag...
+      # result$substrateProductFlag[result$substrateProductFlag == 'substrate'] <- 0
+      # result$substrateProductFlag[result$substrateProductFlag == 'product'] <- 1
+      # result$substrateProductFlag[result$substrateProductFlag == 'cofactor'] <- -1
+      result <- result[order(result$inputId, result$reactionPartnerCommonName, result$substrateProductCofactor),]
       result <- unique(result)
     }
 
