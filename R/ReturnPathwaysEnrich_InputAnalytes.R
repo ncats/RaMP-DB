@@ -221,7 +221,7 @@ runFisherTest <- function(db = RaMP(), analytes,
   # Loop through each pathway, build the contingency table, and calculate Fisher's Exact
   # test p-value
   pidCount <- 0
-  pval <- totinpath <- userinpath <- pidused <- c()
+  pval <- oddsratio <- totinpath <- userinpath <- pidused <- c()
   for (i in pid) {
     ids_inpath <- pathwaydf[which(pathwaydf$pathwayRampId == i), "rampId"]
 
@@ -272,7 +272,7 @@ runFisherTest <- function(db = RaMP(), analytes,
       total_pathway_analytes = 0
     }else{
       total_pathway_analytes = totanalytes[[pathway_index]]
-      tot_in_pathway <- segregated_id_list[[pathway_index]] %>% dplyr::filter(`pathwayRampId`==i) %>% pull(`Freq`)
+      tot_in_pathway <- segregated_id_list[[pathway_index]] %>% dplyr::filter(`pathwayRampId`==i) %>% dplyr::pull(`Freq`)
     }
     ## if ((!is.na(inputkegg$pathwayRampId[1])) && i %in% inputkegg$pathwayRampId) {
     ##   tot_in_pathway <- inputkegg[which(inputkegg[, "pathwayRampId"] == i), "Freq"]
@@ -295,6 +295,7 @@ runFisherTest <- function(db = RaMP(), analytes,
     ## }
     if (tot_in_pathway == 0 || user_in_pathway == 0) {
       pval <- c(pval, NA)
+      oddsratio <- c(oddsratio, NA)
     } else {
       tot_out_pathway <- total_pathway_analytes - tot_in_pathway
       # fill the rest of the table out
@@ -343,8 +344,8 @@ runFisherTest <- function(db = RaMP(), analytes,
           print(pathwaydf)
         }
       )
-
       pval <- c(pval, result$p.value)
+      oddsratio <- c(oddsratio, result$estimate)
     } # End else tot_in_pathway is not zero
 
     userinpath <- c(userinpath, user_in_pathway)
@@ -391,7 +392,7 @@ runFisherTest <- function(db = RaMP(), analytes,
     reactome_gene <- db@dbSummaryObjCache$reactome_gene
 
     count <- 1
-    pval2 <- userinpath2 <- totinpath2 <- c()
+    pval2 <- oddsratio2 <- userinpath2 <- totinpath2 <- c()
 
     for (i in pidstorun) {
       if ((count %% 100) == 0) {
@@ -463,6 +464,7 @@ runFisherTest <- function(db = RaMP(), analytes,
       )
 
       pval2 <- c(pval2, result$p.value)
+      oddsratio2 <- c(oddsratio2, result$estimate)
       userinpath2 <- c(userinpath2, user_in_pathway)
       totinpath2 <- c(totinpath2, tot_in_pathway)
       # pidused <- c(pidused,i)
@@ -476,6 +478,7 @@ runFisherTest <- function(db = RaMP(), analytes,
     out <- data.frame(
       pathwayRampId = c(pidused, pidstorun)[keepers],
       Pval = c(pval, pval2)[keepers], # FDR.Adjusted.Pval=fdr,
+      Odds_Ratio = c(oddsratio, oddsratio2),
       # Holm.Adjusted.Pval=holm,
       Num_In_Path = c(userinpath, userinpath2)[keepers],
       Total_In_Path = c(totinpath, totinpath2)[keepers]
@@ -501,6 +504,7 @@ runFisherTest <- function(db = RaMP(), analytes,
       pathwayRampId = pidused[keepers],
       Pval = pval[keepers], # FDR.Adjusted.Pval=fdr,
       # Holm.Adjusted.Pval=holm,
+      Odds_Ratio = oddsratio[keepers],
       Num_In_Path = userinpath[keepers],
       Total_In_Path = totinpath[keepers]
     )
@@ -645,7 +649,6 @@ runCombinedFisherTest <- function(
     outgene <- NULL
     pathwaydf_gene <- NULL
   }
-
   # if no ids map to pathways, return an empty result.
   if ((is.null(pathwaydf_metab) || nrow(pathwaydf_metab) < 1) &&
     (is.null(pathwaydf_gene) || nrow(pathwaydf_gene) < 1)) {
@@ -700,6 +703,8 @@ runCombinedFisherTest <- function(
     )
     colnames(allfish)[which(colnames(allfish) == "Pval.x")] <- "Pval_Metab"
     colnames(allfish)[which(colnames(allfish) == "Pval.y")] <- "Pval_Gene"
+    colnames(allfish)[which(colnames(allfish) == "Odds_Ratio.x")] <- "Odds_Ratio_Metab"
+    colnames(allfish)[which(colnames(allfish) == "Odds_Ratio.y")] <- "Odds_Ratio_Gene"
     colnames(allfish)[which(colnames(allfish) == "Total_In_Path.x")] <- "Total_In_Path_Metab"
     colnames(allfish)[which(colnames(allfish) == "Total_In_Path.y")] <- "Total_In_Path_Gene"
     colnames(allfish)[which(colnames(allfish) == "Num_In_Path.x")] <- "Num_In_Path_Metab"
@@ -814,7 +819,7 @@ getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
                                   find_synonym = FALSE,
                                   NameOrIds = "ids",
                                   includeRaMPids = FALSE,
-                                  include_smpdb = FALSE) {
+                                  include_smpdb = FALSE,
                                   min_path_size = 5,
                                   max_path_size = 150) {
 
