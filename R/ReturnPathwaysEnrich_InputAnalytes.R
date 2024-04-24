@@ -98,7 +98,7 @@ runFisherTest <- function(db = RaMP(), analytes,
       #   "') and ontology.rampOntologyId = analytehasontology.rampOntologyId and analytehasontology.rampCompoundId = analytehaspathway.rampId"
       # )
 
-      # less data pull back, less data pull-back
+      # less data pull-back
       query <- paste0(
         "SELECT analytehaspathway.* from analytehasontology, ontology, analytehaspathway where ontology.commonName in ('",
         biospecimen,
