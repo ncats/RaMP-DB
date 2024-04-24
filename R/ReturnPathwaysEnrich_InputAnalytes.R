@@ -163,7 +163,7 @@ runFisherTest <- function(db = RaMP(), analytes,
 
   # Get the total number of metabolites that are mapped to pathways in RaMP (that's the default background)
   # added conditional to not pull hmdb ids
-  query <- "select * from analytehaspathway where pathwaySource != 'hmdb';"
+  query <- "select distinct rampId, pathwaySource from analytehaspathway where pathwaySource != 'hmdb';"
 
   allids <- RaMP::runQuery(query, db)
   allids <- allids[!duplicated(allids), ]
