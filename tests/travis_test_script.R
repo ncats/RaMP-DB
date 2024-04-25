@@ -1,7 +1,7 @@
 print(R.version)
 .libPaths("/ramp-db/lib")
 install.packages(c('filelock'))
-install.packages('https://bioconductor.org/packages/release/bioc/src/contrib/BiocFileCache_2.10.1.tar.gz', repos=NULL, method='libcurl', dependencies=TRUE)
+install.packages('https://www.bioconductor.org/packages/3.18/bioc/src/contrib/Archive/BiocFileCache/BiocFileCache_2.10.1.tar.gz', repos=NULL, method='libcurl', dependencies=TRUE)
 install.packages('RMariaDB')
 install.packages('highcharter')
 library(highcharter)
