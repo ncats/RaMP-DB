@@ -4,11 +4,11 @@
 #'
 #' @param db a RaMP databse object
 #' @param analytes list of analytes
-#' @param namesOrIds indicates if input analyte list contains identifiers or analyte names
 #' @param onlyHumanMets boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)
 #' @param humanProtein boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)
 #' @param includeTransportRxns if TRUE, returns metabolic and transport reactions
 #' @param rxnDirs character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", "BD", "ALL"), default = c("UN").
+#' @param includeRxnURLs if TRUE, urls to Rhea.org will be delivered in the result dataframe for each reaction
 #'
 #' @return a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and common reactions
 #' @export
@@ -96,7 +96,7 @@ getReactionsForAnalytes <- function(db = RaMP(), analytes, onlyHumanMets=F, huma
                                          'is_transport' = isTransport,
                                          'has_human_protein' = hasHumanProtein,
                                          'only_human_mets' = justHumanMets))
-      # 'genes' = gRxnSourceIds,
+
 
 
       resultList[['metProteinCommonReactions']] <- commonReactions
@@ -931,8 +931,8 @@ getRheaMetabolitesForProteins <- function(db = RaMP(), analytes, includeRheaRxnD
 
 #' getRampSourceInfoFromAnalyteIDs Utility method to extract source table information from analyte ids
 #'
+#' @param db RaMP Database object
 #' @param analytes list of analyte ids
-#'
 #' @return returns a dataframe of ramp analyte source information
 #'
 getRampSourceInfoFromAnalyteIDs <- function(db = RaMP(), analytes) {

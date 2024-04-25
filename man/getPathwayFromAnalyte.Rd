@@ -11,7 +11,7 @@ getPathwayFromAnalyte(
   find_synonym = FALSE,
   NameOrIds = "ids",
   includeRaMPids = FALSE,
-  include_smpdb = FALSE
+  include_smpdb = FALSE,
   min_path_size = 5,
   max_path_size = 150
 )
@@ -28,6 +28,7 @@ getPathwayFromAnalyte(
 \item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
 
 \item{include_smpdb}{Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant}
+
 \item{min_path_size}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
 
 \item{max_path_size}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}

@@ -103,7 +103,7 @@ runFisherTest <- function(db = RaMP(), analytes,
       #   "') and ontology.rampOntologyId = analytehasontology.rampOntologyId and analytehasontology.rampCompoundId = analytehaspathway.rampId"
       # )
 
-      # less data pull back, less data pull-back
+      # less data pull-back
       query <- paste0(
         "SELECT analytehaspathway.* from analytehasontology, ontology, analytehaspathway where ontology.commonName in ('",
         biospecimen,
@@ -169,10 +169,11 @@ runFisherTest <- function(db = RaMP(), analytes,
   # Get the total number of metabolites that are mapped to pathways in RaMP (that's the default background)
   # added conditional to not pull hmdb ids
   if(!include_smpdb){
-    query <- "select * from analytehaspathway where pathwaySource != 'hmdb';"
+    query <- "select distinct rampId, pathwaySource from analytehaspathway where pathwaySource != 'hmdb';"
   }else{
-    query <- "select * from analytehaspathway;"
+    query <- "select distinct rampId, pathwaySource from analytehaspathway;"
   }
+
   allids <- RaMP::runQuery(query, db)
   allids <- allids[!duplicated(allids), ]
 

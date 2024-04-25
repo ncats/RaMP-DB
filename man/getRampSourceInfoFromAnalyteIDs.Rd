@@ -7,6 +7,8 @@
 getRampSourceInfoFromAnalyteIDs(db = RaMP(), analytes)
 }
 \arguments{
+\item{db}{RaMP Database object}
+
 \item{analytes}{list of analyte ids}
 }
 \value{

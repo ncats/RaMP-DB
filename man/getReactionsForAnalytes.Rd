@@ -27,7 +27,7 @@ getReactionsForAnalytes(
 
 \item{rxnDirs}{character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", "BD", "ALL"), default = c("UN").}
 
-\item{namesOrIds}{indicates if input analyte list contains identifiers or analyte names}
+\item{includeRxnURLs}{if TRUE, urls to Rhea.org will be delivered in the result dataframe for each reaction}
 }
 \value{
 a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and common reactions

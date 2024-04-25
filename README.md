@@ -58,7 +58,8 @@ To access, [click here](https://www.mdpi.com/2218-1989/8/1/16)
 In order to use this R package locally, you will need to install the R code under this repository.
 
 *Special Note:*
-There is incompatibility (reported here: https://stat.ethz.ch/pipermail/bioc-devel/2023-October/020003.html) between the version of BiocFileCache installed using BiocManager (2.8.0) and the actual latest version (2.10.1).  The latter is needed to be compatible with other dependencies in RaMP-DB.  To install the latest version, you will need to download the source file from Bioconductor (https://bioconductor.org/packages/release/bioc/html/BiocFileCache.html), then install using the install.packages() function.  For a Mac, this looks like this: 
+There is incompatibility (reported here: https://stat.ethz.ch/pipermail/bioc-devel/2023-October/020003.html) between the version of BiocFileCache installed using BiocManager (2.8.0) and the actual latest version (2.10.1).  The latter is needed to be compatible with other dependencies in RaMP-DB.  To install the latest version, you will need to download the source file from Bioconductor (https://bioconductor.org/packages/release/bioc/html/BiocFileCache.html), then install using the install.packages() function.  For a Mac, this looks like this:
+
 
 ```
 install.packages("/Users/mathee/Downloads/BiocFileCache_2.10.1.tgz")
@@ -87,7 +88,7 @@ RaMP::listAvailableRaMPDbVersions()
 # if the selected version is not available on your computer, but is in our remote repository at GitHub,
 # the SQLite DB file will be automatically downloaded into local file cache.
 # RaMP is using the BiocFileCache package to manage a local file cache.
-rampDB <- RaMP(version = "2.3.1")
+rampDB <- RaMP(version = "2.5.4")
 
 ```
 
