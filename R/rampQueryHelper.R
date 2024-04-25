@@ -462,7 +462,7 @@ segregateDataBySource<-function(input_RampIds){
   freq_unique_input_RampId_C <- as.data.frame(table(unique_input_RampId_C[,"pathwayRampId"]))
 
   names(freq_unique_input_RampId_C)[1] = 'pathwayRampId'
-  merge_Pathwayfreq_source <- merge(freq_unique_input_RampId_C,
+  merge_Pathwayfreq_source_C <- merge(freq_unique_input_RampId_C,
                                     unique_pathwayRampId_source, by="pathwayRampId")
 
   # subset metabolite data based on source 
@@ -476,10 +476,11 @@ segregateDataBySource<-function(input_RampIds){
   ## input_custom_metab <- subset(merge_Pathwayfreq_source,
   ##                              merge_Pathwayfreq_source$pathwaySource == "custom")
 
-  input_metab <- lapply(unique(merge_Pathwayfreq_source$pathwaySource), function(x){
-    return(subset(merge_Pathwayfreq_source,merge_Pathwayfreq_source$pathwaySource == x))
+  input_metab <- lapply(unique(merge_Pathwayfreq_source_C$pathwaySource),
+                        function(x){
+    return(subset(merge_Pathwayfreq_source_C,merge_Pathwayfreq_source_C$pathwaySource == x))
   })
-  names(input_metab) <- unique(merge_Pathwayfreq_source$pathwaySource)
+  names(input_metab) <- unique(merge_Pathwayfreq_source_C$pathwaySource)
   
   # data frames for Genes with pathawayRampID, Freq based  on Source(kegg, reactome, wiki, hmdb)
 
@@ -498,10 +499,10 @@ segregateDataBySource<-function(input_RampIds){
   ## input_reactome_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "reactome")
   ## input_wiki_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "wiki")
   ## input_custom_gene <- subset(merge_PathwayG_source, merge_PathwayG_source$pathwaySource == "custom")
-  input_gene <- lapply(unique(merge_Pathwayfreq_source$pathwaySource), function(x){
-    return(subset(merge_Pathwayfreq_source,merge_Pathwayfreq_source$pathwaySource == x))
+  input_gene <- lapply(unique(merge_PathwayG_source$pathwaySource), function(x){
+    return(subset(merge_PathwayG_source,merge_PathwayG_source$pathwaySource == x))
   })
-  names(input_gene) <- unique(merge_Pathwayfreq_source$pathwaySource)
+  names(input_gene) <- unique(merge_PathwayG_source$pathwaySource)
   out = list(input_metab,input_gene)
   names(out) <- c("metab","gene")
   return(out)

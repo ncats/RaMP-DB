@@ -269,7 +269,7 @@ runFisherTest <- function(db = RaMP(), analytes,
       }
     }
     pathway_index <- names(segregated_id_list)[which(sapply(segregated_id_list, function(x) i %in% x$pathwayRampId))]
-    if(is.na(pathway_index)){
+    if(is.null(pathway_index) | is.na(pathway_index)){
       total_pathway_analytes = 0
     }else{
       total_pathway_analytes = totanalytes[[pathway_index]]
