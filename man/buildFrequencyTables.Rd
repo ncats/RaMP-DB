@@ -4,7 +4,7 @@
 \alias{buildFrequencyTables}
 \title{Return all analytes that map to unique pathways in a pathwaydf}
 \usage{
-buildFrequencyTables(inputdf, pathway_definitions, analyte_type)
+buildFrequencyTables(db = RaMP(), inputdf, pathway_definitions, analyte_type)
 }
 \arguments{
 \item{inputdf}{internal df with pathwayramp ids}

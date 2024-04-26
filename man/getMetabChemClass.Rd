@@ -4,7 +4,7 @@
 \alias{getMetabChemClass}
 \title{Returns chemical classes for classType}
 \usage{
-getMetabChemClass(classType = "ClassyFire_super_class")
+getMetabChemClass(db = RaMP(), classType = "ClassyFire_super_class")
 }
 \arguments{
 \item{classType}{one of the metab class types as returned by getMetabClassTypes() function; if null

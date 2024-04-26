@@ -1,7 +1,7 @@
 Package: RaMP
 Title: RaMP (Relational Database of Metabolomic Pathways)
 Type: Package
-Version: 2.3.4
+Version: 3.0.2
 License: GPL-2
 Depends: R (>= 3.6.0)
 Authors@R: c(
@@ -14,6 +14,7 @@ Description: The RaMP R package allows users to interact with the RaMP database,
 Imports:
     magrittr,
     shiny,
+    methods,
     shinydashboard,
     highcharter,
     dplyr,
@@ -29,14 +30,19 @@ Imports:
     visNetwork,
     properties,
     stringi,
-    RMariaDB,
     DBI,
+    RSQLite,
+    RMariaDB,
     jsonlite,
     readxl,
-    methods,
-    tibble
+    tibble,
+    BiocFileCache,
+    R.utils,
+    httr,
+    upsetjs,
+    Polychrome
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

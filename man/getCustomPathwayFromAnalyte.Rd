@@ -2,8 +2,7 @@
 % Please edit documentation in R/ReturnPathwaysEnrich_InputAnalytes.R
 \name{getCustomPathwayFromAnalyte}
 \alias{getCustomPathwayFromAnalyte}
-\title{Reads an excel file containing metabolite and gene annotations and filters pathways
-to those pathways represented by the input analytes.}
+\title{Utility method supporting pathway analyses when file-based pathway lists are used rather than the ramp database.}
 \usage{
 getCustomPathwayFromAnalyte(analytes, pathways, analyte_type)
 }
@@ -18,8 +17,7 @@ getCustomPathwayFromAnalyte(analytes, pathways, analyte_type)
 A pathwaydf compatible with runFisherTest
 }
 \description{
-Reads an excel file containing metabolite and gene annotations and filters pathways
-to those pathways represented by the input analytes.
+Utility method supporting pathway analyses when file-based pathway lists are used rather than the ramp database.
 }
 \author{
 Andrew Patt

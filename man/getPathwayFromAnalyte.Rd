@@ -6,13 +6,19 @@
 returns associated pathways}
 \usage{
 getPathwayFromAnalyte(
+  db = RaMP(),
   analytes = "none",
   find_synonym = FALSE,
   NameOrIds = "ids",
-  includeRaMPids = FALSE
+  includeRaMPids = FALSE,
+  include_smpdb = FALSE,
+  min_path_size = 5,
+  max_path_size = 150
 )
 }
 \arguments{
+\item{db}{a RaMP databse object}
+
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
 \item{find_synonym}{find all synonyms or just return same synonym (T/F)}
@@ -20,6 +26,12 @@ getPathwayFromAnalyte(
 \item{NameOrIds}{whether input is "names" or "ids" (default is "ids")}
 
 \item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
+
+\item{include_smpdb}{Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant}
+
+\item{min_path_size}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
+
+\item{max_path_size}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
 }
 \value{
 a list contains all metabolites as name and pathway inside.
@@ -34,6 +46,6 @@ pkg.globals <- setConnectionToRaMP(
   dbname = "ramp2", username = "root",
   conpass = "", host = "localhost"
 )
-mypath <- getPathwayFromAnalyteV2(analytes = c("2-hydroxyglutarate", "glutamate"))
+mypath <- getPathwayFromAnalyte(analytes = c("2-hydroxyglutarate", "glutamate"))
 }
 }

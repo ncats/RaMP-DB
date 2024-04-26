@@ -7,7 +7,12 @@ This function is used to filter out some super common synonyms like glyceride
 Now, this function only format the user input, so the user vector, dataframe,
 and entire string separated by comma are working.}
 \usage{
-rampFindSynonymFromSynonym(synonym, full = FALSE, return_rampIds = FALSE)
+rampFindSynonymFromSynonym(
+  db = RaMP(),
+  synonym,
+  full = FALSE,
+  return_rampIds = FALSE
+)
 }
 \arguments{
 \item{synonym}{name to search for}

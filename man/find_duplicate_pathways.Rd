@@ -4,7 +4,7 @@
 \alias{find_duplicate_pathways}
 \title{Return list of duplicate Wikipathway IDs from Reactome. This may be unnecessary in the future}
 \usage{
-find_duplicate_pathways()
+find_duplicate_pathways(db = RaMP())
 }
 \value{
 List of duplicate Wikipathway IDs from Reactome.
