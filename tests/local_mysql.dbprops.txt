@@ -1,5 +1,0 @@
-hostname=127.0.0.1
-dbname=ramp
-username=root
-conpass=root_password
-port=3306
