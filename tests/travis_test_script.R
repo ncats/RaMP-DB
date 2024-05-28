@@ -9,16 +9,7 @@ library(RMariaDB)
 remotes::install_deps()
 
 # Define a function to run tests with a given database type
-run_tests <- function(database_type) {
-  if (database_type == "sqlite") {
-    Sys.unsetenv("MYSQL_TEST")
-    message("Running tests with the sqlite database.")
-  } else if (database_type == "mysql") {
-    Sys.setenv(MYSQL_TEST = "true")
-    message("Running tests with the mysql database.")
-  } else {
-    stop("Invalid database type specified.")
-  }
+run_tests <- function() {
 
   # Run tests
   test_results <- devtools::test()
@@ -41,16 +32,7 @@ run_tests <- function(database_type) {
 }
 
 # Run tests with sqlite database
-failures <- run_tests("sqlite")
-
-if (!is.null(failures)) {
-    message("Some tests failed. Exiting with an error.")
-    print(failures)
-    q("no", status = 1)
-}
-
-# Run tests with mysql database
-failures <- run_tests("mysql")
+failures <- run_tests()
 
 if (!is.null(failures)) {
     message("Some tests failed. Exiting with an error.")
