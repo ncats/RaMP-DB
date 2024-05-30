@@ -85,8 +85,10 @@ getOntoFromMeta <- function(db = RaMP(), analytes, NameOrIds = "ids") {
 
   mdf <- mdf[c("Metabolites", "sourceId", "IDtype", "Ontology", "HMDBOntologyType")]
 
-  # need to make unique list (JB, 12/1/21)
-  mdf <- unique(mdf)
+  mdf$insensitive_metabolites <- tolower(mdf$Metabolites)
+  mdf <- mdf[!duplicated(mdf[c("insensitive_metabolites", "sourceId", "IDtype", "Ontology", "HMDBOntologyType")]), ]
+
+  mdf$insensitive_metabolites <- NULL
 
   # colnames(mdf) <- c('Metabolites','Ontology','Ontology_Type')
   return(mdf)

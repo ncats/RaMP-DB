@@ -175,6 +175,25 @@ RaMP <- function(version = character()) {
     db
 }
 
+#' @title Connection to a RaMP SQLite database
+#' @description Connects to a specified RaMP SQLite database.
+#' @param db_path `character(1)` specifying the .sqlite file to load.
+#' example: rampDB = RaMP:::local_RaMP("/Users/kelleherkj/IdeaProjects/ramp-backend-ncats/schema/RaMP_SQLite_v2.6.0.sqlite")
+#' @importFrom methods new
+#' @importFrom RSQLite SQLite
+#' @importFrom DBI dbConnect
+local_RaMP <- function(db_path = character()) {
+  db <- .RaMP(SQLite(), dbname = db_path)
+  con <- .dbcon(db)
+
+  # add the cache of summary data objects for enrichment
+  db@dbSummaryObjCache <- setupRdataCache(db)
+
+  on.exit(dbDisconnect(con))
+  .valid_ramp_database(con, error = TRUE)
+  db
+}
+
 #' Internal constructor - to also support MySQL/MariaDB connections.
 #'
 #' @importFrom RSQLite SQLite
@@ -242,11 +261,17 @@ listRaMPVersions <- function(local = FALSE) {
     cacheInfo <- cacheInfo[grepl(paste0("RaMP_SQLite_v", version, ".sqlite"),
                                  cacheInfo$rname), ]
     if (!nrow(cacheInfo)) {
-        message("Downloading RaMP-DB version ", version)
-        db_url <- paste0(
-            "https://github.com/ncats/RaMP-DB/raw/sqlite/db/RaMP_SQLite_v",
-            version, ".sqlite.gz")
-        path <- bfcadd(bfc, db_url, fname = "exact", archiveMethod='unzip')
+      sqlite_file_name <- paste0("RaMP_SQLite_v", version, ".sqlite.gz")
+      uri <- paste0("./db/", sqlite_file_name)
+      if (file.exists(uri)) {
+        message("Copying RaMP-DB version ", version, " from this cloned repository")
+      }
+      else {
+        uri <- paste0(
+          "https://github.com/ncats/RaMP-DB/raw/sqlite/db/", sqlite_file_name)
+        message("Downloading RaMP-DB version ", version, " from remote repository")
+      }
+        path <- bfcadd(bfc, uri, fname = "exact", archiveMethod='unzip')
         dbf <- sub(".gz", "", path, fixed = TRUE)
         if (file.exists(dbf))
             file.remove(dbf)
