@@ -261,17 +261,11 @@ listRaMPVersions <- function(local = FALSE) {
     cacheInfo <- cacheInfo[grepl(paste0("RaMP_SQLite_v", version, ".sqlite"),
                                  cacheInfo$rname), ]
     if (!nrow(cacheInfo)) {
-      sqlite_file_name <- paste0("RaMP_SQLite_v", version, ".sqlite.gz")
-      uri <- paste0("./db/", sqlite_file_name)
-      if (file.exists(uri)) {
-        message("Copying RaMP-DB version ", version, " from this cloned repository")
-      }
-      else {
-        uri <- paste0(
-          "https://github.com/ncats/RaMP-DB/raw/sqlite/db/", sqlite_file_name)
-        message("Downloading RaMP-DB version ", version, " from remote repository")
-      }
-        path <- bfcadd(bfc, uri, fname = "exact", archiveMethod='unzip')
+        message("Downloading RaMP-DB version ", version)
+        db_url <- paste0(
+            "https://github.com/ncats/RaMP-DB/raw/sqlite/db/RaMP_SQLite_v",
+            version, ".sqlite.gz")
+        path <- bfcadd(bfc, db_url, fname = "exact", archiveMethod='unzip')
         dbf <- sub(".gz", "", path, fixed = TRUE)
         if (file.exists(dbf))
             file.remove(dbf)
