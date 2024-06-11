@@ -175,6 +175,25 @@ RaMP <- function(version = character()) {
     db
 }
 
+#' @title Connection to a RaMP SQLite database
+#' @description Connects to a specified RaMP SQLite database.
+#' @param db_path `character(1)` specifying the .sqlite file to load.
+#' example: rampDB = RaMP:::local_RaMP("/Users/kelleherkj/IdeaProjects/ramp-backend-ncats/schema/RaMP_SQLite_v2.6.0.sqlite")
+#' @importFrom methods new
+#' @importFrom RSQLite SQLite
+#' @importFrom DBI dbConnect
+local_RaMP <- function(db_path = character()) {
+  db <- .RaMP(SQLite(), dbname = db_path)
+  con <- .dbcon(db)
+
+  # add the cache of summary data objects for enrichment
+  db@dbSummaryObjCache <- setupRdataCache(db)
+
+  on.exit(dbDisconnect(con))
+  .valid_ramp_database(con, error = TRUE)
+  db
+}
+
 #' Internal constructor - to also support MySQL/MariaDB connections.
 #'
 #' @importFrom RSQLite SQLite
