@@ -465,7 +465,7 @@ segregateDataBySource<-function(input_RampIds){
   merge_Pathwayfreq_source_C <- merge(freq_unique_input_RampId_C,
                                     unique_pathwayRampId_source, by="pathwayRampId")
 
-  # subset metabolite data based on source 
+  # subset metabolite data based on source
 
   ## input_kegg_metab <- subset(merge_Pathwayfreq_source,
   ##                            merge_Pathwayfreq_source$pathwaySource == "kegg")
@@ -481,7 +481,7 @@ segregateDataBySource<-function(input_RampIds){
     return(subset(merge_Pathwayfreq_source_C,merge_Pathwayfreq_source_C$pathwaySource == x))
   })
   names(input_metab) <- unique(merge_Pathwayfreq_source_C$pathwaySource)
-  
+
   # data frames for Genes with pathawayRampID, Freq based  on Source(kegg, reactome, wiki, hmdb)
 
   input_RampId_G <- input_RampIds[grep("RAMP_G", input_RampIds$rampId), ]
@@ -1037,7 +1037,6 @@ filterPathwaysByAnalyteCount <- function(db = RaMP(), pathway_dataframe, pathway
 }
 
 
-
 #' Creates the input dataframe for the sunburst plot created in 'plotReactionClasses'
 #'
 #' @param reactionClassesResults output of getReactionClassesForAnalytes()
@@ -1246,8 +1245,6 @@ buildReactionClassesSunburstDatafarme <- function(reactionClassesResults = "") {
 }
 
 
-
-
 #' Creates the input dataframe for the upset plot created in 'plotAnalyteOverlapPerRxnLevel'
 #'
 #' @param reactionClassesResults output of getReactionClassesForAnalytes()
@@ -1257,13 +1254,15 @@ buildAnalyteOverlapPerRxnLevelUpsetDatafarme <- function(reactionsResults = "", 
   if(nrow(reactionsResults$met2rxn)>0)
   {
     reactionsResults$met2rxn <- reactionsResults$met2rxn %>% dplyr::filter(!dplyr::if_any(ecNumber, is.na))
-    EC_number_split_met <- unlist(strsplit(reactionsResults$met2rxn$ecNumber,split="\\."))
-
-    input2reactions_mets <- cbind(
-      c(reactionsResults$met2rxn$metSourceId),
-      c(reactionsResults$met2rxn$ecNumber),
-      c(paste0(EC_number_split_met[seq(1, length(EC_number_split_met), 4)]))
-    )
+    if(nrow(reactionsResults$met2rxn)>0)
+    {
+      EC_number_split_met <- unlist(strsplit(reactionsResults$met2rxn$ecNumber,split="\\."))
+      input2reactions_mets <- cbind(
+        c(reactionsResults$met2rxn$metSourceId),
+        c(reactionsResults$met2rxn$ecNumber),
+        c(paste0(EC_number_split_met[seq(1, length(EC_number_split_met), 4)]))
+      )
+    }
   }
   if (includeCofactorMets == FALSE)
   {
@@ -1272,13 +1271,15 @@ buildAnalyteOverlapPerRxnLevelUpsetDatafarme <- function(reactionsResults = "", 
   if(nrow(reactionsResults$prot2rxn)>0)
   {
     reactionsResults$prot2rxn <- reactionsResults$prot2rxn %>% dplyr::filter(!dplyr::if_any(ecNumber, is.na))
-    EC_number_split_prot <- unlist(strsplit(reactionsResults$prot2rxn$ecNumber,split="\\."))
-
-    input2reactions_prot <- cbind(
-      c(reactionsResults$prot2rxn$uniprot),
-      c(reactionsResults$prot2rxn$ecNumber),
-      c(paste0(EC_number_split_prot[seq(1, length(EC_number_split_prot), 4)]))
-    )
+    if(nrow(reactionsResults$prot2rxn)>0)
+    {
+      EC_number_split_prot <- unlist(strsplit(reactionsResults$prot2rxn$ecNumber,split="\\."))
+      input2reactions_prot <- cbind(
+        c(reactionsResults$prot2rxn$uniprot),
+        c(reactionsResults$prot2rxn$ecNumber),
+        c(paste0(EC_number_split_prot[seq(1, length(EC_number_split_prot), 4)]))
+      )
+    }
   }
 
   if(exists("input2reactions_mets") && exists("input2reactions_prot"))
