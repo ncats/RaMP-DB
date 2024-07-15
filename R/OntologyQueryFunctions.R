@@ -1,18 +1,19 @@
 #' Function that query database to find ontology information based on
 #' the given list of analytes
+#' @param db a RaMP database object
 #' @param analytes a vector of analytes or a analytes delimited by new line character
-#' @param NameOrIds specify the type of given data
+#' @param nameOrID specify the type of given data
 #' @return dataframe that contains searched ontology from given analytes
 #'
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root",
-#' 	conpass = "", host = "localhost")
-#' getOntoFromMeta("hmdb:HMDB0071437")
+#' analytes.of.interest <- c("chebi:15422", "hmdb:HMDB0000064", "hmdb:HMDB0000148", "wikidata:Q426660")
+#'
+#' new.ontologies <- RaMP::getOntoFromMeta(db = rampDB, analytes = analytes.of.interest)
 #' }
 #' @export
-getOntoFromMeta <- function(db = RaMP(), analytes, NameOrIds = "ids") {
-  if (!(NameOrIds %in% c("ids", "name"))) {
+getOntoFromMeta <- function(db = RaMP(), analytes, nameOrID = "ids") {
+  if (!(nameOrID %in% c("ids", "name"))) {
     stop("Specifiy the type of given data to 'ids' or 'name'")
   }
 
@@ -34,9 +35,9 @@ getOntoFromMeta <- function(db = RaMP(), analytes, NameOrIds = "ids") {
   list_metabolite <- sapply(list_metabolite, shQuote)
   list_metabolite <- paste(list_metabolite, collapse = ",")
 
-  if (NameOrIds == "ids") {
+  if (nameOrID == "ids") {
     sql <- paste0("select * from source where sourceId in (", list_metabolite, ");")
-  } else if (NameOrIds == "name") {
+  } else if (nameOrID == "name") {
     sql <- paste0("select * from source where rampId in (select * from (select rampId from analytesynonym where Synonym in (", list_metabolite, ")) as subquery);")
     cat(file = stderr(), "query sql in Package call with -- ", sql, "\n")
   }
