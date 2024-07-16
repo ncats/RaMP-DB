@@ -11,6 +11,12 @@
 #' @param includeRxnURLs if TRUE, urls to Rhea.org will be delivered in the result dataframe for each reaction
 #'
 #' @return a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and common reactions
+#' @examples
+#' \dontrun{
+#' analytes.of.interest <- c('chebi:57368', 'uniprot:Q96N66')
+#'
+#' reactionsLists <- RaMP::getReactionsForAnalytes(db = rampDB, analytes = analytes.of.interest, includeTransportRxns = F, humanProtein = T)
+#' }
 #' @export
 #'
 getReactionsForAnalytes <- function(db = RaMP(), analytes, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN"), includeRxnURLs=F) {
