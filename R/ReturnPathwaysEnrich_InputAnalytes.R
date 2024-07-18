@@ -3,7 +3,7 @@
 #'
 #' @param db a RaMP databse object
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
-#' @param NameOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
+#' @param nameOrId whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param analyte_type "metabolites" or "genes" (default is "metabolites")
 #' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "F")
@@ -26,7 +26,7 @@
 
 runFisherTest <- function(db = RaMP(), analytes,
                           total_genes = 20000,
-                          NameOrIds = "ids",
+                          nameOrId = "ids",
                           analyte_type = "metabolites",
                           MCall = F, alternative = "less",
                           min_path_size = 5, max_path_size = 150,
@@ -46,7 +46,7 @@ runFisherTest <- function(db = RaMP(), analytes,
   } else {
     pathwaydf <- getPathwayFromAnalyte(db = db, analytes = analytes,
       includeRaMPids = TRUE,
-      NameOrIds = NameOrIds,
+      nameOrId = nameOrId,
       find_synonym = FALSE,
       include_smpdb = include_smpdb
     )
@@ -77,7 +77,7 @@ runFisherTest <- function(db = RaMP(), analytes,
     if (background_type == "list" & analyte_type == "metabolites") {
       backgrounddf <- getPathwayFromAnalyte(db = db, background,
                                             includeRaMPids = TRUE,
-                                            NameOrIds = NameOrIds,
+                                            nameOrId = nameOrId,
                                             include_smpdb = include_smpdb
                                             )
       print("Custom background specified, genes will be discarded")
@@ -86,7 +86,7 @@ runFisherTest <- function(db = RaMP(), analytes,
       userbkg <- utils::read.table(background, header=F)[,1]
       backgrounddf <- getPathwayFromAnalyte(db = db, analytes = userbkg,
                                             includeRaMPids = TRUE,
-                                            NameOrIds = NameOrIds,
+                                            nameOrId = nameOrId,
                                             include_smpdb = include_smpdb
                                             )
       print("Custom background specified, genes will be discarded")
@@ -531,7 +531,7 @@ runFisherTest <- function(db = RaMP(), analytes,
 #' clicked on highchart
 #' @param db a RaMP databse object
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
-#' @param NameOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
+#' @param nameOrId whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param min_analyte if the number of analytes (gene or metabolite) in a pathway is
 #' < min_analyte, do not report
@@ -566,13 +566,13 @@ runFisherTest <- function(db = RaMP(), analytes,
 #'   "uniprot:Q86V21", "uniprot:Q02338", "uniprot:Q9BUT1"
 #' )
 #'
-#' fisher.results <- runCombinedFisherTest(analytes = analyte.list, NameOrIds = "ids")
+#' fisher.results <- runCombinedFisherTest(analytes = analyte.list, nameOrId = "ids")
 #' }
 #' @export
 runCombinedFisherTest <- function(
     db = RaMP(),
     analytes,
-    NameOrIds = "ids",
+    nameOrId = "ids",
     total_genes = 20000,
     min_analyte = 2,
     MCall = F,
@@ -754,7 +754,7 @@ runCombinedFisherTest <- function(
     # of pathways that contain user genes and metabolites
     ## pathwaydf <- getPathwayFromAnalyte(analytes,
     ##   includeRaMPids = TRUE,
-    ##   NameOrIds = NameOrIds
+    ##   nameOrId = nameOrId
     ##   )
     if(pathway_definitions!="RaMP"){
       pathwaydf$pathwayName = pathwaydf$pathwayRampId
@@ -801,7 +801,7 @@ runCombinedFisherTest <- function(
 #' @param db a RaMP databse object
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
 #' @param find_synonym find all synonyms or just return same synonym (T/F)
-#' @param NameOrIds whether input is "names" or "ids" (default is "ids")
+#' @param nameOrId whether input is "names" or "ids" (default is "ids")
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
 #' @param include_smpdb Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant
 #' @param min_path_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
@@ -818,7 +818,7 @@ runCombinedFisherTest <- function(
 #' @export
 getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
                                   find_synonym = FALSE,
-                                  NameOrIds = "ids",
+                                  nameOrId = "ids",
                                   includeRaMPids = FALSE,
                                   include_smpdb = FALSE,
                                   min_path_size = 5,
@@ -832,10 +832,10 @@ getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
     return(NULL)
   }
 
-  if (!(NameOrIds %in% c("ids", "names"))) {
+  if (!(nameOrId %in% c("ids", "names"))) {
     warning(paste0(
-      "NameOrIds must have a value in c('ids','names')\n",
-      "Supplied NameOrIds falue = ('", NameOrIds, "')\nAborting getPathwayFromAnlyte()"
+      "nameOrId must have a value in c('ids','names')\n",
+      "Supplied nameOrId falue = ('", nameOrId, "')\nAborting getPathwayFromAnlyte()"
     ))
     return(NULL)
   }
@@ -850,7 +850,7 @@ getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
 
   isSQLite = RaMP:::.is_sqlite(db)
 
-  if (NameOrIds == "ids") {
+  if (nameOrId == "ids") {
     print("Working on ID List...")
 
     sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, s.sourceId as inputId, group_concat(distinct s.commonName order by s.commonName separator '; ') as commonName, s.rampId, p.pathwayRampId from
