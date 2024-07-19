@@ -1,6 +1,5 @@
 #' Function that query database to find ontology information based on
 #' the given list of analytes
-#' @param db a RaMP database object
 #' @param analytes a vector of analytes or a analytes delimited by new line character
 #' @param nameOrID specify the type of given data
 #' @return dataframe that contains searched ontology from given analytes
