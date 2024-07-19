@@ -2,8 +2,8 @@
 
 #' getReactionsForAnalytes
 #'
-#' @param db a RaMP databse object
-#' @param analytes list of analytes
+#' @param db a RaMP database object
+#' @param analytes list of analytes. chebi and/or uniprot ids are required.
 #' @param onlyHumanMets boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)
 #' @param humanProtein boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)
 #' @param includeTransportRxns if TRUE, returns metabolic and transport reactions
