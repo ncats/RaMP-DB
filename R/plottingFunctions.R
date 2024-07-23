@@ -221,9 +221,14 @@ pathwayResultsPlot <- function(db = RaMP(), pathwaysSig, pval = "FDR", perc_anal
 #' @return  An interactive HTML sunburst plot that allows the user to pan/zoom into reaction classes of interest.
 #' @export
 
-plotReactionClasses <- function(reactionClassesResults = "") {
+plotReactionClasses <- function(reactionClassesResults) {
+
+  if (missing(reactionClassesResults)) {
+    stop("Input is missing. Please input the resulting list of dataframes returned by the getReactionClassesForAnalytes() function")
+  }
+
   if(sum(reactionClassesResults$class_ec_level_1$reactionCount) == 0) {
-    message("The input dataframe has no reaction results. plotCataNetwork function is returning without generating a plot.")
+    message("The input dataframe has no reaction results. plotReactionClasses function is returning without generating a plot.")
     return()
   }
 
@@ -231,7 +236,9 @@ plotReactionClasses <- function(reactionClassesResults = "") {
     stop("Please make sure that the input is the resulting list of dataframes returned by the getReactionClassesForAnalytes() function")
   }
 
-  sunburst_ontology_reactionclass <- buildReactionClassesSunburstDatafarme(reactionClassesResults)
+
+
+  sunburst_ontology_reactionclass <- buildReactionClassesSunburstDataframe(reactionClassesResults)
 
   fig <- plotly::plot_ly(
     color = I("black"),
@@ -271,9 +278,14 @@ plotReactionClasses <- function(reactionClassesResults = "") {
 #' @return  An interactive HTML upset plot that allows the user to visualize the overlap in the number of input compounds across level 1 of reaction classes.
 #' @export
 
-plotAnalyteOverlapPerRxnLevel <- function(reactionsResults = "", includeCofactorMets = FALSE) {
+plotAnalyteOverlapPerRxnLevel <- function(reactionsResults, includeCofactorMets = FALSE) {
+
+  if (missing(reactionsResults)) {
+    stop("Input is missing. Please input the resulting list of dataframes returned by the getReactionsForAnalytes() function")
+  }
+
   if(nrow(reactionsResults$met2rxn) ==0 && nrow(reactionsResults$prot2rxn) == 0) {
-    message("The input has no reaction results. plotCataNetwork function is returning without generating a plot.")
+    message("The input has no reaction results. plotAnalyteOverlapPerRxnLevel function is returning without generating a plot.")
     return()
   }
 
@@ -281,7 +293,7 @@ plotAnalyteOverlapPerRxnLevel <- function(reactionsResults = "", includeCofactor
     stop("Please make sure that the input is the resulting list of dataframes returned by the getReactionsForAnalytes() function")
   }
 
-  input2reactions_list <- buildAnalyteOverlapPerRxnLevelUpsetDatafarme(reactionsResults = reactionsResults, includeCofactorMets = includeCofactorMets)
+  input2reactions_list <- buildAnalyteOverlapPerRxnLevelUpsetDataframe(reactionsResults = reactionsResults, includeCofactorMets = includeCofactorMets)
 
   fig <- upsetjs::upsetjs() %>%
     upsetjs::fromList(input2reactions_list) %>%
@@ -290,6 +302,56 @@ plotAnalyteOverlapPerRxnLevel <- function(reactionsResults = "", includeCofactor
     upsetjs::chartLayout(width.ratios = c(0.15,0.2,0.65),
                          height.ratios = c(0.6,.4)) %>%
     upsetjs::chartFontSizes(set.label = "13px", chart.label = "14px")
+
+  return(fig)
+
+}
+
+
+
+#' Plots an interactive sunburst plot of chemical classes
+#'
+#' @param chemicalClassSurveryResults output of chemicalClassSurvey()
+#' @param plotType choice of 'sunburst' or 'treemap' plot type (default = 'sunburst')
+#' @return  An interactive HTML sunburst plot that allows the user to pan/zoom into reaction classes of interest.
+#' @export
+
+plotChemicalClassSurvery <- function(chemicalClassSurveryResults, plotType = "sunburst") {
+
+  if (missing(chemicalClassSurveryResults)) {
+    stop("Input is missing. Please input the resulting list of dataframes returned by the chemicalClassSurvey() function")
+  }
+
+  if(nrow(chemicalClassSurveryResults$met_classes) == 0) {
+    message("The input dataframe has no metabolites. plotChemicalClassSurvery function is returning without generating a plot.")
+    return()
+  }
+
+  if (length(intersect(c("count_summary","met_classes", "query_report"),names(chemicalClassSurveryResults)))!=3) {
+    stop("Please make sure that the input is the resulting list of dataframes returned by the chemicalClassSurvey() function")
+  }
+
+
+
+  sunburst_ontology_chemicalClass <- buildChemicalClassSurveryDataframe(chemicalClassSurveryResults)
+
+  fig <- plotly::plot_ly(
+    color = I("black")
+  )
+  fig <- fig %>%
+    plotly::add_trace(
+      ids = sunburst_ontology_chemicalClass$ids,
+      labels = sunburst_ontology_chemicalClass$labels,
+      parents = sunburst_ontology_chemicalClass$parents,
+      type = plotType,
+      maxdepth = 2,
+      domain = list(column = 1)
+    )
+  fig <- fig %>%
+    plotly::layout(
+      margin = list(l = 0, r = 0, b = 0, t = 0),
+      colorway = pals::brewer.divdiv()
+    )
 
   return(fig)
 
