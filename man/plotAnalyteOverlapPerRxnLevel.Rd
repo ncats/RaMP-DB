@@ -4,10 +4,7 @@
 \alias{plotAnalyteOverlapPerRxnLevel}
 \title{Plots an interactive upset plot of overlapping input compounds at reaction class level 1}
 \usage{
-plotAnalyteOverlapPerRxnLevel(
-  reactionsResults = "",
-  includeCofactorMets = FALSE
-)
+plotAnalyteOverlapPerRxnLevel(reactionsResults, includeCofactorMets = FALSE)
 }
 \arguments{
 \item{reactionsResults}{output of getReactionsForAnalytes()}

@@ -4,7 +4,7 @@
 \alias{plotReactionClasses}
 \title{Plots an interactive sunburst plot of reaction class}
 \usage{
-plotReactionClasses(reactionClassesResults = "")
+plotReactionClasses(reactionClassesResults)
 }
 \arguments{
 \item{reactionClassesResults}{output of getReactionClassesForAnalytes()}
