@@ -4,11 +4,12 @@
 #' Converts data.frame or csv formatted metabolite metadata into RaMP data input format. The input should have ID sources (e.g. hmdb, kegg, entrez) as column names and the corresponding rows filled with IDs from that source.
 #'
 #' @details
-#' RaMP input format is a vector of entries that look like prefix:ID where the prefix is a code for the ID system the ID belongs to (e.g. hmdb, kegg, entrez). This function expects input with prefixes as column names, and IDs belonging to that prefix as rows in the corresponding column. Data can be supplied as a csv file or data.frame object. NA values, columns named with an usupported prefix, and columns named with a supported prefix but no data will be ignored by the function.
+#' RaMP input format is a vector of entries that look like prefix:ID where the prefix is a code for the ID system the ID belongs to (e.g. hmdb, kegg, entrez).
+#' This function expects input with prefixes as column names, and IDs belonging to that prefix as rows in the corresponding column. Data can be supplied as a csv file or data.frame object.
+#' NA values, columns named with an usupported prefix, and columns named with a supported prefix but no data will be ignored by the function.
 #'
 #'  A complete list of currently supported prefixes for metabolites can be found by running the getPrefixesFromAnalytes function, as shown in examples.
 #'
-#' @param db a RaMP object created by running RaMP::RaMP()
 #' @param data_frame a data.frame object where the column names are prefixes that will be prepended to each identifier in that column. Please specify either this argument or csv_path.
 #' @param csv_path a string containing the file path to a csv that will be read and converted to RaMP data input format. Column names should be prefixes that will be prepended to each identifier in that column.
 #' @param ... additional arguments that will be passed to readr::read_csv()
@@ -52,7 +53,7 @@ createRaMPInput <- function ( db = RaMP(), data_frame = NULL, csv_path = NULL, .
   }
 
   #Get acceptable prefixes from RaMP and convert them to character vector.
-  prefix_c <- strsplit(RaMP::getPrefixesFromAnalytes(db = db, analyteType = 'metabolite')$idTypes[1], ',')[[1]]
+  prefix_c <- strsplit(getPrefixesFromAnalytes(db = db, analyteType = 'metabolite')$idTypes[1], ',')[[1]]
 
   prefix_c <- append(prefix_c, strsplit(getPrefixesFromAnalytes(db = db, analyteType = 'gene')$idTypes[1], ',')[[1]])
 
