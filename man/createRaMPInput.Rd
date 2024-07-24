@@ -24,9 +24,9 @@ RaMP input format is a character() of entries that look like prefix:ID where the
 This function expects input with prefixes as column names, and IDs belonging to that prefix as rows in the corresponding column. Data can be supplied as a csv file or data.frame object.
 NA values, columns named with an usupported prefix, and columns named with a supported prefix but no data will be ignored by the function.
 
- A complete and current list of currently supported prefixes for metabolites can be found by running the getPrefixesFromAnalytes() function, as shown in examples.
- These will include the following genes/proteins: ensembl, gene_symbol, uniprot, entrez, hmdb, wikidata, EN, ncbiprotein, brenda, chebi.
- They will also include the following metabolites: hmdb, chebi, chemspider, kegg, pubchem, CAS, wikidata, LIPIDMAPS, lipidbank, swisslipids, plantfa, kegg_glycan, rhea-comp, polymer
+A complete and current list of currently supported prefixes for metabolites can be found by running the getPrefixesFromAnalytes() function, as shown in examples.
+These will include the following genes/proteins: ensembl, gene_symbol, uniprot, entrez, hmdb, wikidata, EN, ncbiprotein, brenda, chebi.
+They will also include the following metabolites: hmdb, chebi, chemspider, kegg, pubchem, CAS, wikidata, LIPIDMAPS, lipidbank, swisslipids, plantfa, kegg_glycan, rhea-comp, polymer
 }
 \examples{
  \dontrun{
