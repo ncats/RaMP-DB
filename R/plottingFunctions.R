@@ -69,7 +69,8 @@ plotCataNetwork <- function(catalyzedf = "") {
 #' @param interactive If TRUE, return interactive plotly object instead of ggplot object
 #' @examples
 #' \dontrun{
-#' pathwayResultsPlot(db = rampDB, filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2, min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE)
+#' pathwayResultsPlot(db = rampDB, filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2,
+#'                     min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE)
 #' }
 #' @export
 pathwayResultsPlot <- function(db = RaMP(), pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.5,
