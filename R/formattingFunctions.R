@@ -17,6 +17,7 @@
 #' @returns A vector object of type character() including each identifier in the input prepended to a supported prefix in the format "prefix:identifier". This result is designed to be input for several RaMP functions.
 #'
 #' @examples
+#'  \dontrun{
 #' rampDB <- RaMP()
 #'
 #' # Example use with data.frame
@@ -35,6 +36,7 @@
 #' RaMP::getPrefixesFromAnalytes(db = rampDB, analyteType = 'metabolite')
 #'
 #' RaMP::getPrefixesFromAnalytes(db = rampDB, analyteType = 'gene')
+#' }
 #'
 #' @export
 createRaMPInput <- function ( db = RaMP(), data_frame = NULL, csv_path = NULL, ... ) {
