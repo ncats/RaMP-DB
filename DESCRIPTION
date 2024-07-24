@@ -21,6 +21,7 @@ Imports:
     ggplot2,
     plotly,
     tidyr,
+    readr,
     tidytext,
     data.table,
     DT,
