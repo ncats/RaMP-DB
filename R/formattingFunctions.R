@@ -26,7 +26,8 @@
 #' RaMP::getPrefixesFromAnalytes(analyteType = 'gene')
 #'
 #' # Example use with demo data
-#' df <- data.frame(ensembl = c('ENSG00000135679', 'ENSG00000141510'), hmdb = c('HMDB0000064', NA), fake_ID = c('123', NA))
+#' df <- data.frame(ensembl = c('ENSG00000135679', 'ENSG00000141510'),
+#'                 hmdb = c('HMDB0000064', NA), fake_ID = c('123', NA))
 #'
 #' dir <- system.file("extdata", package="RaMP", mustWork=TRUE)
 #' data_frame <- file.path(dir,"ExampleInputFileName.csv")
