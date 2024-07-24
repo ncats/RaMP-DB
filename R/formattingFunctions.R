@@ -8,9 +8,9 @@
 #' This function expects input with prefixes as column names, and IDs belonging to that prefix as rows in the corresponding column. Data can be supplied as a csv file or data.frame object.
 #' NA values, columns named with an usupported prefix, and columns named with a supported prefix but no data will be ignored by the function.
 #'
-#'  A complete and current list of currently supported prefixes for metabolites can be found by running the getPrefixesFromAnalytes() function, as shown in examples.
-#'  These will include the following genes/proteins: ensembl, gene_symbol, uniprot, entrez, hmdb, wikidata, EN, ncbiprotein, brenda, chebi.
-#'  They will also include the following metabolites: hmdb, chebi, chemspider, kegg, pubchem, CAS, wikidata, LIPIDMAPS, lipidbank, swisslipids, plantfa, kegg_glycan, rhea-comp, polymer
+#' A complete and current list of currently supported prefixes for metabolites can be found by running the getPrefixesFromAnalytes() function, as shown in examples.
+#' These will include the following genes/proteins: ensembl, gene_symbol, uniprot, entrez, hmdb, wikidata, EN, ncbiprotein, brenda, chebi.
+#' They will also include the following metabolites: hmdb, chebi, chemspider, kegg, pubchem, CAS, wikidata, LIPIDMAPS, lipidbank, swisslipids, plantfa, kegg_glycan, rhea-comp, polymer
 #'
 #' @param data_frame a data.frame object where the column names are prefixes that will be prepended to each identifier in that column. Please specify either this argument or csv_path. Supported prefixes can be found with getPrefixesFromAnalytes()
 #' @param csv_path a string containing the file path to a csv that will be read and converted to RaMP data input format. Column names should be prefixes that will be prepended to each identifier in that column.
