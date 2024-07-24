@@ -16,7 +16,14 @@
 #'@examples
 #'\dontrun{
 #' # metabolite list of interest
-#' metabolites.of.interest = c("pubchem:64969", "chebi:16958", "chemspider:20549", "kegg:C05598", "chemspider:388809", "pubchem:53861142", "hmdb:HMDB0001138", "hmdb:HMDB0029412")
+#' metabolites.of.interest = c("pubchem:64969",
+#'                              "chebi:16958",
+#'                              "chemspider:20549",
+#'                              "kegg:C05598",
+#'                              "chemspider:388809",
+#'                              "pubchem:53861142",
+#'                              "hmdb:HMDB0001138",
+#'                              "hmdb:HMDB0029412")
 #'
 #' chemical.classes <- chemicalClassSurvey(db = rampDB, mets = metabolites.of.interest)
 #'}
