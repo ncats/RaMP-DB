@@ -15,7 +15,8 @@
 #' \dontrun{
 #' analytes.of.interest <- c('chebi:57368', 'uniprot:Q96N66')
 #'
-#' reactionsLists <- RaMP::getReactionsForAnalytes(db = rampDB, analytes = analytes.of.interest, includeTransportRxns = F, humanProtein = T)
+#' reactionsLists <- RaMP::getReactionsForAnalytes(db = rampDB, analytes = analytes.of.interest,
+#'                                                   includeTransportRxns = F, humanProtein = T)
 #' }
 #' @export
 #'
