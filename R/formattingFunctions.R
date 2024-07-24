@@ -21,7 +21,8 @@
 #' rampDB <- RaMP()
 #'
 #' # Example use with data.frame
-#' df <- data.frame(ensembl = c('ENSG00000135679', 'ENSG00000141510'), hmdb = c('HMDB0000064', NA), fake_ID = c('123', NA))
+#' df <- data.frame(ensembl = c('ENSG00000135679', 'ENSG00000141510'),
+#'                              hmdb = c('HMDB0000064', NA), fake_ID = c('123', NA))
 #'
 #' RaMPInput <- createRaMPInput(data_frame = df)
 #'
