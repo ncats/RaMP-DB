@@ -9,7 +9,7 @@ getPathwayFromAnalyte(
   db = RaMP(),
   analytes = "none",
   find_synonym = FALSE,
-  NameOrIds = "ids",
+  nameOrId = "ids",
   includeRaMPids = FALSE,
   include_smpdb = FALSE,
   min_path_size = 5,
@@ -23,7 +23,7 @@ getPathwayFromAnalyte(
 
 \item{find_synonym}{find all synonyms or just return same synonym (T/F)}
 
-\item{NameOrIds}{whether input is "names" or "ids" (default is "ids")}
+\item{nameOrId}{whether input is "names" or "ids" (default is "ids")}
 
 \item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
 

@@ -8,7 +8,7 @@ clicked on highchart}
 runCombinedFisherTest(
   db = RaMP(),
   analytes,
-  NameOrIds = "ids",
+  nameOrId = "ids",
   total_genes = 20000,
   min_analyte = 2,
   MCall = F,
@@ -27,7 +27,7 @@ runCombinedFisherTest(
 
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
-\item{NameOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
+\item{nameOrId}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
 
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
 
@@ -71,15 +71,30 @@ clicked on highchart
 }
 \examples{
 \dontrun{
-pkg.globals <- setConnectionToRaMP(
-  dbname = "ramp2", username = "root",
-  conpass = "", host = "localhost"
-)
-analyte.list <- c(
-  "chebi:15344", "chebi:10983", "chebi:15351",
-  "uniprot:Q86V21", "uniprot:Q02338", "uniprot:Q9BUT1"
-)
+fisher.results <- runCombinedFisherTest(db = rampDB, analytes = c(
+"hmdb:HMDB0000033",
+"hmdb:HMDB0000052",
+"hmdb:HMDB0000094",
+"hmdb:HMDB0000161",
+"hmdb:HMDB0000168",
+"hmdb:HMDB0000191",
+"hmdb:HMDB0000201",
+"chemspider:10026",
+"hmdb:HMDB0006059",
+"Chemspider:6405",
+"CAS:5657-19-2",
+"hmdb:HMDB0002511",
+"chemspider:20171375", "CAS:133-32-4",
+"CAS:5746-90-7",
+"CAS:477251-67-5",
+"hmdb:HMDB0000695",
+"chebi:15934",
+"CAS:838-07-3",
+"hmdb:HMDBP00789",
+"hmdb:HMDBP00283",
+"hmdb:HMDBP00284",
+"hmdb:HMDBP00850"
+))
 
-fisher.results <- runCombinedFisherTest(analytes = analyte.list, NameOrIds = "ids")
 }
 }

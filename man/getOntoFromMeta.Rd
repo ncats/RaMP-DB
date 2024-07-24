@@ -5,12 +5,12 @@
 \title{Function that query database to find ontology information based on
 the given list of analytes}
 \usage{
-getOntoFromMeta(db = RaMP(), analytes, NameOrIds = "ids")
+getOntoFromMeta(db = RaMP(), analytes, nameOrID = "ids")
 }
 \arguments{
 \item{analytes}{a vector of analytes or a analytes delimited by new line character}
 
-\item{NameOrIds}{specify the type of given data}
+\item{nameOrID}{specify the type of given data}
 }
 \value{
 dataframe that contains searched ontology from given analytes
@@ -21,8 +21,8 @@ the given list of analytes
 }
 \examples{
 \dontrun{
-pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root",
-	conpass = "", host = "localhost")
-getOntoFromMeta("hmdb:HMDB0071437")
+analytes.of.interest <- c("chebi:15422", "hmdb:HMDB0000064", "hmdb:HMDB0000148", "wikidata:Q426660")
+
+new.ontologies <- RaMP::getOntoFromMeta(db = rampDB, analytes = analytes.of.interest)
 }
 }

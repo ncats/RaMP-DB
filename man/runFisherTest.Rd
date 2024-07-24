@@ -9,7 +9,7 @@ runFisherTest(
   db = RaMP(),
   analytes,
   total_genes = 20000,
-  NameOrIds = "ids",
+  nameOrId = "ids",
   analyte_type = "metabolites",
   MCall = F,
   alternative = "less",
@@ -28,7 +28,7 @@ runFisherTest(
 
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
 
-\item{NameOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
+\item{nameOrId}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
 
 \item{analyte_type}{"metabolites" or "genes" (default is "metabolites")}
 
