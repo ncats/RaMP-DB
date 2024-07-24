@@ -4,13 +4,15 @@
 #' Converts data.frame or csv formatted metabolite metadata into RaMP data input format. The input should have ID sources (e.g. hmdb, kegg, entrez) as column names and the corresponding rows filled with IDs from that source.
 #'
 #' @details
-#' RaMP input format is a vector of entries that look like prefix:ID where the prefix is a code for the ID system the ID belongs to (e.g. hmdb, kegg, entrez).
+#' RaMP input format is a character() of entries that look like prefix:ID where the prefix is a code for the ID system the ID belongs to (e.g. hmdb, kegg, entrez).
 #' This function expects input with prefixes as column names, and IDs belonging to that prefix as rows in the corresponding column. Data can be supplied as a csv file or data.frame object.
 #' NA values, columns named with an usupported prefix, and columns named with a supported prefix but no data will be ignored by the function.
 #'
-#'  A complete list of currently supported prefixes for metabolites can be found by running the getPrefixesFromAnalytes function, as shown in examples.
+#'  A complete and current list of currently supported prefixes for metabolites can be found by running the getPrefixesFromAnalytes() function, as shown in examples.
+#'  These will include the following genes/proteins: ensembl, gene_symbol, uniprot, entrez, hmdb, wikidata, EN, ncbiprotein, brenda, chebi.
+#'  They will also include the following metabolites: hmdb, chebi, chemspider, kegg, pubchem, CAS, wikidata, LIPIDMAPS, lipidbank, swisslipids, plantfa, kegg_glycan, rhea-comp, polymer
 #'
-#' @param data_frame a data.frame object where the column names are prefixes that will be prepended to each identifier in that column. Please specify either this argument or csv_path.
+#' @param data_frame a data.frame object where the column names are prefixes that will be prepended to each identifier in that column. Please specify either this argument or csv_path. Supported prefixes can be found with getPrefixesFromAnalytes()
 #' @param csv_path a string containing the file path to a csv that will be read and converted to RaMP data input format. Column names should be prefixes that will be prepended to each identifier in that column.
 #' @param ... additional arguments that will be passed to readr::read_csv()
 #'
@@ -18,11 +20,16 @@
 #'
 #' @examples
 #'  \dontrun{
-#' rampDB <- RaMP()
+#'# Retrieve supported ID source lists for metabolites and genes
+#' RaMP::getPrefixesFromAnalytes(analyteType = 'metabolite')
 #'
-#' # Example use with data.frame
-#' df <- data.frame(ensembl = c('ENSG00000135679', 'ENSG00000141510'),
-#'                              hmdb = c('HMDB0000064', NA), fake_ID = c('123', NA))
+#' RaMP::getPrefixesFromAnalytes(analyteType = 'gene')
+#'
+#' # Example use with demo data
+#' df <- data.frame(ensembl = c('ENSG00000135679', 'ENSG00000141510'), hmdb = c('HMDB0000064', NA), fake_ID = c('123', NA))
+#'
+#' dir <- system.file("extdata", package="RaMP", mustWork=TRUE)
+#' data_frame <- file.path(dir,"ExampleInputFileName.csv")
 #'
 #' RaMPInput <- createRaMPInput(data_frame = df)
 #'
@@ -32,11 +39,6 @@
 #' RaMPInput <- createRaMPInput(csv_path = 'createRaMPInput_test_data.csv')
 #'
 #' getPathwayFromAnalyte(RaMPInput)
-#'
-#' # Retrieve supported ID source lists for metabolites and genes
-#' RaMP::getPrefixesFromAnalytes(db = rampDB, analyteType = 'metabolite')
-#'
-#' RaMP::getPrefixesFromAnalytes(db = rampDB, analyteType = 'gene')
 #' }
 #'
 #' @export
