@@ -3,13 +3,13 @@
 #'
 #' @param db a RaMP databse object
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
-#' @param nameOrId whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
+#' @param namesOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param analyte_type "metabolites" or "genes" (default is "metabolites")
 #' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "F")
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
-#' @param min_path_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
-#' @param max_path_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
+#' @param minPathwaySize the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
+#' @param maxPathwaySize the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
 #' @param background_type type of background that is input by the user.  Opions are "database" if user wants all
 #' analytes from the RaMP database will be used; "file", if user wants to input a file with a list of background
 #' analytes; "list", if user wants to input a vector of analyte IDs; "biospecimen", if user wants to specify a
@@ -26,10 +26,10 @@
 
 runFisherTest <- function(db = RaMP(), analytes,
                           total_genes = 20000,
-                          nameOrId = "ids",
+                          namesOrIds = "ids",
                           analyte_type = "metabolites",
                           MCall = F, alternative = "less",
-                          min_path_size = 5, max_path_size = 150,
+                          minPathwaySize = 5, maxPathwaySize = 150,
                           background_type = "database", background = "database",
                           pathway_definitions = "RaMP", include_smpdb = FALSE) {
   if(analyte_type == "genes"){
@@ -46,7 +46,7 @@ runFisherTest <- function(db = RaMP(), analytes,
   } else {
     pathwaydf <- getPathwayFromAnalyte(db = db, analytes = analytes,
       includeRaMPids = TRUE,
-      nameOrId = nameOrId,
+      namesOrIds = namesOrIds,
       find_synonym = FALSE,
       include_smpdb = include_smpdb
     )
@@ -77,7 +77,7 @@ runFisherTest <- function(db = RaMP(), analytes,
     if (background_type == "list" & analyte_type == "metabolites") {
       backgrounddf <- getPathwayFromAnalyte(db = db, background,
                                             includeRaMPids = TRUE,
-                                            nameOrId = nameOrId,
+                                            namesOrIds = namesOrIds,
                                             include_smpdb = include_smpdb
                                             )
       print("Custom background specified, genes will be discarded")
@@ -86,7 +86,7 @@ runFisherTest <- function(db = RaMP(), analytes,
       userbkg <- utils::read.table(background, header=F)[,1]
       backgrounddf <- getPathwayFromAnalyte(db = db, analytes = userbkg,
                                             includeRaMPids = TRUE,
-                                            nameOrId = nameOrId,
+                                            namesOrIds = namesOrIds,
                                             include_smpdb = include_smpdb
                                             )
       print("Custom background specified, genes will be discarded")
@@ -471,8 +471,8 @@ runFisherTest <- function(db = RaMP(), analytes,
       # pidused <- c(pidused,i)
     } # end for loop
     keepers <- intersect(
-      which(c(totinpath, totinpath2) >= min_path_size),
-      which(c(totinpath, totinpath2) < max_path_size)
+      which(c(totinpath, totinpath2) >= minPathwaySize),
+      which(c(totinpath, totinpath2) < maxPathwaySize)
     )
 
     print(paste0("Calculated p-values for ", length(c(pval, pval2)), " pathways"))
@@ -488,10 +488,10 @@ runFisherTest <- function(db = RaMP(), analytes,
 
   else {
 
-    # only keep pathways that have >= min_path_size or < max_path_size compounds
+    # only keep pathways that have >= minPathwaySize or < maxPathwaySize compounds
     keepers <- intersect(
-      which(c(totinpath) >= min_path_size),
-      which(c(totinpath) < max_path_size)
+      which(c(totinpath) >= minPathwaySize),
+      which(c(totinpath) < maxPathwaySize)
     )
 
     # hist(totinpath,breaks=1000)
@@ -531,14 +531,14 @@ runFisherTest <- function(db = RaMP(), analytes,
 #' clicked on highchart
 #' @param db a RaMP databse object
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
-#' @param nameOrId whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
+#' @param namesOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param min_analyte if the number of analytes (gene or metabolite) in a pathway is
 #' < min_analyte, do not report
 #' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "F")
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
-#' @param min_path_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
-#' @param max_path_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
+#' @param minPathwaySize the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
+#' @param maxPathwaySize the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
 #' @param background_type type of background that is input by the user.  Opions are "database" if user wants all
 #' analytes from the RaMP database to be used as background; "file", if user wnats to input a file path with a list of background
@@ -587,13 +587,13 @@ runFisherTest <- function(db = RaMP(), analytes,
 runCombinedFisherTest <- function(
     db = RaMP(),
     analytes,
-    nameOrId = "ids",
+    namesOrIds = "ids",
     total_genes = 20000,
     min_analyte = 2,
     MCall = F,
     alternative = "less",
-    min_path_size = 5,
-    max_path_size = 150,
+    minPathwaySize = 5,
+    maxPathwaySize = 150,
     includeRaMPids = FALSE,
     background_type = "database",
     background = "database",
@@ -614,8 +614,8 @@ runCombinedFisherTest <- function(
     analyte_type = "metabolites",
     total_genes = total_genes,
     MCall = MCall,
-    min_path_size = min_path_size,
-    max_path_size = max_path_size,
+    minPathwaySize = minPathwaySize,
+    maxPathwaySize = maxPathwaySize,
     background_type = background_type,
     background = background,
     pathway_definitions = pathway_definitions,
@@ -639,8 +639,8 @@ runCombinedFisherTest <- function(
       analyte_type = "genes",
       total_genes = total_genes,
       MCall = MCall,
-      min_path_size = min_path_size,
-      max_path_size = max_path_size,
+      minPathwaySize = minPathwaySize,
+      maxPathwaySize = maxPathwaySize,
       include_smpdb=include_smpdb
     )
     pathwaydf_gene <- outgene[[2]]
@@ -652,8 +652,8 @@ runCombinedFisherTest <- function(
       analyte_type = "genes",
       total_genes = total_genes,
       MCall = MCall,
-      min_path_size = min_path_size,
-      max_path_size = max_path_size,
+      minPathwaySize = minPathwaySize,
+      maxPathwaySize = maxPathwaySize,
       background_type = background_type,
       background = background,
       pathway_definitions = pathway_definitions,
@@ -769,7 +769,7 @@ runCombinedFisherTest <- function(
     # of pathways that contain user genes and metabolites
     ## pathwaydf <- getPathwayFromAnalyte(analytes,
     ##   includeRaMPids = TRUE,
-    ##   nameOrId = nameOrId
+    ##   namesOrIds = namesOrIds
     ##   )
     if(pathway_definitions!="RaMP"){
       pathwaydf$pathwayName = pathwaydf$pathwayRampId
@@ -816,28 +816,28 @@ runCombinedFisherTest <- function(
 #' @param db a RaMP databse object
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
 #' @param find_synonym find all synonyms or just return same synonym (T/F)
-#' @param nameOrId whether input is "names" or "ids" (default is "ids")
+#' @param namesOrIds whether input is "names" or "ids" (default is "ids")
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
 #' @param include_smpdb Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant
-#' @param min_path_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
-#' @param max_path_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
+#' @param minPathwaySize the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
+#' @param maxPathwaySize the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
 #' @return a list contains all metabolites as name and pathway inside.
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(
-#'   dbname = "ramp2", username = "root",
-#'   conpass = "", host = "localhost"
-#' )
-#' mypath <- getPathwayFromAnalyte(analytes = c("2-hydroxyglutarate", "glutamate"))
+#' getPathwayFromAnalyte(db = rampDB, namesOrIds="ids", c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
+#'                                                       "hmdb:HMDB0000148", "ensembl:ENSG00000141510"))
+#'
+#' getPathwayFromAnalyte(db = rampDB, namesOrIds = "names", c("Serotonin", "Bilirubin", "Urea"))
 #' }
 #' @export
-getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
+getPathwayFromAnalyte <- function( analytes = "none",
                                   find_synonym = FALSE,
-                                  nameOrId = "ids",
+                                  namesOrIds = "ids",
                                   includeRaMPids = FALSE,
                                   include_smpdb = FALSE,
-                                  min_path_size = 5,
-                                  max_path_size = 150) {
+                                  minPathwaySize = 5,
+                                  maxPathwaySize = 150,
+                                  db = RaMP() ) {
 
   rampId <- pathwayRampId <- c()
 
@@ -847,10 +847,10 @@ getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
     return(NULL)
   }
 
-  if (!(nameOrId %in% c("ids", "names"))) {
+  if (!(namesOrIds %in% c("ids", "names"))) {
     warning(paste0(
-      "nameOrId must have a value in c('ids','names')\n",
-      "Supplied nameOrId falue = ('", nameOrId, "')\nAborting getPathwayFromAnlyte()"
+      "namesOrIds must have a value in c('ids','names')\n",
+      "Supplied namesOrIds falue = ('", namesOrIds, "')\nAborting getPathwayFromAnlyte()"
     ))
     return(NULL)
   }
@@ -865,7 +865,7 @@ getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
 
   isSQLite = RaMP:::.is_sqlite(db)
 
-  if (nameOrId == "ids") {
+  if (namesOrIds == "ids") {
     print("Working on ID List...")
 
     sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, s.sourceId as inputId, group_concat(distinct s.commonName order by s.commonName separator '; ') as commonName, s.rampId, p.pathwayRampId from
@@ -966,7 +966,7 @@ getPathwayFromAnalyte <- function(db = RaMP(), analytes = "none",
 
   # filter by pathway size criteria
 
-  df2 <- filterPathwaysByAnalyteCount(db, pathway_dataframe=df2, pathway_ramp_id_col_name = 'pathwayRampId', min_path_size = min_path_size, max_path_size = max_path_size)
+  df2 <- filterPathwaysByAnalyteCount(db, pathway_dataframe=df2, pathway_ramp_id_col_name = 'pathwayRampId', minPathwaySize = minPathwaySize, maxPathwaySize = maxPathwaySize)
 
   if (!includeRaMPids && nrow(df2) > 0) {
     df2 <- subset(df2, select = -c(rampId, pathwayRampId))

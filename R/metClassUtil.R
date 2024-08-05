@@ -1,8 +1,14 @@
 #' Query to retrieve database ID prefixes for analyte types
 #' @param analyteType value to indicate the desired analyte type. Value one of 'gene' or 'metabolite'
+#' @param db a RaMP database object, if not specified a new one is created with RaMP::RaMP()
 #' @return Returns list of database ID prefixes for selected 'gene' or 'metabolite'
+#' @examples
+#' \dontrun{
+#'   metabprefixes <- getPrefixesFromAnalytes( "metabolite", db = rampDB )
+#' }
+#'
 #' @export  getPrefixesFromAnalytes
-getPrefixesFromAnalytes<-function(db = RaMP(), analyteType="gene") {
+getPrefixesFromAnalytes<-function(analyteType="gene", db = RaMP()) {
   if (analyteType=="gene"){
     query1 <- "select distinct(IDtype) from source where geneOrCompound ='gene';"
     df1<- RaMP::runQuery(query1, db)
