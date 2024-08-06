@@ -15,6 +15,7 @@
 #' @param inferIdMapping if FALSE, the survey only reports on class annotations made directly on the input ids.
 #' If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to related ids that contain metabolite class annotations.
 #' The default is TRUE.
+#' @param db a RaMP database object
 #' @return Returns chemical class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
 #' metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolved and listing those metabolite ids
 #' that are not found in the database.
@@ -62,7 +63,7 @@
 #' metClassResult$query_report
 #'}
 #' @export
-chemicalClassSurvey <- function(db = RaMP(), mets, background = "database", background_type="database", includeRaMPids = FALSE, inferIdMapping = TRUE){
+chemicalClassSurvey <- function(mets, background = "database", background_type="database", includeRaMPids = FALSE, inferIdMapping = TRUE, db = RaMP()){
 
   print("Starting Chemical Class Survey")
 

@@ -5,12 +5,14 @@
 \title{Function that query database to find ontology information based on
 the given list of analytes}
 \usage{
-getOntoFromMeta(db = RaMP(), analytes, nameOrID = "ids")
+getOntoFromMeta(analytes, namesOrIds = "ids", db = RaMP())
 }
 \arguments{
 \item{analytes}{a vector of analytes or a analytes delimited by new line character}
 
-\item{nameOrID}{specify the type of given data}
+\item{namesOrIds}{specify the type of given data}
+
+\item{db}{a RaMP database object}
 }
 \value{
 dataframe that contains searched ontology from given analytes

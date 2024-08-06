@@ -9,12 +9,12 @@ runFisherTest(
   db = RaMP(),
   analytes,
   total_genes = 20000,
-  nameOrId = "ids",
+  namesOrIds = "ids",
   analyte_type = "metabolites",
   MCall = F,
   alternative = "less",
-  min_path_size = 5,
-  max_path_size = 150,
+  minPathwaySize = 5,
+  maxPathwaySize = 150,
   background_type = "database",
   background = "database",
   pathway_definitions = "RaMP",
@@ -28,7 +28,7 @@ runFisherTest(
 
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
 
-\item{nameOrId}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
+\item{namesOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
 
 \item{analyte_type}{"metabolites" or "genes" (default is "metabolites")}
 
@@ -36,9 +36,9 @@ runFisherTest(
 
 \item{alternative}{alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")}
 
-\item{min_path_size}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
+\item{minPathwaySize}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
 
-\item{max_path_size}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
+\item{maxPathwaySize}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
 
 \item{background_type}{type of background that is input by the user.  Opions are "database" if user wants all
 analytes from the RaMP database will be used; "file", if user wants to input a file with a list of background

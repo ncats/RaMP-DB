@@ -1,8 +1,8 @@
 #' Retrieves analytes that involved in same reaction as input metabolite
 #'
 #' @param analytes a vector of analytes that need to be searched
-#' @param NameOrIds whether input is "names" or "ids" (default is "ids")
-#' @return a dataframe containing query results. If the input is a metabolite, the function will output
+#' @param namesOrIds whether input is "names" or "ids" (default is "ids")
+#' @return a list of two dataframes containing query results from HMDB and Rhea. If the input is a metabolite, the function will output
 #' gene transcript common names and source IDs that are known to catalyze
 #' reactions in the same pathway as that metabolite. Conversely, if the input
 #' is a gene, the function will return the common name and source id of metabolites
@@ -11,17 +11,19 @@
 #'
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-#' rampFastCata(analytes="creatine",NameOrIds="names")
+#' inputs.of.interest <- c("kegg:C00186" , "hmdb:HMDB0000148", "kegg:C00780",
+#'  "hmdb:HMDB0000064", "ensembl:ENSG00000115850", "uniprot:Q99259")
+#'
+#' new.transcripts <- rampFastCata( analytes = inputs.of.interest, db = rampDB )
 #' }
 #' @export
-rampFastCata <- function(db = RaMP(), analytes="none", NameOrIds="ids") {
+rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
 
   rampId <- pathwayRampId <- c()
   if(length(analytes)==1){
     if(analytes=="none"){
       stop("Please provide input analytes")}}
-  if (!(NameOrIds %in% c('names','ids')))
+  if (!(namesOrIds %in% c('names','ids')))
     stop('Please specify search by "names" or "ids"')
 
   now <- proc.time()
@@ -45,7 +47,7 @@ rampFastCata <- function(db = RaMP(), analytes="none", NameOrIds="ids") {
 
   isSQLite = .is_sqlite(db)
 
-  if(NameOrIds == 'ids') {
+  if(namesOrIds == 'ids') {
 
     print("Analyte ID-based reaction partner query.")
 
@@ -199,7 +201,7 @@ rampFastCata <- function(db = RaMP(), analytes="none", NameOrIds="ids") {
 #' Retrieves analytes that involved in same reaction as input metabolite
 #'
 #' @param analytes a vector of analytes that need to be searched
-#' @param NameOrIds whether input is "names" or "ids" (default is "ids")
+#' @param namesOrIds whether input is "names" or "ids" (default is "ids")
 #' @return a dataframe containing query results. If the input is a metabolite, the function will output
 #' gene transcript common names and source IDs that are known to catalyze
 #' reactions in the same pathway as that metabolite. Conversely, if the input
@@ -209,13 +211,13 @@ rampFastCata <- function(db = RaMP(), analytes="none", NameOrIds="ids") {
 #' @examples
 #' \dontrun{
 #' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-#' rampFastCata(analytes="creatine",NameOrIds="names")
+#' rampFastCata(analytes="creatine",namesOrIds="names")
 #' }
-rampFastCataOriginal <- function(db = RaMP(), analytes="none", NameOrIds="ids") {
+rampFastCataOriginal <- function(db = RaMP(), analytes="none", namesOrIds="ids") {
     if(length(analytes)==1){
         if(analytes=="none"){
     stop("Please provide input analytes")}}
-  if (!(NameOrIds %in% c('names','ids')))
+  if (!(namesOrIds %in% c('names','ids')))
     stop('Please specify search by "names" or "ids"')
 
   now <- proc.time()
@@ -240,10 +242,10 @@ rampFastCataOriginal <- function(db = RaMP(), analytes="none", NameOrIds="ids") 
   #  print(list_metabolite)
 
   # Retrieve RaMP analyte ids
-  if (NameOrIds == 'names'){
+  if (namesOrIds == 'names'){
     #    query1 <- paste0("select Synonym as analyte1,rampId,geneOrCompound as type1 from analytesynonym where Synonym in (",list_metabolite,");")
     query1 <- paste0("select rampId,geneOrCompound as type1,Synonym as InputAnalyte from analytesynonym where Synonym in (",list_metabolite,");")
-  } else if (NameOrIds == 'ids'){
+  } else if (namesOrIds == 'ids'){
     #    query1 <- paste0('select rampId,geneOrCompound as type1,commonName as InputMetabolite from analytesynonym where rampId in (select rampId from source where sourceId in (',list_metabolite,'));')
     query1 <- paste0('select rampId,geneOrCompound as type1,commonName as InputMetabolite from source where sourceId in (',list_metabolite,');')
   }
@@ -297,9 +299,9 @@ rampFastCataOriginal <- function(db = RaMP(), analytes="none", NameOrIds="ids") 
           colnames(df_c3)[which(colnames(df_c3)=="rampId")]="rampId2"
           mdf_cfin <- merge(mdc_c,df_c3)
           #print(colnames(mdf_cfin))
-          if (NameOrIds == 'names'){
+          if (namesOrIds == 'names'){
             mdf_cfin <- mdf_cfin[,c("InputAnalyte","sourceId","IDtype","commonName")]
-          } else if (NameOrIds == 'ids'){
+          } else if (namesOrIds == 'ids'){
             mdf_cfin <- mdf_cfin[,c("InputMetabolite","sourceId","IDtype","commonName")]
           }
           colnames(mdf_cfin) <- c("Input_Metabolite","Gene_sourceId","Gene_IDtype",
