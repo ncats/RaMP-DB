@@ -5,17 +5,15 @@
 \title{getReactionsForSourceProteinIds returns reactions for a collection of source input compound ids}
 \usage{
 getReactionsForSourceProteinIds(
-  db = RaMP(),
   proteinIds,
   onlyHumanMets = F,
   humanProtein = F,
   includeTransportRxns = F,
-  rxnDirs = c("UN")
+  rxnDirs = c("UN"),
+  db = RaMP()
 )
 }
 \arguments{
-\item{db}{RaMP object}
-
 \item{proteinIds}{list uniprot accessions with prefix (uniprot:)}
 
 \item{onlyHumanMets}{boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)}
@@ -23,6 +21,8 @@ getReactionsForSourceProteinIds(
 \item{humanProtein}{boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)}
 
 \item{includeTransportRxns}{if TRUE, returns metabolic and transport reactions}
+
+\item{db}{RaMP object}
 }
 \value{
 returns a dataframe of reaction information for each ramp compound id

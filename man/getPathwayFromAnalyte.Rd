@@ -31,7 +31,7 @@ getPathwayFromAnalyte(
 
 \item{maxPathwaySize}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
 
-\item{db}{a RaMP databse object}
+\item{db}{a RaMP database object}
 }
 \value{
 a list contains all metabolites as name and pathway inside.

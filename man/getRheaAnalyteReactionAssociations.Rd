@@ -6,20 +6,20 @@
 Associations are made through shared Rhea reactions}
 \usage{
 getRheaAnalyteReactionAssociations(
-  db = RaMP(),
   analytes,
   includeRheaRxnDetails = F,
-  humanProteins = T
+  humanProteins = T,
+  db = RaMP()
 )
 }
 \arguments{
-\item{db}{a RaMP database object}
-
 \item{analytes}{list of analyte ids}
 
 \item{includeRheaRxnDetails}{returns additional columns that inlucdes info in the reaction connecting mets and proteins}
 
 \item{humanProteins}{require reactions to have a human protein (enzyme or transporter), default True}
+
+\item{db}{a RaMP database object}
 }
 \value{
 returns a three dataframes of reaction EC classe information, one for each EC level

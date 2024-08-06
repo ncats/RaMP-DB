@@ -6,6 +6,9 @@
 \usage{
 getPathwayNameList(db = RaMP())
 }
+\arguments{
+\item{db}{a RaMP database object}
+}
 \value{
 vector of unique pathway names (alphabetically ordered)
 }

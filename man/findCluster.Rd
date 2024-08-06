@@ -23,6 +23,8 @@ findCluster(
 a cluster (medoid) (Default = 3)}
 
 \item{perc_pathway_overlap}{Minimum overlap for clusters to merge (Default = 0.5)}
+
+\item{db}{a RaMP database object}
 }
 \value{
 list:[[1]] Pathway enrichment result with dataframe having a cluster assignment column added

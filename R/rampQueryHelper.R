@@ -1021,21 +1021,21 @@ listToQueryString <- function(analytes) {
 
 
 #' filterPathwaysByAnalyteCount utility method filtered a dataframe based on the number of analytes associated with rampPathwayIds contained in the dataframe.
-#' Like fisher exact code, this one retains pathways with analyte count >= min_path_size, and having analyte_count < max_path_size
+#' Like fisher exact code, this one retains pathways with analyte count >= minPathwaySize, and having analyte_count < max_path_size
 #'
 #' @param pathway_dataframe a dataframe containing at least one column that contains rampPathwayIds
 #' @param pathway_ramp_id_col_name the column name containing the rampPathwayIds
-#' @param min_path_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
-#' @param max_path_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
+#' @param minPathwaySize the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
+#' @param maxPathwaySize the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
 #' @param db a RaMP databse object
-filterPathwaysByAnalyteCount <- function( pathway_dataframe, pathway_ramp_id_col_name = 'pathwayRampId', min_path_size = 5, max_path_size = 150, db = RaMP()) {
+filterPathwaysByAnalyteCount <- function( pathway_dataframe, pathway_ramp_id_col_name = 'pathwayRampId', minPathwaySize = 5, maxPathwaySize = 150, db = RaMP()) {
   pwIds <- unlist(pathway_dataframe[[pathway_ramp_id_col_name]])
   pwIdsStr <- listToQueryString(pwIds)
 
   sql <- paste0("select pathwayRampId, count(distinct(rampId)) as analyte_count from analytehaspathway where pathwayRampId in (", pwIdsStr,") group by pathwayRampId")
 
   res <- RaMP::runQuery(sql, db=db)
-  res <- res[res$analyte_count >= min_path_size & res$analyte_count < max_path_size,]
+  res <- res[res$analyte_count >= minPathwaySize & res$analyte_count < maxPathwaySize,]
   keeperPW <- unlist(res$pathwayRampId)
   pathway_dataframe <- pathway_dataframe[pathway_dataframe[[pathway_ramp_id_col_name]] %in% keeperPW, ]
   return(pathway_dataframe)

@@ -5,10 +5,10 @@
 \title{Retrieve RaMP Analyte Source Intersections, these indicate the level of analyte overlaps between our sources}
 \usage{
 getRaMPAnalyteIntersections(
-  db = RaMP(),
   analyteType = "metabolites",
   format = "json",
-  scope = "mapped-to-pathway"
+  scope = "mapped-to-pathway",
+  db = RaMP()
 )
 }
 \arguments{
@@ -17,6 +17,8 @@ getRaMPAnalyteIntersections(
 \item{format}{can be one of either 'json', 'upsetR_expression'}
 
 \item{scope}{value in c('global', 'mapped-to-pathway'), indicates all metabolite stats should be returned, or just those asssociated with pathways.}
+
+\item{a}{RaMP database object}
 }
 \value{
 current analyte overlaps counts between current data sources, for the specified analyteType

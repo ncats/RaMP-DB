@@ -5,7 +5,7 @@
 \title{chemicalClassSurveyRampIdsFullPopConn2 is a helper function that takes a list of metabolite ids and a MariaDB Connection object
 and returns metabolite class information for the metabolite list and a population of all ramp metabolites.}
 \usage{
-chemicalClassSurveyRampIdsFullPopConn(db = RaMP(), mets, inferIdMapping = TRUE)
+chemicalClassSurveyRampIdsFullPopConn(mets, inferIdMapping = TRUE, db = RaMP())
 }
 \arguments{
 \item{mets}{a list object of prefixed metabolite ids of interest}
@@ -13,6 +13,8 @@ chemicalClassSurveyRampIdsFullPopConn(db = RaMP(), mets, inferIdMapping = TRUE)
 \item{inferIdMapping}{if FALSE, the survey only reports on class annotations made directly on the input ids.
 If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to related ids that contain metabolite class annotations.
 The default is TRUE.}
+
+\item{db}{a RaMP database object}
 }
 \value{
 a list object containing three objects 'count_summary', 'met_classes' and 'met_query_report'.

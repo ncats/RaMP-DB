@@ -11,6 +11,8 @@ getChemicalProperties(mets, propertyList = "all", db = RaMP())
 
 \item{propertyList}{an optional list of specific properties to extract.  Options include 'all' (default),  'smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'.
 If a props list is not supplied, all property fields will be returned.}
+
+\item{db}{a RaMP database object}
 }
 \value{
 Returns chemical property information for the list of input metabolites and a query report reporting on the number of metabolite ids that were matched and the list of un-matched input ids.

@@ -5,10 +5,10 @@
 \title{Internal function for extracting annotations, used by pathway and chemical enrichment test functions}
 \usage{
 getRaMPInfoFromAnalytes(
-  db = RaMP(),
   analytes,
   namesOrIds = "ids",
-  PathOrChem = "path"
+  PathOrChem = "path",
+  db = RaMP()
 )
 }
 \arguments{
@@ -17,6 +17,8 @@ getRaMPInfoFromAnalytes(
 \item{namesOrIds}{whether input is "names" or "ids" (default is "ids")}
 
 \item{PathOrChem}{return "path" information for pathways or "chem" for chemical class}
+
+\item{db}{a RaMP database object}
 }
 \value{
 a list of rampIds for "path" or a dataframe of chemClass info
