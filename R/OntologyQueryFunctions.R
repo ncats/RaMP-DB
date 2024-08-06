@@ -1,7 +1,8 @@
 #' Function that query database to find ontology information based on
 #' the given list of analytes
 #' @param analytes a vector of analytes or a analytes delimited by new line character
-#' @param nameOrID specify the type of given data
+#' @param namesOrIds specify the type of given data
+#' @param db a RaMP database object
 #' @return dataframe that contains searched ontology from given analytes
 #'
 #' @examples
@@ -11,9 +12,9 @@
 #' new.ontologies <- RaMP::getOntoFromMeta(db = rampDB, analytes = analytes.of.interest)
 #' }
 #' @export
-getOntoFromMeta <- function(db = RaMP(), analytes, nameOrID = "ids") {
-  if (!(nameOrID %in% c("ids", "name"))) {
-    stop("Specifiy the type of given data to 'ids' or 'name'")
+getOntoFromMeta <- function(analytes, namesOrIds = "ids", db = RaMP()) {
+  if (!(namesOrIds %in% c("ids", "names"))) {
+    stop("Specifiy the type of given data to 'ids' or 'names'")
   }
 
   now <- proc.time()
@@ -34,9 +35,9 @@ getOntoFromMeta <- function(db = RaMP(), analytes, nameOrID = "ids") {
   list_metabolite <- sapply(list_metabolite, shQuote)
   list_metabolite <- paste(list_metabolite, collapse = ",")
 
-  if (nameOrID == "ids") {
+  if (namesOrIds == "ids") {
     sql <- paste0("select * from source where sourceId in (", list_metabolite, ");")
-  } else if (nameOrID == "name") {
+  } else if (namesOrIds == "names") {
     sql <- paste0("select * from source where rampId in (select * from (select rampId from analytesynonym where Synonym in (", list_metabolite, ")) as subquery);")
     cat(file = stderr(), "query sql in Package call with -- ", sql, "\n")
   }
@@ -95,17 +96,17 @@ getOntoFromMeta <- function(db = RaMP(), analytes, nameOrID = "ids") {
 
 #' function that query database to find analytes in given ontologies
 #' @param ontology a vector of ontology or ontologies delimited by new line character
-#'
+#' @param db a RaMP database object
 #' @return dataframe that  contains searched analytes from given ontology
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root",
-#' 	conpass = "", host = "localhost")
-#' getMetaFromOnto("Adiposome")
+#' ontologies.of.interest <- c("Colon", "Liver", "Lung")
+#'
+#' new.metabolites <- RaMP::getMetaFromOnto(db = rampDB, ontology = ontologies.of.interest)
 #' }
 #' @importFrom rlang .data
 #' @export
-getMetaFromOnto <- function(db = RaMP(), ontology) {
+getMetaFromOnto <- function(ontology, db = RaMP()) {
 
   print("Retreiving Metabolites for input ontology terms.")
   now <- proc.time()
