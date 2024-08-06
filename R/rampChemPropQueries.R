@@ -25,7 +25,7 @@
 #'                              "hmdb:HMDB0001138",
 #'                              "hmdb:HMDB0029412")
 #'
-#' chemical.classes <- chemicalClassSurvey(db = rampDB, mets = metabolites.of.interest)
+#' chemical.classes <- getChemicalProperties(mets = metabolites.of.interest, db = rampDB)
 #'}
 #' @export
 getChemicalProperties <- function(mets, propertyList = 'all', db = RaMP() ){
