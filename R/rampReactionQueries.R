@@ -342,7 +342,7 @@ getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F
 #' 'chebi:62286', 'chebi:77897', 'uniprot:P30566','uniprot:P30520',
 #' 'uniprot:P00568', 'uniprot:P23109', 'uniprot:P22102', 'uniprot:P15531')
 #'
-#' reaction.classes <- getReactionClassesForAnalytes(db = RaMP(), analytes = analytes.of.interest)
+#' reaction.classes <- getReactionClassesForAnalytes(analytes = analytes.of.interest, db = RaMP())
 #' }
 #' @export
  getReactionClassesForAnalytes <- function(analytes, multiRxnParticipantCount=1, humanProtein=TRUE,
