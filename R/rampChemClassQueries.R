@@ -200,6 +200,7 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
 #' If inferIdMapping is set to TRUE, the input ids are cross-referenced or mapped to other existing ids that contain metabolite class annotations.
 #' Following id cross references can expand coverage if the input type is other than HMDB ids or LIPIDMAPS ids.
 #' The default value is FALSE.
+#' @param db a RaMP database object
 #' @return a list of dataframes, each holding chemical classs enrichment statistics for specific chemical classification systems,
 #' such as HMDB Classyfire class categories and LIPIDMAPS class categories.  The results list chemical classes, metabolite hits counts,
 #' Fisher Exact p-values and Benjamini-Hochberg corrected p-values (FDR estimates)
@@ -216,10 +217,10 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
 #'                             "hmdb:HMDB0001138",
 #'                             "hmdb:HMDB0029412")
 #'
-#' chemical.enrichment <- chemicalClassEnrichment(db = rampDB, mets = metabolites.of.interest)
+#' chemical.enrichment <- chemicalClassEnrichment(mets = metabolites.of.interest, db = rampDB)
 #'}
 #' @export
-chemicalClassEnrichment <- function(db = RaMP(), mets, background = "database", background_type = "database", inferIdMapping=F) {
+chemicalClassEnrichment <- function( mets, background = "database", background_type = "database", inferIdMapping=F, db = RaMP() ) {
   print("Starting Chemical Class Enrichment")
 
   # note that inferIdMapping is set to FALSE
