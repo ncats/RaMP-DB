@@ -529,7 +529,6 @@ runFisherTest <- function(db = RaMP(), analytes,
 
 #' Do fisher test for only one pathway from search result
 #' clicked on highchart
-#' @param db a RaMP databse object
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
 #' @param namesOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
@@ -552,12 +551,13 @@ runFisherTest <- function(db = RaMP(), analytes,
 #' "Saliva", and "Feces"
 #' @param pathway_definitions If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows. Please supply a .xls or .xlsx file. If supplying pathway definitions for genes and metabolites, ensure that metabolite definitions are on tab 1, and gene definitions are on tab2.
 #' @param include_smpdb Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant
+#' @param db a RaMP databse object
 #' @return a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values
 #' (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway,
 #' and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
 #' @examples
 #' \dontrun{
-#' fisher.results <- runCombinedFisherTest(db = rampDB, analytes = c(
+#' fisher.results <- runCombinedFisherTest(analytes = c(
 #' "hmdb:HMDB0000033",
 #' "hmdb:HMDB0000052",
 #' "hmdb:HMDB0000094",
@@ -580,12 +580,11 @@ runFisherTest <- function(db = RaMP(), analytes,
 #' "hmdb:HMDBP00283",
 #' "hmdb:HMDBP00284",
 #' "hmdb:HMDBP00850"
-#' ))
+#' ), db = rampDB )
 #'
 #' }
 #' @export
 runCombinedFisherTest <- function(
-    db = RaMP(),
     analytes,
     namesOrIds = "ids",
     total_genes = 20000,
@@ -598,7 +597,8 @@ runCombinedFisherTest <- function(
     background_type = "database",
     background = "database",
     pathway_definitions = "RaMP",
-    include_smpdb = FALSE) {
+    include_smpdb = FALSE,
+    db = RaMP()) {
 
   G <- M <- 0
 

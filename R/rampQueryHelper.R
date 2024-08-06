@@ -106,7 +106,7 @@ rampFindSourceFromId <- function(db = RaMP(), rampId = "",full = TRUE){
 #' @param sourceid a vector of synonym that need to be searched
 #' @param find_synonym bool if find all synonyms or just return same synonym
 #' @return a list contains all metabolits as name and pathway inside.
-rampFastPathFromSource<- function(db = RaMP(), sourceid,find_synonym = FALSE){
+rampFastPathFromSource<- function(db = RaMP(), sourceid, find_synonym = FALSE){
   # progress<- shiny::Progress$new()
   # progress$set(message = "Querying databases ...",value = 0)
   now <- proc.time()
@@ -354,13 +354,13 @@ rampFindClassInfoFromSourceId<-function(db = RaMP(), sourceIds){
 #' Internal function for extracting annotations, used by pathway and chemical enrichment test functions
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
 #' @param PathOrChem return "path" information for pathways or "chem" for chemical class
-#' @param NameOrIds whether input is "names" or "ids" (default is "ids")
+#' @param namesOrIds whether input is "names" or "ids" (default is "ids")
 #' @return a list of rampIds for "path" or a dataframe of chemClass info
 getRaMPInfoFromAnalytes<-function(db = RaMP(), analytes,
-                                  NameOrIds = "ids",
+                                  namesOrIds = "ids",
                                   PathOrChem = "path"){
     if(PathOrChem == "path"){
-        if(NameOrIds == "names"){
+        if(namesOrIds == "names"){
             synonym <- rampFindSynonymFromSynonym(synonym=analytes,
                                                   return_rampIds=FALSE)
 
@@ -371,21 +371,21 @@ getRaMPInfoFromAnalytes<-function(db = RaMP(), analytes,
                 stop("Could not find any matches to the analytes entered.  If pasting, please make sure the names are delimited by end of line (not analyte per line)\nand that you are selecting 'names', not 'ids'");
             }
             return(synonym)
-        } else if (NameOrIds == "ids"){
+        } else if (namesOrIds == "ids"){
             sourceramp <- rampFindSourceRampId(db = db, sourceId=analytes)
             if (nrow(sourceramp)==0) {
-                warning("Make sure you are actually inputting ids and not names (you have NameOrIds set to 'ids'. If you are, then no ids were matched in the RaMP database.")
+                warning("Make sure you are actually inputting ids and not names (you have namesOrIds set to 'ids'. If you are, then no ids were matched in the RaMP database.")
 		return(NULL)
             } else {
 	            return(sourceramp)
    	    }
         } else {
-            stop("Make sure NameOrIds is set to 'names' or 'ids'")
+            stop("Make sure namesOrIds is set to 'names' or 'ids'")
         }
     }else if(PathOrChem == "chem"){
-        if(NameOrIds == "names"){
+        if(namesOrIds == "names"){
             stop("Please do not use common names when searching for chemical structures, as a single name often refers to many structures")
-        }else if (NameOrIds == "ids"){
+        }else if (namesOrIds == "ids"){
             chem_info<-rampFindClassInfoFromSourceId(sourceIds=analytes)
             return(chem_info)
         }
@@ -610,13 +610,9 @@ findDuplicatePathways <- function(db = RaMP()) {
 #' [[2]]analyte type
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(
-#'   dbname = "ramp2", username = "root",
-#'   conpass = "", host = "localhost"
-#' )
-#' analyteList <- c("MDM2", "TP53", "glutamate", "creatinine"),
+#' analyteList <- c("MDM2", "TP53", "glutamate", "creatinine")
 #'
-#' fisher.results <- runCombinedFisherTest(analytes = analytesList, NamesOrIds = 'names')
+#' fisher.results <- runCombinedFisherTest(analytes = analytesList, namesOrIds = 'names')
 #' filtered.fisher.results <- FilterFishersResults(fisher.results, pval_type='fdr', pval_cutoff = 0.10)
 #' }
 #' @export
