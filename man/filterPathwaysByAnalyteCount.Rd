@@ -3,13 +3,13 @@
 \name{filterPathwaysByAnalyteCount}
 \alias{filterPathwaysByAnalyteCount}
 \title{filterPathwaysByAnalyteCount utility method filtered a dataframe based on the number of analytes associated with rampPathwayIds contained in the dataframe.
-Like fisher exact code, this one retains pathways with analyte count >= min_path_size, and having analyte_count < max_path_size}
+Like fisher exact code, this one retains pathways with analyte count >= minPathwaySize, and having analyte_count < max_path_size}
 \usage{
 filterPathwaysByAnalyteCount(
   pathway_dataframe,
   pathway_ramp_id_col_name = "pathwayRampId",
-  min_path_size = 5,
-  max_path_size = 150,
+  minPathwaySize = 5,
+  maxPathwaySize = 150,
   db = RaMP()
 )
 }
@@ -18,13 +18,13 @@ filterPathwaysByAnalyteCount(
 
 \item{pathway_ramp_id_col_name}{the column name containing the rampPathwayIds}
 
-\item{min_path_size}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
+\item{minPathwaySize}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
 
-\item{max_path_size}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
+\item{maxPathwaySize}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
 
 \item{db}{a RaMP databse object}
 }
 \description{
 filterPathwaysByAnalyteCount utility method filtered a dataframe based on the number of analytes associated with rampPathwayIds contained in the dataframe.
-Like fisher exact code, this one retains pathways with analyte count >= min_path_size, and having analyte_count < max_path_size
+Like fisher exact code, this one retains pathways with analyte count >= minPathwaySize, and having analyte_count < max_path_size
 }
