@@ -1,7 +1,6 @@
 #' Do fisher test for only one pathway from search result
 #' clicked on highchart
 #'
-#' @param db a RaMP databse object
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
 #' @param namesOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
@@ -22,16 +21,17 @@
 #' "Saliva", and "Feces"
 #' @param pathway_definitions If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows
 #' @param include_smpdb Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant
+#' @param db a RaMP databse object
 #' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
 
-runFisherTest <- function(db = RaMP(), analytes,
+runFisherTest <- function(analytes,
                           total_genes = 20000,
                           namesOrIds = "ids",
                           analyte_type = "metabolites",
                           MCall = F, alternative = "less",
                           minPathwaySize = 5, maxPathwaySize = 150,
                           background_type = "database", background = "database",
-                          pathway_definitions = "RaMP", include_smpdb = FALSE) {
+                          pathway_definitions = "RaMP", include_smpdb = FALSE, db = RaMP()) {
   if(analyte_type == "genes"){
     background_type = "database"
     print("Using database background for genes")
@@ -813,7 +813,6 @@ runCombinedFisherTest <- function(
 #' Function that search analytes (gene or compounds)  or a list of analytes and
 #' returns associated pathways
 #'
-#' @param db a RaMP databse object
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
 #' @param find_synonym find all synonyms or just return same synonym (T/F)
 #' @param namesOrIds whether input is "names" or "ids" (default is "ids")
@@ -821,6 +820,7 @@ runCombinedFisherTest <- function(
 #' @param include_smpdb Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant
 #' @param minPathwaySize the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
 #' @param maxPathwaySize the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
+#' @param db a RaMP database object
 #' @return a list contains all metabolites as name and pathway inside.
 #' @examples
 #' \dontrun{
@@ -1043,6 +1043,7 @@ getCustomPathwayFromAnalyte <- function(analytes, pathways, analyte_type) {
 #' @param min_pathway_tocluster Minimum number of 'similar' pathways required to start
 #' a cluster (medoid) (Default = 3)
 #' @param perc_pathway_overlap Minimum overlap for clusters to merge (Default = 0.5)
+#' @param db a RaMP database object
 #'
 #' @return list:[[1]] Pathway enrichment result with dataframe having a cluster assignment column added
 #' [[2]] analyte type

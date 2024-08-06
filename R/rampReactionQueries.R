@@ -148,15 +148,15 @@ getReactionsForAnalytes <- function( analytes, onlyHumanMets=F, humanProtein=T, 
 
 #' getReactionsForSourceCompoundIds returns reactions for a collection of ChEBI input Ids
 #'
-#' @param db RaMP object
 #' @param compoundIds list of ChEBI compound ids (prefixed with chebi:)
 #' @param onlyHumanMets boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)
 #' @param humanProtein boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)
 #' @param includeTransportRxns if TRUE, returns metabolic and transport reactions
+#' @param db RaMP object
 #'
 #' @return returns a dataframe of reaction information for each ramp compound id
 #'
-getReactionsForSourceCompoundIds <- function(db = RaMP(), compoundIds, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN")) {
+getReactionsForSourceCompoundIds <- function( compoundIds, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN"), db = RaMP()) {
 
   idStr <- listToQueryString(compoundIds)
   query <- paste0("select mr.met_source_id, mr.substrate_product, mr.is_cofactor, mr.met_name,
@@ -193,15 +193,15 @@ getReactionsForSourceCompoundIds <- function(db = RaMP(), compoundIds, onlyHuman
 
 #' getReactionsForSourceProteinIds returns reactions for a collection of source input compound ids
 #'
-#' @param db RaMP object
 #' @param proteinIds list uniprot accessions with prefix (uniprot:)
 #' @param onlyHumanMets boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)
 #' @param humanProtein boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)
+#' @param db RaMP object
 #' @param includeTransportRxns if TRUE, returns metabolic and transport reactions
 #'
 #' @return returns a dataframe of reaction information for each ramp compound id
 #'
-getReactionsForSourceProteinIds <- function(db = RaMP(), proteinIds, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN")) {
+getReactionsForSourceProteinIds <- function( proteinIds, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN"), db = RaMP()) {
 
   idStr <- listToQueryString(proteinIds)
   query <- paste0("select gr.uniprot, gr.protein_name, rxn.rxn_source_id,
@@ -238,15 +238,15 @@ getReactionsForSourceProteinIds <- function(db = RaMP(), proteinIds, onlyHumanMe
 
 #' getReactionsForRaMPCompoundIds returns reactions for a collection of RaMP compound ids
 #'
-#' @param db RaMP object
 #' @param rampCompoundIds list of ramp compound ids
 #' @param onlyHumanMets boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)
 #' @param humanProtein boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)
 #' @param includeTransportRxns if TRUE, returns metabolic and transport reactions
+#' @param db RaMP object
 #'
 #' @return returns a dataframe of reaction information for each ramp compound id
 #'
-getReactionsForRaMPCompoundIds <- function(db = RaMP(), rampCompoundIds, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN")) {
+getReactionsForRaMPCompoundIds <- function(rampCompoundIds, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN"), db = RaMP()) {
 
   idStr <- listToQueryString(rampCompoundIds)
   query <- paste0("select mr.ramp_rxn_id, mr.ramp_cmpd_id, mr.met_source_id, mr.substrate_product, mr.is_cofactor, mr.met_name,
@@ -287,10 +287,11 @@ getReactionsForRaMPCompoundIds <- function(db = RaMP(), rampCompoundIds, onlyHum
 #' @param onlyHumanMets boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)
 #' @param humanProtein boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)
 #' @param includeTransportRxns if TRUE, returns metabolic and transport reactions
+#' @param db a RaMP database object
 #'
 #' @return returns a dataframe of reaction information for each ramp compound id
 #'
-getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN")) {
+getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtein=F, includeTransportRxns=F, rxnDirs=c("UN"), db = RaMP()) {
 
   idStr <- listToQueryString(rampGeneIds)
   query <- paste0("select gr.ramp_rxn_id, gr.ramp_gene_id, gr.uniprot, gr.protein_name, rxn.rxn_source_id,
@@ -685,12 +686,12 @@ getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F
 #' For instance, if a user queries for reactions related to a list of metabolites,
 #' this method can be used to return proteins on some subset of reaction ids to find related proteins.
 #'
-#' @param db a RaMP databse object
 #' @param reactionList list of reaction ids
+#' @param db a RaMP databse object
 #'
 #' @return returns a dataframe object with reaction to reaction participant mappings.
 #' @export
-getReactionParticipants <- function(db = RaMP(), reactionList = c()) {
+getReactionParticipants <- function( reactionList = c(), db = RaMP()) {
   reactionListStr <- listToQueryString(reactionList)
 
 
@@ -750,12 +751,12 @@ getReactionParticipants <- function(db = RaMP(), reactionList = c()) {
 #' For instance, if a user queries for reactions related to a list of analytes, or filtered on reactions,
 #' this method can be used to return general reaction info on some subset of reaction ids of interest.
 #'
-#' @param db a RaMP databse object
 #' @param reactionList list of reaction ids
+#' @param db a RaMP database object
 #'
 #' @return returns a dataframe object with reaction information.
 #' @export
-getReactionDetails <- function(db = RaMP(), reactionList = c()) {
+getReactionDetails <- function( reactionList = c(), db = RaMP()) {
   reactionListStr <- listToQueryString(reactionList)
   sql = paste0('select rxn_source_id, direction, is_transport, has_human_prot, ec_num, label, equation, html_equation from reaction where rxn_source_id in (', reactionListStr,");")
 
@@ -770,14 +771,14 @@ getReactionDetails <- function(db = RaMP(), reactionList = c()) {
 #' getAnalyteReactionAssociations returns mets associated with input proteins, and proteins associated with input metabolites
 #' Associations are made through shared Rhea reactions
 #'
-#' @param db a RaMP database object
 #' @param analytes list of analyte ids
 #' @param includeRheaRxnDetails returns additional columns that inlucdes info in the reaction connecting mets and proteins
 #' @param humanProteins require reactions to have a human protein (enzyme or transporter), default True
+#' @param db a RaMP database object
 #'
 #' @return returns a three dataframes of reaction EC classe information, one for each EC level
 #' @export
-getRheaAnalyteReactionAssociations <- function(db = RaMP(), analytes, includeRheaRxnDetails=F, humanProteins=T) {
+getRheaAnalyteReactionAssociations <- function( analytes, includeRheaRxnDetails=F, humanProteins=T, db = RaMP()) {
 
     m2p <- RaMP:::getRheaEnzymesAndTransportersForMetabolites(db = db, analytes=analytes, includeRheaRxnDetails=includeRheaRxnDetails, humanProteins=humanProteins)
     p2m <- RaMP:::getRheaMetabolitesForProteins(db = db, analytes=analytes, includeRheaRxnDetails=includeRheaRxnDetails, humanProteins=humanProteins)
@@ -810,13 +811,13 @@ getRheaAnalyteReactionAssociations <- function(db = RaMP(), analytes, includeRhe
 #' getRheaEnzymesAndTransportersForMetabolites returns proteins that are either enzymes or transporters
 #' that are reaction participants with the input metabolite ids.
 #'
-#' @param db a RaMP databse object
 #' @param analytes analyte id vector
 #' @param includeRheaRxnDetails returns additional columns that inlucdes info in the reaction connecting mets and proteins
 #' @param humanProteins require reactions to have a human protein (enzyme or transporter), default True
+#' @param db a RaMP database object
 #'
 #' @return returns a dataframe object with input metabolites, and reaction and associated protein information.
-getRheaEnzymesAndTransportersForMetabolites <- function(db = RaMP(), analytes, includeRheaRxnDetails=F, humanProteins=T) {
+getRheaEnzymesAndTransportersForMetabolites <- function( analytes, includeRheaRxnDetails=F, humanProteins=T, db = RaMP()) {
 
   chebiIds <- analytes[grepl("chebi", analytes)]
 
@@ -864,13 +865,13 @@ getRheaEnzymesAndTransportersForMetabolites <- function(db = RaMP(), analytes, i
 #' getRheaEnzymesAndTransportersForMetabolites returns proteins that are either enzymes or transporters
 #' that are reaction participants with the input metabolite ids.
 #'
-#' @param db a RaMP databse object
 #' @param analytes analyte id vector
 #' @param includeRheaRxnDetails returns additional columns that inlucdes info in the reaction connecting mets and proteins
 #' @param humanProteins require reactions to have a human protein (enzyme or transporter), default True
+#' @param db a RaMP database object
 #'
 #' @return returns a dataframe object with input metabolites, and reaction and associated protein informatin.
-getRheaMetabolitesForProteins <- function(db = RaMP(), analytes, includeRheaRxnDetails=F, humanProteins=T) {
+getRheaMetabolitesForProteins <- function( analytes, includeRheaRxnDetails=F, humanProteins=T, db = RaMP()) {
 
   uniprotIds <- analytes[grepl("uniprot", analytes)]
 
@@ -1051,10 +1052,10 @@ getReactionClassStats <- function(db=RaMP(), humanProtein=T) {
 
 #' Utility method that returns the number of rhea reaction count in each reaction class.
 #'
-#' @param db RaMP Object
 #' @param humanProtein boolean value indicating if reactions should be constrained to those having human proteins
+#' @param db RaMP Object
 #'
-getReactionClassStatsOnAnalytes <- function(db=RaMP(), humanProtein=T) {
+getReactionClassStatsOnAnalytes <- function( humanProtein=T, db=RaMP()) {
 
   humanProteinArg = ''
   if(humanProtein) {

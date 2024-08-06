@@ -2,6 +2,7 @@
 #'
 #' @param analytes a vector of analytes that need to be searched
 #' @param namesOrIds whether input is "names" or "ids" (default is "ids")
+#' @param db a RaMP database object
 #' @return a list of two dataframes containing query results from HMDB and Rhea. If the input is a metabolite, the function will output
 #' gene transcript common names and source IDs that are known to catalyze
 #' reactions in the same pathway as that metabolite. Conversely, if the input
@@ -202,6 +203,7 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
 #'
 #' @param analytes a vector of analytes that need to be searched
 #' @param namesOrIds whether input is "names" or "ids" (default is "ids")
+#' @param db a RaMP database object
 #' @return a dataframe containing query results. If the input is a metabolite, the function will output
 #' gene transcript common names and source IDs that are known to catalyze
 #' reactions in the same pathway as that metabolite. Conversely, if the input
@@ -213,7 +215,7 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
 #' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
 #' rampFastCata(analytes="creatine",namesOrIds="names")
 #' }
-rampFastCataOriginal <- function(db = RaMP(), analytes="none", namesOrIds="ids") {
+rampFastCataOriginal <- function( analytes="none", namesOrIds="ids", db = RaMP()) {
     if(length(analytes)==1){
         if(analytes=="none"){
     stop("Please provide input analytes")}}

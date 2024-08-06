@@ -1,6 +1,7 @@
 #' Retrieve RaMP version
 #' @param justVersion boolean value indicating if the method should just return the version id (default, justVersion = T),
 #' or a table that includes db_version_id, load_timestamp (update time/date), version_notes, and the db_sql_url (a url for mysql schema download)
+#' @param db a RaMP database object
 #' @return current ramp databse version
 #' @examples
 #' \dontrun{
@@ -8,7 +9,7 @@
 #' getCurrentRaMPVersion()
 #' }
 #' @export
-getCurrentRaMPVersion<-function(db = RaMP(), justVersion=T){
+getCurrentRaMPVersion<-function(justVersion=T, db = RaMP()){
   if(justVersion) {
     query<-"select ramp_version from db_version where load_timestamp order by load_timestamp desc limit 1"
   } else {
@@ -19,6 +20,7 @@ getCurrentRaMPVersion<-function(db = RaMP(), justVersion=T){
 }
 
 #' Retrieve versions of each database within the current version of RaMP
+#' @param a RaMP database object
 #' @return database source version info
 #' @examples
 #' \dontrun{
@@ -33,6 +35,7 @@ getCurrentRaMPSourceDBVersions<-function(db = RaMP()){
 }
 
 #' Retrieve counts of entitites (e.g. Metabolites, Pathways, Metabolite-Pathway associations, etc.) for RaMP source databases
+#' @param db a RaMP database object
 #' @return database sources and entity counts associated with each data source
 #' @examples
 #' \dontrun{
@@ -55,6 +58,7 @@ getEntityCountsFromSourceDBs<-function(db = RaMP()){
 #' @param analyteType returns analyte overlaps for 'metabolites' or 'genes'
 #' @param format can be one of either 'json', 'upsetR_expression'
 #' @param scope value in c('global', 'mapped-to-pathway'), indicates all metabolite stats should be returned, or just those asssociated with pathways.
+#' @param a RaMP database object
 #' @return current analyte overlaps counts between current data sources, for the specified analyteType
 #' @examples
 #' \dontrun{
@@ -62,7 +66,7 @@ getEntityCountsFromSourceDBs<-function(db = RaMP()){
 #' jsonResult <- getRaMPAnalyteIntersections(analyteType='genes', format='json')
 #' }
 #' @export
-getRaMPAnalyteIntersections<-function(db = RaMP(), analyteType='metabolites', format='json', scope='mapped-to-pathway'){
+getRaMPAnalyteIntersections<-function( analyteType='metabolites', format='json', scope='mapped-to-pathway', db = RaMP()){
   if(analyteType == 'metabolites') {
     if(scope == 'global') {
       query<-"select met_intersects_json from db_version where load_timestamp order by load_timestamp desc limit 1"
@@ -121,6 +125,7 @@ getRaMPAnalyteIntersections<-function(db = RaMP(), analyteType='metabolites', fo
 
 #' Retrieve list of pathway names
 #' @return vector of unique pathway names (alphabetically ordered)
+#' @param db a RaMP database object
 #' @examples
 #' \dontrun{
 #' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
