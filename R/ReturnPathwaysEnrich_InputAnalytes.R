@@ -1049,20 +1049,18 @@ getCustomPathwayFromAnalyte <- function(analytes, pathways, analyte_type) {
 #' [[3]] cluster assignment in the list form
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(
-#'   dbname = "ramp2", username = "root",
-#'   conpass = "", host = "localhost"
-#' )
 #' pathwaydf <- getPathwayFromAnalyte(c(
-#'   "ensembl:ENSG00000135679", "hmdb:HMDB0000064",
-#'   "hmdb:HMDB0000148", "ensembl:ENSG00000141510"
+#' "ensembl:ENSG00000135679", "hmdb:HMDB0000064",
+#' "hmdb:HMDB0000148", "ensembl:ENSG00000141510"
 #' ))
+#'
 #' fisher.results <- runCombinedFisherTest(pathwaydf = pathwaydf)
+#'
 #' clustered.fisher.results <- findCluster(fisher.results)
 #' }
 #' @export
-findCluster <- function(db = RaMP(), fishers_df, perc_analyte_overlap = 0.5,
-                        min_pathway_tocluster = 2, perc_pathway_overlap = 0.5) {
+findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
+                        min_pathway_tocluster = 2, perc_pathway_overlap = 0.5, db = RaMP()) {
   print("Clustering pathways...")
 
   if (perc_analyte_overlap <= 0 || perc_analyte_overlap >= 1 ||

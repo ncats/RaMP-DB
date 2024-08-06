@@ -69,15 +69,16 @@ plotCataNetwork <- function(catalyzedf = "") {
 #' @param text_size Scales all text in figure (Default=16)
 #' @param sig_cutoff Aesthetic, shows pvalue cutoff for significant pathways
 #' @param interactive If TRUE, return interactive plotly object instead of ggplot object
+#' @param db a RaMP database object
 #' @examples
 #' \dontrun{
-#' pathwayResultsPlot(db = rampDB, filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2,
-#'                     min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE)
+#' plotEnrichedPathways(filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2,
+#'                     min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE, db = rampDB )
 #' }
 #' @export
-pathwayResultsPlot <- function(db = RaMP(), pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.5,
+plotEnrichedPathways <- function( pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.5,
                                  perc_pathway_overlap = 0.5, min_pathway_tocluster = 3,
-                                 text_size = 8, sig_cutoff = 0.05, interactive=FALSE) {
+                                 text_size = 8, sig_cutoff = 0.05, interactive=FALSE, db = RaMP()) {
 
   if( !('cluster_assignment' %in% colnames(pathwaysSig$fishresult))) {
     fishClustering <- findCluster(db = db, pathwaysSig,
