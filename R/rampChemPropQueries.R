@@ -5,6 +5,7 @@
 #' @param mets a list object of source prepended metabolite ids, representing a metabolite set of interest
 #' @param propertyList an optional list of specific properties to extract.  Options include 'all' (default),  'smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'.
 #' If a props list is not supplied, all property fields will be returned.
+#' @param db a RaMP database object
 #' @return Returns chemical property information for the list of input metabolites and a query report reporting on the number of metabolite ids that were matched and the list of un-matched input ids.
 #'
 #' The returned object (return_obj below) contains two results. Use str(return_obj) to see the structure described here.
@@ -72,9 +73,10 @@ getChemicalProperties <- function(mets, propertyList = 'all', db = RaMP() ){
   return(result)
 }
 
-# Internal function to validate property list
-# @param propList an optional list of specific properties to extract.  Options include 'all' (default),  'iso_smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'.
-buildPropertyList <- function(db = RaMP(), propList) {
+#' Internal function to validate property list
+#' @param propList an optional list of specific properties to extract.  Options include 'all' (default),  'iso_smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'.
+#' @param db a RaMP database object
+buildPropertyList <- function( propList, db = RaMP()) {
 
   # validate that all properties are valid
   #  validProperties <- c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name')

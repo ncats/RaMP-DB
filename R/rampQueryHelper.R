@@ -6,9 +6,10 @@
 #' @param full bool if return whole data.frame
 #' @param return_rampIds bool to return ramp Ids with output
 #' (there are some common synonyms that will mess up whole searching)
+#' @param db a RaMP database object
 #' @return a data frame that contains synonym in the first column rampId in the second column
-rampFindSynonymFromSynonym <- function(db = RaMP(), synonym,full = FALSE,
-	return_rampIds = FALSE){
+rampFindSynonymFromSynonym <- function( synonym,full = FALSE,
+	return_rampIds = FALSE, db = RaMP()){
   if(is.character(synonym)){
     if(grepl("\n",synonym)[1]){
       list_metabolite <- strsplit(synonym,"\n")
@@ -105,8 +106,9 @@ rampFindSourceFromId <- function(db = RaMP(), rampId = "",full = TRUE){
 #' Fast search given a list of metabolites source Id
 #' @param sourceid a vector of synonym that need to be searched
 #' @param find_synonym bool if find all synonyms or just return same synonym
+#' @param db a RaMP database object
 #' @return a list contains all metabolits as name and pathway inside.
-rampFastPathFromSource<- function(db = RaMP(), sourceid, find_synonym = FALSE){
+rampFastPathFromSource<- function( sourceid, find_synonym = FALSE, db = RaMP()){
   # progress<- shiny::Progress$new()
   # progress$set(message = "Querying databases ...",value = 0)
   now <- proc.time()
@@ -156,8 +158,9 @@ rampFastPathFromSource<- function(db = RaMP(), sourceid, find_synonym = FALSE){
 #' The rampId can be plugged in other functions to continue query
 #' @param sourceId a data frame or string separated by comma or string
 #' separated by new line
+#' @param db a RaMP database object
 #' @return data.frame that has sourceId and rampId and source as columns
-rampFindSourceRampId <- function(db = RaMP(), sourceId){
+rampFindSourceRampId <- function( sourceId, db = RaMP()){
 
   if(is.character(sourceId)){
     if(grepl("\n",sourceId)[1]){
@@ -355,10 +358,11 @@ rampFindClassInfoFromSourceId<-function(db = RaMP(), sourceIds){
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
 #' @param PathOrChem return "path" information for pathways or "chem" for chemical class
 #' @param namesOrIds whether input is "names" or "ids" (default is "ids")
+#' @param db a RaMP database object
 #' @return a list of rampIds for "path" or a dataframe of chemClass info
-getRaMPInfoFromAnalytes<-function(db = RaMP(), analytes,
+getRaMPInfoFromAnalytes<-function( analytes,
                                   namesOrIds = "ids",
-                                  PathOrChem = "path"){
+                                  PathOrChem = "path", db = RaMP()){
     if(PathOrChem == "path"){
         if(namesOrIds == "names"){
             synonym <- rampFindSynonymFromSynonym(synonym=analytes,
@@ -398,9 +402,10 @@ getRaMPInfoFromAnalytes<-function(db = RaMP(), analytes,
 ##' @param inputdf internal df with pathwayramp ids
 ##' @param pathway_definitions If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows
 ##' @param analyte_type "genes" or "metabolites"
+##' @param db a RaMP database object
 ##' @return dataframe of all analytes that map to the input pathways
 ##' @author Andrew Christopher Patt
-buildFrequencyTables<-function(db = RaMP(), inputdf, pathway_definitions, analyte_type) {
+buildFrequencyTables<-function( inputdf, pathway_definitions, analyte_type, db = RaMP()) {
 
   if(pathway_definitions == "RaMP") {
 
@@ -510,6 +515,7 @@ segregateDataBySource<-function(input_RampIds){
 
 ##' Return list of duplicate Wikipathway IDs from Reactome. This may be unnecessary in the future
 ##' @return List of duplicate Wikipathway IDs from Reactome.
+##' @param db a RaMP database object
 ##' @author Andrew Patt
 find_duplicate_pathways <- function(db = RaMP()){
 
@@ -554,6 +560,7 @@ find_duplicate_pathways <- function(db = RaMP()){
 
 ##' Return list of duplicate Wikipathway IDs from Reactome. This may be unnecessary in the future
 ##' @return List of duplicate Wikipathway IDs from Reactome.
+##' @param db a RaMP database object
 ##' @author John Braisted
 findDuplicatePathways <- function(db = RaMP()) {
 
@@ -695,11 +702,12 @@ FilterFishersResults <- function(fishers_df, pval_type = 'fdr', pval_cutoff = 0.
 #' @param inferIdMapping if FALSE, the survey only reports on class annotations made directly on the input ids.
 #' If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to related ids that contain metabolite class annotations.
 #' The default is TRUE.
+#' @param db a RaMP database object
 #' @returns a list object containing three objects 'count_summary', 'met_classes' and 'met_query_report'.
 #' The count_summary is a dataframe containing metabolite classes and number of metabolites in each class.
 #' The met_classes is a detailed listing of compound classes associated with each input metabolite
 #' The met_query_report indicates the number of input metabolites, how many were found in the DB and the list of metabolites not found in RaMP DB.
-chemicalClassSurveyRampIdsConn <- function(db = RaMP(), mets, pop, inferIdMapping=TRUE) {
+chemicalClassSurveyRampIdsConn <- function( mets, pop, inferIdMapping=TRUE, db = RaMP()) {
 
   mets <- unique(mets)
 
@@ -869,11 +877,12 @@ chemicalClassSurveyRampIdsConn <- function(db = RaMP(), mets, pop, inferIdMappin
 #' @param inferIdMapping if FALSE, the survey only reports on class annotations made directly on the input ids.
 #' If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to related ids that contain metabolite class annotations.
 #' The default is TRUE.
+#' @param db a RaMP database object
 #' @returns a list object containing three objects 'count_summary', 'met_classes' and 'met_query_report'.
 #' The count_summary is a dataframe containing metabolite classes and number of metabolites in each class.
 #' The met_classes is a detailed listing of compound classes associated with each input metabolite
 #' The met_query_report indicates the number of input metabolites, how many were found in the DB and the list of metabolites not found in RaMP DB.
-chemicalClassSurveyRampIdsFullPopConn <- function(db = RaMP(), mets, inferIdMapping=TRUE) {
+chemicalClassSurveyRampIdsFullPopConn <- function( mets, inferIdMapping=TRUE, db = RaMP()) {
 
   mets <- unique(mets)
 
@@ -1014,12 +1023,12 @@ listToQueryString <- function(analytes) {
 #' filterPathwaysByAnalyteCount utility method filtered a dataframe based on the number of analytes associated with rampPathwayIds contained in the dataframe.
 #' Like fisher exact code, this one retains pathways with analyte count >= min_path_size, and having analyte_count < max_path_size
 #'
-#' @param db a RaMP databse object
 #' @param pathway_dataframe a dataframe containing at least one column that contains rampPathwayIds
 #' @param pathway_ramp_id_col_name the column name containing the rampPathwayIds
 #' @param min_path_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
 #' @param max_path_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
-filterPathwaysByAnalyteCount <- function(db = RaMP(), pathway_dataframe, pathway_ramp_id_col_name = 'pathwayRampId', min_path_size = 5, max_path_size = 150) {
+#' @param db a RaMP databse object
+filterPathwaysByAnalyteCount <- function( pathway_dataframe, pathway_ramp_id_col_name = 'pathwayRampId', min_path_size = 5, max_path_size = 150, db = RaMP()) {
   pwIds <- unlist(pathway_dataframe[[pathway_ramp_id_col_name]])
   pwIdsStr <- listToQueryString(pwIds)
 
