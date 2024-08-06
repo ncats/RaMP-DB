@@ -6,7 +6,6 @@
 clicked on highchart}
 \usage{
 runCombinedFisherTest(
-  db = RaMP(),
   analytes,
   namesOrIds = "ids",
   total_genes = 20000,
@@ -19,12 +18,11 @@ runCombinedFisherTest(
   background_type = "database",
   background = "database",
   pathway_definitions = "RaMP",
-  include_smpdb = FALSE
+  include_smpdb = FALSE,
+  db = RaMP()
 )
 }
 \arguments{
-\item{db}{a RaMP databse object}
-
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
 \item{namesOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
@@ -59,6 +57,8 @@ then users should specify one of the following: "Blood", "Adipose tissue", "Hear
 \item{pathway_definitions}{If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows. Please supply a .xls or .xlsx file. If supplying pathway definitions for genes and metabolites, ensure that metabolite definitions are on tab 1, and gene definitions are on tab2.}
 
 \item{include_smpdb}{Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant}
+
+\item{db}{a RaMP databse object}
 }
 \value{
 a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values
@@ -71,7 +71,7 @@ clicked on highchart
 }
 \examples{
 \dontrun{
-fisher.results <- runCombinedFisherTest(db = rampDB, analytes = c(
+fisher.results <- runCombinedFisherTest(analytes = c(
 "hmdb:HMDB0000033",
 "hmdb:HMDB0000052",
 "hmdb:HMDB0000094",
@@ -94,7 +94,7 @@ fisher.results <- runCombinedFisherTest(db = rampDB, analytes = c(
 "hmdb:HMDBP00283",
 "hmdb:HMDBP00284",
 "hmdb:HMDBP00850"
-))
+), db = rampDB )
 
 }
 }

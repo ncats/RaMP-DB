@@ -7,14 +7,14 @@
 getRaMPInfoFromAnalytes(
   db = RaMP(),
   analytes,
-  NameOrIds = "ids",
+  namesOrIds = "ids",
   PathOrChem = "path"
 )
 }
 \arguments{
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
-\item{NameOrIds}{whether input is "names" or "ids" (default is "ids")}
+\item{namesOrIds}{whether input is "names" or "ids" (default is "ids")}
 
 \item{PathOrChem}{return "path" information for pathways or "chem" for chemical class}
 }

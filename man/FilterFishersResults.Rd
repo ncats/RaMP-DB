@@ -24,13 +24,9 @@ Filter pathways by p-value cutoff for display and clustering
 }
 \examples{
 \dontrun{
-pkg.globals <- setConnectionToRaMP(
-  dbname = "ramp2", username = "root",
-  conpass = "", host = "localhost"
-)
-analyteList <- c("MDM2", "TP53", "glutamate", "creatinine"),
+analyteList <- c("MDM2", "TP53", "glutamate", "creatinine")
 
-fisher.results <- runCombinedFisherTest(analytes = analytesList, NamesOrIds = 'names')
+fisher.results <- runCombinedFisherTest(analytes = analytesList, namesOrIds = 'names')
 filtered.fisher.results <- FilterFishersResults(fisher.results, pval_type='fdr', pval_cutoff = 0.10)
 }
 }

@@ -17,8 +17,10 @@ Plots a network based on gene-metabolite relationships
 }
 \examples{
 \dontrun{
-pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-catalyzedf <- rampFastCata(analytes="creatine",NamesOrIds="names")
-plotCataNetwork(catalyzedf)
+inputs.of.interest <- c("kegg:C00186" , "hmdb:HMDB0000148", "kegg:C00780", "hmdb:HMDB0000064", "ensembl:ENSG00000115850", "uniprot:Q99259")
+
+new.transcripts <- rampFastCata(analytes = inputs.of.interest, db = rampDB)
+
+plotCataNetwork(head(new.transcripts$HMDB_Analyte_Associations, n=100))
 }
 }
