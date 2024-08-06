@@ -326,18 +326,27 @@ getReactionsForRaMPGeneIds <- function(db = RaMP(), rampGeneIds, onlyHumanMets=F
 
 #' getReactionClassesForAnalytes returns reactions class and EC numbers for a collection of input compound ids
 #'
-#' @param db a RaMP database object
 #' @param analytes list of analyte ids
 #' @param multiRxnParticipantCount minimum number of analytes to report a reaction class, default = 1
 #' @param humanProtein require reactions to have a human protein (enzyme or transporter), default True
 #' @param concatResults returns all reaction class levels in one dataframe rather than a list of 3 dataframes
 #' @param includeReactionIDs adds the list of reaction ids for each reaction class
 #' @param useIdMapping allows one to fuzzy match input ids to chebi and uniprot to support reaction queries.
+#' @param db a RaMP database object
 #'
-#' @return returns a three dataframes of reaction EC classe information, one for each EC level
+#' @return returns a three dataframes of reaction EC class information, one for each EC level
+#' @examples
+#' \dontrun{
+#'  analytes.of.interest = c('chebi:58115', 'chebi:456215', 'chebi:58245', 'chebi:58450',
+#' 'chebi:17596', 'chebi:16335', 'chebi:16750', 'chebi:172878',
+#' 'chebi:62286', 'chebi:77897', 'uniprot:P30566','uniprot:P30520',
+#' 'uniprot:P00568', 'uniprot:P23109', 'uniprot:P22102', 'uniprot:P15531')
+#'
+#' reaction.classes <- getReactionClassesForAnalytes(db = RaMP(), analytes = analytes.of.interest)
+#' }
 #' @export
- getReactionClassesForAnalytes <- function(db = RaMP(), analytes, multiRxnParticipantCount=1, humanProtein=TRUE,
-                                           concatResults=F, includeReactionIDs=F, useIdMapping = F) {
+ getReactionClassesForAnalytes <- function(analytes, multiRxnParticipantCount=1, humanProtein=TRUE,
+                                           concatResults=F, includeReactionIDs=F, useIdMapping = F, db = RaMP()) {
 
   print("Starting reaction class query...")
 
