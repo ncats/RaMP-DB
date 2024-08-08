@@ -6,16 +6,13 @@
 enrichment p-values and FDR values.}
 \usage{
 chemicalClassEnrichment(
-  db = RaMP(),
-  mets,
   background = "database",
   background_type = "database",
-  inferIdMapping = F
+  inferIdMapping = F,
+  db = RaMP()
 )
 }
 \arguments{
-\item{mets}{a vector of source prepended metabolite ids}
-
 \item{background}{an optional list of source prepended metaboite ids to be used as the background reference of
 metabolites for enrichment. The background can be either a list of ids, a file name containing the id list,
 one id per column (no file header row) or a specificed biospecimen type (available biospecimen types: "Blood",
@@ -29,6 +26,10 @@ a RaMP HMDB metabolite ontology term (see background parameter, above. for the m
 If inferIdMapping is set to TRUE, the input ids are cross-referenced or mapped to other existing ids that contain metabolite class annotations.
 Following id cross references can expand coverage if the input type is other than HMDB ids or LIPIDMAPS ids.
 The default value is FALSE.}
+
+\item{db}{a RaMP database object}
+
+\item{mets}{a vector of source prepended metabolite ids}
 }
 \value{
 a list of dataframes, each holding chemical classs enrichment statistics for specific chemical classification systems,
@@ -57,8 +58,7 @@ metList = c('hmdb:HMDB0000056',
             'hmdb:HMDB0011211')
 
 # the background population can be a separate ID list (preferred) or all database entries
-# (skip pop parameter).
-pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
+# (skip pop parameter)
 enrichedClassStats <- chemicalClassEnrichment(mets = metList)
 }
 }

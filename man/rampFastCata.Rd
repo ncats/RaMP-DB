@@ -4,12 +4,12 @@
 \alias{rampFastCata}
 \title{Retrieves analytes that involved in same reaction as input metabolite}
 \usage{
-rampFastCata(db = RaMP(), analytes = "none", NameOrIds = "ids")
+rampFastCata(db = RaMP(), analytes = "none", NamesOrIds = "ids")
 }
 \arguments{
 \item{analytes}{a vector of analytes that need to be searched}
 
-\item{NameOrIds}{whether input is "names" or "ids" (default is "ids")}
+\item{NamesOrIds}{whether input is "names" or "ids" (default is "ids")}
 }
 \value{
 a dataframe containing query results. If the input is a metabolite, the function will output

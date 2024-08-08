@@ -5,7 +5,6 @@
 \title{Cluster and plot significant pathways by FDR-adjusted pval}
 \usage{
 pathwayResultsPlot(
-  db = RaMP(),
   pathwaysSig,
   pval = "FDR",
   perc_analyte_overlap = 0.5,
@@ -13,7 +12,8 @@ pathwayResultsPlot(
   min_pathway_tocluster = 3,
   text_size = 8,
   sig_cutoff = 0.05,
-  interactive = FALSE
+  interactive = FALSE,
+  db = RaMP()
 )
 }
 \arguments{
@@ -34,6 +34,8 @@ a cluster (medoid) (Default = 3)}
 \item{sig_cutoff}{Aesthetic, shows pvalue cutoff for significant pathways}
 
 \item{interactive}{If TRUE, return interactive plotly object instead of ggplot object}
+
+\item{db}{a RaMP database object}
 }
 \description{
 Cluster and plot significant pathways by FDR-adjusted pval

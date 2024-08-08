@@ -7,6 +7,7 @@
 #' @param max_pathway_size (default Inf), trims returned results to pathways that have fewer than this number
 #' @param names_or_ids are the input pathways input as pathway names or as pathway ids
 #' of genes and metabolites
+#' @param db a RaMP database object
 #' @return a data.frame that contains all search results
 #' @examples
 #' \dontrun{
@@ -19,7 +20,7 @@
 #'	"sphingolipid metabolism"))
 #' }
 #' @export
-getAnalyteFromPathway <- function(db = RaMP(), pathway, match="exact", analyte_type="both", max_pathway_size = Inf, names_or_ids="names") {
+getAnalyteFromPathway <- function(pathway, match="exact", analyte_type="both", max_pathway_size = Inf, names_or_ids="names",db = RaMP()) {
   now <- proc.time()
   print("fired!")
   if(is.character(pathway)){
