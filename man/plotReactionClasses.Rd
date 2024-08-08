@@ -21,7 +21,9 @@ analytes.of.interest = c('chebi:58115', 'chebi:456215', 'chebi:58245', 'chebi:58
 'chebi:17596', 'chebi:16335', 'chebi:16750', 'chebi:172878',
 'chebi:62286', 'chebi:77897', 'uniprot:P30566','uniprot:P30520',
 'uniprot:P00568', 'uniprot:P23109', 'uniprot:P22102', 'uniprot:P15531')
-reaction.classes <- getReactionClassesForAnalytes(db = RaMP(), analytes = analytes.of.interest)
+
+reaction.classes <- getReactionClassesForAnalytes( analytes = analytes.of.interest, db = RaMP())
+
 plotReactionClasses(reaction.classes)
 }
 

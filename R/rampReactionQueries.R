@@ -924,8 +924,11 @@ getRheaMetabolitesForProteins <- function( analytes, includeRheaRxnDetails=F, hu
 
 
 
- #' Utility method to combine two list to tally unique counts and combine lists into a string.
- #' This utility script specifically supports accounting in reaction class queries.
+#' Utility method to combine two list to tally unique counts and combine lists into a string.
+#' This utility script specifically supports accounting in reaction class queries.
+#' @param x list1
+#' @param y list2
+#' @param sep what to split on
  combineStringLists <- function(x, y, sep=",") {
    reactions <- c()
    rxn_count <- c()

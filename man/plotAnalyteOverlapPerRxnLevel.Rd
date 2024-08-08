@@ -18,12 +18,14 @@ An interactive HTML upset plot that allows the user to visualize the overlap in 
 Plots an interactive upset plot of overlapping input compounds at reaction class level 1
 }
 \examples{
-\dontrun {
+\dontrun{
 analytes.of.interest = c('chebi:58115', 'chebi:456215', 'chebi:58245', 'chebi:58450',
 'chebi:17596', 'chebi:16335', 'chebi:16750', 'chebi:172878',
 'chebi:62286', 'chebi:77897', 'uniprot:P30566','uniprot:P30520',
 'uniprot:P00568', 'uniprot:P23109', 'uniprot:P22102', 'uniprot:P15531')
-reactionsLists <- RaMP::getReactionsForAnalytes(db = rampDB, analytes = analytes.of.interest, includeTransportRxns = F, humanProtein = T)
+
+reactionsLists <- RaMP::getReactionsForAnalytes(analytes = analytes.of.interest, includeTransportRxns = F, humanProtein = T, db = rampDB)
+
 plotAnalyteOverlapPerRxnLevel(reactionsLists)
 }
 
