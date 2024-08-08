@@ -35,18 +35,19 @@ RaMP::getPrefixesFromAnalytes(analyteType = 'metabolite')
 
 RaMP::getPrefixesFromAnalytes(analyteType = 'gene')
 
-# Example use with demo data
+# Example use with demo dataframe data
 df <- data.frame(ensembl = c('ENSG00000135679', 'ENSG00000141510'), hmdb = c('HMDB0000064', NA), fake_ID = c('123', NA))
-
-dir <- system.file("extdata", package="RaMP", mustWork=TRUE)
-dataFrame <- file.path(dir,"ExampleInputFileName.csv")
 
 RaMPInput <- createRaMPInput(dataFrame = df)
 
 getPathwayFromAnalyte(RaMPInput)
 
-# Example use with csv
-RaMPInput <- createRaMPInput(filePath = 'createRaMPInput_test_data.csv')
+# Example use with demo csv data
+
+dir <- system.file("extdata", package="RaMP", mustWork=TRUE)
+ExampleRaMPInputPath <- file.path(dir,"ExampleRaMPInput.csv")
+
+RaMPInput <- createRaMPInput(filePath = ExampleRaMPInputPath)
 
 getPathwayFromAnalyte(RaMPInput)
 }
