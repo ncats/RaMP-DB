@@ -15,9 +15,9 @@ getReactionsForAnalytes(
 )
 }
 \arguments{
-\item{db}{a RaMP databse object}
+\item{db}{a RaMP database object}
 
-\item{analytes}{list of analytes}
+\item{analytes}{list of analytes. chebi and/or uniprot ids are required.}
 
 \item{onlyHumanMets}{boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)}
 
@@ -34,4 +34,12 @@ a list of reaction information on each input analyte, separate data.frame for me
 }
 \description{
 getReactionsForAnalytes
+}
+\examples{
+\dontrun{
+analytes.of.interest <- c('chebi:57368', 'uniprot:Q96N66')
+
+reactionsLists <- RaMP::getReactionsForAnalytes(db = rampDB, analytes = analytes.of.interest,
+                                                  includeTransportRxns = F, humanProtein = T)
+}
 }

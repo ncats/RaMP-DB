@@ -2,8 +2,8 @@
 
 #' getReactionsForAnalytes
 #'
-#' @param db a RaMP databse object
-#' @param analytes list of analytes
+#' @param db a RaMP database object
+#' @param analytes list of analytes. chebi and/or uniprot ids are required.
 #' @param onlyHumanMets boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)
 #' @param humanProtein boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)
 #' @param includeTransportRxns if TRUE, returns metabolic and transport reactions
@@ -11,6 +11,13 @@
 #' @param includeRxnURLs if TRUE, urls to Rhea.org will be delivered in the result dataframe for each reaction
 #'
 #' @return a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and common reactions
+#' @examples
+#' \dontrun{
+#' analytes.of.interest <- c('chebi:57368', 'uniprot:Q96N66')
+#'
+#' reactionsLists <- RaMP::getReactionsForAnalytes(db = rampDB, analytes = analytes.of.interest,
+#'                                                   includeTransportRxns = F, humanProtein = T)
+#' }
 #' @export
 #'
 getReactionsForAnalytes <- function(db = RaMP(), analytes, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN"), includeRxnURLs=F) {

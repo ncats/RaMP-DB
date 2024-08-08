@@ -1,7 +1,7 @@
 #' Function that query database to find ontology information based on
 #' the given list of analytes
 #' @param analytes a vector of analytes or a analytes delimited by new line character
-#' @param NameOrIds specify the type of given data
+#' @param nameOrID specify the type of given data
 #' @return dataframe that contains searched ontology from given analytes
 #'
 #' @examples
@@ -13,8 +13,8 @@
 #' getOntoFromMeta("hmdb:HMDB0071437")
 #' }
 #' @export
-getOntoFromMeta <- function(analytes, NameOrIds = "ids", includeRaMPids = FALSE, db = RaMP()) {
-  if (!(NameOrIds %in% c("ids", "name"))) {
+getOntoFromMeta <- function(analytes, NamesOrIds = "ids", includeRaMPids = FALSE, db = RaMP()) {
+  if (!(NamesOrIds %in% c("ids", "name"))) {
     stop("Specifiy the type of given data to 'ids' or 'name'")
   }
 
@@ -36,9 +36,9 @@ getOntoFromMeta <- function(analytes, NameOrIds = "ids", includeRaMPids = FALSE,
   list_metabolite <- sapply(list_metabolite, shQuote)
   list_metabolite <- paste(list_metabolite, collapse = ",")
 
-  if (NameOrIds == "ids") {
+  if (nameOrID == "ids") {
     sql <- paste0("select * from source where sourceId in (", list_metabolite, ");")
-  } else if (NameOrIds == "name") {
+  } else if (nameOrID == "name") {
     sql <- paste0("select * from source where rampId in (select * from (select rampId from analytesynonym where Synonym in (", list_metabolite, ")) as subquery);")
     cat(file = stderr(), "query sql in Package call with -- ", sql, "\n")
   }
@@ -180,7 +180,7 @@ getMetaFromOnto <- function(db = RaMP(), ontology) {
 #' Enrichment analysis for metabolite ontology mappings
 #' @param db a RaMP database object
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
-#' @param NameOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
+#' @param NamesOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param analyte_type "metabolites" or "genes" (default is "metabolites")
 #' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "F")
@@ -203,7 +203,7 @@ getMetaFromOnto <- function(db = RaMP(), ontology) {
 #' @export
 
 runOntologyTest <- function(analytes,
-                            NameOrIds = "ids",
+                            NamesOrIds = "ids",
                             alternative = "less", min_analyte = 2,
                             min_ontology_size = 5, max_ontology_size = 1500,
                             includeRaMPids = FALSE,
@@ -215,7 +215,7 @@ runOntologyTest <- function(analytes,
   ontologydf <- getOntoFromMeta(
     db = db, analytes = analytes,
     includeRaMPids = TRUE,
-    NameOrIds = NameOrIds
+    NamesOrIds = NamesOrIds
   )
   ontologyRampId <- rampId <- c()
 
@@ -234,14 +234,14 @@ runOntologyTest <- function(analytes,
     backgrounddf <- getOntoFromMeta(
       db = db, background,
       includeRaMPids = TRUE,
-      NameOrIds = NameOrIds
+      NamesOrIds = NamesOrIds
     )
   } else if (background_type == "file") {
     userbkg <- utils::read.table(background, header = F)[, 1]
     backgrounddf <- getOntologyFromAnalyte(
       db = db, analytes = userbkg,
       includeRaMPids = TRUE,
-      NameOrIds = NameOrIds,
+      NamesOrIds = NamesOrIds,
       include_smpdb = include_smpdb
     )
   } else if (background_type == "biospecimen") {

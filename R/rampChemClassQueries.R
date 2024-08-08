@@ -43,24 +43,16 @@
 #'@examples
 #'\dontrun{
 #' # metabolite list of interest
-#' metList = c('hmdb:HMDB0000056',
-#'             'hmdb:HMDB0000439',
-#'             'hmdb:HMDB0000479',
-#'             'hmdb:HMDB0000532',
-#'             'hmdb:HMDB0001015',
-#'             'hmdb:HMDB0001138',
-#'             'hmdb:HMDB0029159',
-#'             'hmdb:HMDB0029412',
-#'             'hmdb:HMDB0034365',
-#'             'hmdb:HMDB0035227',
-#'             'hmdb:HMDB0007973',
-#'             'hmdb:HMDB0008057',
-#'             'hmdb:HMDB0011211')
+#' metabolites.of.interest = c("pubchem:64969",
+#'                              "chebi:16958",
+#'                              "chemspider:20549",
+#'                              "kegg:C05598",
+#'                              "chemspider:388809",
+#'                              "pubchem:53861142",
+#'                              "hmdb:HMDB0001138",
+#'                              "hmdb:HMDB0029412")
 #'
-#' # The background population can be a separate ID list (preferred) or all database entries
-#' # (skip pop parameter).
-#' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-#' metClassResult <- chemicalClassSurvey(mets = metList)
+#' metClassResult <- chemicalClassSurvey(mets = metabolites.of.interest)
 #'
 #' # show structure
 #' utils::str(metClassResult)
@@ -216,24 +208,16 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
 #'@examples
 #'\dontrun{
 #' # metabolite list of interest
-#' metList = c('hmdb:HMDB0000056',
-#'             'hmdb:HMDB0000439',
-#'             'hmdb:HMDB0000479',
-#'             'hmdb:HMDB0000532',
-#'             'hmdb:HMDB0001015',
-#'             'hmdb:HMDB0001138',
-#'             'hmdb:HMDB0029159',
-#'             'hmdb:HMDB0029412',
-#'             'hmdb:HMDB0034365',
-#'             'hmdb:HMDB0035227',
-#'             'hmdb:HMDB0007973',
-#'             'hmdb:HMDB0008057',
-#'             'hmdb:HMDB0011211')
+#' metabolites.of.interest = c("pubchem:64969",
+#'                             "chebi:16958",
+#'                             "chemspider:20549",
+#'                             "kegg:C05598",
+#'                             "chemspider:388809",
+#'                             "pubchem:53861142",
+#'                             "hmdb:HMDB0001138",
+#'                             "hmdb:HMDB0029412")
 #'
-#' # the background population can be a separate ID list (preferred) or all database entries
-#' # (skip pop parameter)
-
-#' enrichedClassStats <- chemicalClassEnrichment(mets = metList)
+#' chemical.enrichment <- chemicalClassEnrichment(db = rampDB, mets = metabolites.of.interest)
 #'}
 #' @export
 chemicalClassEnrichment <- function(background = "database", background_type = "database", inferIdMapping=F,db = RaMP()) {

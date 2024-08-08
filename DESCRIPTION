@@ -21,6 +21,7 @@ Imports:
     ggplot2,
     plotly,
     tidyr,
+    readr,
     tidytext,
     data.table,
     DT,
@@ -40,7 +41,8 @@ Imports:
     R.utils,
     httr,
     upsetjs,
-    Polychrome
+    Polychrome,
+    pals
 Encoding: UTF-8
 RoxygenNote: 7.3.1
 Suggests: 

@@ -1042,7 +1042,7 @@ filterPathwaysByAnalyteCount <- function(db = RaMP(), pathway_dataframe, pathway
 #'
 #' @param reactionClassesResults output of getReactionClassesForAnalytes()
 
-buildReactionClassesSunburstDatafarme <- function(reactionClassesResults = "") {
+buildReactionClassesSunburstDataframe <- function(reactionClassesResults) {
 
   #create empty table for sunburst information
   sunburst_ontology_reactionclass <- data.frame(matrix(ncol = 3, nrow = 0))
@@ -1250,7 +1250,7 @@ buildReactionClassesSunburstDatafarme <- function(reactionClassesResults = "") {
 #'
 #' @param reactionClassesResults output of getReactionClassesForAnalytes()
 
-buildAnalyteOverlapPerRxnLevelUpsetDatafarme <- function(reactionsResults = "", includeCofactorMets = FALSE) {
+buildAnalyteOverlapPerRxnLevelUpsetDataframe <- function(reactionsResults, includeCofactorMets = FALSE) {
 
   if(nrow(reactionsResults$met2rxn)>0)
   {
@@ -1345,4 +1345,141 @@ buildAnalyteOverlapPerRxnLevelUpsetDatafarme <- function(reactionsResults = "", 
   }
 
   return(input2reactions_list)
+}
+
+
+
+#' Creates the input dataframe for the interactive plot created in 'plotChemicalClassSurvery'
+#'
+#' @param reactionClassesResults output of getReactionClassesForAnalytes()
+
+buildChemicalClassSurveryDataframe <- function(chemicalClassSurveryResults) {
+
+  chemicalClassSurveryResults_split <- split(chemicalClassSurveryResults$met_classes, chemicalClassSurveryResults$met_classes$source)
+
+  sunburst_ontology_chemicalClass <- data.frame(matrix(ncol = 3, nrow = 0))
+  colnames(sunburst_ontology_chemicalClass) <- c("ids", "labels", "parents")
+
+  sunburst_ontology_chemicalClass <- data.frame(matrix(ncol = 3, nrow = 0))
+  colnames(sunburst_ontology_chemicalClass) <- c("ids", "labels", "parents")
+
+  if (length(chemicalClassSurveryResults_split) == 2)
+  {
+    hmdb_levels <- split(chemicalClassSurveryResults_split$hmdb, chemicalClassSurveryResults_split$hmdb$class_level_name)
+    lipidmaps_levels <- split(chemicalClassSurveryResults_split$lipidmaps, chemicalClassSurveryResults_split$lipidmaps$class_level_name)
+
+    missing_level2 <- which(is.na(merge(hmdb_levels$ClassyFire_super_class, hmdb_levels$ClassyFire_class, by = 1, all = TRUE)$class_name.y)==TRUE)
+
+    hmdb_collate <- merge(hmdb_levels$ClassyFire_super_class, hmdb_levels$ClassyFire_class, by = 1)
+
+    sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, data.frame("ids" = unique(hmdb_levels$ClassyFire_super_class$class_name), "labels" = unique(hmdb_levels$ClassyFire_super_class$class_name), "parents"= ""))
+
+    if("Lipids and lipid-like molecules" %in% sunburst_ontology_chemicalClass$ids == FALSE)
+    {
+      sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, data.frame("ids" = "Lipids and lipid-like molecules", "labels" = "Lipids and lipid-like molecules", "parents"= ""))
+    }
+
+    sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(hmdb_collate$class_name.x,"-", hmdb_collate$class_name.y), "labels" = hmdb_collate$class_name.y, "parents"= hmdb_collate$class_name.x)))
+
+    if(length(missing_level2)>0)
+    {
+      sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(hmdb_levels$ClassyFire_super_class[missing_level2,]$class_name,"-", hmdb_levels$ClassyFire_super_class[missing_level2,]$common_names), "labels" = paste0(hmdb_levels$ClassyFire_super_class[missing_level2,]$common_names, '\n', hmdb_levels$ClassyFire_super_class[missing_level2,][,1]), "parents"= hmdb_levels$ClassyFire_super_class[missing_level2,]$class_name)))
+    }
+
+    missing_level3 <- which(is.na(merge(hmdb_levels$ClassyFire_class, hmdb_levels$ClassyFire_sub_class, by = 1, all = TRUE)$class_name.y)==TRUE)
+
+    if(length(missing_level3)>0)
+    {
+      sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(hmdb_collate[missing_level3,]$class_name.y,"-", hmdb_collate[missing_level3,]$common_names.x), "labels" = paste0(hmdb_collate[missing_level3,]$common_names.x, '\n', hmdb_collate[missing_level3,][,1]), "parents"= paste0(hmdb_collate[missing_level3,]$class_name.x,"-", hmdb_collate[missing_level3,]$class_name.y))))
+    }
+
+    hmdb_collate <- merge(hmdb_collate, hmdb_levels$ClassyFire_sub_class, by = 1)
+
+    sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(hmdb_collate$class_name.y,"-", hmdb_collate$class_name), "labels" = hmdb_collate$class_name, "parents"= paste0(hmdb_collate$class_name.x,"-", hmdb_collate$class_name.y))))
+
+
+    sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(hmdb_collate$class_name,"-", hmdb_collate$common_names.x), "labels" = paste0(hmdb_collate$common_names.x, '\n', hmdb_collate[,1]), "parents"= paste0(hmdb_collate$class_name.y,"-", hmdb_collate$class_name))))
+
+    lipidmaps_levels$LipidMaps_category$class_name <- gsub(" \\[.*","",lipidmaps_levels$LipidMaps_category$class_name)
+    lipidmaps_levels$LipidMaps_main_class$class_name <- gsub(" \\[.*","",lipidmaps_levels$LipidMaps_main_class$class_name)
+    lipidmaps_levels$LipidMaps_sub_class$class_name <- gsub(" \\[.*","",lipidmaps_levels$LipidMaps_sub_class$class_name)
+
+    if (any(unique(paste0("Lipids and lipid-like molecules-", lipidmaps_levels$LipidMaps_category$class_name)) %in% sunburst_ontology_chemicalClass$ids == FALSE))
+    {
+      index <- which(unique(paste0("Lipids and lipid-like molecules-", lipidmaps_levels$LipidMaps_category$class_name)) %in% sunburst_ontology_chemicalClass$ids == FALSE)
+
+      sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0("Lipids and lipid-like molecules-", lipidmaps_levels$LipidMaps_category$class_name), "labels" = lipidmaps_levels$LipidMaps_category$class_name, "parents"= "Lipids and lipid-like molecules"))[index,])
+    }
+
+    lipidmaps_collate <- merge(lipidmaps_levels$LipidMaps_category, lipidmaps_levels$LipidMaps_main_class, by = 1)
+    lipidmaps_collate <- merge(lipidmaps_collate, lipidmaps_levels$LipidMaps_sub_class, by = 1)
+
+    if (any(unique(paste0(lipidmaps_collate$class_name.x, "-", lipidmaps_collate$class_name.y)) %in% sunburst_ontology_chemicalClass$ids == FALSE))
+    {
+      index <- which(unique(paste0(lipidmaps_collate$class_name.x, "-", lipidmaps_collate$class_name.y)) %in% sunburst_ontology_chemicalClass$ids == FALSE)
+
+      sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(lipidmaps_collate$class_name.x, "-", lipidmaps_collate$class_name.y), "labels" = lipidmaps_collate$class_name.y, "parents"= paste0("Lipids and lipid-like molecules-", lipidmaps_collate$class_name.x)))[index,])
+    }
+
+    sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(lipidmaps_collate$class_name.y, "-", lipidmaps_collate$class_name), "labels" = lipidmaps_collate$class_name, "parents"= paste0(lipidmaps_collate$class_name.x, "-", lipidmaps_collate$class_name.y))))
+
+    sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(lipidmaps_collate$class_name, "-", lipidmaps_collate$common_names.x), "labels" = paste0(lipidmaps_collate$common_names.x, '\n', lipidmaps_collate[,1]), "parents"= paste0(lipidmaps_collate$class_name.y, "-", lipidmaps_collate$class_name))))
+
+  }
+  if (length(chemicalClassSurveryResults_split) == 1)
+  {
+    if(names(chemicalClassSurveryResults_split[1]) == "hmdb")
+    {
+      hmdb_levels <- split(chemicalClassSurveryResults_split$hmdb, chemicalClassSurveryResults_split$hmdb$class_level_name)
+
+      missing_level2 <- which(is.na(merge(hmdb_levels$ClassyFire_super_class, hmdb_levels$ClassyFire_class, by = 1, all = TRUE)$class_name.y)==TRUE)
+
+      hmdb_collate <- merge(hmdb_levels$ClassyFire_super_class, hmdb_levels$ClassyFire_class, by = 1)
+
+      sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, data.frame("ids" = unique(hmdb_levels$ClassyFire_super_class$class_name), "labels" = unique(hmdb_levels$ClassyFire_super_class$class_name), "parents"= ""))
+
+      sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(hmdb_collate$class_name.x,"-", hmdb_collate$class_name.y), "labels" = hmdb_collate$class_name.y, "parents"= hmdb_collate$class_name.x)))
+
+      if(length(missing_level2)>0)
+      {
+        sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(hmdb_levels$ClassyFire_super_class[missing_level2,]$class_name,"-", hmdb_levels$ClassyFire_super_class[missing_level2,]$common_names), "labels" = paste0(hmdb_levels$ClassyFire_super_class[missing_level2,]$common_names, '\n', hmdb_levels$ClassyFire_super_class[missing_level2,][,1]), "parents"= hmdb_levels$ClassyFire_super_class[missing_level2,]$class_name)))
+      }
+
+      missing_level3 <- which(is.na(merge(hmdb_levels$ClassyFire_class, hmdb_levels$ClassyFire_sub_class, by = 1, all = TRUE)$class_name.y)==TRUE)
+
+      if(length(missing_level3)>0)
+      {
+        sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(hmdb_collate[missing_level3,]$class_name.y,"-", hmdb_collate[missing_level3,]$common_names.x), "labels" = paste0(hmdb_collate[missing_level3,]$common_names.x, '\n', hmdb_collate[missing_level3,][,1]), "parents"= paste0(hmdb_collate[missing_level3,]$class_name.x,"-", hmdb_collate[missing_level3,]$class_name.y))))
+      }
+
+      hmdb_collate <- merge(hmdb_collate, hmdb_levels$ClassyFire_sub_class, by = 1)
+
+      sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(hmdb_collate$class_name.y,"-", hmdb_collate$class_name), "labels" = hmdb_collate$class_name, "parents"= paste0(hmdb_collate$class_name.x,"-", hmdb_collate$class_name.y))))
+
+
+      sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(hmdb_collate$class_name,"-", hmdb_collate$common_names.x), "labels" = paste0(hmdb_collate$common_names.x, '\n', hmdb_collate[,1]), "parents"= paste0(hmdb_collate$class_name.y,"-", hmdb_collate$class_name))))
+    }
+
+    else if (names(chemicalClassSurveryResults_split[1]) == "lipidmaps")
+    {
+      lipidmaps_levels <- split(chemicalClassSurveryResults_split$lipidmaps, chemicalClassSurveryResults_split$lipidmaps$class_level_name)
+
+      sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = lipidmaps_levels$LipidMaps_category$class_name, "labels" = lipidmaps_levels$LipidMaps_category$class_name, "parents"= "")))
+
+      lipidmaps_collate <- merge(lipidmaps_levels$LipidMaps_category, lipidmaps_levels$LipidMaps_main_class, by = 1)
+      lipidmaps_collate <- merge(lipidmaps_collate, lipidmaps_levels$LipidMaps_sub_class, by = 1)
+
+      sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(lipidmaps_collate$class_name.x, "-", lipidmaps_collate$class_name.y), "labels" = lipidmaps_collate$class_name.y, "parents"= lipidmaps_collate$class_name.x)))
+
+      sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(lipidmaps_collate$class_name.y, "-", lipidmaps_collate$class_name), "labels" = lipidmaps_collate$class_name, "parents"= paste0(lipidmaps_collate$class_name.x, "-", lipidmaps_collate$class_name.y))))
+
+      sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(lipidmaps_collate$class_name, "-", lipidmaps_collate$common_names.x), "labels" = paste0(lipidmaps_collate$common_names.x, '\n', lipidmaps_collate[,1]), "parents"= paste0(lipidmaps_collate$class_name.y, "-", lipidmaps_collate$class_name))))
+
+    }
+  }
+
+  rownames(sunburst_ontology_chemicalClass) <- c(1:nrow(sunburst_ontology_chemicalClass))
+
+  return(sunburst_ontology_chemicalClass)
+
 }

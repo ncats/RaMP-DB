@@ -557,14 +557,30 @@ runFisherTest <- function(analytes,
 #' and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(
-#'   dbname = "ramp2", username = "root",
-#'   conpass = "", host = "localhost"
-#' )
-#' analyte.list <- c(
-#'   "chebi:15344", "chebi:10983", "chebi:15351",
-#'   "uniprot:Q86V21", "uniprot:Q02338", "uniprot:Q9BUT1"
-#' )
+#' fisher.results <- runCombinedFisherTest(db = rampDB, analytes = c(
+#' "hmdb:HMDB0000033",
+#' "hmdb:HMDB0000052",
+#' "hmdb:HMDB0000094",
+#' "hmdb:HMDB0000161",
+#' "hmdb:HMDB0000168",
+#' "hmdb:HMDB0000191",
+#' "hmdb:HMDB0000201",
+#' "chemspider:10026",
+#' "hmdb:HMDB0006059",
+#' "Chemspider:6405",
+#' "CAS:5657-19-2",
+#' "hmdb:HMDB0002511",
+#' "chemspider:20171375", "CAS:133-32-4",
+#' "CAS:5746-90-7",
+#' "CAS:477251-67-5",
+#' "hmdb:HMDB0000695",
+#' "chebi:15934",
+#' "CAS:838-07-3",
+#' "hmdb:HMDBP00789",
+#' "hmdb:HMDBP00283",
+#' "hmdb:HMDBP00284",
+#' "hmdb:HMDBP00850"
+#' ))
 #'
 #' fisher.results <- runCombinedFisherTest(analytes = analyte.list, NamesOrIds = "ids")
 #' }
