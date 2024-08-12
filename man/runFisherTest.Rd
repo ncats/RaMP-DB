@@ -8,11 +8,7 @@ clicked on highchart}
 runFisherTest(
   analytes,
   total_genes = 20000,
-<<<<<<< HEAD
   namesOrIds = "ids",
-=======
-  NamesOrIds = "ids",
->>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
   analyte_type = "metabolites",
   MCall = F,
   alternative = "less",
@@ -30,11 +26,7 @@ runFisherTest(
 
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
 
-<<<<<<< HEAD
 \item{namesOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
-=======
-\item{NamesOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
->>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
 
 \item{analyte_type}{"metabolites" or "genes" (default is "metabolites")}
 
@@ -62,11 +54,7 @@ then users should specify one of the following: "Blood", "Adipose tissue", "Hear
 
 \item{include_smpdb}{Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant}
 
-<<<<<<< HEAD
 \item{db}{a RaMP databse object}
-=======
-\item{db}{a RaMP database object}
->>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
 }
 \value{
 a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway

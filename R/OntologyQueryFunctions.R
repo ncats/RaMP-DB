@@ -14,15 +14,9 @@
 #' getOntoFromMeta("hmdb:HMDB0071437")
 #' }
 #' @export
-<<<<<<< HEAD
-getOntoFromMeta <- function(analytes, namesOrIds = "ids", db = RaMP()) {
+getOntoFromMeta <- function(analytes, namesOrIds = "ids", includeRaMPids = FALSE, db = RaMP()) {
   if (!(namesOrIds %in% c("ids", "names"))) {
     stop("Specifiy the type of given data to 'ids' or 'names'")
-=======
-getOntoFromMeta <- function(analytes, NamesOrIds = "ids", includeRaMPids = FALSE, db = RaMP()) {
-  if (!(NamesOrIds %in% c("ids", "name"))) {
-    stop("Specifiy the type of given data to 'ids' or 'name'")
->>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
   }
 
   now <- proc.time()
@@ -110,7 +104,6 @@ getOntoFromMeta <- function(analytes, NamesOrIds = "ids", includeRaMPids = FALSE
 #' @return dataframe that  contains searched analytes from given ontology
 #' @examples
 #' \dontrun{
-<<<<<<< HEAD
 #' ontologies.of.interest <- c("Colon", "Liver", "Lung")
 #'
 #' new.metabolites <- RaMP::getMetaFromOnto(db = rampDB, ontology = ontologies.of.interest)
@@ -118,18 +111,6 @@ getOntoFromMeta <- function(analytes, NamesOrIds = "ids", includeRaMPids = FALSE
 #' @importFrom rlang .data
 #' @export
 getMetaFromOnto <- function(ontology, db = RaMP()) {
-
-=======
-#' pkg.globals <- setConnectionToRaMP(
-#'   dbname = "ramp2", username = "root",
-#'   conpass = "", host = "localhost"
-#' )
-#' getMetaFromOnto("Adiposome")
-#' }
-#' @importFrom rlang .data
-#' @export
-getMetaFromOnto <- function(db = RaMP(), ontology) {
->>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
   print("Retreiving Metabolites for input ontology terms.")
   now <- proc.time()
   if (is.character(ontology)) {
@@ -198,13 +179,13 @@ getMetaFromOnto <- function(db = RaMP(), ontology) {
 #' Enrichment analysis for metabolite ontology mappings
 #' @param db a RaMP database object
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
-#' @param NamesOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
+#' @param namesOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
 #' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
 #' @param analyte_type "metabolites" or "genes" (default is "metabolites")
 #' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "F")
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
-#' @param min_path_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
-#' @param max_path_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
+#' @param min_ontology_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
+#' @param max_ontology_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
 #' @param background_type type of background that is input by the user.  Opions are "database" if user wants all
 #' analytes from the RaMP database will be used; "file", if user wants to input a file with a list of background
 #' analytes; "list", if user wants to input a vector of analyte IDs; "biospecimen", if user wants to specify a
@@ -221,7 +202,7 @@ getMetaFromOnto <- function(db = RaMP(), ontology) {
 #' @export
 
 runOntologyTest <- function(analytes,
-                            NamesOrIds = "ids",
+                            namesOrIds = "ids",
                             alternative = "less", min_analyte = 2,
                             min_ontology_size = 5, max_ontology_size = 1500,
                             includeRaMPids = FALSE,
@@ -233,7 +214,7 @@ runOntologyTest <- function(analytes,
   ontologydf <- getOntoFromMeta(
     db = db, analytes = analytes,
     includeRaMPids = TRUE,
-    NamesOrIds = NamesOrIds
+    namesOrIds = namesOrIds
   )
   ontologyRampId <- rampId <- c()
 
@@ -252,14 +233,14 @@ runOntologyTest <- function(analytes,
     backgrounddf <- getOntoFromMeta(
       db = db, background,
       includeRaMPids = TRUE,
-      NamesOrIds = NamesOrIds
+      namesOrIds = namesOrIds
     )
   } else if (background_type == "file") {
     userbkg <- utils::read.table(background, header = F)[, 1]
     backgrounddf <- getOntologyFromAnalyte(
       db = db, analytes = userbkg,
       includeRaMPids = TRUE,
-      NamesOrIds = NamesOrIds,
+      namesOrIds = namesOrIds,
       include_smpdb = include_smpdb
     )
   } else if (background_type == "biospecimen") {
@@ -498,7 +479,7 @@ runOntologyTest <- function(analytes,
       paste0(collapse = ";")
     return(analytes)
   })
-  
+
   # for user is the output needed, based on what user input
   if (includeRaMPids) {
     return(out)

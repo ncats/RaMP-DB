@@ -76,16 +76,11 @@ plotCataNetwork <- function(catalyzedf = "") {
 #'                     min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE, db = rampDB )
 #' }
 #' @export
-<<<<<<< HEAD
-plotEnrichedPathways <- function( pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.5,
-                                 perc_pathway_overlap = 0.5, min_pathway_tocluster = 3,
-                                 text_size = 8, sig_cutoff = 0.05, interactive=FALSE, db = RaMP()) {
-=======
 pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.5,
                                  perc_pathway_overlap = 0.5, min_pathway_tocluster = 3,
                                text_size = 8, sig_cutoff = 0.05, interactive=FALSE,
                                db = RaMP()) {
->>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
+
 
   if( !('cluster_assignment' %in% colnames(pathwaysSig$fishresult))) {
     fishClustering <- findCluster(db = db, pathwaysSig,
@@ -353,15 +348,15 @@ plotAnalyteOverlapPerRxnLevel <- function(reactionsResults, includeCofactorMets 
 #' @param interactive If TRUE, return interactive plotly object instead of ggplot object
 #' @param db a RaMP database object
 #' @export
-ontologyEnrichmentResultsPlot <- function(ontologiesSig, pval = "FDR", 
+ontologyEnrichmentResultsPlot <- function(ontologiesSig, pval = "FDR",
                                           text_size = 8,
                                           sig_cutoff = 0.05, interactive=FALSE,
                                           db = RaMP()) {
 
   inOntology <- ontologiesSig$Num_In_Ontology
   totOntology <- ontologiesSig$Total_In_Ontology
-  
-  
+
+
   if (pval == "FDR") {
     plotDF <- data.frame(
       x = -log10(ontologiesSig[, grepl("FDR", colnames(ontologiesSig))]),
@@ -400,8 +395,8 @@ ontologyEnrichmentResultsPlot <- function(ontologiesSig, pval = "FDR",
 
   ## plotDF <- plotDF[order(plotDF$y, decreasing = TRUE), ]
   plotDF$y <- factor(plotDF$y,
-                     levels  = unique(plotDF$y[order(plotDF$x, decreasing = FALSE)])) 
-  
+                     levels  = unique(plotDF$y[order(plotDF$x, decreasing = FALSE)]))
+
   p <- plotDF %>%
     ggplot2::ggplot(
       ggplot2::aes_string(y = "x", x = "y")

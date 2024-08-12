@@ -7,6 +7,13 @@ This utility script specifically supports accounting in reaction class queries.}
 \usage{
 combineStringLists(x, y, sep = ",")
 }
+\arguments{
+\item{x}{list1}
+
+\item{y}{list2}
+
+\item{sep}{what to split on}
+}
 \description{
 Utility method to combine two list to tally unique counts and combine lists into a string.
 This utility script specifically supports accounting in reaction class queries.

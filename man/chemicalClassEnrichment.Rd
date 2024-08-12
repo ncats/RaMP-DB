@@ -6,10 +6,7 @@
 enrichment p-values and FDR values.}
 \usage{
 chemicalClassEnrichment(
-<<<<<<< HEAD
   mets,
-=======
->>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
   background = "database",
   background_type = "database",
   inferIdMapping = F,
@@ -17,6 +14,8 @@ chemicalClassEnrichment(
 )
 }
 \arguments{
+\item{mets}{a vector of source prepended metabolite ids}
+
 \item{background}{an optional list of source prepended metaboite ids to be used as the background reference of
 metabolites for enrichment. The background can be either a list of ids, a file name containing the id list,
 one id per column (no file header row) or a specificed biospecimen type (available biospecimen types: "Blood",
@@ -32,11 +31,6 @@ Following id cross references can expand coverage if the input type is other tha
 The default value is FALSE.}
 
 \item{db}{a RaMP database object}
-<<<<<<< HEAD
-=======
-
-\item{mets}{a vector of source prepended metabolite ids}
->>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
 }
 \value{
 a list of dataframes, each holding chemical classs enrichment statistics for specific chemical classification systems,

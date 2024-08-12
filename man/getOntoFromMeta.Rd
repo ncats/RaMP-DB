@@ -5,16 +5,12 @@
 \title{Function that query database to find ontology information based on
 the given list of analytes}
 \usage{
-<<<<<<< HEAD
-getOntoFromMeta(analytes, namesOrIds = "ids", db = RaMP())
-=======
 getOntoFromMeta(
   analytes,
-  NameOrIds = "ids",
+  namesOrIds = "ids",
   includeRaMPids = FALSE,
   db = RaMP()
 )
->>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
 }
 \arguments{
 \item{analytes}{a vector of analytes or a analytes delimited by new line character}
@@ -32,8 +28,10 @@ the given list of analytes
 }
 \examples{
 \dontrun{
-analytes.of.interest <- c("chebi:15422", "hmdb:HMDB0000064", "hmdb:HMDB0000148", "wikidata:Q426660")
-
-new.ontologies <- RaMP::getOntoFromMeta(db = rampDB, analytes = analytes.of.interest)
+pkg.globals <- setConnectionToRaMP(
+  dbname = "ramp2", username = "root",
+  conpass = "", host = "localhost"
+)
+getOntoFromMeta("hmdb:HMDB0071437")
 }
 }

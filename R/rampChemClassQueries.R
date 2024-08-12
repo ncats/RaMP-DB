@@ -63,11 +63,7 @@
 #' metClassResult$query_report
 #'}
 #' @export
-<<<<<<< HEAD
 chemicalClassSurvey <- function(mets, background = "database", background_type="database", includeRaMPids = FALSE, inferIdMapping = TRUE, db = RaMP()){
-=======
-chemicalClassSurvey <- function(mets, background = "database", background_type="database", includeRaMPids = FALSE, inferIdMapping = TRUE,db = RaMP()){
->>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
 
   print("Starting Chemical Class Survey")
 
@@ -224,11 +220,7 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
 #' chemical.enrichment <- chemicalClassEnrichment(mets = metabolites.of.interest, db = rampDB)
 #'}
 #' @export
-<<<<<<< HEAD
 chemicalClassEnrichment <- function( mets, background = "database", background_type = "database", inferIdMapping=F, db = RaMP() ) {
-=======
-chemicalClassEnrichment <- function(background = "database", background_type = "database", inferIdMapping=F,db = RaMP()) {
->>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
   print("Starting Chemical Class Enrichment")
 
   # note that inferIdMapping is set to FALSE

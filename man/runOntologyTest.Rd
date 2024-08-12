@@ -6,7 +6,7 @@
 \usage{
 runOntologyTest(
   analytes,
-  NameOrIds = "ids",
+  namesOrIds = "ids",
   alternative = "less",
   min_analyte = 2,
   min_ontology_size = 5,
@@ -20,9 +20,13 @@ runOntologyTest(
 \arguments{
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
-\item{NameOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
+\item{namesOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
 
 \item{alternative}{alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")}
+
+\item{min_ontology_size}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
+
+\item{max_ontology_size}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
 
 \item{background_type}{type of background that is input by the user.  Opions are "database" if user wants all
 analytes from the RaMP database will be used; "file", if user wants to input a file with a list of background
@@ -43,10 +47,6 @@ then users should specify one of the following: "Blood", "Adipose tissue", "Hear
 \item{analyte_type}{"metabolites" or "genes" (default is "metabolites")}
 
 \item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "F")}
-
-\item{min_path_size}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
-
-\item{max_path_size}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
 
 \item{pathway_definitions}{If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows}
 

@@ -19,16 +19,8 @@ function that query database to find analytes in given ontologies
 }
 \examples{
 \dontrun{
-<<<<<<< HEAD
 ontologies.of.interest <- c("Colon", "Liver", "Lung")
 
 new.metabolites <- RaMP::getMetaFromOnto(db = rampDB, ontology = ontologies.of.interest)
-=======
-pkg.globals <- setConnectionToRaMP(
-  dbname = "ramp2", username = "root",
-  conpass = "", host = "localhost"
-)
-getMetaFromOnto("Adiposome")
->>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
 }
 }
