@@ -7,6 +7,8 @@
 buildFrequencyTables(inputdf, pathway_definitions, analyte_type, db = RaMP())
 }
 \arguments{
+\item{db}{a RaMP database object}
+
 \item{inputdf}{internal df with pathwayramp ids}
 
 \item{pathway_definitions}{If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows}

@@ -7,9 +7,15 @@
 getAnalyteFromPathway(
   pathway,
   match = "exact",
+<<<<<<< HEAD
   analyteType = "both",
   maxPathwaySize = Inf,
   namesOrIds = "names",
+=======
+  analyte_type = "both",
+  max_pathway_size = Inf,
+  names_or_ids = "names",
+>>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
   db = RaMP()
 )
 }
@@ -25,7 +31,11 @@ getAnalyteFromPathway(
 \item{namesOrIds}{are the input pathways input as pathway names or as pathway ids
 of genes and metabolites}
 
+<<<<<<< HEAD
 \item{db}{a RaMP database object, if not specified a new one is created with RaMP::RaMP()}
+=======
+\item{db}{a RaMP database object}
+>>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
 }
 \value{
 a data.frame that contains all search results

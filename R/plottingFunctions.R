@@ -76,9 +76,16 @@ plotCataNetwork <- function(catalyzedf = "") {
 #'                     min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE, db = rampDB )
 #' }
 #' @export
+<<<<<<< HEAD
 plotEnrichedPathways <- function( pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.5,
                                  perc_pathway_overlap = 0.5, min_pathway_tocluster = 3,
                                  text_size = 8, sig_cutoff = 0.05, interactive=FALSE, db = RaMP()) {
+=======
+pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.5,
+                                 perc_pathway_overlap = 0.5, min_pathway_tocluster = 3,
+                               text_size = 8, sig_cutoff = 0.05, interactive=FALSE,
+                               db = RaMP()) {
+>>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
 
   if( !('cluster_assignment' %in% colnames(pathwaysSig$fishresult))) {
     fishClustering <- findCluster(db = db, pathwaysSig,
@@ -338,6 +345,110 @@ plotAnalyteOverlapPerRxnLevel <- function(reactionsResults, includeCofactorMets 
 
 }
 
+#' Cluster and plot significant ontologies by FDR-adjusted pval
+#' @param ontologiesSig output of FilterFisherResults
+#' @param pval Which p value to plot, choose from Raw, FDR or Holm-adjusted
+#' @param text_size Scales all text in figure (Default=16)
+#' @param sig_cutoff Aesthetic, shows pvalue cutoff for significant ontologies
+#' @param interactive If TRUE, return interactive plotly object instead of ggplot object
+#' @param db a RaMP database object
+#' @export
+ontologyEnrichmentResultsPlot <- function(ontologiesSig, pval = "FDR", 
+                                          text_size = 8,
+                                          sig_cutoff = 0.05, interactive=FALSE,
+                                          db = RaMP()) {
+
+  inOntology <- ontologiesSig$Num_In_Ontology
+  totOntology <- ontologiesSig$Total_In_Ontology
+  
+  
+  if (pval == "FDR") {
+    plotDF <- data.frame(
+      x = -log10(ontologiesSig[, grepl("FDR", colnames(ontologiesSig))]),
+      y = ontologiesSig$Ontology,
+      inOntology = inOntology,
+      totOntology = totOntology,
+      ontologytype = ontologiesSig$HMDBOntologyType
+    )
+    ylab <- "-log10(FDR pval)"
+  } else if (pval == "Holm") {
+    plotDF <- data.frame(
+      x = -log10(ontologiesSig[, grepl("Holm", colnames(ontologiesSig))]),
+      y = ontologiesSig$Ontology, inOntology <- ontologiesSig$Num_In_Ontology,
+      totOntology <- ontologiesSig$Total_In_Ontology,
+      ontologytype = ontologiesSig$HMDBOntologyType
+    )
+    ylab <- "-log10(Holm pval)"
+  } else if (pval == "Raw") {
+    plotDF <- data.frame(
+      x = -log10(ontologiesSig[
+        ,
+        grepl(
+          "^(?=.*Pval)(?!.*FDR)(?!.*Holm)(?=.*Combined).*",
+          colnames(ontologiesSig)
+        )
+      ]),
+      y = ontologiesSig$Ontology, inOntology <- ontologiesSig$Num_In_Ontology,
+      totOntology <- ontologiesSig$Total_In_Ontology,
+      ontologytype = ontologiesSig$HMDBOntologyType
+    )
+    ylab <- "-log10(pval)"
+  } else {
+    print("Invalid p value selection, choose from 'Raw', 'FDR' or 'Holm'")
+    stop()
+  }
+
+  ## plotDF <- plotDF[order(plotDF$y, decreasing = TRUE), ]
+  plotDF$y <- factor(plotDF$y,
+                     levels  = unique(plotDF$y[order(plotDF$x, decreasing = FALSE)])) 
+  
+  p <- plotDF %>%
+    ggplot2::ggplot(
+      ggplot2::aes_string(y = "x", x = "y")
+    ) +
+    ggplot2::geom_segment(ggplot2::aes_string(xend = "y", y = 0, yend = "x")) +
+    suppressWarnings(ggplot2::geom_point(
+      stat = "identity",
+      ggplot2::aes_string(
+        colour = "ontologytype",
+        size = "inOntology",
+      )
+    )) +
+    ggplot2::geom_hline(yintercept = -log10(sig_cutoff), linetype = "dotted") +
+    ggplot2::theme_bw(base_size = text_size) +
+    ggplot2::coord_flip() +
+    tidytext::scale_x_reordered() +
+    ggplot2::labs(x = "", y = ylab) +
+    ggplot2::theme(
+      axis.line = ggplot2::element_line(colour = "black"),
+      axis.title = ggplot2::element_text(face = "bold"),
+      plot.title = ggplot2::element_text(face = "bold"),
+      panel.grid.minor = ggplot2::element_blank(),
+      panel.background = ggplot2::element_blank(),
+      strip.text.y = ggplot2::element_text(angle = 0),
+      axis.text = ggplot2::element_text(face = "bold")
+    ) +
+    with(plotDF, {
+      ggplot2::facet_grid(ontologytype ~ ., space = "free", scales = "free")
+    }) +
+    ggplot2::guides(colour = ggplot2::guide_legend(
+      override.aes =
+        list(size = 10),
+      title = "Ontology Type"
+    )) +
+    ggplot2::scale_size_area(
+      breaks = c(2, 4, 6, 8, 10),
+      name = "# of Altered Metabolites in Ontology"
+    )
+
+  if(interactive){
+    return(plotly::ggplotly(p, tooltip="text"))
+  }else if (!interactive){
+    return(p)
+  }else{
+    stop("'interactive' must be a boolean")
+  }
+}
 
 
 #' Plots an interactive sunburst plot of chemical classes

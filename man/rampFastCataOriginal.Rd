@@ -4,14 +4,22 @@
 \alias{rampFastCataOriginal}
 \title{Retrieves analytes that involved in same reaction as input metabolite}
 \usage{
+<<<<<<< HEAD
 rampFastCataOriginal(analytes = "none", namesOrIds = "ids", db = RaMP())
+=======
+rampFastCataOriginal(db = RaMP(), analytes = "none", NamesOrIds = "ids")
+>>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
 }
 \arguments{
 \item{analytes}{a vector of analytes that need to be searched}
 
+<<<<<<< HEAD
 \item{namesOrIds}{whether input is "names" or "ids" (default is "ids")}
 
 \item{db}{a RaMP database object}
+=======
+\item{NamesOrIds}{whether input is "names" or "ids" (default is "ids")}
+>>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
 }
 \value{
 a dataframe containing query results. If the input is a metabolite, the function will output
@@ -26,6 +34,10 @@ Retrieves analytes that involved in same reaction as input metabolite
 \examples{
 \dontrun{
 pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
+<<<<<<< HEAD
 rampFastCata(analytes="creatine",namesOrIds="names")
+=======
+rampFastCata(analytes="creatine",NamesOrIds="names")
+>>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
 }
 }

@@ -4,7 +4,11 @@
 \alias{plotEnrichedPathways}
 \title{Cluster and plot significant pathways by FDR-adjusted pval}
 \usage{
+<<<<<<< HEAD:man/plotEnrichedPathways.Rd
 plotEnrichedPathways(
+=======
+pathwayResultsPlot(
+>>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a:man/pathwayResultsPlot.Rd
   pathwaysSig,
   pval = "FDR",
   perc_analyte_overlap = 0.5,

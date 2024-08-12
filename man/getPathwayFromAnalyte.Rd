@@ -8,7 +8,11 @@ returns associated pathways}
 getPathwayFromAnalyte(
   analytes = "none",
   find_synonym = FALSE,
+<<<<<<< HEAD
   namesOrIds = "ids",
+=======
+  NamesOrIds = "ids",
+>>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
   includeRaMPids = FALSE,
   include_smpdb = FALSE,
   minPathwaySize = 5,
@@ -17,11 +21,20 @@ getPathwayFromAnalyte(
 )
 }
 \arguments{
+<<<<<<< HEAD
+=======
+\item{db}{a RaMP database object}
+
+>>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
 \item{find_synonym}{find all synonyms or just return same synonym (T/F)}
 
+<<<<<<< HEAD
 \item{namesOrIds}{whether input is "names" or "ids" (default is "ids")}
+=======
+\item{NamesOrIds}{whether input is "names" or "ids" (default is "ids")}
+>>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
 
 \item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
 

@@ -63,7 +63,11 @@
 #' metClassResult$query_report
 #'}
 #' @export
+<<<<<<< HEAD
 chemicalClassSurvey <- function(mets, background = "database", background_type="database", includeRaMPids = FALSE, inferIdMapping = TRUE, db = RaMP()){
+=======
+chemicalClassSurvey <- function(mets, background = "database", background_type="database", includeRaMPids = FALSE, inferIdMapping = TRUE,db = RaMP()){
+>>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
 
   print("Starting Chemical Class Survey")
 
@@ -220,7 +224,11 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
 #' chemical.enrichment <- chemicalClassEnrichment(mets = metabolites.of.interest, db = rampDB)
 #'}
 #' @export
+<<<<<<< HEAD
 chemicalClassEnrichment <- function( mets, background = "database", background_type = "database", inferIdMapping=F, db = RaMP() ) {
+=======
+chemicalClassEnrichment <- function(background = "database", background_type = "database", inferIdMapping=F,db = RaMP()) {
+>>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
   print("Starting Chemical Class Enrichment")
 
   # note that inferIdMapping is set to FALSE
@@ -260,9 +268,9 @@ chemicalClassEnrichment <- function( mets, background = "database", background_t
       totPopCnt <- as.integer(popInfo[popInfo$Var1 == category,2])
 
       contingencyMat <- matrix(nrow=2, ncol=2)
-      resultMat <- data.frame(matrix(ncol=7))
+      resultMat <- data.frame(matrix(ncol=8))
       colnames(resultMat) <- c("category", "class_name", "met_hits", "pop_hits",
-                               "met_size", "pop_size", "p-value")
+                               "met_size", "pop_size", "p-value","odds_ratio")
 
       for (i in 1:nrow(categoryData)) {
         if(categoryData[i,'mets_count'] >= 1) {
@@ -273,18 +281,18 @@ chemicalClassEnrichment <- function( mets, background = "database", background_t
           contingencyMat[2,2] <- totPopCnt - contingencyMat[2,1] - contingencyMat[1,2]
           className <- categoryData[i,'class_name']
 
-          p <- stats::fisher.test(contingencyMat, alternative = "greater")
-          p <- p$p.value
+          testres <- stats::fisher.test(contingencyMat, alternative = "greater")
+          p <- testres$p.value
+          oddsratio <- testres$estimate
 
           row = list(as.character(category), as.character(className), contingencyMat[1,1], contingencyMat[1,1] + contingencyMat[2,1],
-                     totMetCnt, totPopCnt, p)
+                     totMetCnt, totPopCnt, p, oddsratio)
 
           resultMat[resultRow, ] <- row
 
           resultRow <- resultRow + 1
         }
       }
-
       resultMat <- bhCorrect(resultMat)
       enrichmentStat[[as.character(category)]] <- resultMat
 

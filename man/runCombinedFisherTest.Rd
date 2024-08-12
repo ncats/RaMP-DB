@@ -7,7 +7,11 @@ clicked on highchart}
 \usage{
 runCombinedFisherTest(
   analytes,
+<<<<<<< HEAD
   namesOrIds = "ids",
+=======
+  NamesOrIds = "ids",
+>>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
   total_genes = 20000,
   min_analyte = 2,
   MCall = F,
@@ -23,9 +27,17 @@ runCombinedFisherTest(
 )
 }
 \arguments{
+<<<<<<< HEAD
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
 \item{namesOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
+=======
+\item{db}{a RaMP database object}
+
+\item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
+
+\item{NamesOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
+>>>>>>> 12716f1d27e660ab70e18b100d2e9e2ff3da755a
 
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
 
@@ -96,5 +108,6 @@ fisher.results <- runCombinedFisherTest(analytes = c(
 "hmdb:HMDBP00850"
 ), db = rampDB )
 
+fisher.results <- runCombinedFisherTest(analytes = analyte.list, NamesOrIds = "ids")
 }
 }
