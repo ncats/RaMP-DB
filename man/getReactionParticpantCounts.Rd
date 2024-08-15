@@ -9,7 +9,7 @@ getReactionParticpantCounts(analyte2Rxn, minRxnParticipantCountFilter = 1)
 \arguments{
 \item{analyte2Rxn}{result object from getReactionsForAnalytes}
 
-\item{minRxnParticipantFilter}{if > 1, the set of reactions is reduced to those with having this number of mapped analytes}
+\item{minRxnParticipantCountFilter}{if > 1, the set of reactions is reduced to those with having this number of mapped analytes}
 }
 \description{
 Utility method that evalutates the mapping counts for analytes to reaction ids

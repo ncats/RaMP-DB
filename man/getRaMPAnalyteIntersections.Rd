@@ -18,7 +18,7 @@ getRaMPAnalyteIntersections(
 
 \item{scope}{value in c('global', 'mapped-to-pathway'), indicates all metabolite stats should be returned, or just those asssociated with pathways.}
 
-\item{a}{RaMP database object}
+\item{db}{a RaMP database object}
 }
 \value{
 current analyte overlaps counts between current data sources, for the specified analyteType

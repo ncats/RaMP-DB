@@ -152,7 +152,8 @@ getReactionsForAnalytes <- function( analytes, onlyHumanMets=F, humanProtein=T, 
 #' @param onlyHumanMets boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)
 #' @param humanProtein boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)
 #' @param includeTransportRxns if TRUE, returns metabolic and transport reactions
-#' @param db RaMP object
+#' @param rxnDirs character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", "BD", "ALL"), default = c("UN")
+#' @param db a RaMP database object
 #'
 #' @return returns a dataframe of reaction information for each ramp compound id
 #'
@@ -196,8 +197,9 @@ getReactionsForSourceCompoundIds <- function( compoundIds, onlyHumanMets=F, huma
 #' @param proteinIds list uniprot accessions with prefix (uniprot:)
 #' @param onlyHumanMets boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)
 #' @param humanProtein boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)
-#' @param db RaMP object
 #' @param includeTransportRxns if TRUE, returns metabolic and transport reactions
+#' @param rxnDirs character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", "BD", "ALL"), default = c("UN")
+#' @param db a RaMP database object
 #'
 #' @return returns a dataframe of reaction information for each ramp compound id
 #'
@@ -236,13 +238,14 @@ getReactionsForSourceProteinIds <- function( proteinIds, onlyHumanMets=F, humanP
 
 
 
-#' getReactionsForRaMPCompoundIds returns reactions for a collection of RaMP compound ids
+#' The getReactionsForRaMPCompoundIds() function returns reactions for a collection of RaMP compound ids
 #'
 #' @param rampCompoundIds list of ramp compound ids
 #' @param onlyHumanMets boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)
 #' @param humanProtein boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)
 #' @param includeTransportRxns if TRUE, returns metabolic and transport reactions
-#' @param db RaMP object
+#' @param rxnDirs character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", "BD", "ALL"), default = c("UN")
+#' @param db a RaMP database object
 #'
 #' @return returns a dataframe of reaction information for each ramp compound id
 #'
@@ -287,6 +290,7 @@ getReactionsForRaMPCompoundIds <- function(rampCompoundIds, onlyHumanMets=F, hum
 #' @param onlyHumanMets boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)
 #' @param humanProtein boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)
 #' @param includeTransportRxns if TRUE, returns metabolic and transport reactions
+#' @param rxnDirs character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", "BD", "ALL"), default = c("UN")
 #' @param db a RaMP database object
 #'
 #' @return returns a dataframe of reaction information for each ramp compound id
@@ -971,7 +975,7 @@ getRampSourceInfoFromAnalyteIDs <- function(db = RaMP(), analytes) {
 #' Utility method that evalutates the mapping counts for analytes to reaction ids
 #'
 #' @param analyte2Rxn result object from getReactionsForAnalytes
-#' @param minRxnParticipantFilter if > 1, the set of reactions is reduced to those with having this number of mapped analytes
+#' @param minRxnParticipantCountFilter if > 1, the set of reactions is reduced to those with having this number of mapped analytes
 #'
 getReactionParticpantCounts <- function(analyte2Rxn, minRxnParticipantCountFilter=1) {
 
@@ -1032,10 +1036,10 @@ getReactionSourceIdsFromReactionQuery <- function(reactions) {
 
 #' Utility method that returns the number of rhea reaction count in each reaction class.
 #'
-#' @param reactions input result from the getReactionsForAnalytes
 #' @param humanProtein boolean value indicating if reactions should be constrained to those having human proteins
+#' @param db a RaMP database object
 #'
-getReactionClassStats <- function(db=RaMP(), humanProtein=T) {
+getReactionClassStats <- function(humanProtein=T, db=RaMP()) {
 
   humanProteinArg = ''
   if(humanProtein) {
@@ -1056,7 +1060,7 @@ getReactionClassStats <- function(db=RaMP(), humanProtein=T) {
 #' Utility method that returns the number of rhea reaction count in each reaction class.
 #'
 #' @param humanProtein boolean value indicating if reactions should be constrained to those having human proteins
-#' @param db RaMP Object
+#' @param db a RaMP database object
 #'
 getReactionClassStatsOnAnalytes <- function( humanProtein=T, db=RaMP()) {
 

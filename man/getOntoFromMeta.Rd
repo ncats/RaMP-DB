@@ -17,6 +17,8 @@ getOntoFromMeta(
 
 \item{namesOrIds}{specify the type of given data}
 
+\item{includeRaMPids}{whether or not to include RaMP ids in the output (TRUE/FALSE)}
+
 \item{db}{a RaMP database object}
 }
 \value{

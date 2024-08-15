@@ -81,7 +81,7 @@ setClass(
 #' @importFrom DBI dbDisconnect
 #'
 #' @exportMethod show
-#'
+#' @param object a RaMP object
 #' @rdname RaMP
 setMethod("show", "RaMP", function(object) {
     if (is.null(object@driver))

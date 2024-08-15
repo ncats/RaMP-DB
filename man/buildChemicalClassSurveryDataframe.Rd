@@ -7,7 +7,7 @@
 buildChemicalClassSurveryDataframe(chemicalClassSurveryResults)
 }
 \arguments{
-\item{reactionClassesResults}{output of getReactionClassesForAnalytes()}
+\item{chemicalClassSurveryResults}{output of getReactionClassesForAnalytes()}
 }
 \description{
 Creates the input dataframe for the interactive plot created in 'plotChemicalClassSurvery'

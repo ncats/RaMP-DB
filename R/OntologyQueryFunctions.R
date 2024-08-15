@@ -2,6 +2,7 @@
 #' the given list of analytes
 #' @param analytes a vector of analytes or a analytes delimited by new line character
 #' @param namesOrIds specify the type of given data
+#' @param includeRaMPids whether or not to include RaMP ids in the output (TRUE/FALSE)
 #' @param db a RaMP database object
 #' @return dataframe that contains searched ontology from given analytes
 #'
@@ -177,15 +178,13 @@ getMetaFromOnto <- function(ontology, db = RaMP()) {
 
 
 #' Enrichment analysis for metabolite ontology mappings
-#' @param db a RaMP database object
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
 #' @param namesOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
-#' @param total_genes number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")
-#' @param analyte_type "metabolites" or "genes" (default is "metabolites")
-#' @param MCall T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "F")
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
-#' @param min_ontology_size the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
-#' @param max_ontology_size the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
+#' @param min_analyte minimum number of analytes per pathway (pathways with < min_analyte analytes are filtered out).
+#' @param min_ontology_size the minimum number of ontology members (genes and metabolites) to include the ontology in the output (default = 5)
+#' @param max_ontology_size the maximum number of ontology memnbers (genes and metaboltes) to include the ontology in the output (default = 150)
+#' @param includeRaMPids whether or not to include RaMP IDs in the output (TRUE/FALSE)
 #' @param background_type type of background that is input by the user.  Opions are "database" if user wants all
 #' analytes from the RaMP database will be used; "file", if user wants to input a file with a list of background
 #' analytes; "list", if user wants to input a vector of analyte IDs; "biospecimen", if user wants to specify a
@@ -196,8 +195,7 @@ getMetaFromOnto <- function(ontology, db = RaMP()) {
 #' directory); if 'background_type="list"', then 'background' should be a vector of RaMP IDs; if 'backgroud_type="biospecimen"'
 #' then users should specify one of the following: "Blood", "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney",
 #' "Saliva", and "Feces"
-#' @param pathway_definitions If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows
-#' @param include_smpdb Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant
+#' @param db a RaMP database object
 #' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
 #' @export
 

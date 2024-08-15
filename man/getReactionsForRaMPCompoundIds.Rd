@@ -2,7 +2,7 @@
 % Please edit documentation in R/rampReactionQueries.R
 \name{getReactionsForRaMPCompoundIds}
 \alias{getReactionsForRaMPCompoundIds}
-\title{getReactionsForRaMPCompoundIds returns reactions for a collection of RaMP compound ids}
+\title{The getReactionsForRaMPCompoundIds() function returns reactions for a collection of RaMP compound ids}
 \usage{
 getReactionsForRaMPCompoundIds(
   rampCompoundIds,
@@ -22,11 +22,13 @@ getReactionsForRaMPCompoundIds(
 
 \item{includeTransportRxns}{if TRUE, returns metabolic and transport reactions}
 
-\item{db}{RaMP object}
+\item{rxnDirs}{character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", "BD", "ALL"), default = c("UN")}
+
+\item{db}{a RaMP database object}
 }
 \value{
 returns a dataframe of reaction information for each ramp compound id
 }
 \description{
-getReactionsForRaMPCompoundIds returns reactions for a collection of RaMP compound ids
+The getReactionsForRaMPCompoundIds() function returns reactions for a collection of RaMP compound ids
 }
