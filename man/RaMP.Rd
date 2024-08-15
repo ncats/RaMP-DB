@@ -14,6 +14,8 @@ RaMP(version = character())
 listRaMPVersions(local = FALSE)
 }
 \arguments{
+\item{object}{a RaMP object}
+
 \item{version}{`character(1)` specifying the RaMP version to load. By
 default (`version = character()`), the most recent release will be
 used.}

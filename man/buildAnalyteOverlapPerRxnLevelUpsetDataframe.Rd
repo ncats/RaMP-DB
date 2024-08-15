@@ -10,7 +10,9 @@ buildAnalyteOverlapPerRxnLevelUpsetDataframe(
 )
 }
 \arguments{
-\item{reactionClassesResults}{output of getReactionClassesForAnalytes()}
+\item{reactionsResults}{output of getReactionClassesForAnalytes()}
+
+\item{includeCofactorMets}{whether or not to include metabolite cofactors (TRUE/FALSE)}
 }
 \description{
 Creates the input dataframe for the upset plot created in 'plotAnalyteOverlapPerRxnLevel'

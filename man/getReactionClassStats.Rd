@@ -4,12 +4,12 @@
 \alias{getReactionClassStats}
 \title{Utility method that returns the number of rhea reaction count in each reaction class.}
 \usage{
-getReactionClassStats(db = RaMP(), humanProtein = T)
+getReactionClassStats(humanProtein = T, db = RaMP())
 }
 \arguments{
 \item{humanProtein}{boolean value indicating if reactions should be constrained to those having human proteins}
 
-\item{reactions}{input result from the getReactionsForAnalytes}
+\item{db}{a RaMP database object}
 }
 \description{
 Utility method that returns the number of rhea reaction count in each reaction class.

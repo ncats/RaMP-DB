@@ -2,7 +2,7 @@
 % Please edit documentation in R/rampQueryHelper.R
 \name{chemicalClassSurveyRampIdsConn}
 \alias{chemicalClassSurveyRampIdsConn}
-\title{chemicalClassSurveyRampIdsConn2 is a helper function that takes a list of metabolite ids, a list of 'population' metabolite ids
+\title{chemicalClassSurveyRampIdsConn is a helper function that takes a list of metabolite ids, a list of 'population' metabolite ids
 and a MariaDB Connection object. The method returns metabolite class information for the metabolite list and a population of all ramp metabolites.}
 \usage{
 chemicalClassSurveyRampIdsConn(mets, pop, inferIdMapping = TRUE, db = RaMP())
@@ -17,8 +17,6 @@ If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to rela
 The default is TRUE.}
 
 \item{db}{a RaMP database object}
-
-\item{conn}{a MariaDB Connection object to support queries}
 }
 \value{
 a list object containing three objects 'count_summary', 'met_classes' and 'met_query_report'.
@@ -27,6 +25,6 @@ The met_classes is a detailed listing of compound classes associated with each i
 The met_query_report indicates the number of input metabolites, how many were found in the DB and the list of metabolites not found in RaMP DB.
 }
 \description{
-chemicalClassSurveyRampIdsConn2 is a helper function that takes a list of metabolite ids, a list of 'population' metabolite ids
+chemicalClassSurveyRampIdsConn is a helper function that takes a list of metabolite ids, a list of 'population' metabolite ids
 and a MariaDB Connection object. The method returns metabolite class information for the metabolite list and a population of all ramp metabolites.
 }

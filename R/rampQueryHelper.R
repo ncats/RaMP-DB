@@ -66,8 +66,10 @@ rampFindSynonymFromSynonym <- function( synonym,full = FALSE,
 #' containing all information related to synonym. Or can be a list of
 #' rampId
 #' @param full return whole searching result or not (TRUE/FALSE)
+#' @param db a RaMP database object
 #' @return a data frame that has all source Id in the column or the source table that has metabolites entry
-rampFindSourceFromId <- function(db = RaMP(), rampId = "",full = TRUE){
+
+rampFindSourceFromId <- function(rampId = "",full = TRUE, db = RaMP()){
     if(rampId == ""){
         stop("Data must be a list or dataframe")
     }
@@ -310,8 +312,9 @@ bhCorrect <- function(resultMat) {
 
 #' Get class info for an input of metabolite source Ids
 #' @param sourceIds a vector of analytes (genes or metabolites) that need to be searched
+#' @param db a RaMP database object
 #' @return a dataframe of chemClass info
-rampFindClassInfoFromSourceId<-function(db = RaMP(), sourceIds){
+rampFindClassInfoFromSourceId<-function(sourceIds, db = RaMP()){
     sourceIds <- unique(sourceIds)
     checkIdPrefixes(sourceIds)
     idsToCheck <- sapply(sourceIds,function(x){
@@ -694,19 +697,18 @@ FilterFishersResults <- function(fishers_df, pval_type = 'fdr', pval_cutoff = 0.
 }
 
 
-#'chemicalClassSurveyRampIdsConn2 is a helper function that takes a list of metabolite ids, a list of 'population' metabolite ids
+#'chemicalClassSurveyRampIdsConn is a helper function that takes a list of metabolite ids, a list of 'population' metabolite ids
 #' and a MariaDB Connection object. The method returns metabolite class information for the metabolite list and a population of all ramp metabolites.
 #' @param mets a list object of prefixed metabolite ids of interest
 #' @param pop a list object of prefixed metabolite ids, representing a larger population of metabolites from which the mets were selected.
-#' @param conn a MariaDB Connection object to support queries
 #' @param inferIdMapping if FALSE, the survey only reports on class annotations made directly on the input ids.
 #' If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to related ids that contain metabolite class annotations.
 #' The default is TRUE.
-#' @param db a RaMP database object
 #' @returns a list object containing three objects 'count_summary', 'met_classes' and 'met_query_report'.
 #' The count_summary is a dataframe containing metabolite classes and number of metabolites in each class.
 #' The met_classes is a detailed listing of compound classes associated with each input metabolite
 #' The met_query_report indicates the number of input metabolites, how many were found in the DB and the list of metabolites not found in RaMP DB.
+#' @param db a RaMP database object
 chemicalClassSurveyRampIdsConn <- function( mets, pop, inferIdMapping=TRUE, db = RaMP()) {
 
   mets <- unique(mets)
@@ -1252,7 +1254,8 @@ buildReactionClassesSunburstDataframe <- function(reactionClassesResults) {
 
 #' Creates the input dataframe for the upset plot created in 'plotAnalyteOverlapPerRxnLevel'
 #'
-#' @param reactionClassesResults output of getReactionClassesForAnalytes()
+#' @param reactionsResults output of getReactionClassesForAnalytes()
+#' @param includeCofactorMets whether or not to include metabolite cofactors (TRUE/FALSE)
 
 buildAnalyteOverlapPerRxnLevelUpsetDataframe <- function(reactionsResults, includeCofactorMets = FALSE) {
 
@@ -1355,7 +1358,7 @@ buildAnalyteOverlapPerRxnLevelUpsetDataframe <- function(reactionsResults, inclu
 
 #' Creates the input dataframe for the interactive plot created in 'plotChemicalClassSurvery'
 #'
-#' @param reactionClassesResults output of getReactionClassesForAnalytes()
+#' @param chemicalClassSurveryResults output of getReactionClassesForAnalytes()
 
 buildChemicalClassSurveryDataframe <- function(chemicalClassSurveryResults) {
 

@@ -7,7 +7,7 @@
 getCurrentRaMPSourceDBVersions(db = RaMP())
 }
 \arguments{
-\item{a}{RaMP database object}
+\item{db}{a RaMP database object}
 }
 \value{
 database source version info

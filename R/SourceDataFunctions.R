@@ -20,7 +20,7 @@ getCurrentRaMPVersion<-function(justVersion=T, db = RaMP()){
 }
 
 #' Retrieve versions of each database within the current version of RaMP
-#' @param a RaMP database object
+#' @param db a RaMP database object
 #' @return database source version info
 #' @examples
 #' \dontrun{
@@ -58,7 +58,7 @@ getEntityCountsFromSourceDBs<-function(db = RaMP()){
 #' @param analyteType returns analyte overlaps for 'metabolites' or 'genes'
 #' @param format can be one of either 'json', 'upsetR_expression'
 #' @param scope value in c('global', 'mapped-to-pathway'), indicates all metabolite stats should be returned, or just those asssociated with pathways.
-#' @param a RaMP database object
+#' @param db a RaMP database object
 #' @return current analyte overlaps counts between current data sources, for the specified analyteType
 #' @examples
 #' \dontrun{

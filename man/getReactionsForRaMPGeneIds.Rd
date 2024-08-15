@@ -22,6 +22,8 @@ getReactionsForRaMPGeneIds(
 
 \item{includeTransportRxns}{if TRUE, returns metabolic and transport reactions}
 
+\item{rxnDirs}{character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", "BD", "ALL"), default = c("UN")}
+
 \item{db}{a RaMP database object}
 }
 \value{

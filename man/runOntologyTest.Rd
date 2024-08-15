@@ -24,9 +24,13 @@ runOntologyTest(
 
 \item{alternative}{alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")}
 
-\item{min_ontology_size}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
+\item{min_analyte}{minimum number of analytes per pathway (pathways with < min_analyte analytes are filtered out).}
 
-\item{max_ontology_size}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
+\item{min_ontology_size}{the minimum number of ontology members (genes and metabolites) to include the ontology in the output (default = 5)}
+
+\item{max_ontology_size}{the maximum number of ontology memnbers (genes and metaboltes) to include the ontology in the output (default = 150)}
+
+\item{includeRaMPids}{whether or not to include RaMP IDs in the output (TRUE/FALSE)}
 
 \item{background_type}{type of background that is input by the user.  Opions are "database" if user wants all
 analytes from the RaMP database will be used; "file", if user wants to input a file with a list of background
@@ -41,16 +45,6 @@ then users should specify one of the following: "Blood", "Adipose tissue", "Hear
 "Saliva", and "Feces"}
 
 \item{db}{a RaMP database object}
-
-\item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
-
-\item{analyte_type}{"metabolites" or "genes" (default is "metabolites")}
-
-\item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "F")}
-
-\item{pathway_definitions}{If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows}
-
-\item{include_smpdb}{Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant}
 }
 \value{
 a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
