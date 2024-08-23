@@ -151,7 +151,7 @@ RaMP <- function(version = character()) {
             print(paste0("RaMP version '", version,"' not available. Use ",
                  "'listAvailableRaMPDbVersions()' to list available versions."))
             print(paste0("Checking for version '", version, "' on remote server."))
-              avail <- RaMP:::.is_version_in_remote_lfs(version)
+              avail <- .is_version_in_remote_lfs(version)
             if(!avail) {
               print("The spcified RaMP Database version is not available in local file cache OR in remote repository.")
               print("")
@@ -297,7 +297,7 @@ listRaMPVersions <- function(local = FALSE) {
   suppressWarnings( {
     cacheInfo <- cacheInfo[grepl("RaMP_SQLite_v", cacheInfo$rname), ]$rname
     if(length(cacheInfo) > 0) {
-      localVersions <- unlist(lapply(cacheInfo, FUN=RaMP:::.version_from_db_file))
+      localVersions <- unlist(lapply(cacheInfo, FUN=.version_from_db_file))
     }
   })
 
@@ -340,8 +340,8 @@ listRaMPVersions <- function(local = FALSE) {
 #' @export
 listAvailableRaMPDbVersions <- function() {
 
-  localVersions <- RaMP:::.get_local_db_version_list()
-  remoteVersions <- RaMP:::.get_remote_db_version_list()
+  localVersions <- .get_local_db_version_list()
+  remoteVersions <- .get_remote_db_version_list()
 
   newVersions <- setdiff(remoteVersions, localVersions)
   haveLocalVersions <- (length(localVersions)>0)
@@ -380,7 +380,7 @@ removeLocalRampDB <- function(version = 'none') {
     message("Please specify a RaMP database version to remove from local cache, or specify version as 'all' to clear file cache.")
   } else {
 
-    localVersions <- RaMP:::.get_local_db_version_list()
+    localVersions <- .get_local_db_version_list()
     cacheInfo <- BiocFileCache::bfcinfo()
 
     if(version == 'all') {

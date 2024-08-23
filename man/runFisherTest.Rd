@@ -2,8 +2,7 @@
 % Please edit documentation in R/ReturnPathwaysEnrich_InputAnalytes.R
 \name{runFisherTest}
 \alias{runFisherTest}
-\title{Do fisher test for only one pathway from search result
-clicked on highchart}
+\title{Do fisher test for only one pathway from search result}
 \usage{
 runFisherTest(
   analytes,
@@ -61,5 +60,4 @@ a dataframe with columns containing pathway ID, fisher's p value, user analytes 
 }
 \description{
 Do fisher test for only one pathway from search result
-clicked on highchart
 }

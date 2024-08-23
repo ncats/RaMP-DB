@@ -8,7 +8,7 @@ that are reaction participants with the input metabolite ids.}
 getRheaMetabolitesForProteins(
   analytes,
   includeRheaRxnDetails = F,
-  humanProteins = T,
+  humanProtein = T,
   db = RaMP()
 )
 }
@@ -17,7 +17,7 @@ getRheaMetabolitesForProteins(
 
 \item{includeRheaRxnDetails}{returns additional columns that inlucdes info in the reaction connecting mets and proteins}
 
-\item{humanProteins}{require reactions to have a human protein (enzyme or transporter), default True}
+\item{humanProtein}{require reactions to have a human protein (enzyme or transporter), default True}
 
 \item{db}{a RaMP database object}
 }

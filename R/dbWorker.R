@@ -59,7 +59,7 @@ setupRdataCache <- function(db = RaMP()) {
 
   sql = "select data_key, data_blob from ramp_data_object"
 
-  objs <- RaMP:::runQuery(sql, db)
+  objs <- runQuery(sql, db)
 
   dbSummaryData = list()
 
