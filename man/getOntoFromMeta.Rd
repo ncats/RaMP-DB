@@ -5,7 +5,7 @@
 \title{Function that query database to find ontology information based on
 the given list of analytes}
 \usage{
-getOntoFromMeta(analytes, NameOrIds = "ids")
+getOntoFromMeta(db = RaMP(), analytes, NameOrIds = "ids")
 }
 \arguments{
 \item{analytes}{a vector of analytes or a analytes delimited by new line character}

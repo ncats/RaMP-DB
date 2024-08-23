@@ -4,7 +4,7 @@
 \alias{getCurrentRaMPSourceDBVersions}
 \title{Retrieve versions of each database within the current version of RaMP}
 \usage{
-getCurrentRaMPSourceDBVersions()
+getCurrentRaMPSourceDBVersions(db = RaMP())
 }
 \value{
 database source version info

@@ -2,9 +2,10 @@
 % Please edit documentation in R/rampReactionQueries.R
 \name{getReactionsForRaMPCompoundIds}
 \alias{getReactionsForRaMPCompoundIds}
-\title{getReactionsForRaMPCompoundIds returns reactions for a collection of ramp compound ids}
+\title{getReactionsForRaMPCompoundIds returns reactions for a collection of RaMP compound ids}
 \usage{
 getReactionsForRaMPCompoundIds(
+  db = RaMP(),
   rampCompoundIds,
   onlyHumanMets = F,
   humanProtein = F,
@@ -13,6 +14,8 @@ getReactionsForRaMPCompoundIds(
 )
 }
 \arguments{
+\item{db}{RaMP object}
+
 \item{rampCompoundIds}{list of ramp compound ids}
 
 \item{onlyHumanMets}{boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)}
@@ -25,5 +28,5 @@ getReactionsForRaMPCompoundIds(
 returns a dataframe of reaction information for each ramp compound id
 }
 \description{
-getReactionsForRaMPCompoundIds returns reactions for a collection of ramp compound ids
+getReactionsForRaMPCompoundIds returns reactions for a collection of RaMP compound ids
 }

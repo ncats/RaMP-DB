@@ -6,6 +6,7 @@
 enrichment p-values and FDR values.}
 \usage{
 chemicalClassEnrichment(
+  db = RaMP(),
   mets,
   background = "database",
   background_type = "database",

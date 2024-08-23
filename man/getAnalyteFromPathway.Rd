@@ -5,6 +5,7 @@
 \title{Use fast search algorithm to find all pathways from given analytes}
 \usage{
 getAnalyteFromPathway(
+  db = RaMP(),
   pathway,
   match = "exact",
   analyte_type = "both",

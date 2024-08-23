@@ -4,7 +4,7 @@
 \alias{getMetabClassTypes}
 \title{Returns class categories for metabolites}
 \usage{
-getMetabClassTypes()
+getMetabClassTypes(db = RaMP())
 }
 \value{
 Returns metabolite class types

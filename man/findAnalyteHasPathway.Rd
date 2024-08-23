@@ -6,7 +6,7 @@
 Aggregate ramp Id to ramp pathway Id
 GC is C or G}
 \usage{
-findAnalyteHasPathway(pathwayRampId, GC = "C", n = 10)
+findAnalyteHasPathway(db = RaMP(), pathwayRampId, GC = "C", n = 10)
 }
 \arguments{
 \item{pathwayRampId}{a vector of ramp Pathway ID}

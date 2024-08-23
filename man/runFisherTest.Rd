@@ -6,6 +6,7 @@
 clicked on highchart}
 \usage{
 runFisherTest(
+  db = RaMP(),
   analytes,
   total_genes = 20000,
   NameOrIds = "ids",
@@ -16,10 +17,13 @@ runFisherTest(
   max_path_size = 150,
   background_type = "database",
   background = "database",
-  pathway_definitions = "RaMP"
+  pathway_definitions = "RaMP",
+  include_smpdb = FALSE
 )
 }
 \arguments{
+\item{db}{a RaMP databse object}
+
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
@@ -49,6 +53,8 @@ then users should specify one of the following: "Blood", "Adipose tissue", "Hear
 "Saliva", and "Feces"}
 
 \item{pathway_definitions}{If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows}
+
+\item{include_smpdb}{Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant}
 }
 \value{
 a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway

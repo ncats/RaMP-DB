@@ -12,9 +12,12 @@
 #' @export
 plotCataNetwork <- function(catalyzedf = "") {
 
-        if(catalyzedf == "" ||
-        (length(intersect(c("input_analyte","rxn_partner_common_name",
-                "rxn_partner_ids"),colnames(catalyzedf)))!=3)) {
+        if(nrow(catalyzedf) == 0) {
+          message("The input dataframe has 0 rows. plotCataNetwork function is returning without generating a plot.")
+          return()
+        }
+
+        if (length(intersect(c("input_analyte","rxn_partner_common_name", "rxn_partner_ids"),colnames(catalyzedf)))!=3) {
                 stop("Please make sure that the input is the resulting data.frame returned by the rampFastCata() function")
         }
 
@@ -65,18 +68,20 @@ plotCataNetwork <- function(catalyzedf = "") {
 #' @param sig_cutoff Aesthetic, shows pvalue cutoff for significant pathways
 #' @param interactive If TRUE, return interactive plotly object instead of ggplot object
 #' @export
-pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.5,
+pathwayResultsPlot <- function(db = RaMP(), pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.5,
                                  perc_pathway_overlap = 0.5, min_pathway_tocluster = 3,
-                                 text_size = 16, sig_cutoff = 0.05, interactive=FALSE) {
+                                 text_size = 8, sig_cutoff = 0.05, interactive=FALSE) {
 
   if( !('cluster_assignment' %in% colnames(pathwaysSig$fishresult))) {
-    fishClustering <- findCluster(pathwaysSig,
+    fishClustering <- findCluster(db = db, pathwaysSig,
                                   perc_analyte_overlap = perc_analyte_overlap,
                                   perc_pathway_overlap = perc_pathway_overlap,
                                   min_pathway_tocluster = min_pathway_tocluster
     )
+    # asign this here if clustering is proformed here...
     fishresult <- fishClustering$fishresults
   } else {
+    message("The input pathway result has already been clustered. Defaulting to existing clustering.")
     fishresult <- pathwaysSig$fishresults
   }
 
@@ -84,7 +89,7 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
     inPath <- fishresult$Num_In_Path
     totPath <- fishresult$Total_In_Path
   } else {
-      inPath <- apply(fishresult, 1, function(x) {
+    inPath <- apply(fishresult, 1, function(x) {
       if (is.na(x["Num_In_Path_Metab"])) {
         return(as.numeric(x["Num_In_Path_Gene"]))
       } else if (is.na(x["Num_In_Path_Gene"])) {
@@ -158,13 +163,13 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
     paste0(y," (", pathwaysource,")")
   })
   p <- clusterDF %>%
-      dplyr::mutate("pathway.db" =
-                        with(clusterDF,{tidytext::reorder_within(pathway.db,
-                                                 x,
-                                                 cluster)})) %>%
-      ggplot2::ggplot(
-    ggplot2::aes_string(y = "x", x = "pathway.db")
-  ) +
+    dplyr::mutate("pathway.db" =
+                    with(clusterDF,{tidytext::reorder_within(pathway.db,
+                                                             x,
+                                                             cluster)})) %>%
+    ggplot2::ggplot(
+      ggplot2::aes_string(y = "x", x = "pathway.db")
+    ) +
     ggplot2::geom_segment(ggplot2::aes_string(xend = "pathway.db", y = 0, yend = "x")) +
     suppressWarnings(ggplot2::geom_point(
       stat = "identity",
@@ -187,9 +192,9 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
       panel.background = ggplot2::element_blank(),
       strip.text.y = ggplot2::element_text(angle = 0),
       axis.text = ggplot2::element_text(face = "bold")
-      ) +
+    ) +
     with(clusterDF, {
-            ggplot2::facet_grid(cluster ~ ., space = "free", scales = "free")
+      ggplot2::facet_grid(cluster ~ ., space = "free", scales = "free")
     }) +
     ggplot2::guides(colour = ggplot2::guide_legend(
       override.aes =
@@ -199,13 +204,93 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
     ggplot2::scale_size_area(
       breaks = c(2, 4, 6, 8, 10),
       name = "# of Altered Analytes in Pathway"
-      )
+    )
 
   if(interactive){
-      return(plotly::ggplotly(p, tooltip="text"))
+    return(plotly::ggplotly(p, tooltip="text"))
   }else if (!interactive){
-      return(p)
+    return(p)
   }else{
-      stop("'interactive' must be a boolean")
+    stop("'interactive' must be a boolean")
   }
+}
+
+#' Plots an interactive sunburst plot of reaction class
+#'
+#' @param reactionClassesResults output of getReactionClassesForAnalytes()
+#' @return  An interactive HTML sunburst plot that allows the user to pan/zoom into reaction classes of interest.
+#' @export
+
+plotReactionClasses <- function(reactionClassesResults = "") {
+  if(sum(reactionClassesResults$class_ec_level_1$reactionCount) == 0) {
+    message("The input dataframe has no reaction results. plotCataNetwork function is returning without generating a plot.")
+    return()
+  }
+
+  if (length(intersect(c("class_ec_level_1","class_ec_level_2", "class_ec_level_3", "class_ec_level_4"),names(reactionClassesResults)))!=4) {
+    stop("Please make sure that the input is the resulting list of dataframes returned by the getReactionClassesForAnalytes() function")
+  }
+
+  sunburst_ontology_reactionclass <- buildReactionClassesSunburstDatafarme(reactionClassesResults)
+
+  fig <- plotly::plot_ly(
+    color = I("black"),
+    marker = list(colors = ~ sunburst_ontology_reactionclass$color)
+  )
+  fig <- fig %>%
+    plotly::add_trace(
+      ids = sunburst_ontology_reactionclass$ids,
+      labels = sunburst_ontology_reactionclass$labels,
+      parents = sunburst_ontology_reactionclass$parents,
+      hovertemplate = sunburst_ontology_reactionclass$hovertemplate,
+      type = 'sunburst',
+      maxdepth = 2,
+      domain = list(column = 1),
+      name = ""
+    )
+  fig <- fig %>%
+    plotly::layout(
+      margin = list(
+        l = 0,
+        r = 0,
+        b = 0,
+        t = 0
+      ),
+      marker = list(colors = list(sunburst_ontology_reactionclass$color)),
+      extendsunburstcolors = TRUE
+    )
+
+  return(fig)
+
+}
+
+#' Plots an interactive upset plot of overlapping input compounds at reaction class level 1
+#'
+#' @param reactionsResults output of getReactionsForAnalytes()
+#' @param includeCofactorMets include metabolites labeled at cofactors within ChEBI (Default = FALSE)
+#' @return  An interactive HTML upset plot that allows the user to visualize the overlap in the number of input compounds across level 1 of reaction classes.
+#' @export
+
+plotAnalyteOverlapPerRxnLevel <- function(reactionsResults = "", includeCofactorMets = FALSE) {
+  if(nrow(reactionsResults$met2rxn) ==0 && nrow(reactionsResults$prot2rxn) == 0) {
+    message("The input has no reaction results. plotCataNetwork function is returning without generating a plot.")
+    return()
+  }
+
+  if (length(intersect(c("met2rxn","prot2rxn", "metProteinCommonReactions"),names(reactionsResults)))!=3) {
+    stop("Please make sure that the input is the resulting list of dataframes returned by the getReactionsForAnalytes() function")
+  }
+
+  input2reactions_list <- buildAnalyteOverlapPerRxnLevelUpsetDatafarme(reactionsResults = reactionsResults, includeCofactorMets = includeCofactorMets)
+
+  fig <- upsetjs::upsetjs() %>%
+    upsetjs::fromList(input2reactions_list) %>%
+    upsetjs::generateDistinctIntersections() %>% upsetjs::interactiveChart() %>%
+    upsetjs::chartLabels(set.name = "Number of Reactions") %>%
+    upsetjs::chartLayout(width.ratios = c(0.15,0.2,0.65),
+                         height.ratios = c(0.6,.4)) %>%
+    upsetjs::chartFontSizes(set.label = "13px", chart.label = "14px")
+
+  return(fig)
+
 }

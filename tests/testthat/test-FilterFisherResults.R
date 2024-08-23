@@ -1,9 +1,5 @@
 test_that("Fisher test results does not equal filtered fisher test results, FilterFisherResults",
           {
-            library(properties)
-            dbpass <- properties::read.properties('../../dbprops.txt')
-            pkg.globals <- setConnectionToRaMP(host=dbpass$hostname, dbname=dbpass$dbname, username=dbpass$username, conpass=dbpass$conpass)
-            assign("pkg.globals", pkg.globals, envir = .GlobalEnv)
 
             analytes <-
                 c(
@@ -14,7 +10,7 @@ test_that("Fisher test results does not equal filtered fisher test results, Filt
                 )
 
             fisher.results <-
-              runCombinedFisherTest(analytes = analytes)
+              runCombinedFisherTest(db = rampDB, analytes = analytes)
 
             filtered.fisher.results <-
               FilterFishersResults(fisher.results, pval_type='holm', pval_cutoff  = 0.05)
