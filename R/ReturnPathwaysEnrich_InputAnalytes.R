@@ -207,7 +207,7 @@ runFisherTest <- function(analytes,
 
   ## Input_RampIds is a table of all analytes included in pathways represented in the user set
   ## "User" refers to significant analytes
-  input_RampIds <- buildFrequencyTables(db, pathwaydf, pathway_definitions, analyte_type)
+  input_RampIds <- buildFrequencyTables(pathwaydf, pathway_definitions, analyte_type, db)
   if (is.null(input_RampIds)) {
     stop("Data doesn't exist")
   } else {
