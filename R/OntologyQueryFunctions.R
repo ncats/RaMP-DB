@@ -150,7 +150,7 @@ getMetaFromOnto <- function(ontology, db = RaMP()) {
           and o.rampOntologyId = ao.rampOntologyId and s.rampId = ao.rampCompoundId
           group by o.commonName, s.rampId, o.HMDBOntologyType")
 
-    if (RaMP:::.is_sqlite(db)) {
+    if (.is_sqlite(db)) {
       sql <- paste0("select rampId,
           group_concat(distinct s.sourceId COLLATE NOCASE) as source_ids,
           group_concat(distinct s.commonName COLLATE NOCASE) as common_names, o.commonName, o.HMDBOntologyType
@@ -178,6 +178,7 @@ getMetaFromOnto <- function(ontology, db = RaMP()) {
 
 
 #' Enrichment analysis for metabolite ontology mappings
+#' @importFrom rlang .data
 #' @param analytes a vector of analytes (genes or metabolites) that need to be searched
 #' @param namesOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
@@ -198,6 +199,7 @@ getMetaFromOnto <- function(ontology, db = RaMP()) {
 #' @param db a RaMP database object
 #' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
 #' @export
+#' @importFrom methods is
 
 runOntologyTest <- function(analytes,
                             namesOrIds = "ids",
@@ -271,7 +273,7 @@ runOntologyTest <- function(analytes,
     # only keep the input metabolites (converted into ontologydf in line above) that are in the biospecimen type specified
     ontologydf <- with(ontologydf, {
       ontologydf %>%
-        dplyr::filter(rampId %in% backgrounddf$rampId)
+        dplyr::filter(.data$rampId %in% .data$backgrounddf$rampId)
     })
     if (nrow(ontologydf) == 0) {
       stop("There are no metabolites in your input that map to your selected biospecimen")
@@ -368,7 +370,7 @@ runOntologyTest <- function(analytes,
     }
     total_ontology_analytes <- totanalytes
     tot_in_ontology <- input_metab %>%
-      dplyr::filter(`ontology` == i) %>%
+      dplyr::filter(.data$ontology == i) %>%
       dplyr::pull(`Freq`)
     if (tot_in_ontology == 0 || user_in_ontology == 0) {
       pval <- c(pval, NA)

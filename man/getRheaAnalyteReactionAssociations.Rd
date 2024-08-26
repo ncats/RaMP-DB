@@ -8,7 +8,7 @@ Associations are made through shared Rhea reactions}
 getRheaAnalyteReactionAssociations(
   analytes,
   includeRheaRxnDetails = F,
-  humanProteins = T,
+  humanProtein = TRUE,
   db = RaMP()
 )
 }
@@ -17,7 +17,7 @@ getRheaAnalyteReactionAssociations(
 
 \item{includeRheaRxnDetails}{returns additional columns that inlucdes info in the reaction connecting mets and proteins}
 
-\item{humanProteins}{require reactions to have a human protein (enzyme or transporter), default True}
+\item{humanProtein}{require reactions to have a human protein (enzyme or transporter), default True}
 
 \item{db}{a RaMP database object}
 }

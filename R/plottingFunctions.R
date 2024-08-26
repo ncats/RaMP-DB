@@ -2,16 +2,19 @@
 #' @importFrom magrittr %>%
 #'
 #' @param catalyzedf a data.frame output by rampFastCata() that contains analytes that are in the same reaction
-#' @return  An interactive HTML plot that allows the user to pan/zoom into regions of interest. User genes/metabolites are highlighted in blue, whereas analytes found by the function are orange.
+#' @return  An interactive HTML plot that allows the user to pan/zoom into regions of interest. User genes/
+#' metabolites are highlighted in blue, whereas analytes found by the function are orange.
 #' @examples
 #' \dontrun{
-#' inputs.of.interest <- c("kegg:C00186" , "hmdb:HMDB0000148", "kegg:C00780", "hmdb:HMDB0000064", "ensembl:ENSG00000115850", "uniprot:Q99259")
+#' inputs.of.interest <- c("kegg:C00186" , "hmdb:HMDB0000148", "kegg:C00780", "hmdb:HMDB0000064", 
+#'       "ensembl:ENSG00000115850", "uniprot:Q99259")
 #'
 #' new.transcripts <- rampFastCata(analytes = inputs.of.interest, db = rampDB)
 #'
 #' plotCataNetwork(head(new.transcripts$HMDB_Analyte_Associations, n=100))
 #' }
 #' @export
+#' @importFrom utils head"
 plotCataNetwork <- function(catalyzedf = "") {
 
         if(nrow(catalyzedf) == 0) {
@@ -59,7 +62,7 @@ plotCataNetwork <- function(catalyzedf = "") {
 }
 
 #' Cluster and plot significant pathways by FDR-adjusted pval
-#' @param pathwaysSig output of FilterFisherResults
+#' @param pathwaysSig output of FilterFishersResults
 #' @param pval Which p value to plot, choose from Raw, FDR or Holm-adjusted
 #' @param perc_analyte_overlap Minimum overlap for pathways to be considered similar
 #' (Default = 0.2)
@@ -73,7 +76,7 @@ plotCataNetwork <- function(catalyzedf = "") {
 #' @examples
 #' \dontrun{
 #' plotEnrichedPathways(filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2,
-#'                     min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE, db = rampDB )
+#'    min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE, db = rampDB )
 #' }
 #' @export
 pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.5,
@@ -297,7 +300,8 @@ plotReactionClasses <- function(reactionClassesResults) {
 #'
 #' @param reactionsResults output of getReactionsForAnalytes()
 #' @param includeCofactorMets include metabolites labeled at cofactors within ChEBI (Default = FALSE)
-#' @return  An interactive HTML upset plot that allows the user to visualize the overlap in the number of input compounds across level 1 of reaction classes.
+#' @return  An interactive HTML upset plot that allows the user to visualize the overlap in the number of 
+#' input compounds across level 1 of reaction classes.
 #' @examples
 #' \dontrun{
 #' analytes.of.interest = c('chebi:58115', 'chebi:456215', 'chebi:58245', 'chebi:58450',
@@ -305,7 +309,8 @@ plotReactionClasses <- function(reactionClassesResults) {
 #' 'chebi:62286', 'chebi:77897', 'uniprot:P30566','uniprot:P30520',
 #' 'uniprot:P00568', 'uniprot:P23109', 'uniprot:P22102', 'uniprot:P15531')
 #'
-#' reactionsLists <- RaMP::getReactionsForAnalytes(analytes = analytes.of.interest, includeTransportRxns = F, humanProtein = T, db = rampDB)
+#' reactionsLists <- RaMP::getReactionsForAnalytes(analytes = analytes.of.interest, 
+#'     includeTransportRxns = F, humanProtein = T, db = rampDB)
 #'
 #' plotAnalyteOverlapPerRxnLevel(reactionsLists)
 #' }
@@ -341,7 +346,7 @@ plotAnalyteOverlapPerRxnLevel <- function(reactionsResults, includeCofactorMets 
 }
 
 #' Cluster and plot significant ontologies by FDR-adjusted pval
-#' @param ontologiesSig output of FilterFisherResults
+#' @param ontologiesSig output of FilterFishersResults
 #' @param pval Which p value to plot, choose from Raw, FDR or Holm-adjusted
 #' @param text_size Scales all text in figure (Default=16)
 #' @param sig_cutoff Aesthetic, shows pvalue cutoff for significant ontologies

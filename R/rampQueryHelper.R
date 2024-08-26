@@ -408,9 +408,14 @@ getRaMPInfoFromAnalytes<-function( analytes,
 ##' @param db a RaMP database object
 ##' @return dataframe of all analytes that map to the input pathways
 ##' @author Andrew Christopher Patt
-buildFrequencyTables<-function( inputdf, pathway_definitions, analyte_type, db = RaMP()) {
+#' @importFrom utils head
+buildFrequencyTables<-function( inputdf, pathway_definitions="RaMP", analyte_type, db = RaMP()) {
 
   if(pathway_definitions == "RaMP") {
+	print("Now in buildFrequencyTables function")
+	print(mode(inputdf))
+	print(class(inputdf))
+	head(inputdf$pathwayRampId)
 
     ## Get pathway ids that contain the user analytes
     pid <- unique(inputdf$pathwayRampId);
@@ -571,7 +576,6 @@ findDuplicatePathways <- function(db = RaMP()) {
 
   reactomePIDs <- RaMP::runQuery(query, db)
 
-  # ar <- RaMP:::analyte_result
   ar <- db@dbSummaryObjCache$analyte_result
   diag(ar) <- 0.0
   ar[ar != 1.0] <- 0.0
@@ -622,7 +626,7 @@ findDuplicatePathways <- function(db = RaMP()) {
 #' \dontrun{
 #' analyteList <- c("MDM2", "TP53", "glutamate", "creatinine")
 #'
-#' fisher.results <- runCombinedFisherTest(analytes = analytesList, namesOrIds = 'names')
+#' fisher.results <- runCombinedFisherTest(analytes = analyteList, namesOrIds = 'names')
 #' filtered.fisher.results <- FilterFishersResults(fisher.results, pval_type='fdr', pval_cutoff = 0.10)
 #' }
 #' @export
@@ -685,7 +689,7 @@ FilterFishersResults <- function(fishers_df, pval_type = 'fdr', pval_cutoff = 0.
     for(result in names(fishers_df)) {
 
       #if(class(fishers_df[[result]]) == 'data.frame') {
-       if(is(fishers_df[[result]], 'data.frame')) {
+       if(methods::is(fishers_df[[result]], 'data.frame')) {
         print(result)
         resultDf <- fishers_df[[result]]
         resultDf <- subset(resultDf, resultDf[[criteriaCol]] <= pval_cutoff)
@@ -726,7 +730,7 @@ chemicalClassSurveyRampIdsConn <- function( mets, pop, inferIdMapping=TRUE, db =
   metStr <- paste("'" ,metStr, "'", sep = "")
 
 
-  isSQLite <- RaMP:::.is_sqlite(db)
+  isSQLite <- .is_sqlite(db)
 
   # if inferring ID mapping, the query goes through the source table to map input id to ramp id, then map to related ids having chem class annotations
   # if not ID mapping, then the match is directly on the input source ids. HMDB and LipidMaps IDs are supported directly, May 2023.
@@ -764,10 +768,10 @@ chemicalClassSurveyRampIdsConn <- function( mets, pop, inferIdMapping=TRUE, db =
   # need to filter for our specific source ids
   # ID mapping uses a subset to report on found additional source ids, else matches on class_source_id (source ids directly mapped to chem class)
   if(inferIdMapping) {
-    metsData2 <- subset(metsData, sourceId %in% mets)
+    metsData2 <- subset(metsData, "sourceId" %in% mets)
     metsData <- metsData2
   } else {
-    metsData <- subset(metsData, class_source_id %in% mets)
+    metsData <- subset(metsData, "class_source_id" %in% mets)
   }
 
   # get query summary
@@ -815,13 +819,13 @@ chemicalClassSurveyRampIdsConn <- function( mets, pop, inferIdMapping=TRUE, db =
   popData <- RaMP::runQuery(sql, db)
 
   if(inferIdMapping) {
-    popData <- subset(popData, sourceId %in% pop)
+    popData <- subset(popData, "sourceId" %in% pop)
   } else {
-    popData <- subset(popData, class_source_id %in% pop)
+    popData <- subset(popData, "class_source_id" %in% pop)
   }
 
   #need to filter for our source ids
-  # popData <- subset(popData, sourceId %in% pop)
+  # popData <- subset(popData, "sourceId" %in% pop)
 
   # get query summary
   popQueryReport <- queryReport(pop, popData$sourceId)
@@ -896,7 +900,7 @@ chemicalClassSurveyRampIdsFullPopConn <- function( mets, inferIdMapping=TRUE, db
   metStr <- paste(mets, collapse = "','")
   metStr <- paste("'" ,metStr, "'", sep = "")
 
-  isSQLite = RaMP:::.is_sqlite(db)
+  isSQLite = .is_sqlite(db)
 
   # Id mapping matches on source ids mapped via ramp ids in the source table. No id mapping matches on input ids directly.
   if(inferIdMapping) {
@@ -926,10 +930,10 @@ chemicalClassSurveyRampIdsFullPopConn <- function( mets, inferIdMapping=TRUE, db
 
   # need to filter for our specific source ids
   if(inferIdMapping) {
-    metsData2 <- subset(metsData, sourceId %in% mets)
+    metsData2 <- subset(metsData, "sourceId" %in% mets)
     metsData <- metsData2
   } else {
-    metsData <- subset(metsData, class_source_id %in% mets)
+    metsData <- subset(metsData, "class_source_id" %in% mets)
   }
 
   # get query summary
@@ -1047,7 +1051,7 @@ filterPathwaysByAnalyteCount <- function( pathway_dataframe, pathway_ramp_id_col
 #' Creates the input dataframe for the sunburst plot created in 'plotReactionClasses'
 #'
 #' @param reactionClassesResults output of getReactionClassesForAnalytes()
-
+#' @importFrom grDevices adjustcolor
 buildReactionClassesSunburstDataframe <- function(reactionClassesResults) {
 
   #create empty table for sunburst information
@@ -1224,27 +1228,19 @@ buildReactionClassesSunburstDataframe <- function(reactionClassesResults) {
       ))
     if (num_of_dashes == 3)
     {
-      sunburst_ontology_reactionclass$color[i] <-
-        adjustcolor(colors_sunburst[as.numeric(strsplit(sunburst_ontology_reactionclass$ids[i], split =
-                                                          "\\.")[[1]][1])], alpha.f = 0.8)
+      sunburst_ontology_reactionclass$color[i] <- adjustcolor(colors_sunburst[as.numeric(strsplit(sunburst_ontology_reactionclass$ids[i], split = "\\.")[[1]][1])], alpha.f = 0.8)
     }
     if (num_of_dashes == 2)
     {
-      sunburst_ontology_reactionclass$color[i] <-
-        adjustcolor(colors_sunburst[as.numeric(strsplit(sunburst_ontology_reactionclass$ids[i], split =
-                                                          "\\.")[[1]][1])], alpha.f = 0.6)
+      sunburst_ontology_reactionclass$color[i] <- adjustcolor(colors_sunburst[as.numeric(strsplit(sunburst_ontology_reactionclass$ids[i], split = "\\.")[[1]][1])], alpha.f = 0.6)
     }
     if (num_of_dashes == 1)
     {
-      sunburst_ontology_reactionclass$color[i] <-
-        adjustcolor(colors_sunburst[as.numeric(strsplit(sunburst_ontology_reactionclass$ids[i], split =
-                                                          "\\.")[[1]][1])], alpha.f = 0.4)
+      sunburst_ontology_reactionclass$color[i] <- adjustcolor(colors_sunburst[as.numeric(strsplit(sunburst_ontology_reactionclass$ids[i], split = "\\.")[[1]][1])], alpha.f = 0.4)
     }
     if (num_of_dashes == 0)
     {
-      sunburst_ontology_reactionclass$color[i] <-
-        adjustcolor(colors_sunburst[as.numeric(strsplit(sunburst_ontology_reactionclass$ids[i], split =
-                                                          "\\.")[[1]][1])], alpha.f = 0.2)
+      sunburst_ontology_reactionclass$color[i] <- adjustcolor(colors_sunburst[as.numeric(strsplit(sunburst_ontology_reactionclass$ids[i], split = "\\.")[[1]][1])], alpha.f = 0.2)
     }
   }
   return(sunburst_ontology_reactionclass)
@@ -1261,7 +1257,7 @@ buildAnalyteOverlapPerRxnLevelUpsetDataframe <- function(reactionsResults, inclu
 
   if(nrow(reactionsResults$met2rxn)>0)
   {
-    reactionsResults$met2rxn <- reactionsResults$met2rxn %>% dplyr::filter(!dplyr::if_any(ecNumber, is.na))
+    reactionsResults$met2rxn <- reactionsResults$met2rxn %>% dplyr::filter(!dplyr::if_any(.data$ecNumber, is.na))
     if(nrow(reactionsResults$met2rxn)>0)
     {
       EC_number_split_met <- unlist(strsplit(reactionsResults$met2rxn$ecNumber,split="\\."))
@@ -1274,11 +1270,11 @@ buildAnalyteOverlapPerRxnLevelUpsetDataframe <- function(reactionsResults, inclu
   }
   if (includeCofactorMets == FALSE)
   {
-    reactionsResults$met2rxn <- reactionsResults$met2rxn %>% dplyr::filter(isCofactor == 0)
+    reactionsResults$met2rxn <- reactionsResults$met2rxn %>% dplyr::filter(.data$isCofactor == 0)
   }
   if(nrow(reactionsResults$prot2rxn)>0)
   {
-    reactionsResults$prot2rxn <- reactionsResults$prot2rxn %>% dplyr::filter(!dplyr::if_any(ecNumber, is.na))
+    reactionsResults$prot2rxn <- reactionsResults$prot2rxn %>% dplyr::filter(!dplyr::if_any(.data$ecNumber, is.na))
     if(nrow(reactionsResults$prot2rxn)>0)
     {
       EC_number_split_prot <- unlist(strsplit(reactionsResults$prot2rxn$ecNumber,split="\\."))

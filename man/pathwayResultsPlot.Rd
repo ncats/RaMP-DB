@@ -17,7 +17,7 @@ pathwayResultsPlot(
 )
 }
 \arguments{
-\item{pathwaysSig}{output of FilterFisherResults}
+\item{pathwaysSig}{output of FilterFishersResults}
 
 \item{pval}{Which p value to plot, choose from Raw, FDR or Holm-adjusted}
 
@@ -43,6 +43,6 @@ Cluster and plot significant pathways by FDR-adjusted pval
 \examples{
 \dontrun{
 plotEnrichedPathways(filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2,
-                    min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE, db = rampDB )
+   min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE, db = rampDB )
 }
 }

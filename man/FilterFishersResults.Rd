@@ -26,7 +26,7 @@ Filter pathways by p-value cutoff for display and clustering
 \dontrun{
 analyteList <- c("MDM2", "TP53", "glutamate", "creatinine")
 
-fisher.results <- runCombinedFisherTest(analytes = analytesList, namesOrIds = 'names')
+fisher.results <- runCombinedFisherTest(analytes = analyteList, namesOrIds = 'names')
 filtered.fisher.results <- FilterFishersResults(fisher.results, pval_type='fdr', pval_cutoff = 0.10)
 }
 }

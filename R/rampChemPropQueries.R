@@ -53,7 +53,7 @@ getChemicalProperties <- function(mets, propertyList = 'all', db = RaMP() ){
                    "where chem_source_id in (",metStr,")")
   }
 
-  metsData <- RaMP:::runQuery(sql, db)
+  metsData <- runQuery(sql, db)
   foundMets <- unique(metsData$chem_source_id)
 
   result[['chem_props']] <- metsData
@@ -83,11 +83,11 @@ buildPropertyList <- function( propList, db = RaMP()) {
 
   if(.is_sqlite(db)) {
     sql = 'pragma table_info(chem_props)'
-    ramptypes <- RaMP:::runQuery(sql, db)
+    ramptypes <- runQuery(sql, db)
     ramptypes <- unlist(ramptypes$name)
   } else {
     sql = 'describe chem_props'
-    ramptypes <- RaMP:::runQuery(sql, db)
+    ramptypes <- runQuery(sql, db)
     ramptypes <- unlist(ramptypes$Field)
   }
 

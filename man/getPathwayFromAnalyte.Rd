@@ -25,11 +25,14 @@ getPathwayFromAnalyte(
 
 \item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
 
-\item{include_smpdb}{Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant}
+\item{include_smpdb}{Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are 
+highly redundant}
 
-\item{minPathwaySize}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
+\item{minPathwaySize}{the minimum number of pathway members (genes and metabolites) to include the pathway in
+the output (default = 5)}
 
-\item{maxPathwaySize}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
+\item{maxPathwaySize}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in
+the output (default = 150)}
 
 \item{db}{a RaMP database object}
 }
@@ -42,8 +45,10 @@ returns associated pathways
 }
 \examples{
 \dontrun{
-getPathwayFromAnalyte(db = rampDB, namesOrIds="ids", c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
-                                                      "hmdb:HMDB0000148", "ensembl:ENSG00000141510"))
+getPathwayFromAnalyte(db = rampDB, namesOrIds="ids", c("ensembl:ENSG00000135679", 
+     "hmdb:HMDB0000064",
+     "hmdb:HMDB0000148", 
+     "ensembl:ENSG00000141510"))
 
 getPathwayFromAnalyte(db = rampDB, namesOrIds = "names", c("Serotonin", "Bilirubin", "Urea"))
 }
