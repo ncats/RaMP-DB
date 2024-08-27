@@ -7,7 +7,7 @@
 getReactionsForSourceCompoundIds(
   compoundIds,
   onlyHumanMets = F,
-  humanProtein = F,
+  humanProtein = T,
   includeTransportRxns = F,
   rxnDirs = c("UN"),
   db = RaMP()

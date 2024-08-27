@@ -4,12 +4,12 @@
 \alias{getCustomPathwayFromAnalyte}
 \title{Utility method supporting pathway analyses when file-based pathway lists are used rather than the ramp database.}
 \usage{
-getCustomPathwayFromAnalyte(analytes, pathways, analyte_type)
+getCustomPathwayFromAnalyte(analytes, pathway_definitions, analyte_type)
 }
 \arguments{
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
-\item{pathways}{If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows}
+\item{pathway_definitions}{If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows}
 
 \item{analyte_type}{"genes" or "metabolites"}
 }

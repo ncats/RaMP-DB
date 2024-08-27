@@ -3,12 +3,13 @@
 ##' @param show_n_rows Only print first n rows of input (Shows all if NA)
 ##' @return Printed out and prettified version of input
 ##' @author Andrew Christopher Patt
+## @import is from methods
 cleanup<- function(data, show_n_rows = 6) {
   if (class(data) != "data.frame" & (class(data) != "list" & length(data) != 1)) {
     stop("Input should be a dataframe resulting from runCombinedFishersTest, getAnalyteFromPathway, getPathwayFromAnalyte, chemicalClassSurvey, or getChemicalProperties")
   }
 #  if (class(data) == "list") {
-   if (is(data, "list")){
+   if( is( data, "list")){
     data <- data[[1]]
   }
   rownames(data) <- NULL

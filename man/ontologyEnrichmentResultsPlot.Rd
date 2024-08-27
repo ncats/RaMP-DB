@@ -14,7 +14,7 @@ ontologyEnrichmentResultsPlot(
 )
 }
 \arguments{
-\item{ontologiesSig}{output of FilterFisherResults}
+\item{ontologiesSig}{output of FilterFishersResults}
 
 \item{pval}{Which p value to plot, choose from Raw, FDR or Holm-adjusted}
 

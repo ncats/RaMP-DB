@@ -1,54 +1,55 @@
 # ProcessNewRamp.R - is ONLY FOR DEVELOPERS to generate data required for Ramp internal functions(findCluster(), fisherTest()) to perform calculations.
 
-#' Find table of analyte has pathway from given pathway IDs
-#' Aggregate ramp Id to ramp pathway Id
-#' GC is C or G
-#' @param pathwayRampId a vector of ramp Pathway ID
-#' @param GC the analytes type that is either "C" for compound or "G" for gene
-#' @param n minimum analytes of which pathway to considered computing overlap
-#' @param db a RaMP database object
-#' @return A list with pathway rampID as name, a vector of analytes from this pathway as content.
-findAnalyteHasPathway <- function( pathwayRampId,GC = "C",n = 10, db = RaMP()){
+# #' Find table of analyte has pathway from given pathway IDs
+# #' @param pathwayRampId a vector of ramp Pathway ID
+# #' @param GC the analytes type that is either "C" for compound or "G" for gene
+# #' @param n minimum analytes of which pathway to considered computing overlap
+# #' @param db a RaMP database object
+# #' @return A list with pathway rampID as name, a vector of analytes from this pathway as content.
+# findAnalyteHasPathway <- function( pathwayRampId,GC = "C",n = 10, db = RaMP()){
 
-  con <- connectToRaMP()
-  on.exit(RMariaDB::dbDisconnect(con))
-  p_id <- unique(pathwayRampId)
-  p_id <- sapply(p_id,shQuote)
-  p_id <- paste(p_id,collapse = ",")
-  query <-paste0("select * from analytehaspathway where pathwayRampId in (",
-                 p_id,
-                 ");")
+  # Commenting the following lines out because we no longer use the MySQL and this is only internal - EwyM
+  # Will need to update this.
+#  con <- connectToRaMP()
+#  on.exit(RMariaDB::dbDisconnect(con))
+#  p_id <- unique(pathwayRampId)
+#  p_id <- sapply(p_id,shQuote)
+#  p_id <- paste(p_id,collapse = ",")
+#  query <-paste0("select * from analytehaspathway where pathwayRampId in (",
+#                 p_id,
+#                 ");")
 
-  df <- RMariaDB::dbGetQuery(con, query)
+#  df <- RMariaDB::dbGetQuery(con, query)
 
-  if(GC == 'both'){
-    df2 <- stats::aggregate(df$rampId,list(df$pathwayRampId),FUN = function(x){
-      if(length(x) >= n){
-        paste(x,collapse = ',')
-      } else{
-        x <- 0
-      }
-    })
-  }
-  else if (GC %in% c('G','C')){
-    df2 <- stats::aggregate(df$rampId,list(df$pathwayRampId),FUN = function(x){
-      x <- x[grepl(paste0("RAMP_",GC,"_"),x)]
-      if(length(x) >= n ){
-        paste(x,collapse = ",")
-      } else {
-        x <- 0
-      }
-    })
-  }
-  fdf <- df2[df2$x!=0,]
-  fdf2 <- data.frame(fdf[,-1],row.names = fdf[,1],stringsAsFactors = F)
-  df.list <- stats::setNames(split(fdf2, seq(nrow(fdf2))), rownames(fdf2))
-  df.list <- lapply(df.list,FUN = function(x){
-    text <- x[[1]]
-    text <- strsplit(text,split = ",")
-  })
-  df.list <- lapply(df.list,unlist)
-}
+#  if(GC == 'both'){
+#    df2 <- stats::aggregate(df$rampId,list(df$pathwayRampId),FUN = function(x){
+#      if(length(x) >= n){
+#        paste(x,collapse = ',')
+#      } else{
+#        x <- 0
+#      }
+#    })
+#  }
+#  else if (GC %in% c('G','C')){
+#    df2 <- stats::aggregate(df$rampId,list(df$pathwayRampId),FUN = function(x){
+#      x <- x[grepl(paste0("RAMP_",GC,"_"),x)]
+#      if(length(x) >= n ){
+#        paste(x,collapse = ",")
+#      } else {
+#        x <- 0
+#      }
+#    })
+#  }
+#  fdf <- df2[df2$x!=0,]
+#  fdf2 <- data.frame(fdf[,-1],row.names = fdf[,1],stringsAsFactors = F)
+#  df.list <- stats::setNames(split(fdf2, seq(nrow(fdf2))), rownames(fdf2))
+#  df.list <- lapply(df.list,FUN = function(x){
+#    text <- x[[1]]
+#    text <- strsplit(text,split = ",")
+#  })
+#  df.list <- lapply(df.list,unlist)
+#}
+
 #'Compute overlaping matrix based on given list return by findAnalyteHasPathway()
 #'
 #'@param pathwayid a vector that has all ramp pathway id in the pathwaysWithAnalytes

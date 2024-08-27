@@ -12,7 +12,8 @@ plotAnalyteOverlapPerRxnLevel(reactionsResults, includeCofactorMets = FALSE)
 \item{includeCofactorMets}{include metabolites labeled at cofactors within ChEBI (Default = FALSE)}
 }
 \value{
-An interactive HTML upset plot that allows the user to visualize the overlap in the number of input compounds across level 1 of reaction classes.
+An interactive HTML upset plot that allows the user to visualize the overlap in the number of 
+input compounds across level 1 of reaction classes.
 }
 \description{
 Plots an interactive upset plot of overlapping input compounds at reaction class level 1
@@ -24,7 +25,8 @@ analytes.of.interest = c('chebi:58115', 'chebi:456215', 'chebi:58245', 'chebi:58
 'chebi:62286', 'chebi:77897', 'uniprot:P30566','uniprot:P30520',
 'uniprot:P00568', 'uniprot:P23109', 'uniprot:P22102', 'uniprot:P15531')
 
-reactionsLists <- RaMP::getReactionsForAnalytes(analytes = analytes.of.interest, includeTransportRxns = F, humanProtein = T, db = rampDB)
+reactionsLists <- RaMP::getReactionsForAnalytes(analytes = analytes.of.interest, 
+    includeTransportRxns = F, humanProtein = T, db = rampDB)
 
 plotAnalyteOverlapPerRxnLevel(reactionsLists)
 }
