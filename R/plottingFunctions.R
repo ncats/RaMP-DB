@@ -14,7 +14,6 @@
 #' plotCataNetwork(head(new.transcripts$HMDB_Analyte_Associations, n=100))
 #' }
 #' @export
-#' @importFrom utils head"
 plotCataNetwork <- function(catalyzedf = "") {
 
         if(nrow(catalyzedf) == 0) {

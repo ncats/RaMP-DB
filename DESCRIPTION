@@ -14,27 +14,26 @@ Imports:
     methods,
     dplyr,
     ggplot2,
-    plotly,
     tidyr,
     readr,
-    tidytext,
     data.table,
     rlang,
-    visNetwork,
     DBI,
     RSQLite,
-    RMariaDB,
     jsonlite,
-    readxl,
     tibble,
     BiocFileCache,
     R.utils,
     httr,
-    upsetjs,
-    Polychrome,
-    pals,
+    pals
 Encoding: UTF-8
 RoxygenNote: 7.3.2
-Suggests: 
-    testthat (>= 3.0.0)
+Suggests:
+    visNetwork,	
+    testthat (>= 3.0.0),
+    tidytext,
+    Polychrome,
+    readxl,
+    upsetjs,
+    plotly
 Config/testthat/edition: 3

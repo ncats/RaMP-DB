@@ -237,11 +237,10 @@ runOntologyTest <- function(analytes,
     )
   } else if (background_type == "file") {
     userbkg <- utils::read.table(background, header = F)[, 1]
-    backgrounddf <- getOntologyFromAnalyte(
+    backgrounddf <- getOntoFromMeta(
       db = db, analytes = userbkg,
       includeRaMPids = TRUE,
-      namesOrIds = namesOrIds,
-      include_smpdb = include_smpdb
+      namesOrIds = namesOrIds
     )
   } else if (background_type == "biospecimen") {
     biospecimen <- background
@@ -371,7 +370,7 @@ runOntologyTest <- function(analytes,
     total_ontology_analytes <- totanalytes
     tot_in_ontology <- input_metab %>%
       dplyr::filter(.data$ontology == i) %>%
-      dplyr::pull(`Freq`)
+      dplyr::pull(.data$Freq)
     if (tot_in_ontology == 0 || user_in_ontology == 0) {
       pval <- c(pval, NA)
       oddsratio <- c(oddsratio, NA)
@@ -416,7 +415,6 @@ runOntologyTest <- function(analytes,
           print(tot_out_ontology)
           print(user_in_ontology)
           print(user_out_ontology)
-          print(analyte_type)
           print(ontologydf)
         }
       )

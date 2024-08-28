@@ -189,7 +189,7 @@ runFisherTest <- function(analytes,
     ## sourceIds <- allids[which(allids$pathwaySource == "kegg"), "rampId"]
     ## kegg_totanalytes <- length(unique(sourceIds[grep("RAMP_C", sourceIds)]))
     totanalytes <- lapply(unique(allids$pathwaySource), function(x){
-      return(allids %>% dplyr::filter(`pathwaySource`==x) %>% nrow)
+      return(allids %>% dplyr::filter(.data$pathwaySource==x) %>% nrow)
     })
     names(totanalytes) <- unique(allids$pathwaySource)
   } else if (analyte_type == "genes") {
@@ -826,6 +826,7 @@ runCombinedFisherTest <- function(
 #' @param maxPathwaySize the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in
 #' the output (default = 150)
 #' @param db a RaMP database object
+#' @importFrom rlang .data
 #' @return a list contains all metabolites as name and pathway inside.
 #' @examples
 #' \dontrun{
@@ -953,7 +954,7 @@ getPathwayFromAnalyte <- function( analytes = "none",
 
   df2 <- RaMP::runQuery(sql, db)
   if(!include_smpdb){
-    df2 <- df2 %>% dplyr::filter(`pathwaySource` != "hmdb")
+    df2 <- df2 %>% dplyr::filter(.data$pathwaySource != "hmdb")
   }
   if (find_synonym && nrow(df2) > 0) {
     rampIds <- df2[, "rampId"]
@@ -992,15 +993,16 @@ getPathwayFromAnalyte <- function( analytes = "none",
 #' @param pathway_definitions If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows
 #' @param analyte_type "genes" or "metabolites"
 #' @return A pathwaydf compatible with runFisherTest
+#' @importFrom rlang .data
 #' @author Andrew Patt
 getCustomPathwayFromAnalyte <- function(analytes, pathway_definitions, analyte_type) {
   print("Starting getCustomPathwayFromAnalyte()")
   tryCatch(
     {
       if (analyte_type == "metabolites") {
-        pathway_definitions <- readxl::read_excel(pathways, sheet = 1)
+        pathway_definitions <- readxl::read_excel(pathway_definitions, sheet = 1)
       } else if (analyte_type == "genes") {
-        pathway_definitions <- readxl::read_excel(pathways, sheet = 2)
+        pathway_definitions <- readxl::read_excel(pathway_definitions, sheet = 2)
       }
     },
     error = function(e) {
@@ -1035,7 +1037,7 @@ getCustomPathwayFromAnalyte <- function(analytes, pathway_definitions, analyte_t
     pathwaydf$rampId <- paste0("RAMP_G_", pathwaydf$inputId)
   }
   pathwaydf$pathwaySource <- "custom"
-  pathwaydf <- subset(pathwaydf, select = -c(Pathway, Analyte))
+  pathwaydf <- subset(pathwaydf, select = -c(.data$Pathway, .data$Analyte))
 
   return(pathwaydf)
 }
