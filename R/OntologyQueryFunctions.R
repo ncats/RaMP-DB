@@ -86,15 +86,21 @@ getOntoFromMeta <- function(analytes, namesOrIds = "ids", includeRaMPids = FALSE
   ))
   colnames(mdf)[colnames(mdf) == "commonName.x"] <- "Ontology"
   colnames(mdf)[colnames(mdf) == "commonName.y"] <- "Metabolites"
-  if (!includeRaMPids) {
-    mdf <- mdf[c("Metabolites", "sourceId", "IDtype", "Ontology", "HMDBOntologyType")]
-  } else {
-    mdf <- mdf[c("rampCompoundId", "rampOntologyId", "Metabolites", "sourceId", "IDtype", "Ontology", "HMDBOntologyType")]
-  }
-  # need to make unique list (JB, 12/1/21)
-  mdf <- unique(mdf)
 
-  # colnames(mdf) <- c('Metabolites','Ontology','Ontology_Type')
+  # KJK - deduplicate rows ignoring case for Metabolites
+  filtered_column_names = c("rampCompoundId", "rampOntologyId", "sourceId", "IDtype", "Ontology", "HMDBOntologyType")
+  if (!includeRaMPids) {
+    filtered_column_names = c("sourceId", "IDtype", "Ontology", "HMDBOntologyType")
+  }
+
+  final_column_names = c("Metabolites", filtered_column_names)
+  mdf <- mdf[ , final_column_names, drop = FALSE]
+
+  mdf$insensitive_metabolites = tolower(mdf$Metabolites)
+  dedup_column_names = c("insensitive_metabolites", filtered_column_names)
+  mdf <- mdf[!duplicated(mdf[ , dedup_column_names]), ]
+  mdf$insensitive_metabolites <- NULL
+
   return(mdf)
 }
 
