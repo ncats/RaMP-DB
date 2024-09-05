@@ -433,9 +433,9 @@ buildFrequencyTables<-function( inputdf, pathway_definitions="RaMP", analyte_typ
     tryCatch(
       {
         if (analyte_type == "metabolites") {
-          pathway_definitions <- readxl::read_excel(pathways, sheet = 1)
+          pathway_definitions <- readxl::read_excel(pathway_definitions, sheet = 1)
         } else if (analyte_type == "genes") {
-          pathway_definitions <- readxl::read_excel(pathways, sheet = 2)
+          pathway_definitions <- readxl::read_excel(pathway_definitions, sheet = 2)
         }
       },
       error = function(e) {
@@ -527,9 +527,9 @@ segregateDataBySource<-function(input_RampIds){
 ##' @author Andrew Patt
 find_duplicate_pathways <- function(db = RaMP()){
 
-  .Deprecated("findDuplicatPathways")
+  .Deprecated("findDuplicatePathways")
 
-  pathway_overlap = analyte_result
+  pathway_overlap = db@dbSummaryObjCache$analyte_result
   duplicate_pairs = data.frame(Pathway1=character(),Pathway2=character())
   for(i in 1:ncol(pathway_overlap)){
     duplicates <- which(pathway_overlap[,i]==1)

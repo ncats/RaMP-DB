@@ -13,3 +13,4 @@
 ^tests/.*$
 ^db/.*$
 ^docs/.*$
+^.dockerignore$

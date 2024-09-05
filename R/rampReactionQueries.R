@@ -395,7 +395,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
     if(multiRxnParticipantCount > 1) {
 
       analyte2Rxn = getReactionsForAnalytes(db=db, analytes=analytes, humanProtein = humanProtein)
-      rxnParticipantData <- getReactionParticpantCounts(analyte2Rxn, multiRxnParticipantCount)
+      rxnParticipantData <- getReactionParticipantCounts(analyte2Rxn, multiRxnParticipantCount)
 
       if(rxnParticipantData[['total_rxns_retained']] == 0) {
 
@@ -493,7 +493,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
     if(multiRxnParticipantCount > 1) {
 
       analyte2Rxn = RaMP::getReactionsForAnalytes(db=db, analytes=analytes, humanProtein = humanProtein)
-      rxnParticipantData <- getReactionParticpantCounts(analyte2Rxn, multiRxnParticipantCount)
+      rxnParticipantData <- getReactionParticipantCounts(analyte2Rxn, multiRxnParticipantCount)
 
       if(rxnParticipantData[['total_rxns_retained']] == 0) {
 
@@ -984,7 +984,7 @@ getRampSourceInfoFromAnalyteIDs <- function(db = RaMP(), analytes) {
 #' @param analyte2Rxn result object from getReactionsForAnalytes
 #' @param minRxnParticipantCountFilter if > 1, the set of reactions is reduced to those with having this number of mapped analytes
 #'
-getReactionParticpantCounts <- function(analyte2Rxn, minRxnParticipantCountFilter=1) {
+getReactionParticipantCounts <- function(analyte2Rxn, minRxnParticipantCountFilter=1) {
 
   metCounts <- data.frame(table(unlist(analyte2Rxn$met2rx$reactionId)))
   proteinCounts <- data.frame(table(unlist(analyte2Rxn$protein2rxn$reactionId)))
@@ -995,7 +995,7 @@ getReactionParticpantCounts <- function(analyte2Rxn, minRxnParticipantCountFilte
     mergedCounts <- merge(metCounts, proteinCounts, by.x = 'Var1', by.y='Var1', all.x=T, all.y=T)
     mergedCounts$Freq.x[is.na(mergedCounts$Freq.x)] <- 0
     mergedCounts$Freq.y[is.na(mergedCounts$Freq.y)] <- 0
-    mergedCounts$partCount <- mergedCounts$Freq.x + mergeCounts$Freq.y
+    mergedCounts$partCount <- mergedCounts$Freq.x + mergedCounts$Freq.y
     mergedCounts <- mergedCounts[,c(1,4)]
 
   } else if(nrow(metCounts) > 0) {
