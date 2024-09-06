@@ -54,10 +54,7 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
 
     metQuery <- paste0("select cmp_source.sourceId as input_analyte,
                                cmp_analyte.common_name as input_common_name,
-                               group_concat(distinct cmp_source.commonName COLLATE NOCASE) as input_common_names,
                                gene_analyte.common_name as rxn_partner_common_name,
-                               group_concat(distinct gene_source.commonName COLLATE NOCASE) as rxn_partner_common_names,
-                               group_concat(distinct gene_source.sourceId COLLATE NOCASE) as rxn_partner_ids,
                                gene_source.rampId
                       from catalyzed
                           join source gene_source on catalyzed.rampGeneId = gene_source.rampId
@@ -75,10 +72,7 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
 
     geneQuery <- paste0("select gene_source.sourceId as input_analyte,
                                 gene_analyte.common_name as input_common_name,
-                                group_concat(distinct gene_source.commonName COLLATE NOCASE) as input_common_names,
                                 cmp_analyte.common_name as rxn_partner_common_name,
-                                group_concat(distinct cmp_source.commonName COLLATE NOCASE) as rxn_partner_common_names,
-                                group_concat(distinct cmp_source.sourceId COLLATE NOCASE) as rxn_partner_ids,
                                 cmp_source.rampId
                           from catalyzed
                              join source gene_source on catalyzed.rampGeneId = gene_source.rampId
@@ -101,11 +95,8 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
 
 
       metQuery <- paste0("select synonym.Synonym as input_analyte,
-                                 cmp_analyte.common_name as input_common_name,
-                                 group_concat(distinct cmp_source.commonName COLLATE NOCASE) as input_common_names,
-                                 gene_analyte.common_name as rxn_partner_common_name,
-                                 group_concat(distinct gene_source.commonName COLLATE NOCASE) as rxn_partner_common_names,
-                                 group_concat(distinct gene_source.sourceId COLLATE NOCASE) as rxn_partner_ids,
+                                group_concat(distinct cmp_analyte.common_name COLLATE NOCASE) as input_common_name,
+                                group_concat(distinct gene_analyte.common_name COLLATE NOCASE) as rxn_partner_common_name,
                                  gene_source.rampId
                           from catalyzed
                                    join source gene_source on catalyzed.rampGeneId = gene_source.rampId
@@ -123,11 +114,8 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
     print(paste0("Number of met2gene relations: ",(nrow(df1))))
 
    geneQuery <- paste0("select synonym.Synonym as input_analyte,
-                               gene_analyte.common_name as input_common_name,
-                               group_concat(distinct gene_source.commonName COLLATE NOCASE) as input_common_names,
-                               cmp_analyte.common_name as rxn_partner_common_name,
-                               group_concat(distinct cmp_source.commonName COLLATE NOCASE) as rxn_partner_common_names,
-                               group_concat(distinct cmp_source.sourceId COLLATE NOCASE) as rxn_partner_ids,
+                               group_concat(distinct gene_analyte.common_name COLLATE NOCASE) as input_common_name,
+                               group_concat(distinct cmp_analyte.common_name COLLATE NOCASE) as rxn_partner_common_name,
                                cmp_source.rampId
                         from catalyzed
                                  join source gene_source on catalyzed.rampGeneId = gene_source.rampId
