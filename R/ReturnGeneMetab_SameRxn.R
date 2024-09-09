@@ -188,7 +188,39 @@ rampFastCata <- function(db = RaMP(), analytes="none", NameOrIds="ids") {
   resultList[["HMDB_Analyte_Associations"]] <- result
   resultList[["Rhea_Analyte_Associations"]] <- rheaResult
 
-  return(resultList)
+
+
+  if(nrow(resultList$HMDB_Analyte_Associations) >0)
+  {
+    resultList$HMDB_Analyte_Associations$rxn_partner_ids <- NA
+    resultList$HMDB_Analyte_Associations$Source <- "HMDB"
+  }
+
+  if(nrow(resultList$Rhea_Analyte_Associations) >0)
+  {
+    colnames(resultList$Rhea_Analyte_Associations)[3] <- "input_common_name"
+    resultList$Rhea_Analyte_Associations$Source <- "Rhea"
+  }
+
+  if (nrow(resultList$HMDB_Analyte_Associations) >0 && nrow(resultList$Rhea_Analyte_Associations) >0)
+  {
+    resultDF <- rbind(resultList$HMDB_Analyte_Associations, resultList$Rhea_Analyte_Associations)
+    resultDF[which(do.call(paste0, resultDF[,3:4]) %in% do.call(paste0, resultDF[duplicated(resultDF[3:4]),3:4])),]$Source <- "Both"
+    duplicates <- subset(resultDF, resultDF$Source=='Both')
+    resultDF <- subset(resultDF, resultDF$Source!='Both')
+
+    resultDF <- rbind(resultDF, duplicates[!is.na(duplicates$rxn_partner_ids),])
+
+  } else if (nrow(resultList$HMDB_Analyte_Associations) >0)
+  {
+    resultDF <- resultList$HMDB_Analyte_Associations
+  } else if (nrow(resultList$Rhea_Analyte_Associations) >0)
+  {
+    resultDF <- resultList$Rhea_Analyte_Associations
+  }
+
+
+  return(resultDF)
 }
 
 

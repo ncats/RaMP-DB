@@ -12,48 +12,116 @@
 #' @export
 plotCataNetwork <- function(catalyzedf = "") {
 
-        if(nrow(catalyzedf) == 0) {
-          message("The input dataframe has 0 rows. plotCataNetwork function is returning without generating a plot.")
-          return()
-        }
+  if(nrow(catalyzedf) == 0) {
+    message("The input data has 0 rows. plotCataNetwork function is returning without generating a plot.")
+    return()
+  }
 
-        if (length(intersect(c("input_analyte","rxn_partner_common_name", "rxn_partner_ids"),colnames(catalyzedf)))!=3) {
-                stop("Please make sure that the input is the resulting data.frame returned by the rampFastCata() function")
-        }
+  if (length(intersect(c("query_relation", "input_analyte", "input_common_name", "rxn_partner_common_name", "rxn_partner_ids", "Source" ),
+                       names(catalyzedf)))!=6) {
+    stop("Please make sure that the input is the resulting data.frame returned by the rampFastCata() function")
+  }
 
-        toplot = catalyzedf[,c("input_analyte","rxn_partner_common_name")]
-        colnames(toplot)<-c("from","to")
+  #Set Edges
+  myedges = catalyzedf[,c("query_relation", "input_common_name","rxn_partner_common_name", "Source")]
+  colnames(myedges)[2:3] <-c("from","to")
 
-        #colopts <- brewer.pal(12,"Set3")
-        mycol=rep("black")
-        mysize<-rep(8,nrow(toplot))
-        mynames<-rep(NA,nrow(toplot))
+  myedges$color <- ifelse(myedges$Source=="HMDB", "#ca1f7b", ifelse(myedges$Source=="Rhea", "#cc5500", "#008080"))
+  myedges$highlight <- myedges$color
 
-        myedges <- cbind(toplot,mycol,mysize,mynames)
+  #Set nodes
+  mynodes=c(unique(myedges$from),unique(myedges$to))
+  mycol=c(rep("black",length(unique(myedges$from))),
+          rep("#d2e5f6",length(unique(myedges$to))))
+  mynames <- mynodes
 
-        # Now set nodes
-        mynodes=c(unique(toplot$from),unique(toplot$to))
-        mycol=c(rep("blue",length(unique(toplot$from))),
-                rep("orange",length(unique(toplot$to))))
-        mysize <- rep(8,length(mynodes))
-        mynames <- mynodes
+  mynodes <- data.frame(color=mycol,id=mynames,label=mynames)
 
-        mynodes=data.frame(color=mycol,size=mysize,id=mynames,label=mynames)
+  duplicates <- mynodes[mynodes[,3] %in% mynodes[duplicated(mynodes[3]),3],]
 
-        # Now plot
-        visNetwork::visNetwork(mynodes, myedges, width = "100%",height="1000px") %>%
-		visNetwork::visInteraction(dragNodes = FALSE,
-                 dragView = TRUE,hideEdgesOnDrag=TRUE,hideNodesOnDrag=TRUE,
-                 navigationButtons=TRUE,zoomView = TRUE) %>%
-  		visNetwork::visLayout(randomSeed = 123) %>%
-		visNetwork::visPhysics(
-		  barnesHut = list(
-		    gravitationalConstant = -100,
-		    centralGravity = 0,
-		    springConstant = 0
-		  ),
-		  stabilization = TRUE)
-        #return(NULL) #return(list(nodes=mynodes,edges=myedges))
+  if(nrow(duplicates)>0)
+  {
+    mynodes <- mynodes[-c(as.numeric(rownames(duplicates))),]
+
+    duplicates <- split(duplicates, duplicates$id)
+
+    for (i in 1:length(duplicates))
+    {
+      if(length(which(grepl("black", duplicates[[i]]$color)))>0)
+      {
+        single <- unique(duplicates[[i]][grepl("black", duplicates[[i]]$color),])
+      } else
+      {
+        single <- duplicates[[i]][1,]
+      }
+
+      mynodes <- rbind(mynodes, single)
+    }
+  }
+
+  for (i in 1:nrow(mynodes))
+  {
+    if (mynodes[i,1] == "black")
+    {
+      if (myedges[which(myedges$from == mynodes[i,2])[1], 1]=="met2gene" | myedges[which(myedges$from == mynodes[i,2])[1], 1]=="met2protein")
+      {
+        mynodes$shape[i] <- "dot"
+      } else {
+        mynodes$shape[i] <- "square"
+      }
+    } else if (mynodes[i,1] == "#d2e5f6")
+    {
+      if (myedges[which(myedges$to == mynodes[i,2])[1], 1]=="met2gene" | myedges[which(myedges$to == mynodes[i,2])[1], 1]=="met2protein")
+      {
+        mynodes$shape[i] <- "square"
+      } else {
+        mynodes$shape[i] <- "dot"
+      }
+    }
+  }
+
+  #ledges <- data.frame(color = unique(myedges$color.color),
+  #           label = c("From HMDB", "From Rhea", "From Both"))
+  lnodes <- data.frame(icon.color = c("black", "#d2e5f6"),
+                       id =  c("Input", "Output"),
+                       label = c("Input Analyte", "Output Analyte"),
+                       shape = "icon",
+                       icon.face = "'Font Awesome 5 Free'",
+                       icon.code = "f111")
+  lnodes <- rbind(lnodes, data.frame(icon.color = c("#ca1f7b", "#cc5500", "#008080"),
+                                     id = c("From HMDB", "From Rhea", "From Both"),
+                                     label = c("From HMDB", "From Rhea", "From Both"),
+                                     shape = "icon",
+                                     icon.face = "'Font Awesome 5 Free'",
+                                     icon.code = "f068"))
+  lnodes <- rbind(lnodes, data.frame(icon.color = c("#F9e4bc", "#F9e4bc"),
+                                     id = c("Metabolite", "Gene/Protein"),
+                                     label = c("Metabolite", "Gene/Protein"),
+                                     shape = "icon",
+                                     icon.face = "'Font Awesome 5 Free'",
+                                     icon.code = c("f111", "f0c8")))
+
+  # Now plot
+  visNetwork::visNetwork(mynodes, myedges) %>%
+    visNetwork::visInteraction(dragNodes = TRUE,
+                               dragView = TRUE,
+                               navigationButtons=TRUE,zoomView = TRUE) %>%
+    visNetwork::visLayout(randomSeed = 123) %>%
+    visNetwork::visNodes(size = 20, font = list(size = 25, background = "white")) %>%
+    visNetwork::visEdges(width = 1.5, dashes = TRUE, selectionWidth = 3) %>%
+    #visNetwork::visLegend(useGroups = F, addNodes = lnodes, addEdges = ledges, main = "Legend") %>%
+    visNetwork::visLegend(useGroups = F, addNodes = lnodes, main = "Legend") %>%
+    visNetwork::visGroups()%>%
+    visNetwork::addFontAwesome(version = "5.13.0") %>%
+    visNetwork::visPhysics(
+      barnesHut = list(
+        gravitationalConstant = -100,
+        centralGravity = 0,
+        springConstant = 0
+      ),
+      stabilization = TRUE) %>%   # explicit edge options
+    visNetwork::visOptions(highlightNearest = list(enabled = TRUE, degree = 1,
+                                                   labelOnly = FALSE, hover = TRUE))
 }
 
 #' Cluster and plot significant pathways by FDR-adjusted pval
