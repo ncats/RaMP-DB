@@ -11,12 +11,12 @@
 getPrefixesFromAnalytes<-function(analyteType="gene", db = RaMP()) {
   if (analyteType=="gene"){
     query1 <- "select distinct(IDtype) from source where geneOrCompound ='gene';"
-    df1<- RaMP::runQuery(query1, db)
+    df1<- runQuery(sql = query1, db = db)
     df1 <- data.frame(analyteType="Genes/Proteins", idTypes=paste(df1$IDtype,collapse=", "))
     }
   else if (analyteType=="metabolite"){
     query2 <- "select distinct(IDtype) from source where geneOrCompound ='compound';"
-    df1 <- RaMP::runQuery(query2, db)
+    df1 <- runQuery(sql = query2, db = db)
     df1 <- data.frame(analyteType="Metabolites", idTypes=paste(df1$IDtype,collapse=", "))
     }
   else{
@@ -42,7 +42,7 @@ getMetabClassDataSources<-function(db = RaMP()){
 #' @export getMetabClassTypes
 getMetabClassTypes<-function(db = RaMP()){
   query1<-"select distinct(class_level_name) from metabolite_class order by class_level_name asc"
-  results<- RaMP::runQuery(query1, db)
+  results<- RaMP::runQuery(sql = query1, db = db)
   return(results)
 }
 
@@ -55,13 +55,13 @@ getMetabClassTypes<-function(db = RaMP()){
 getMetabChemClass <- function( classType= 'ClassyFire_super_class', db = RaMP() ) {
   if (!is.null(classType)) {
     query1<- paste0("select class_level_name, class_name from metabolite_class where class_level_name = '",classType,"' group by class_level_name, class_name")
-    res <- RaMP::runQuery(query1, db)
+    res <- RaMP::runQuery(sql = query1, db = db)
     res <- split(res$class_name,res$class_level_name)
   }
 
   else if (is.null(classType)){
     query1 <- "select class_level_name, class_name from metabolite_class group by class_level_name, class_name"
-    res <- RaMP::runQuery(query1, db)
+    res <- RaMP::runQuery(sql = query1, db = db)
     res <- split(res$class_name,res$class_level_name)
   }
 
@@ -82,7 +82,7 @@ getMetabChemClass <- function( classType= 'ClassyFire_super_class', db = RaMP() 
 
 getOntologies <- function(db = RaMP()) {
   query1 <- "select * from ontology"
-  OntoRes <- RaMP::runQuery(query1, db)
+  OntoRes <- RaMP::runQuery(sql = query1, db = db)
   return(OntoRes)
 }
 

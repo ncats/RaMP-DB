@@ -42,7 +42,7 @@ Cluster and plot significant pathways by FDR-adjusted pval
 }
 \examples{
 \dontrun{
-plotEnrichedPathways(filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2,
+pathwayResultsPlot(pathwaysSig = filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2,
    min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE, db = rampDB )
 }
 }

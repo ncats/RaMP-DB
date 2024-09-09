@@ -6,7 +6,7 @@
 #' metabolites are highlighted in blue, whereas analytes found by the function are orange.
 #' @examples
 #' \dontrun{
-#' inputs.of.interest <- c("kegg:C00186" , "hmdb:HMDB0000148", "kegg:C00780", "hmdb:HMDB0000064", 
+#' inputs.of.interest <- c("kegg:C00186" , "hmdb:HMDB0000148", "kegg:C00780", "hmdb:HMDB0000064",
 #'       "ensembl:ENSG00000115850", "uniprot:Q99259")
 #'
 #' new.transcripts <- rampFastCata(analytes = inputs.of.interest, db = rampDB)
@@ -74,7 +74,7 @@ plotCataNetwork <- function(catalyzedf = "") {
 #' @param db a RaMP database object
 #' @examples
 #' \dontrun{
-#' plotEnrichedPathways(filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2,
+#' pathwayResultsPlot(pathwaysSig = filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2,
 #'    min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE, db = rampDB )
 #' }
 #' @export
@@ -85,12 +85,12 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
 
 
   if( !('cluster_assignment' %in% colnames(pathwaysSig$fishresult))) {
-    fishClustering <- findCluster(db = db, pathwaysSig,
+    fishClustering <- findCluster(db = db, fishers_df = pathwaysSig,
                                   perc_analyte_overlap = perc_analyte_overlap,
                                   perc_pathway_overlap = perc_pathway_overlap,
                                   min_pathway_tocluster = min_pathway_tocluster
     )
-    # asign this here if clustering is proformed here...
+    # assign this here if clustering is preformed here...
     fishresult <- fishClustering$fishresults
   } else {
     message("The input pathway result has already been clustered. Defaulting to existing clustering.")
@@ -262,7 +262,7 @@ plotReactionClasses <- function(reactionClassesResults) {
 
 
 
-  sunburst_ontology_reactionclass <- buildReactionClassesSunburstDataframe(reactionClassesResults)
+  sunburst_ontology_reactionclass <- buildReactionClassesSunburstDataframe(reactionClassesResults = reactionClassesResults)
 
   fig <- plotly::plot_ly(
     color = I("black"),
@@ -299,7 +299,7 @@ plotReactionClasses <- function(reactionClassesResults) {
 #'
 #' @param reactionsResults output of getReactionsForAnalytes()
 #' @param includeCofactorMets include metabolites labeled at cofactors within ChEBI (Default = FALSE)
-#' @return  An interactive HTML upset plot that allows the user to visualize the overlap in the number of 
+#' @return  An interactive HTML upset plot that allows the user to visualize the overlap in the number of
 #' input compounds across level 1 of reaction classes.
 #' @examples
 #' \dontrun{
@@ -308,10 +308,10 @@ plotReactionClasses <- function(reactionClassesResults) {
 #' 'chebi:62286', 'chebi:77897', 'uniprot:P30566','uniprot:P30520',
 #' 'uniprot:P00568', 'uniprot:P23109', 'uniprot:P22102', 'uniprot:P15531')
 #'
-#' reactionsLists <- RaMP::getReactionsForAnalytes(analytes = analytes.of.interest, 
+#' reactionsLists <- RaMP::getReactionsForAnalytes(analytes = analytes.of.interest,
 #'     includeTransportRxns = F, humanProtein = T, db = rampDB)
 #'
-#' plotAnalyteOverlapPerRxnLevel(reactionsLists)
+#' plotAnalyteOverlapPerRxnLevel(reactionsResults = reactionsLists)
 #' }
 #'
 #' @export
@@ -474,7 +474,7 @@ plotChemicalClassSurvery <- function(chemicalClassSurveryResults, plotType = "su
 
 
 
-  sunburst_ontology_chemicalClass <- buildChemicalClassSurveryDataframe(chemicalClassSurveryResults)
+  sunburst_ontology_chemicalClass <- buildChemicalClassSurveryDataframe(chemicalClassSurveryResults = chemicalClassSurveryResults)
 
   fig <- plotly::plot_ly(
     color = I("black")

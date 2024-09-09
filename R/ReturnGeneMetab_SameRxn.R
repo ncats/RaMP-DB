@@ -48,7 +48,7 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
 
-  isSQLite = .is_sqlite(db)
+  isSQLite = .is_sqlite(x = db)
 
   if(namesOrIds == 'ids') {
 
@@ -76,7 +76,7 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
 
     print("Building metabolite to gene relations.")
 
-    df1 <- RaMP::runQuery(metQuery, db)
+    df1 <- runQuery(sql = metQuery, db = db)
 
     print(paste0("Number of met2gene relations: ",(nrow(df1))))
 
@@ -100,7 +100,7 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
     }
     print("Building gene to metabolite relations.")
 
-    df2 <- RaMP::runQuery(geneQuery, db)
+    df2 <- runQuery(sql = geneQuery, db = db)
 
   } else {
 
@@ -131,7 +131,7 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
 
     print("Building metabolite to gene relations.")
 
-    df1 <- RaMP::runQuery(metQuery, db)
+    df1 <- runQuery(sql = metQuery, db = db)
 
     print(paste0("Number of met2gene relations: ",(nrow(df1))))
 
@@ -156,7 +156,7 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
     }
     print("Building gene to metabolite relations.")
 
-    df2 <- RaMP::runQuery(geneQuery, db)
+    df2 <- runQuery(sql = geneQuery, db = db)
 
     print(paste0("Number of gene2met relations: ",(nrow(df2))))
   }

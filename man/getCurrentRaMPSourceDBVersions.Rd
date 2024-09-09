@@ -17,7 +17,6 @@ Retrieve versions of each database within the current version of RaMP
 }
 \examples{
 \dontrun{
-pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-getCurrentRaMPDBVersions()
+getCurrentRaMPSourceDBVersions()
 }
 }

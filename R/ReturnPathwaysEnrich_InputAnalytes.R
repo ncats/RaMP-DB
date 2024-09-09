@@ -174,7 +174,7 @@ runFisherTest <- function(analytes,
     query <- "select distinct rampId, pathwaySource from analytehaspathway;"
   }
 
-  allids <- RaMP::runQuery(query, db)
+  allids <- runQuery(sql = query, db = db)
   allids <- allids[!duplicated(allids), ]
 
   if ((analyte_type == "metabolites")) {
@@ -206,11 +206,11 @@ runFisherTest <- function(analytes,
 
   ## Input_RampIds is a table of all analytes included in pathways represented in the user set
   ## "User" refers to significant analytes
-  input_RampIds <- buildFrequencyTables(pathwaydf, pathway_definitions, analyte_type, db)
+  input_RampIds <- buildFrequencyTables(inputdf = pathwaydf, pathway_definitions = pathway_definitions, analyte_type = analyte_type, db = db)
   if (is.null(input_RampIds)) {
     stop("Data doesn't exist")
   } else {
-    segregated_id_list <- segregateDataBySource(input_RampIds)
+    segregated_id_list <- segregateDataBySource(input_RampIds = input_RampIds)
     if(analyte_type=="metabolites"){
       segregated_id_list <- segregated_id_list$metab
     }else{
@@ -364,7 +364,7 @@ runFisherTest <- function(analytes,
     # Now run fisher's tests for all other pids
     query <- "select distinct(pathwayRampId) from analytehaspathway where pathwaySource != 'hmdb';"
 
-    allpids <- RaMP::runQuery(query, db)
+    allpids <- runQuery(sql = query, db = db)
 
     pidstorun <- setdiff(allpids[, 1], pid)
     pidstorunlist <- sapply(pidstorun, shQuote)
@@ -375,12 +375,12 @@ runFisherTest <- function(analytes,
       pidstorunlist, ")"
     )
 
-    restcids <- RaMP::runQuery(query2, db) # [[1]]
+    restcids <- runQuery(sql = query2, db = db) # [[1]]
 
     # modify to not take hmdb pathways
     query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwaySource != 'hmdb';")
 
-    allcids <- RaMP::runQuery(query1, db) # [[1]]
+    allcids <- runQuery(sql = query1, db = db) # [[1]]
 
     # We're collecting p-values for all pathways, now those with no analyte support at all - JCB:?
 
@@ -515,7 +515,7 @@ runFisherTest <- function(analytes,
   # Remove duplicate pathways between wikipathways and reactome, only perfect overlaps
   # only make the dup list if it doesn't exist from a previous run in the session
   if( !exists('duplicate_pathways')) {
-    duplicate_pathways <- findDuplicatePathways(db)
+    duplicate_pathways <- findDuplicatePathways(db = db)
   }
   if (any(out$pathwayRampId %in% duplicate_pathways)) {
     out <- out[-which(out$pathwayRampId %in% duplicate_pathways), ]
@@ -819,7 +819,7 @@ runCombinedFisherTest <- function(
 #' @param find_synonym find all synonyms or just return same synonym (T/F)
 #' @param namesOrIds whether input is "names" or "ids" (default is "ids")
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
-#' @param include_smpdb Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are 
+#' @param include_smpdb Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are
 #' highly redundant
 #' @param minPathwaySize the minimum number of pathway members (genes and metabolites) to include the pathway in
 #'  the output (default = 5)
@@ -830,9 +830,9 @@ runCombinedFisherTest <- function(
 #' @return a list contains all metabolites as name and pathway inside.
 #' @examples
 #' \dontrun{
-#' getPathwayFromAnalyte(db = rampDB, namesOrIds="ids", c("ensembl:ENSG00000135679", 
+#' getPathwayFromAnalyte(db = rampDB, namesOrIds="ids", c("ensembl:ENSG00000135679",
 #'      "hmdb:HMDB0000064",
-#'      "hmdb:HMDB0000148", 
+#'      "hmdb:HMDB0000148",
 #'      "ensembl:ENSG00000141510"))
 #'
 #' getPathwayFromAnalyte(db = rampDB, namesOrIds = "names", c("Serotonin", "Bilirubin", "Urea"))
@@ -871,7 +871,7 @@ getPathwayFromAnalyte <- function( analytes = "none",
     return(NULL)
   }
 
-  isSQLite = .is_sqlite(db)
+  isSQLite = .is_sqlite(x = db)
 
   if (namesOrIds == "ids") {
 
@@ -952,7 +952,7 @@ getPathwayFromAnalyte <- function( analytes = "none",
 
   }
 
-  df2 <- RaMP::runQuery(sql, db)
+  df2 <- runQuery(sql = sql, db = db)
   if(!include_smpdb){
     df2 <- df2 %>% dplyr::filter(.data$pathwaySource != "hmdb")
   }
@@ -966,7 +966,7 @@ getPathwayFromAnalyte <- function( analytes = "none",
      as synonyms from analytesynonym
      where rampId in (", rampIds, ") group by rampId")
 
-    synonymsDf <- RaMP::runQuery(sql, db)
+    synonymsDf <- runQuery(sql = sql, db = db)
 
     if (nrow(synonymsDf) > 0) {
       df2 <- merge(df2, synonymsDf, by = "rampId")
@@ -975,7 +975,7 @@ getPathwayFromAnalyte <- function( analytes = "none",
 
   # filter by pathway size criteria
 
-  df2 <- filterPathwaysByAnalyteCount(db, pathway_dataframe=df2, pathway_ramp_id_col_name = 'pathwayRampId', minPathwaySize = minPathwaySize, maxPathwaySize = maxPathwaySize)
+  df2 <- filterPathwaysByAnalyteCount(db = db, pathway_dataframe=df2, pathway_ramp_id_col_name = 'pathwayRampId', minPathwaySize = minPathwaySize, maxPathwaySize = maxPathwaySize)
 
   if (!includeRaMPids && nrow(df2) > 0) {
     df2 <- subset(df2, select = -c(rampId, pathwayRampId))
@@ -1096,7 +1096,7 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
     ")"
   )
 
-  idkey <- RaMP::runQuery(query, db) %>%
+  idkey <- runQuery(sql = query, db = db) %>%
     dplyr::rename("pathwayId" = "sourceId") ##  %>%
   ## dplyr::rename("rampId" = "pathwayRampId")
 
@@ -1266,7 +1266,7 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
     }
 
     ## fishers_df$rampids <- rampids
-    fishers_df <- cleanup(fishers_df)
+    fishers_df <- cleanup(data = fishers_df)
     rownames(fishers_df) <- NULL
 
     ## Remove RaMP ids

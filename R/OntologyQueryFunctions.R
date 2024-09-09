@@ -45,7 +45,7 @@ getOntoFromMeta <- function(analytes, namesOrIds = "ids", includeRaMPids = FALSE
     cat(file = stderr(), "query sql in Package call with -- ", sql, "\n")
   }
 
-  df <- RaMP::runQuery(sql, db)
+  df <- runQuery(sql = sql, db = db)
 
   if (nrow(df) == 0) {
     message("This source id
@@ -62,7 +62,7 @@ getOntoFromMeta <- function(analytes, namesOrIds = "ids", includeRaMPids = FALSE
     rampid, ");"
   )
 
-  df2 <- RaMP::runQuery(sql, db)
+  df2 <- runQuery(sql = sql, db = db)
 
   if (nrow(df2) == 0) {
     message("No searching result because these metabolites are not linked to ontology")
@@ -77,7 +77,7 @@ getOntoFromMeta <- function(analytes, namesOrIds = "ids", includeRaMPids = FALSE
     rampontoid, ");"
   )
 
-  df3 <- RaMP::runQuery(sql, db)
+  df3 <- runQuery(sql = sql, db = db)
 
   mdf <- unique(merge(df3, df2, all.x = T))
   mdf <- unique(merge(mdf, df,
@@ -108,7 +108,7 @@ getOntoFromMeta <- function(analytes, namesOrIds = "ids", includeRaMPids = FALSE
 #' function that query database to find analytes in given ontologies
 #' @param ontology a vector of ontology or ontologies delimited by new line character
 #' @param db a RaMP database object
-#' @return dataframe that  contains searched analytes from given ontology
+#' @return dataframe that contains searched analytes from given ontology
 #' @examples
 #' \dontrun{
 #' ontologies.of.interest <- c("Colon", "Liver", "Lung")
@@ -166,7 +166,7 @@ getMetaFromOnto <- function(ontology, db = RaMP()) {
           group by o.commonName, s.rampId, o.HMDBOntologyType")
     }
 
-    mdf_final <- RaMP::runQuery(sql, db)
+    mdf_final <- runQuery(sql = sql, db = db)
 
     mdf_final <- unique(mdf_final)
     mdf_final <- mdf_final[, c(4, 5, 3, 2)]
@@ -190,16 +190,16 @@ getMetaFromOnto <- function(ontology, db = RaMP()) {
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
 #' @param min_analyte minimum number of analytes per pathway (pathways with < min_analyte analytes are filtered out).
 #' @param min_ontology_size the minimum number of ontology members (genes and metabolites) to include the ontology in the output (default = 5)
-#' @param max_ontology_size the maximum number of ontology memnbers (genes and metaboltes) to include the ontology in the output (default = 150)
+#' @param max_ontology_size the maximum number of ontology members (genes and metabolites) to include the ontology in the output (default = 150)
 #' @param includeRaMPids whether or not to include RaMP IDs in the output (TRUE/FALSE)
-#' @param background_type type of background that is input by the user.  Opions are "database" if user wants all
+#' @param background_type type of background that is input by the user.  Options are "database" if user wants all
 #' analytes from the RaMP database will be used; "file", if user wants to input a file with a list of background
 #' analytes; "list", if user wants to input a vector of analyte IDs; "biospecimen", if user wants to specify a
 #' biospecimen type (e.g. blood, adipose tissue, etc.) and have those biospecimen-specific analytes used.  For genes,
 #' only the "database" option is used.
 #' @param background background to be used for Fisher's tests.  If parameter 'background_type="database"', this parameter
 #' is ignored (default="database"); if parameter 'background_type= "file"', then 'background' should be a file name (with
-#' directory); if 'background_type="list"', then 'background' should be a vector of RaMP IDs; if 'backgroud_type="biospecimen"'
+#' directory); if 'background_type="list"', then 'background' should be a vector of RaMP IDs; if 'background_type="biospecimen"'
 #' then users should specify one of the following: "Blood", "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney",
 #' "Saliva", and "Feces"
 #' @param db a RaMP database object
@@ -237,7 +237,7 @@ runOntologyTest <- function(analytes,
 
   if (background_type == "list") {
     backgrounddf <- getOntoFromMeta(
-      db = db, background,
+      db = db, analytes = background,
       includeRaMPids = TRUE,
       namesOrIds = namesOrIds
     )
@@ -269,7 +269,7 @@ runOntologyTest <- function(analytes,
       "') and analytehasontology.rampOntologyId = ontology.rampOntologyId and analytehasontology.rampCompoundId = analytehasontology.rampId"
     )
 
-    backgrounddf <- RaMP::runQuery(query, db)
+    backgrounddf <- runQuery(sql = query, db = db)
 
     if (nrow(backgrounddf) == 0) {
       stop("Biospecimen background not found. Choices are 'Blood', 'Adipose', 'Heart', 'Urine', 'Brain', 'Liver', 'Kidney', 'Saliva', and 'Feces'")
@@ -310,7 +310,7 @@ runOntologyTest <- function(analytes,
   # added conditional to not pull hmdb ids
   query <- "select distinct rampCompoundId from analytehasontology;"
 
-  allids <- RaMP::runQuery(query, db)
+  allids <- runQuery(sql = query, db = db)
   allids <- allids[!duplicated(allids), ]
 
   totanalytes <- length(allids)
@@ -329,7 +329,7 @@ runOntologyTest <- function(analytes,
     list_pid, ")"
   )
 
-  input_RampIds <- RaMP::runQuery(query, db)
+  input_RampIds <- runQuery(sql = query, db = db)
 
   if (is.null(input_RampIds)) {
     stop("Data doesn't exist")
@@ -488,6 +488,6 @@ runOntologyTest <- function(analytes,
   if (includeRaMPids) {
     return(out)
   } else {
-    return(out %>% cleanup())
+    return(cleanup(data = out))
   }
 }

@@ -86,7 +86,7 @@ setClass(
 setMethod("show", "RaMP", function(object) {
     if (is.null(object@driver))
         cat("Empty RaMP object")
-    con <- .dbcon(object)
+    con <- .dbcon(x = object)
     on.exit(dbDisconnect(con))
     cat(class(object), "\n")
     ## Maybe get some additional information from the database with e.g.
@@ -151,7 +151,7 @@ RaMP <- function(version = character()) {
             print(paste0("RaMP version '", version,"' not available. Use ",
                  "'listAvailableRaMPDbVersions()' to list available versions."))
             print(paste0("Checking for version '", version, "' on remote server."))
-              avail <- .is_version_in_remote_lfs(version)
+              avail <- .is_version_in_remote_lfs(version = version)
             if(!avail) {
               print("The spcified RaMP Database version is not available in local file cache OR in remote repository.")
               print("")
@@ -160,18 +160,18 @@ RaMP <- function(version = character()) {
               return(NULL)
             } else {
               print(paste0("Retrieving RaMP SQLite DB version '", version, "' from remote server."))
-              .get_ramp_db(version)
+              .get_ramp_db(version = version)
             }
         }
     }
-    db <- .RaMP(SQLite(), dbname = .get_ramp_db(version))
-    con <- .dbcon(db)
+    db <- .RaMP(driver = SQLite(), dbname = .get_ramp_db(version = version))
+    con <- .dbcon(x = db)
 
     # add the cache of summary data objects for enrichment
-    db@dbSummaryObjCache <- setupRdataCache(db)
+    db@dbSummaryObjCache <- setupRdataCache(db = db)
 
     on.exit(dbDisconnect(con))
-    .valid_ramp_database(con, error = TRUE)
+    .valid_ramp_database(con = con, error = TRUE)
     db
 }
 
