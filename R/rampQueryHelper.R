@@ -765,6 +765,15 @@ chemicalClassSurveyRampIdsConn <- function( mets, pop, inferIdMapping=TRUE, db =
 
   metsData <- RaMP::runQuery(sql, db)
 
+  # need to filter for our specific source ids
+  # ID mapping uses a subset to report on found additional source ids, else matches on class_source_id (source ids directly mapped to chem class)
+  if(inferIdMapping) {
+    metsData2 <- subset(metsData, "sourceId" %in% mets)
+    metsData <- metsData2
+  } else {
+    metsData <- subset(metsData, "class_source_id" %in% mets)
+  }
+
   # get query summary
   metQueryReport <- queryReport(mets, metsData$sourceId)
 
@@ -918,6 +927,14 @@ chemicalClassSurveyRampIdsFullPopConn <- function( mets, inferIdMapping=TRUE, db
   }
 
   metsData <- RaMP::runQuery(sql, db)
+
+  # need to filter for our specific source ids
+  if(inferIdMapping) {
+    metsData2 <- subset(metsData, "sourceId" %in% mets)
+    metsData <- metsData2
+  } else {
+    metsData <- subset(metsData, "class_source_id" %in% mets)
+  }
 
   # get query summary
   metQueryReport <- queryReport(mets, metsData$sourceId)
