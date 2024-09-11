@@ -1,3 +1,5 @@
+#' @importFrom R6 R6Class
+
 dbHasAnalyteCommonName <- function(db) {
   query <- "PRAGMA table_info(analyte);"
   table_info <- RaMP::runQuery(query, db)
