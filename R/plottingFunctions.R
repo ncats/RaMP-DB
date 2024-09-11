@@ -6,7 +6,7 @@
 #' metabolites are highlighted in blue, whereas analytes found by the function are orange.
 #' @examples
 #' \dontrun{
-#' inputs.of.interest <- c("kegg:C00186" , "hmdb:HMDB0000148", "kegg:C00780", "hmdb:HMDB0000064", 
+#' inputs.of.interest <- c("kegg:C00186" , "hmdb:HMDB0000148", "kegg:C00780", "hmdb:HMDB0000064",
 #'       "ensembl:ENSG00000115850", "uniprot:Q99259")
 #'
 #' new.transcripts <- rampFastCata(analytes = inputs.of.interest, db = rampDB)
@@ -21,7 +21,7 @@ plotCataNetwork <- function(catalyzedf = "") {
           return()
         }
 
-        if (length(intersect(c("input_analyte","rxn_partner_common_name", "rxn_partner_ids"),colnames(catalyzedf)))!=3) {
+        if (length(intersect(c("input_analyte","rxn_partner_common_name"),colnames(catalyzedf)))!=2) {
                 stop("Please make sure that the input is the resulting data.frame returned by the rampFastCata() function")
         }
 
@@ -299,7 +299,7 @@ plotReactionClasses <- function(reactionClassesResults) {
 #'
 #' @param reactionsResults output of getReactionsForAnalytes()
 #' @param includeCofactorMets include metabolites labeled at cofactors within ChEBI (Default = FALSE)
-#' @return  An interactive HTML upset plot that allows the user to visualize the overlap in the number of 
+#' @return  An interactive HTML upset plot that allows the user to visualize the overlap in the number of
 #' input compounds across level 1 of reaction classes.
 #' @examples
 #' \dontrun{
@@ -308,7 +308,7 @@ plotReactionClasses <- function(reactionClassesResults) {
 #' 'chebi:62286', 'chebi:77897', 'uniprot:P30566','uniprot:P30520',
 #' 'uniprot:P00568', 'uniprot:P23109', 'uniprot:P22102', 'uniprot:P15531')
 #'
-#' reactionsLists <- RaMP::getReactionsForAnalytes(analytes = analytes.of.interest, 
+#' reactionsLists <- RaMP::getReactionsForAnalytes(analytes = analytes.of.interest,
 #'     includeTransportRxns = F, humanProtein = T, db = rampDB)
 #'
 #' plotAnalyteOverlapPerRxnLevel(reactionsLists)
