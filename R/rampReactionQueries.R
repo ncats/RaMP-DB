@@ -164,7 +164,7 @@ getReactionsForAnalytes <- function( analytes, onlyHumanMets=F, humanProtein=T, 
 #'
 getReactionsForSourceCompoundIds <- function( compoundIds, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN"), db = RaMP()) {
   data_access <- DataAccessObject$new(db = db)
-  return (data_access$getRheaRxnPartnersFromMetIDs(compoundIds, onlyHumanMets, humanProtein, includeTransportRxns, rxnDirs))
+  return (data_access$getRheaRxnPartnersFromMetIDs(metaboliteIDs = compoundIds, onlyHumanMets=onlyHumanMets, humanProtein=humanProtein, includeTransportRxns=includeTransportRxns, rxnDirs=rxnDirs))
 }
 
 
@@ -182,7 +182,7 @@ getReactionsForSourceCompoundIds <- function( compoundIds, onlyHumanMets=F, huma
 #'
 getReactionsForSourceProteinIds <- function( proteinIds, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN"), db = RaMP()) {
   data_access <- DataAccessObject$new(db = db)
-  return (data_access$getRheaRxnPartnersFromGeneIDs(proteinIds, onlyHumanMets, humanProtein, includeTransportRxns, rxnDirs))
+  return (data_access$getRheaRxnPartnersFromGeneIDs(geneIDs=proteinIds, onlyHumanMets=onlyHumanMets, humanProtein=humanProtein, includeTransportRxns=includeTransportRxns, rxnDirs=rxnDirs))
 }
 
 
@@ -558,7 +558,7 @@ getReactionParticipants <- function( reactionList = c(), db = RaMP()) {
 
   data_access <- DataAccessObject$new(db = db)
 
-  metResult <- data_access$getRxnMetParticipants(reactionListStr)
+  metResult <- data_access$getRxnMetParticipants(rxnString = reactionListStr)
   metResult$participant_role <- 'substrate'
   metResult$participant_role_id <- 3
   metResult$participant_role[metResult$is_product == 1] <- 'product'
@@ -577,7 +577,7 @@ getReactionParticipants <- function( reactionList = c(), db = RaMP()) {
 
   proteinResult$reaction_type <- 'biochemical'
 
-  rxnResult <- data_access$getRxnIsTransport(reactionListStr)
+  rxnResult <- data_access$getRxnIsTransport(rxnString=reactionListStr)
 
   if(nrow(rxnResult) > 0) {
     transportRxns <- unique(unlist(rxnResult$rxn_source_id))
