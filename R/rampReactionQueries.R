@@ -163,36 +163,8 @@ getReactionsForAnalytes <- function( analytes, onlyHumanMets=F, humanProtein=T, 
 #' @return returns a dataframe of reaction information for each ramp compound id
 #'
 getReactionsForSourceCompoundIds <- function( compoundIds, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN"), db = RaMP()) {
-
-  idStr <- listToQueryString(compoundIds)
-  query <- paste0("select mr.met_source_id, mr.substrate_product, mr.is_cofactor, mr.met_name,
-  rxn.rxn_source_id, rxn.is_transport, rxn.label, rxn.direction, rxn.equation, rxn.html_equation, rxn.ec_num, rxn.has_human_prot, rxn.only_human_mets
-  from reaction2met mr, reaction rxn
-  where mr.met_source_id in (",idStr,") and rxn.rxn_source_id = mr.rxn_source_id")
-
-  if(length(rxnDirs) == 1) {
-    query <- paste0(query, " and rxn.direction = '",rxnDirs[1],"'")
-  } else if(length(rxnDirs)>1) {
-    query <- paste0(query, " and rxn.direction in (",listToQueryString(rxnDirs),")")
-  } else {
-    print("rxnDirs must be of length > 0")
-  }
-
-  if(humanProtein) {
-    query <- paste0(query," and rxn.has_human_prot = 1")
-  }
-
-  if(onlyHumanMets) {
-    query <- paste0(query, " and rxn.only_human_mets = 1")
-  }
-
-  if(!includeTransportRxns) {
-    query <- paste0(query, " and rxn.is_transport = 0")
-  }
-
-  df <- RaMP::runQuery(query, db)
-
-  return(df)
+  data_access <- DataAccessObject$new(db = db)
+  return (data_access$getRheaRxnPartnersFromMetIDs(compoundIds, onlyHumanMets, humanProtein, includeTransportRxns, rxnDirs))
 }
 
 
@@ -209,128 +181,8 @@ getReactionsForSourceCompoundIds <- function( compoundIds, onlyHumanMets=F, huma
 #' @return returns a dataframe of reaction information for each ramp compound id
 #'
 getReactionsForSourceProteinIds <- function( proteinIds, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN"), db = RaMP()) {
-
-  idStr <- listToQueryString(proteinIds)
-  query <- paste0("select gr.uniprot, gr.protein_name, rxn.rxn_source_id,
-                  rxn.is_transport, rxn.label, rxn.direction, rxn.equation, rxn.html_equation,
-                  rxn.ec_num, rxn.has_human_prot, rxn.only_human_mets from reaction2protein gr,
-                  reaction rxn where gr.uniprot in (",idStr,") and rxn.rxn_source_id = gr.rxn_source_id")
-
-  if(length(rxnDirs) == 1) {
-    query <- paste0(query, " and rxn.direction = '",rxnDirs[1],"'")
-  } else if(length(rxnDirs)>1) {
-    query <- paste0(query, " and rxn.direction in (",listToQueryString(rxnDirs),")")
-  } else {
-    print("rxnDirs must be of length > 0")
-  }
-
-  if(humanProtein) {
-    query <- paste0(query, " and rxn.has_human_prot = 1")
-  }
-
-  if(onlyHumanMets) {
-    query <- paste0(query, " and rxn.only_human_mets = 1")
-  }
-
-  if(!includeTransportRxns) {
-    query <- paste0(query, " and rxn.is_transport = 0")
-  }
-
-  df <- RaMP::runQuery(query, db)
-
-  return(df)
-}
-
-
-
-#' The getReactionsForRaMPCompoundIds() function returns reactions for a collection of RaMP compound ids
-#'
-#' @param rampCompoundIds list of ramp compound ids
-#' @param onlyHumanMets boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)
-#' @param humanProtein boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)
-#' @param includeTransportRxns if TRUE, returns metabolic and transport reactions
-#' @param rxnDirs character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", "BD", "ALL"), default = c("UN")
-#' @param db a RaMP database object
-#'
-#' @return returns a dataframe of reaction information for each ramp compound id
-#'
-getReactionsForRaMPCompoundIds <- function(rampCompoundIds, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN"), db = RaMP()) {
-
-  idStr <- listToQueryString(rampCompoundIds)
-  query <- paste0("select mr.ramp_rxn_id, mr.ramp_cmpd_id, mr.met_source_id, mr.substrate_product, mr.is_cofactor, mr.met_name,
-  rxn.rxn_source_id, rxn.is_transport, rxn.label, rxn.direction, rxn.equation, rxn.html_equation, rxn.ec_num, rxn.has_human_prot, rxn.only_human_mets
-  from reaction2met mr, reaction rxn
-  where mr.ramp_cmpd_id in (",idStr,") and rxn.ramp_rxn_id = mr.ramp_rxn_id")
-
-  if(length(rxnDirs) == 1) {
-    query <- paste0(query, " and rxn.direction = '",rxnDirs[1],"'")
-  } else if(length(rxnDirs)>1) {
-    query <- paste0(query, " and rxn.direction in (",listToQueryString(rxnDirs),")")
-  } else {
-    print("rxnDirs must be of length > 0")
-  }
-  print("Error in getReactionsForRaMPCompoundIds")
-  if(humanProtein) {
-    query <- paste0(query," and rxn.has_human_prot = 1")
-  }
-
-  if(onlyHumanMets) {
-    query <- paste0(query, " and rxn.only_human_mets = 1")
-  }
-
-  if(!includeTransportRxns) {
-    query <- paste0(query, " and rxn.is_transport = 0")
-  }
-
-  df <- RaMP::runQuery(query, db)
-
-  return(df)
-}
-
-
-
-#' getReactionsForRaMPGeneIds returns reactions for a collection of ramp compound ids
-#'
-#' @param rampGeneIds list of ramp compound ids
-#' @param onlyHumanMets boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)
-#' @param humanProtein boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)
-#' @param includeTransportRxns if TRUE, returns metabolic and transport reactions
-#' @param rxnDirs character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", "BD", "ALL"), default = c("UN")
-#' @param db a RaMP database object
-#'
-#' @return returns a dataframe of reaction information for each ramp compound id
-#'
-getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN"), db = RaMP()) {
-
-  idStr <- listToQueryString(rampGeneIds)
-  query <- paste0("select gr.ramp_rxn_id, gr.ramp_gene_id, gr.uniprot, gr.protein_name, rxn.rxn_source_id,
-                  rxn.is_transport, rxn.label, rxn.direction, rxn.equation, rxn.html_equation,
-                  rxn.ec_num, rxn.has_human_prot, rxn.only_human_mets from reaction2protein gr,
-                  reaction rxn where gr.ramp_gene_id in (",idStr,") and rxn.ramp_rxn_id = gr.ramp_rxn_id")
-
-  if(length(rxnDirs) == 1) {
-    query <- paste0(query, " and rxn.direction = '",rxnDirs[1],"'")
-  } else if(length(rxnDirs)>1) {
-    query <- paste0(query, " and rxn.direction in (",listToQueryString(rxnDirs),")")
-  } else {
-    print("rxnDirs must be of length > 0")
-  }
-  print("Error in getReactionsForRaMPGeneIds")
-  if(humanProtein) {
-    query <- paste0(query, " and rxn.has_human_prot = 1")
-  }
-
-  if(onlyHumanMets) {
-    query <- paste0(query, " and rxn.only_human_mets = 1")
-  }
-
-  if(!includeTransportRxns) {
-    query <- paste0(query, " and rxn.is_transport = 0")
-  }
-
-  df <- RaMP::runQuery(query, db)
-
-  return(df)
+  data_access <- DataAccessObject$new(db = db)
+  return (data_access$getRheaRxnPartnersFromGeneIDs(proteinIds, onlyHumanMets, humanProtein, includeTransportRxns, rxnDirs))
 }
 
 
@@ -361,7 +213,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
   print("Starting reaction class query...")
 
   if(!useIdMapping) {
-    ids = checkReactionInputIds(callingFunction = "getReactionClassesForAnalytes", idList = analytes)
+    ids = checkReactionInputIds("getReactionClassesForAnalytes", analytes)
     analytes = c(ids$metIds, ids$proteinIds)
 
     if(length(analytes) == 0) {
@@ -371,7 +223,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
     }
   }
 
-  analytesStr <- listToQueryString(analytes = analytes)
+  analytesStr <- listToQueryString(analytes)
 
   # base reaction stats, reactions per reaction class
   rxnClassStats <- getReactionClassStats(db=db, humanProtein=humanProtein)
@@ -395,7 +247,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
     if(multiRxnParticipantCount > 1) {
 
       analyte2Rxn = getReactionsForAnalytes(db=db, analytes=analytes, humanProtein = humanProtein)
-      rxnParticipantData <- getReactionParticipantCounts(analyte2Rxn = analyte2Rxn, minRxnParticipantCountFilter = multiRxnParticipantCount)
+      rxnParticipantData <- getReactionParticipantCounts(analyte2Rxn, multiRxnParticipantCount)
 
       if(rxnParticipantData[['total_rxns_retained']] == 0) {
 
@@ -413,7 +265,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
 
       # reaction list is already filtered
       keeperRxns <- unlist(rxnParticipantData$merged_rxn2analyte_count$rxn_source_id)
-      keeperRxnStr <- listToQueryString(analytes = keeperRxns)
+      keeperRxnStr <- listToQueryString(keeperRxns)
 
       metQuery <- paste0("select distinct c.rxn_class, c.rxn_class_hierarchy, c.rxn_class_ec, c.ec_level, count(distinct(r.rxn_source_id)) as rxn_count, count(distinct(r.ramp_cmpd_id)) as met_count, group_concat(distinct(r.rxn_source_id)) as met_reactions
         from reaction_ec_class c, reaction2met r, source s, reaction rxn
@@ -425,7 +277,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
                          " group by c.rxn_class_hierarchy, c.rxn_class, c.rxn_class_ec, c.ec_level
         order by ec_level asc, rxn_count desc")
 
-      metResult <- runQuery(sql=metQuery, db = db)
+      metResult <- RaMP::runQuery(sql=metQuery, db = db)
 
       proteinQuery <- paste0("select distinct c.rxn_class, c.rxn_class_hierarchy, c.rxn_class_ec, c.ec_level, count(distinct(r.rxn_source_id)) as rxn_count, count(distinct(r.ramp_gene_id)) as protein_count, group_concat(distinct(r.rxn_source_id)) as protein_reactions
           from reaction_ec_class c, reaction2protein r, source s, reaction rxn
@@ -437,7 +289,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
                              " group by c.rxn_class_hierarchy, c.rxn_class, c.rxn_class_ec, c.ec_level
           order by ec_level asc, rxn_count desc")
 
-      proteinResult <- runQuery(sql=proteinQuery, db=db)
+      proteinResult <- RaMP::runQuery(sql=proteinQuery, db=db)
 
     } else {
 
@@ -452,7 +304,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
                          " group by c.rxn_class_hierarchy, c.rxn_class, c.rxn_class_ec, c.ec_level
         order by ec_level asc, rxn_count desc")
 
-      metResult <- runQuery(sql=metQuery, db = db)
+      metResult <- RaMP::runQuery(sql=metQuery, db = db)
 
       proteinQuery <- paste0("select distinct c.rxn_class, c.rxn_class_hierarchy, c.rxn_class_ec, c.ec_level, count(distinct(r.rxn_source_id)) as rxn_count, count(distinct(r.ramp_gene_id)) as protein_count, group_concat(distinct(r.rxn_source_id)) as protein_reactions
           from reaction_ec_class c, reaction2protein r, source s, reaction rxn
@@ -464,7 +316,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
                              " group by c.rxn_class_hierarchy, c.rxn_class, c.rxn_class_ec, c.ec_level
           order by ec_level asc, rxn_count desc")
 
-      proteinResult <- runQuery(sql=proteinQuery, db=db)
+      proteinResult <- RaMP::runQuery(sql=proteinQuery, db=db)
     }
 
     metRxns <- metResult[,c('rxn_class', 'rxn_class_hierarchy', 'met_reactions')]
@@ -492,8 +344,8 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
     # not using the source table and ID mapping
     if(multiRxnParticipantCount > 1) {
 
-      analyte2Rxn = getReactionsForAnalytes(db=db, analytes=analytes, humanProtein = humanProtein)
-      rxnParticipantData <- getReactionParticipantCounts(analyte2Rxn = analyte2Rxn, minRxnParticipantCountFilter = multiRxnParticipantCount)
+      analyte2Rxn = RaMP::getReactionsForAnalytes(db=db, analytes=analytes, humanProtein = humanProtein)
+      rxnParticipantData <- getReactionParticipantCounts(analyte2Rxn, multiRxnParticipantCount)
 
       if(rxnParticipantData[['total_rxns_retained']] == 0) {
 
@@ -511,7 +363,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
 
       # reaction list is already filtered
       keeperRxns <- unlist(rxnParticipantData$merged_rxn2analyte_count$rxn_source_id)
-      keeperRxnStr <- listToQueryString(analytes = keeperRxns)
+      keeperRxnStr <- listToQueryString(keeperRxns)
 
       metQuery <- paste0("select distinct c.rxn_class, c.rxn_class_hierarchy, c.rxn_class_ec, c.ec_level, count(distinct(r.rxn_source_id)) as rxn_count, count(distinct(r.met_source_id)) as met_count, group_concat(distinct(r.rxn_source_id)) as met_reactions
         from reaction_ec_class c, reaction2met r, reaction rxn
@@ -522,7 +374,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
                          " group by c.rxn_class_hierarchy, c.rxn_class, c.rxn_class_ec, c.ec_level
         order by ec_level asc, rxn_count desc")
 
-      metResult <- runQuery(sql=metQuery, db = db)
+      metResult <- RaMP::runQuery(sql=metQuery, db = db)
 
       proteinQuery <- paste0("select distinct c.rxn_class, c.rxn_class_hierarchy, c.rxn_class_ec, c.ec_level, count(distinct(r.rxn_source_id)) as rxn_count, count(distinct(r.uniprot)) as protein_count, group_concat(distinct(r.rxn_source_id)) as protein_reactions
           from reaction_ec_class c, reaction2protein r, source s, reaction rxn
@@ -533,7 +385,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
                              " group by c.rxn_class_hierarchy, c.rxn_class, c.rxn_class_ec, c.ec_level
           order by ec_level asc, rxn_count desc")
 
-      proteinResult <- runQuery(sql=proteinQuery, db=db)
+      proteinResult <- RaMP::runQuery(sql=proteinQuery, db=db)
 
     } else {
 
@@ -547,7 +399,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
                          " group by c.rxn_class_hierarchy, c.rxn_class, c.rxn_class_ec, c.ec_level
         order by ec_level asc, rxn_count desc")
 
-      metResult <- runQuery(sql=metQuery, db = db)
+      metResult <- RaMP::runQuery(sql=metQuery, db = db)
 
       proteinQuery <- paste0("select distinct c.rxn_class, c.rxn_class_hierarchy, c.rxn_class_ec, c.ec_level, count(distinct(r.rxn_source_id)) as rxn_count, count(distinct(r.uniprot)) as protein_count, group_concat(distinct(r.rxn_source_id)) as protein_reactions
           from reaction_ec_class c, reaction2protein r, reaction rxn
@@ -558,7 +410,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
                              " group by c.rxn_class_hierarchy, c.rxn_class, c.rxn_class_ec, c.ec_level
           order by ec_level asc, rxn_count desc")
 
-      proteinResult <- runQuery(sql=proteinQuery, db=db)
+      proteinResult <- RaMP::runQuery(sql=proteinQuery, db=db)
     }
 
     metRxns <- metResult[,c('rxn_class', 'rxn_class_hierarchy', 'met_reactions')]
@@ -599,7 +451,7 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
   combinedResult$protein_reactions[is.na(combinedResult$protein_reactions)] <- ""
   combinedResult$met_reactions[is.na(combinedResult$met_reactions)] <- ""
 
-  rxnStats <- combineStringLists(x = combinedResult$met_reactions, y = combinedResult$protein_reactions)
+  rxnStats <- combineStringLists(combinedResult$met_reactions, combinedResult$protein_reactions)
 
   combinedResult <- cbind(combinedResult, rxnStats)
 
@@ -702,14 +554,11 @@ getReactionsForRaMPGeneIds <- function(rampGeneIds, onlyHumanMets=F, humanProtei
 #' @return returns a dataframe object with reaction to reaction participant mappings.
 #' @export
 getReactionParticipants <- function( reactionList = c(), db = RaMP()) {
-  reactionListStr <- listToQueryString(analytes = reactionList)
+  reactionListStr <- listToQueryString(reactionList)
 
+  data_access <- DataAccessObject$new(db = db)
 
-  sql = paste0('select rm.rxn_source_id as reaction_id, rm.met_source_id as participant_id, rm.met_name as participant_name, rm.is_cofactor as is_cofactor, rm.substrate_product as is_product, cp.iso_smiles as iso_smiles ',
-               'from reaction2met rm, chem_props cp ',
-               'where rxn_source_id in (', reactionListStr,") and cp.chem_source_id = rm.met_source_id;")
-
-  metResult <- runQuery(sql = sql, db=db)
+  metResult <- data_access$getRxnMetParticipants(reactionListStr)
   metResult$participant_role <- 'substrate'
   metResult$participant_role_id <- 3
   metResult$participant_role[metResult$is_product == 1] <- 'product'
@@ -719,9 +568,7 @@ getReactionParticipants <- function( reactionList = c(), db = RaMP()) {
 
   metResult$reaction_type <- 'biochemical'
 
-  sql = paste0('select rxn_source_id as reaction_id, uniprot as participant_id, protein_name as participant_name from reaction2protein where rxn_source_id in (', reactionListStr,");")
-
-  proteinResult <- runQuery(sql = sql, db=db)
+  proteinResult <- data_access$getRxnGeneParticipants(reactionListStr)
   proteinResult$is_cofactor <- NA
   proteinResult$is_product <- NA
   proteinResult$iso_smiles <- NA
@@ -730,9 +577,7 @@ getReactionParticipants <- function( reactionList = c(), db = RaMP()) {
 
   proteinResult$reaction_type <- 'biochemical'
 
-  sql = paste0('select rxn_source_id, is_transport from reaction where rxn_source_id in (',reactionListStr,') and is_transport = 1')
-
-  rxnResult <- runQuery(sql = sql, db=db)
+  rxnResult <- data_access$getRxnIsTransport(reactionListStr)
 
   if(nrow(rxnResult) > 0) {
     transportRxns <- unique(unlist(rxnResult$rxn_source_id))
@@ -767,7 +612,7 @@ getReactionParticipants <- function( reactionList = c(), db = RaMP()) {
 #' @return returns a dataframe object with reaction information.
 #' @export
 getReactionDetails <- function( reactionList = c(), db = RaMP()) {
-  reactionListStr <- listToQueryString(analytes = reactionList)
+  reactionListStr <- listToQueryString(reactionList)
   sql = paste0('select rxn_source_id, direction, is_transport, has_human_prot, ec_num, label, equation, html_equation from reaction where rxn_source_id in (', reactionListStr,");")
 
   result <- runQuery(sql = sql, db=db)
@@ -822,7 +667,7 @@ getRheaAnalyteReactionAssociations <- function( analytes, includeRheaRxnDetails=
 #' that are reaction participants with the input metabolite ids.
 #'
 #' @param analytes analyte id vector
-#' @param includeRheaRxnDetails returns additional columns that includes info in the reaction connecting mets and proteins
+#' @param includeRheaRxnDetails returns additional columns that inlucdes info in the reaction connecting mets and proteins
 #' @param humanProtein require reactions to have a human protein (enzyme or transporter), default True
 #' @param db a RaMP database object
 #'
@@ -853,7 +698,7 @@ getRheaEnzymesAndTransportersForMetabolites <- function( analytes, includeRheaRx
       keeperCols = c('metSourceId', 'metName', 'participantName', 'participantId')
       result <- result[, keeperCols]
       result$relation <- "met2protein"
-      result <- result[,c(5,1,2,4,3)]
+      result <- result[,c(5,1,2,3,4)]
       colnames(result) <- c("query_relation", "input_analyte", "input_common_names", "rxn_partner_common_name", "rxn_partner_ids")
       result <- unique(result)
     } else {
@@ -908,8 +753,8 @@ getRheaMetabolitesForProteins <- function( analytes, includeRheaRxnDetails=F, hu
       keeperCols = c('uniprot', 'proteinName', 'participantName', 'participantId')
       result <- result[, keeperCols]
       result$relation <- "protein2met"
-      result <- result[,c(5,1,2,4,3)]
-      colnames(result) <- c("query_relation", "input_analyte", "input_common_names", "rxn_partner_ids", "rxn_partner_common_name")
+      result <- result[,c(5,1,2,3,4)]
+      colnames(result) <- c("query_relation", "input_analyte", "input_common_names", "rxn_partner_common_name", "rxn_partner_ids")
       result <- unique(result)
     } else {
       result$relation <- "protein2met"
@@ -968,11 +813,11 @@ getRheaMetabolitesForProteins <- function( analytes, includeRheaRxnDetails=F, hu
 #'
 getRampSourceInfoFromAnalyteIDs <- function(db = RaMP(), analytes) {
 
-  analyteStr <- listToQueryString(analytes = analytes)
+  analyteStr <- listToQueryString(analytes)
 
   query = paste("select distinct sourceId, rampId, geneOrCompound from source where sourceId in (",analyteStr,")")
 
-  df <- runQuery(sql = query, db = db)
+  df <- RaMP::runQuery(query, db)
 
   return(df)
 }

@@ -21,7 +21,7 @@ plotCataNetwork <- function(catalyzedf = "") {
           return()
         }
 
-        if (length(intersect(c("input_analyte","rxn_partner_common_name", "rxn_partner_ids"),colnames(catalyzedf)))!=3) {
+        if (length(intersect(c("input_analyte","rxn_partner_common_name"),colnames(catalyzedf)))!=2) {
                 stop("Please make sure that the input is the resulting data.frame returned by the rampFastCata() function")
         }
 
