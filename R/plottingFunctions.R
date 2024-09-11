@@ -335,9 +335,8 @@ plotReactionClasses <- function(reactionClassesResults) {
         r = 0,
         b = 0,
         t = 0
-      ),
-      marker = list(colors = list(sunburst_ontology_reactionclass$color)),
-      extendsunburstcolors = TRUE
+      )
+      # ,marker = list(colors = list(sunburst_ontology_reactionclass$color))
     )
 
   return(fig)
