@@ -163,51 +163,8 @@ getReactionsForAnalytes <- function( analytes, onlyHumanMets=F, humanProtein=T, 
 #' @return returns a dataframe of reaction information for each ramp compound id
 #'
 getReactionsForSourceCompoundIds <- function( compoundIds, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN"), db = RaMP()) {
-
-  idStr <- listToQueryString(compoundIds)
-  query <- paste0("select mr.met_source_id,
-                         mr.substrate_product,
-                         mr.is_cofactor,
-                         analyte.common_name,
-                         rxn.rxn_source_id,
-                         rxn.is_transport,
-                         rxn.label,
-                         rxn.direction,
-                         rxn.equation,
-                         rxn.html_equation,
-                         rxn.ec_num,
-                         rxn.has_human_prot,
-                         rxn.only_human_mets
-                  from reaction2met mr,
-                       reaction rxn,
-                       analyte
-                  where mr.met_source_id in (",idStr,")
-                    and rxn.rxn_source_id = mr.rxn_source_id
-                    and mr.ramp_cmpd_id = analyte.rampId")
-
-  if(length(rxnDirs) == 1) {
-    query <- paste0(query, " and rxn.direction = '",rxnDirs[1],"'")
-  } else if(length(rxnDirs)>1) {
-    query <- paste0(query, " and rxn.direction in (",listToQueryString(rxnDirs),")")
-  } else {
-    print("rxnDirs must be of length > 0")
-  }
-
-  if(humanProtein) {
-    query <- paste0(query," and rxn.has_human_prot = 1")
-  }
-
-  if(onlyHumanMets) {
-    query <- paste0(query, " and rxn.only_human_mets = 1")
-  }
-
-  if(!includeTransportRxns) {
-    query <- paste0(query, " and rxn.is_transport = 0")
-  }
-
-  df <- RaMP::runQuery(query, db)
-
-  return(df)
+  data_access <- DataAccessObject$new(db = db)
+  return (data_access$getRheaRxnPartnersFromMetIDs(compoundIds, onlyHumanMets, humanProtein, includeTransportRxns, rxnDirs))
 }
 
 
@@ -224,48 +181,8 @@ getReactionsForSourceCompoundIds <- function( compoundIds, onlyHumanMets=F, huma
 #' @return returns a dataframe of reaction information for each ramp compound id
 #'
 getReactionsForSourceProteinIds <- function( proteinIds, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN"), db = RaMP()) {
-
-  idStr <- listToQueryString(proteinIds)
-  query <- paste0("select gr.uniprot,
-                         analyte.common_name,
-                         rxn.rxn_source_id,
-                         rxn.is_transport,
-                         rxn.label,
-                         rxn.direction,
-                         rxn.equation,
-                         rxn.html_equation,
-                         rxn.ec_num,
-                         rxn.has_human_prot,
-                         rxn.only_human_mets
-                  from reaction2protein gr,
-                       reaction rxn, analyte
-                  where gr.uniprot in (",idStr,")
-                    and rxn.rxn_source_id = gr.rxn_source_id
-                    and gr.ramp_gene_id = analyte.rampId")
-
-  if(length(rxnDirs) == 1) {
-    query <- paste0(query, " and rxn.direction = '",rxnDirs[1],"'")
-  } else if(length(rxnDirs)>1) {
-    query <- paste0(query, " and rxn.direction in (",listToQueryString(rxnDirs),")")
-  } else {
-    print("rxnDirs must be of length > 0")
-  }
-
-  if(humanProtein) {
-    query <- paste0(query, " and rxn.has_human_prot = 1")
-  }
-
-  if(onlyHumanMets) {
-    query <- paste0(query, " and rxn.only_human_mets = 1")
-  }
-
-  if(!includeTransportRxns) {
-    query <- paste0(query, " and rxn.is_transport = 0")
-  }
-
-  df <- RaMP::runQuery(query, db)
-
-  return(df)
+  data_access <- DataAccessObject$new(db = db)
+  return (data_access$getRheaRxnPartnersFromGeneIDs(proteinIds, onlyHumanMets, humanProtein, includeTransportRxns, rxnDirs))
 }
 
 
@@ -639,20 +556,9 @@ getReactionsForSourceProteinIds <- function( proteinIds, onlyHumanMets=F, humanP
 getReactionParticipants <- function( reactionList = c(), db = RaMP()) {
   reactionListStr <- listToQueryString(reactionList)
 
-  sql = paste0("select rm.rxn_source_id     as reaction_id,
-                       rm.met_source_id     as participant_id,
-                       analyte.common_name  as participant_name,
-                       rm.is_cofactor       as is_cofactor,
-                       rm.substrate_product as is_product,
-                       cp.iso_smiles        as iso_smiles
-                from reaction2met rm,
-                     chem_props cp,
-                     analyte
-                where rxn_source_id in (", reactionListStr,")
-                  and cp.chem_source_id = rm.met_source_id
-                  and rm.ramp_cmpd_id = analyte.rampId")
+  data_access <- DataAccessObject$new(db = db)
 
-  metResult <- runQuery(sql = sql, db=db)
+  metResult <- data_access$getRxnMetParticipants(reactionListStr)
   metResult$participant_role <- 'substrate'
   metResult$participant_role_id <- 3
   metResult$participant_role[metResult$is_product == 1] <- 'product'
@@ -662,15 +568,7 @@ getReactionParticipants <- function( reactionList = c(), db = RaMP()) {
 
   metResult$reaction_type <- 'biochemical'
 
-  sql = paste0("select rxn_source_id       as reaction_id,
-                       uniprot             as participant_id,
-                       analyte.common_name as participant_name
-                from   reaction2protein,
-                       analyte
-                where  rxn_source_id in (", reactionListStr, ")
-                       and reaction2protein.ramp_gene_id = analyte.rampId;")
-
-  proteinResult <- runQuery(sql = sql, db=db)
+  proteinResult <- data_access$getRxnGeneParticipants(reactionListStr)
   proteinResult$is_cofactor <- NA
   proteinResult$is_product <- NA
   proteinResult$iso_smiles <- NA
@@ -679,9 +577,7 @@ getReactionParticipants <- function( reactionList = c(), db = RaMP()) {
 
   proteinResult$reaction_type <- 'biochemical'
 
-  sql = paste0('select rxn_source_id, is_transport from reaction where rxn_source_id in (',reactionListStr,') and is_transport = 1')
-
-  rxnResult <- runQuery(sql = sql, db=db)
+  rxnResult <- data_access$getRxnIsTransport(reactionListStr)
 
   if(nrow(rxnResult) > 0) {
     transportRxns <- unique(unlist(rxnResult$rxn_source_id))

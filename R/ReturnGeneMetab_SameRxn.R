@@ -48,43 +48,19 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
 
+  data_access <- DataAccessObject$new(db = db)
+
   if(namesOrIds == 'ids') {
 
     print("Analyte ID-based reaction partner query.")
 
-    metQuery <- paste0("select cmp_source.sourceId as input_analyte,
-                               cmp_analyte.common_name as input_common_name,
-                               gene_analyte.common_name as rxn_partner_common_name,
-                               gene_source.rampId
-                      from catalyzed
-                          join source gene_source on catalyzed.rampGeneId = gene_source.rampId
-                          join analyte gene_analyte on gene_source.rampId = gene_analyte.rampId
-                          join source cmp_source on catalyzed.rampCompoundId = cmp_source.rampId
-                          join analyte cmp_analyte on cmp_source.rampId = cmp_analyte.rampId
-                      where cmp_source.sourceId in (",list_metabolite,")
-                      group by gene_source.rampId, cmp_source.sourceId")
-
+    df1 <- data_access$getRxnPartnersFromMetIDs(list_metabolite)
     print("Building metabolite to gene relations.")
-
-    df1 <- RaMP::runQuery(metQuery, db)
 
     print(paste0("Number of met2gene relations: ",(nrow(df1))))
 
-    geneQuery <- paste0("select gene_source.sourceId as input_analyte,
-                                gene_analyte.common_name as input_common_name,
-                                cmp_analyte.common_name as rxn_partner_common_name,
-                                cmp_source.rampId
-                          from catalyzed
-                             join source gene_source on catalyzed.rampGeneId = gene_source.rampId
-                             join analyte gene_analyte on gene_source.rampId = gene_analyte.rampId
-                             join source cmp_source on catalyzed.rampCompoundId = cmp_source.rampId
-                             join analyte cmp_analyte on cmp_source.rampId = cmp_analyte.rampId
-                          where gene_source.sourceId in (", list_metabolite,")
-                          group by cmp_source.rampId, gene_source.sourceId")
-
+    df2 <- data_access$getRxnPartnersFromGeneIDs(list_metabolite)
     print("Building gene to metabolite relations.")
-
-    df2 <- RaMP::runQuery(geneQuery, db)
 
   } else {
 
@@ -92,44 +68,13 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
     # note that we now bring in the synonyms table
 
     print("Analyte name-based reaction partner query.")
-
-
-      metQuery <- paste0("select synonym.Synonym as input_analyte,
-                                group_concat(distinct cmp_analyte.common_name COLLATE NOCASE) as input_common_name,
-                                group_concat(distinct gene_analyte.common_name COLLATE NOCASE) as rxn_partner_common_name,
-                                 gene_source.rampId
-                          from catalyzed
-                                   join source gene_source on catalyzed.rampGeneId = gene_source.rampId
-                                   join analyte gene_analyte on gene_source.rampId = gene_analyte.rampId
-                                   join source cmp_source on catalyzed.rampCompoundId = cmp_source.rampId
-                                   join analyte cmp_analyte on cmp_source.rampId = cmp_analyte.rampId
-                                   join analytesynonym synonym on synonym.rampId = catalyzed.rampCompoundId
-                          where synonym.Synonym in (",list_metabolite,")
-                          group by gene_source.rampId, synonym.Synonym;")
-
     print("Building metabolite to gene relations.")
-
-    df1 <- RaMP::runQuery(metQuery, db)
+    df1 <- data_access$getRxnPartnersFromMetNames(list_metabolite)
 
     print(paste0("Number of met2gene relations: ",(nrow(df1))))
-
-   geneQuery <- paste0("select synonym.Synonym as input_analyte,
-                               group_concat(distinct gene_analyte.common_name COLLATE NOCASE) as input_common_name,
-                               group_concat(distinct cmp_analyte.common_name COLLATE NOCASE) as rxn_partner_common_name,
-                               cmp_source.rampId
-                        from catalyzed
-                                 join source gene_source on catalyzed.rampGeneId = gene_source.rampId
-                                 join analyte gene_analyte on gene_source.rampId = gene_analyte.rampId
-                                 join source cmp_source on catalyzed.rampCompoundId = cmp_source.rampId
-                                 join analyte cmp_analyte on cmp_source.rampId = cmp_analyte.rampId
-                                 join analytesynonym synonym on synonym.rampId = catalyzed.rampGeneId
-                        where synonym.Synonym in (", list_metabolite,")
-                        group by cmp_source.rampId, synonym.Synonym;")
+    df2 <- data_access$getRxnPartnersFromGeneNames(list_metabolite)
 
     print("Building gene to metabolite relations.")
-
-    df2 <- RaMP::runQuery(geneQuery, db)
-
     print(paste0("Number of gene2met relations: ",(nrow(df2))))
   }
 

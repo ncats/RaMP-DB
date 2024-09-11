@@ -10,6 +10,7 @@ Authors@R: c(
     person("Khyati", "Mehta", email = "khyati.mehta@nih.gov", rol="aut"))
 Description: The RaMP R package allows users to interact with the RaMP database, which integrates biological, reaction-level, ontologies, and chemical annoations from multiple resources (Reactome, HMDB, WikiPathways, KEGG, LipidMAPS, ChEBI).  The package allows users to query RaMP and to perform pathway and chemical overrepresentation analyses.  
 Imports:
+    R6,
     magrittr,
     methods,
     dplyr,

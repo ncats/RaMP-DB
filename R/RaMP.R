@@ -18,7 +18,8 @@ setClass(
         conpass = "character",
         host = "character",
         port = "integer",
-        dbSummaryObjCache = "list"
+        dbSummaryObjCache = "list",
+        versionSupport = "environment"
     ),
     prototype = prototype(
         driver = NULL,
@@ -27,7 +28,8 @@ setClass(
         conpass = character(),
         host = character(),
         port = integer(),
-        dbSummaryObjCache = list()
+        dbSummaryObjCache = list(),
+        versionSupport = new.env()
     ))
 
 #' Helper function to return the connection to the database, defined by the
@@ -92,6 +94,16 @@ setMethod("show", "RaMP", function(object) {
     ## Maybe get some additional information from the database with e.g.
     ## number of analytes or versions and list them.
 })
+
+setMethod(
+  "initialize",
+  "RaMP",
+  function(.Object, ...) {
+    .Object@versionSupport <- new.env()
+    callNextMethod()
+  }
+)
+
 
 #' @title Connection to a RaMP database
 #'
@@ -189,6 +201,8 @@ RaMP <- function(version = character(), branch = "main") {
 
     # creates the cache of R data objects
     rampObj@dbSummaryObjCache <- setupRdataCache(db = rampObj)
+
+    setupVersionSupport(rampObj)
 
     return(rampObj)
 }
