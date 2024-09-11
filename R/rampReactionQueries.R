@@ -627,7 +627,7 @@ getReactionDetails <- function( reactionList = c(), db = RaMP()) {
 #' Associations are made through shared Rhea reactions
 #'
 #' @param analytes list of analyte ids
-#' @param includeRheaRxnDetails returns additional columns that inlucdes info in the reaction connecting mets and proteins
+#' @param includeRheaRxnDetails returns additional columns that includes info in the reaction connecting mets and proteins
 #' @param humanProtein require reactions to have a human protein (enzyme or transporter), default True
 #' @param db a RaMP database object
 #'
