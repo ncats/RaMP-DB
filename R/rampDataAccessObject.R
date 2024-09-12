@@ -61,7 +61,7 @@ DataAccessObject <- R6::R6Class(
       return (RaMP::runQuery(rxnTransportQuery(rxnString), self$db))
     },
     getPathwayNames = function() {
-      return (RaMP::runQuery(getPathwayNamesQuery(), self$db))
+      return (RaMP::runQuery(sql = getPathwayNamesQuery(), db = self$db))
     }
   ),
   private = list(
