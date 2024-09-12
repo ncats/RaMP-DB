@@ -95,6 +95,7 @@ setMethod("show", "RaMP", function(object) {
     ## number of analytes or versions and list them.
 })
 
+#' @importFrom methods callNextMethod
 setMethod(
   "initialize",
   "RaMP",
@@ -131,6 +132,10 @@ setMethod(
 #' @param version `character(1)` specifying the RaMP version to load. By
 #'     default (`version = character()`), the most recent release will be
 #'     used.
+#'
+#' @param branch `character(1)` specifying the RaMP repository branch to load
+#' the database from. by default (`version = "main"`) for the released versions
+#' of the database.
 #'
 #' @param local `logical(1)` for `listRaMPVersion`: whether remote
 #'     (`local = FALSE`, default) or locally (`local = TRUE`) available RaMP
@@ -357,6 +362,10 @@ listRaMPVersions <- function(local = FALSE, branch = "main") {
 #' Lists local and remotely available RaMP SQLite DB versions and prompts with
 #' message to download a new version if one exists.
 #' @param branch specifies what branch versions should be taken from. Default is 'main'.
+#'
+#' @param branch `character(1)` specifying the RaMP repository branch to load
+#' the database from. by default (`version = "main"`) for the released versions
+#' of the database.
 #'
 #' @export
 listAvailableRaMPDbVersions <- function(branch = "main") {
