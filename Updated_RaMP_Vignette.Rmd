@@ -90,14 +90,13 @@ Users are able to input external data sources of analytes using the function cre
 dir   <- system.file("extdata", package="RaMP", mustWork=TRUE)
 exInput <- file.path(dir, "ExampleRaMPInput.csv")
 
-data2 <- createRaMPInput(csv_path = "/Users/jadensauer/Documents/NIH Docs 2024./testinput1v2.csv")
+data2 <- createRaMPInput(filePath = exInput)
 testids <- getPathwayFromAnalyte(analytes = data2, db=rampDB)
 
 datatable(testids)
 new.data <- distinct(testids, commonName, inputId)
 print(new.data)
 
-write.csv()
 ```
 
 ## Biological Pathways
@@ -110,22 +109,7 @@ Here is an example:
 
 ```{r}
 myanalytes <- getAnalyteFromPathway(pathway="Sphingolipid metabolism", db=rampDB)
-```
 
-```{r echo = FALSE}
-cutoff <- 100
-
-for(i in 1:nrow(myanalytes)) {
-  char.length <- nchar(myanalytes$sourceAnalyteIDs[i])
-  if(char.length >= cutoff) {
-    new.string <- substr(myanalytes$sourceAnalyteIDs[i], 1, cutoff)
-    new.string <- paste0(new.string, "...")
-    myanalytes$sourceAnalyteIDs[i] <- new.string
-  }
-}
-```
-
-```{r}
 datatable(myanalytes)
 ```
 
@@ -279,13 +263,17 @@ inputs.of.interest <- c("kegg:C00186" , "hmdb:HMDB0000148", "kegg:C00780", "hmdb
 new.transcripts <- rampFastCata(analytes = inputs.of.interest, db=rampDB)
 
 #just show HMDB analyte associations
-datatable(head(new.transcripts$HMDB_Analyte_Associations, n=10))
+datatable(head(new.transcripts))
 
 ```
 
 ### Reaction visualizations
 RaMP can output reaction class and Enzyme Commission numbers (EC numbers) for a collection of input compound ids. 
 The function getReactionClassesForAnalytes() will output this information for the user. 
+
+###################################################
+UpSEt plot will include non-enzymatic reactions - 
+###################################################
 
 #### Plot Reaction Classes
 RaMP also a built in function which is able to generate an interactive plot from the reaction class data.
