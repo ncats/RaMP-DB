@@ -60,8 +60,10 @@ DataAccessObject <- R6::R6Class(
       return (RaMP::runQuery(sql = queryFunction(rxnString), db = self$db))
     },
     getRxnIsTransport = function(rxnString) {
-      queryFunction <- rxnTransportQuery
-      return (RaMP::runQuery(sql = queryFunction(rxnString), db = self$db))
+      return (RaMP::runQuery(sql = rxnTransportQuery(rxnString), db = self$db))
+    },
+    getPathwayNames = function() {
+      return (RaMP::runQuery(sql = getPathwayNamesQuery(), db = self$db))
     }
   ),
   private = list(
@@ -89,7 +91,11 @@ DataAccessObject <- R6::R6Class(
     }
   )
 )
-
+getPathwayNamesQuery <- function() {
+  return ("select pathwayName from pathway
+            where pathwayCategory != 'smpdb3'
+            order by pathwayName;")
+}
 rxnPartnersFromMetIDsQuery <- function(metaboliteIDs) {
   return (paste0("select cmp_source.sourceId as input_analyte,
                                cmp_analyte.common_name as input_common_name,

@@ -125,15 +125,11 @@ getRaMPAnalyteIntersections<-function( analyteType='metabolites', format='json',
 #' @param db a RaMP database object
 #' @examples
 #' \dontrun{
-#' getPathwayNameList()
+#' getPathwayNameList(db = rampDB)
 #' }
 #' @export
 getPathwayNameList <- function(db = RaMP()){
-  query1<-"select pathwayName from pathway;"
-  results<-runQuery(sql = query1, db = db)
-  return(sort(unique(results$pathwayName)))
+  data_access <- DataAccessObject$new(db = db)
+  pathwayNames <- data_access$getPathwayNames()
+  return(pathwayNames)
 }
-
-
-
-
