@@ -1,11 +1,13 @@
+#' @importFrom R6 R6Class
+
 dbHasAnalyteCommonName <- function(db) {
   query <- "PRAGMA table_info(analyte);"
-  table_info <- RaMP::runQuery(query, db)
+  table_info <- RaMP::runQuery(sql = query, db = db)
   return("common_name" %in% table_info$name)
 }
 
 setupVersionSupport <- function(db) {
-  db@versionSupport[["analyte.common_name"]] <- dbHasAnalyteCommonName(db)
+  db@versionSupport[["analyte.common_name"]] <- dbHasAnalyteCommonName(db = db)
 }
 
 supportsCommonName <- function(db) {
@@ -20,42 +22,42 @@ DataAccessObject <- R6::R6Class(
       self$db <- db
     },
     getRxnPartnersFromMetIDs = function(metaboliteIDs) {
-      queryFunction <- if (supportsCommonName(self$db)) rxnPartnersFromMetIDsQuery else rxnPartnersFromMetIDsQueryOld
-      return (RaMP::runQuery(queryFunction(metaboliteIDs), self$db))
+      queryFunction <- if (supportsCommonName(db = self$db)) rxnPartnersFromMetIDsQuery else rxnPartnersFromMetIDsQueryOld
+      return (RaMP::runQuery(sql = queryFunction(metaboliteIDs), db = self$db))
     },
     getRxnPartnersFromGeneIDs = function(geneIDs) {
-      queryFunction <- if (supportsCommonName(self$db)) rxnPartnersFromGeneIDsQuery else rxnPartnersFromGeneIDsQueryOld
-      return (RaMP::runQuery(queryFunction(geneIDs), self$db))
+      queryFunction <- if (supportsCommonName(db = self$db)) rxnPartnersFromGeneIDsQuery else rxnPartnersFromGeneIDsQueryOld
+      return (RaMP::runQuery(sql = queryFunction(geneIDs), db = self$db))
     },
     getRxnPartnersFromMetNames = function(metaboliteNames) {
-      queryFunction <- if (supportsCommonName(self$db)) rxnPartnersFromMetNamesQuery else rxnPartnersFromMetNamesQueryOld
-      return (RaMP::runQuery(queryFunction(metaboliteNames), self$db))
+      queryFunction <- if (supportsCommonName(db = self$db)) rxnPartnersFromMetNamesQuery else rxnPartnersFromMetNamesQueryOld
+      return (RaMP::runQuery(sql = queryFunction(metaboliteNames), db = self$db))
     },
     getRxnPartnersFromGeneNames = function(geneNames) {
-      queryFunction <- if (supportsCommonName(self$db)) rxnPartnersFromGeneNamesQuery else rxnPartnersFromGeneNamesQueryOld
-      return (RaMP::runQuery(queryFunction(geneNames), self$db))
+      queryFunction <- if (supportsCommonName(db = self$db)) rxnPartnersFromGeneNamesQuery else rxnPartnersFromGeneNamesQueryOld
+      return (RaMP::runQuery(sql = queryFunction(geneNames), db = self$db))
     },
     getRheaRxnPartnersFromMetIDs = function(metaboliteIDs, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN")) {
-      idStr <- listToQueryString(metaboliteIDs)
-      query <-  if (supportsCommonName(self$db)) rheaRxnPartnersFromMetIDsQuery(idStr) else rheaRxnPartnersFromMetIDsQueryOld(idStr)
+      idStr <- listToQueryString(analytes = metaboliteIDs)
+      query <-  if (supportsCommonName(db = self$db)) rheaRxnPartnersFromMetIDsQuery(metaboliteIDs = idStr) else rheaRxnPartnersFromMetIDsQueryOld(metaboliteIDs = idStr)
       query <- private$addConstraintsToRxnPartnersQuery(query, onlyHumanMets, humanProtein, includeTransportRxns, rxnDirs)
       df <- RaMP::runQuery(query, self$db)
       return(df)
     },
     getRheaRxnPartnersFromGeneIDs = function(geneIDs, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN")) {
-      idStr <- listToQueryString(geneIDs)
-      query <- if (supportsCommonName(self$db)) rheaRxnPartnersFromGeneIDsQuery(idStr) else rheaRxnPartnersFromGeneIDsQueryOld(idStr)
-      query <- private$addConstraintsToRxnPartnersQuery(query, onlyHumanMets, humanProtein, includeTransportRxns, rxnDirs)
-      df <- RaMP::runQuery(query, self$db)
+      idStr <- listToQueryString(analytes = geneIDs)
+      query <- if (supportsCommonName(db = self$db)) rheaRxnPartnersFromGeneIDsQuery(idStr) else rheaRxnPartnersFromGeneIDsQueryOld(idStr)
+      query <- private$addConstraintsToRxnPartnersQuery(query = query, onlyHumanMets = onlyHumanMets, humanProtein = humanProtein, includeTransportRxns = includeTransportRxns, rxnDirs = rxnDirs)
+      df <- RaMP::runQuery(sql = query, db = self$db)
       return(df)
     },
     getRxnMetParticipants = function(rxnString) {
-      queryFunction <- if (supportsCommonName(self$db)) rxnMetParticipantsQuery else rxnMetParticipantsQueryOld
-      return (RaMP::runQuery(queryFunction(rxnString), self$db))
+      queryFunction <- if (supportsCommonName(db = self$db)) rxnMetParticipantsQuery else rxnMetParticipantsQueryOld
+      return (RaMP::runQuery(sql = queryFunction(rxnString), db = self$db))
     },
     getRxnGeneParticipants = function(rxnString) {
-      queryFunction <- if (supportsCommonName(self$db)) rxnGeneParticipantsQuery else rxnGeneParticipantsQueryOld
-      return (RaMP::runQuery(queryFunction(rxnString), self$db))
+      queryFunction <- if (supportsCommonName(db = self$db)) rxnGeneParticipantsQuery else rxnGeneParticipantsQueryOld
+      return (RaMP::runQuery(sql = queryFunction(rxnString), db = self$db))
     },
     getRxnIsTransport = function(rxnString) {
       return (RaMP::runQuery(sql = rxnTransportQuery(rxnString), db = self$db))

@@ -34,7 +34,7 @@ getChemicalProperties <- function(mets, propertyList = 'all', db = RaMP() ){
   message("Starting Chemical Property Query")
 
   mets <- unique(mets)
-  checkIdPrefixes(mets)
+  checkIdPrefixes(idList = mets)
   result <- list()
 
   # first handle metabolites of interest
@@ -44,7 +44,7 @@ getChemicalProperties <- function(mets, propertyList = 'all', db = RaMP() ){
   if(length(grep("all",propertyList))==1) {
     sql <- paste0("select * from chem_props where chem_source_id in (",metStr,")")
   } else {
-      propList <- buildPropertyList(db, propertyList);
+      propList <- buildPropertyList(db = db, propList = propertyList);
       if(startsWith(propList, "Error")) {
         message(propList)
         return(NULL)
@@ -53,12 +53,12 @@ getChemicalProperties <- function(mets, propertyList = 'all', db = RaMP() ){
                    "where chem_source_id in (",metStr,")")
   }
 
-  metsData <- runQuery(sql, db)
+  metsData <- runQuery(sql = sql, db = db)
   foundMets <- unique(metsData$chem_source_id)
 
   result[['chem_props']] <- metsData
 
-  queryNotes <- queryReport(mets, foundMets)
+  queryNotes <- queryReport(queryList = mets, foundList = foundMets)
 
   result[['query_report']] <- queryNotes
 
@@ -81,13 +81,13 @@ buildPropertyList <- function( propList, db = RaMP()) {
   # validate that all properties are valid
   #  validProperties <- c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name')
 
-  if(.is_sqlite(db)) {
+  if(.is_sqlite(x = db)) {
     sql = 'pragma table_info(chem_props)'
-    ramptypes <- runQuery(sql, db)
+    ramptypes <- runQuery(sql = sql, db = db)
     ramptypes <- unlist(ramptypes$name)
   } else {
     sql = 'describe chem_props'
-    ramptypes <- runQuery(sql, db)
+    ramptypes <- runQuery(sql = sql, db = db)
     ramptypes <- unlist(ramptypes$Field)
   }
 

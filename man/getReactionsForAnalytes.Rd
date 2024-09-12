@@ -17,15 +17,15 @@ getReactionsForAnalytes(
 \arguments{
 \item{analytes}{list of analytes. chebi and/or uniprot ids are required.}
 
-\item{onlyHumanMets}{boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev 
+\item{onlyHumanMets}{boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev
 in progress)}
 
-\item{humanProtein}{boolean to only control pathways catalyzed by a human proteins (having human Uniprot) 
+\item{humanProtein}{boolean to only control pathways catalyzed by a human proteins (having human Uniprot)
 (dev in progress)}
 
 \item{includeTransportRxns}{if TRUE, returns metabolic and transport reactions}
 
-\item{rxnDirs}{character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", 
+\item{rxnDirs}{character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL",
 "BD", "ALL"), default = c("UN").}
 
 \item{includeRxnURLs}{if TRUE, urls to Rhea.org will be delivered in the result dataframe for each reaction}
@@ -33,7 +33,7 @@ in progress)}
 \item{db}{a RaMP database object}
 }
 \value{
-a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and 
+a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and
 common reactions
 }
 \description{

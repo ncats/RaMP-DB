@@ -1,5 +1,5 @@
 #' @importFrom methods setClassUnion
-#'
+#' @importFrom methods callNextMethod
 #' @importClassesFrom DBI DBIDriver
 #'
 #' @noRd
@@ -135,6 +135,8 @@ setMethod(
 #' @param local `logical(1)` for `listRaMPVersion`: whether remote
 #'     (`local = FALSE`, default) or locally (`local = TRUE`) available RaMP
 #'     versions should be listed.
+#'
+#' @param branch specifies what branch versions should be taken from. Default is 'main'.
 #'
 #' @name RaMP
 #'
@@ -354,6 +356,7 @@ listRaMPVersions <- function(local = FALSE, branch = "main") {
 #'
 #' Lists local and remotely available RaMP SQLite DB versions and prompts with
 #' message to download a new version if one exists.
+#' @param branch specifies what branch versions should be taken from. Default is 'main'.
 #'
 #' @export
 listAvailableRaMPDbVersions <- function(branch = "main") {
