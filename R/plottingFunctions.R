@@ -20,17 +20,10 @@ plotCataNetwork <- function(catalyzedf = "") {
     message("The input data has 0 rows. plotCataNetwork function is returning without generating a plot.")
     return()
   }
-
-<<<<<<< HEAD
   if (length(intersect(c("query_relation", "input_analyte", "input_common_name", "rxn_partner_common_name", "rxn_partner_ids", "Source" ),
                        names(catalyzedf)))!=6) {
     stop("Please make sure that the input is the resulting data.frame returned by the rampFastCata() function")
   }
-=======
-        if (length(intersect(c("input_analyte","rxn_partner_common_name"),colnames(catalyzedf)))!=2) {
-                stop("Please make sure that the input is the resulting data.frame returned by the rampFastCata() function")
-        }
->>>>>>> ramp3.0
 
   #Set Edges
   myedges = catalyzedf[,c("query_relation", "input_common_name","rxn_partner_common_name", "Source")]
