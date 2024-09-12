@@ -9,7 +9,7 @@ findAnalyteHasPathway(pathwayRampId, GC = "C", n = 10, db = RaMP())
 \arguments{
 \item{pathwayRampId}{a vector of ramp Pathway ID}
 
-\item{GC}{the analytes type that is either "C" for compound or "G" for gene}
+\item{GC}{the analytes type that is either "C" for compound or "G" for gene or 'both'}
 
 \item{n}{minimum analytes of which pathway to considered computing overlap}
 

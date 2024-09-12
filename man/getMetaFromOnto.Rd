@@ -12,7 +12,7 @@ getMetaFromOnto(ontology, db = RaMP())
 \item{db}{a RaMP database object}
 }
 \value{
-dataframe that  contains searched analytes from given ontology
+dataframe that contains searched analytes from given ontology
 }
 \description{
 function that query database to find analytes in given ontologies

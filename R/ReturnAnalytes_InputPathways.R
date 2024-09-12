@@ -43,7 +43,7 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyteType="both", ma
     match = 'exact'
   }
 
-  isSQLite = .is_sqlite(db)
+  isSQLite = .is_sqlite(x = db)
 
   # Retrieve pathway RaMP ids
   if (match=='exact') {
@@ -83,7 +83,7 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyteType="both", ma
     order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;")
     }
 
-    df <- RaMP::runQuery(sql, db)
+    df <- runQuery(sql = sql, db = db)
 
   } else if(match == 'fuzzy') {
     df = data.frame(matrix(nrow=0, ncol=7))
@@ -124,7 +124,7 @@ getAnalyteFromPathway <- function(pathway, match="exact", analyteType="both", ma
     for(p in pathway) {
       if(nchar(p)>2) {
         currSQL = gsub(pattern = '[SOME_PW_NAME]', replacement = p, x= sql, fixed = T )
-        subdf <- RaMP::runQuery(currSQL, db)
+        subdf <- runQuery(sql = currSQL, db = db)
         df <- rbind(df, subdf)
       }
     }

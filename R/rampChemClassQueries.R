@@ -115,7 +115,7 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
       where o.commonName in ('", background, "') and o.rampOntologyId=ao.rampOntologyId and s.rampId = ao.rampCompoundId")
     }
 
-    bg = RaMP::runQuery(query, db)
+    bg = RaMP::runQuery(sql = query, db = db)
 
     # cases check if bg is empty (suggest to query for biospecimen types in ramp)
     if(is.null(bg) || nrow(bg) == 0) {
@@ -173,12 +173,10 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
     return(res)
   }else{
     if(!is.null(res$met_classes)) {
-      res$met_classes<-res$met_classes %>% cleanup
-      res$met_classes<-res$met_classes %>% cleanup
+      res$met_classes <- cleanup(data = res$met_classes)
     }
     if(!is.null(res$pop_classes)) {
-      res$pop_classes<-res$pop_classes %>% cleanup
-      res$pop_classes<-res$pop_classes %>% cleanup
+      res$pop_classes <- cleanup(data = res$pop_classes)
     }
     return(res)
   }
@@ -240,7 +238,7 @@ chemicalClassEnrichment <- function( mets, background = "database", background_t
   enrichmentStat <- list()
 
   # helper method to summarize information on classes based on chemical class survey
-  totalCountInfo <- getTotalFoundInCategories(classData, inferIdMapping = inferIdMapping)
+  totalCountInfo <- getTotalFoundInCategories(classData = classData, inferIdMapping = inferIdMapping)
 
   for (category in names(classData$count_summary)) {
 
@@ -285,7 +283,7 @@ chemicalClassEnrichment <- function( mets, background = "database", background_t
           resultRow <- resultRow + 1
         }
       }
-      resultMat <- bhCorrect(resultMat)
+      resultMat <- bhCorrect(resultMat = resultMat)
       enrichmentStat[[as.character(category)]] <- resultMat
 
     }

@@ -2,7 +2,7 @@
 
 #' Find table of analyte has pathway from given pathway IDs
 #' @param pathwayRampId a vector of ramp Pathway ID
-#' @param GC the analytes type that is either "C" for compound or "G" for gene
+#' @param GC the analytes type that is either "C" for compound or "G" for gene or 'both'
 #' @param n minimum analytes of which pathway to considered computing overlap
 #' @param db a RaMP database object
 #' @return A list with pathway rampID as name, a vector of analytes from this pathway as content.
@@ -19,7 +19,7 @@ findAnalyteHasPathway <- function( pathwayRampId,GC = "C",n = 10, db = RaMP()){
                 p_id,
                 ");")
 
- df <- runQuery(db, query)
+ df <- runQuery(db = db, sql = query)
 
  if(GC == 'both'){
    df2 <- stats::aggregate(df$rampId,list(df$pathwayRampId),FUN = function(x){
@@ -190,8 +190,8 @@ updateOverlapMatrix <- function(min_analyte, overlapmethod, together, db = RaMP(
   print("Start updateOverlapMatrix()")
 
   if(!together){
-    pathways<- runQuery(db,'select * from pathway;')
-    source <- runQuery(db,'select * from source;')
+    pathways<- runQuery(db = db, sql = 'select * from pathway;')
+    source <- runQuery(db = db, sql = 'select * from source;')
 
 
     # dbname <- unique(pathways$type)
@@ -206,15 +206,14 @@ updateOverlapMatrix <- function(min_analyte, overlapmethod, together, db = RaMP(
 
     # Store Compound Ids in List
     # listOfHmdbC <- findAnalyteHasPathway(pathwayInHmdb$pathwayRampId)
-    listOfKeggC <- findAnalyteHasPathway(pathwayInKegg$pathwayRampId,n = min_analyte)
-
-    listOfWikiC <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,n = min_analyte)
-    listOfReacC <- findAnalyteHasPathway(pathwayInReac$pathwayRampId,n = min_analyte)
+    listOfKeggC <- findAnalyteHasPathway(pathwayRampId = pathwayInKegg$pathwayRampId,n = min_analyte)
+    listOfWikiC <- findAnalyteHasPathway(pathwayRampId = pathwayInWiki$pathwayRampId,n = min_analyte)
+    listOfReacC <- findAnalyteHasPathway(pathwayRampId = pathwayInReac$pathwayRampId,n = min_analyte)
     # Store Gene Ids in List
     # listOfHmdbG <- findAnalyteHasPathway(pathwayInHmdb$pathwayRampId,GC="G")
-    listOfKeggG <- findAnalyteHasPathway(pathwayInKegg$pathwayRampId,GC="G",n = min_analyte)
-    listOfWikiG <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,GC="G",n = min_analyte)
-    listOfReacG <- findAnalyteHasPathway(pathwayInReac$pathwayRampId,GC="G",n = min_analyte)
+    listOfKeggG <- findAnalyteHasPathway(pathwayRampId = pathwayInKegg$pathwayRampId,GC="G",n = min_analyte)
+    listOfWikiG <- findAnalyteHasPathway(pathwayRampId = pathwayInWiki$pathwayRampId,GC="G",n = min_analyte)
+    listOfReacG <- findAnalyteHasPathway(pathwayRampId = pathwayInReac$pathwayRampId,GC="G",n = min_analyte)
 
     # Setup minimum number of analytes that will be considered
 
@@ -258,9 +257,9 @@ updateOverlapMatrix <- function(min_analyte, overlapmethod, together, db = RaMP(
       listOfReacG))
     # compute for matrix
     if(overlapmethod == 'balanced' ){
-      gene_result <- compute_overlap_matrix2(pathwayid = pathwayidG,pathToanalG,overlapmethod = 'balanced')
+      gene_result <- compute_overlap_matrix2(pathwayid = pathwayidG,pathwaysWithAnalytes = pathToanalG,overlapmethod = 'balanced')
     } else if(overlapmethod == 'weighted' ){
-      gene_result <- compute_overlap_matrix2(pathwayid = pathwayidG,pathToanalG,overlapmethod = 'weighted')
+      gene_result <- compute_overlap_matrix2(pathwayid = pathwayidG,pathwaysWithAnalytes = pathToanalG,overlapmethod = 'weighted')
     }
 
     print("End updateOverlapMatrix()")
@@ -270,7 +269,7 @@ updateOverlapMatrix <- function(min_analyte, overlapmethod, together, db = RaMP(
       gene = gene_result
     ))
   } else if(together) {
-    pathways<- runQuery(db,'select * from pathway;')
+    pathways<- runQuery(db = db, sql = 'select * from pathway;')
 
     # dbname <- unique(pathways$type)
 
@@ -286,9 +285,9 @@ updateOverlapMatrix <- function(min_analyte, overlapmethod, together, db = RaMP(
     # listOfHmdbC <- findAnalyteHasPathway(pathwayInHmdb$pathwayRampId)
     # use both to save metabolites/genes in the list
 
-    listOfKegg <- findAnalyteHasPathway(pathwayInKegg$pathwayRampId,GC = 'both',n = min_analyte)
-    listOfWiki <- findAnalyteHasPathway(pathwayInWiki$pathwayRampId,GC = 'both',n = min_analyte)
-    listOfReac <- findAnalyteHasPathway(pathwayInReac$pathwayRampId,GC = 'both',n = min_analyte)
+    listOfKegg <- findAnalyteHasPathway(pathwayRampId = pathwayInKegg$pathwayRampId,GC = 'both',n = min_analyte)
+    listOfWiki <- findAnalyteHasPathway(pathwayRampId = pathwayInWiki$pathwayRampId,GC = 'both',n = min_analyte)
+    listOfReac <- findAnalyteHasPathway(pathwayRampId = pathwayInReac$pathwayRampId,GC = 'both',n = min_analyte)
     # Append all pathways id together
 
     pathwayid <- c(#names(listOfHmdbC),
@@ -354,7 +353,7 @@ processData <- function(db = RaMP()){
 
   # get all rows form analytehaspathway
   query <- "select * from analytehaspathway"
-  allRampIds <- runQuery(db,query)
+  allRampIds <- runQuery(db = db, sql = query)
 
   if(is.null(allRampIds)) {
 

@@ -74,7 +74,7 @@ plotCataNetwork <- function(catalyzedf = "") {
 #' @param db a RaMP database object
 #' @examples
 #' \dontrun{
-#' plotEnrichedPathways(filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2,
+#' pathwayResultsPlot(pathwaysSig = filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2,
 #'    min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE, db = rampDB )
 #' }
 #' @export
@@ -85,12 +85,12 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
 
 
   if( !('cluster_assignment' %in% colnames(pathwaysSig$fishresult))) {
-    fishClustering <- findCluster(db = db, pathwaysSig,
+    fishClustering <- findCluster(db = db, fishers_df = pathwaysSig,
                                   perc_analyte_overlap = perc_analyte_overlap,
                                   perc_pathway_overlap = perc_pathway_overlap,
                                   min_pathway_tocluster = min_pathway_tocluster
     )
-    # asign this here if clustering is proformed here...
+    # assign this here if clustering is preformed here...
     fishresult <- fishClustering$fishresults
   } else {
     message("The input pathway result has already been clustered. Defaulting to existing clustering.")
@@ -262,7 +262,7 @@ plotReactionClasses <- function(reactionClassesResults) {
 
 
 
-  sunburst_ontology_reactionclass <- buildReactionClassesSunburstDataframe(reactionClassesResults)
+  sunburst_ontology_reactionclass <- buildReactionClassesSunburstDataframe(reactionClassesResults = reactionClassesResults)
 
   fig <- plotly::plot_ly(
     color = I("black"),
@@ -311,7 +311,7 @@ plotReactionClasses <- function(reactionClassesResults) {
 #' reactionsLists <- RaMP::getReactionsForAnalytes(analytes = analytes.of.interest,
 #'     includeTransportRxns = F, humanProtein = T, db = rampDB)
 #'
-#' plotAnalyteOverlapPerRxnLevel(reactionsLists)
+#' plotAnalyteOverlapPerRxnLevel(reactionsResults = reactionsLists)
 #' }
 #'
 #' @export
@@ -474,7 +474,7 @@ plotChemicalClassSurvery <- function(chemicalClassSurveryResults, plotType = "su
 
 
 
-  sunburst_ontology_chemicalClass <- buildChemicalClassSurveryDataframe(chemicalClassSurveryResults)
+  sunburst_ontology_chemicalClass <- buildChemicalClassSurveryDataframe(chemicalClassSurveryResults = chemicalClassSurveryResults)
 
   fig <- plotly::plot_ly(
     color = I("black")

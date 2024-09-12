@@ -17,7 +17,6 @@ Retrieve list of pathway names
 }
 \examples{
 \dontrun{
-pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
 getPathwayNameList()
 }
 }

@@ -19,10 +19,11 @@
 #' @importMethodsFrom DBI dbGetQuery
 #'
 #' @export
-runQuery <- function(sql, db = RaMP()) {
-    con <- .dbcon(db)
-    on.exit(dbDisconnect(con))
-    dbGetQuery(con, sql)
+runQuery <- function(
+    sql, db = RaMP()) {
+    con <- .dbcon(x = db)
+    on.exit(dbDisconnect(conn = con))
+    dbGetQuery(conn = con, statement = sql)
 }
 
 
@@ -59,7 +60,7 @@ setupRdataCache <- function(db = RaMP()) {
 
   sql = "select data_key, data_blob from ramp_data_object"
 
-  objs <- runQuery(sql, db)
+  objs <- runQuery(sql = sql, db = db)
 
   dbSummaryData = list()
 
@@ -68,7 +69,7 @@ setupRdataCache <- function(db = RaMP()) {
     blob = objs[i,2]
     blob = blob[[1]]
     obj = memDecompress(from=blob, type = 'gzip', asChar = T)
-    data = data.frame(data.table::fread(obj, sep="\t"), row.names = 1)
+    data = data.frame(data.table::fread(input = obj, sep="\t"), row.names = 1)
     dbSummaryData[[varName]] <- data
   }
 
