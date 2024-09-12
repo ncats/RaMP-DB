@@ -25,6 +25,7 @@ plotCataNetwork <- function(catalyzedf = "") {
     stop("Please make sure that the input is the resulting data.frame returned by the rampFastCata() function")
   }
 
+
   #Set Edges
   myedges = catalyzedf[,c("query_relation", "input_common_name","rxn_partner_common_name", "Source")]
   colnames(myedges)[2:3] <-c("from","to")
