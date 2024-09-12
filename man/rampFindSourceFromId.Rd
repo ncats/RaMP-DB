@@ -4,7 +4,7 @@
 \alias{rampFindSourceFromId}
 \title{Find all source from given list of RaMP Ids}
 \usage{
-rampFindSourceFromId(db = RaMP(), rampId = "", full = TRUE)
+rampFindSourceFromId(rampId = "", full = TRUE, db = RaMP())
 }
 \arguments{
 \item{rampId}{could be a data frame return by rampFindSynonymFromSynonym
@@ -12,6 +12,8 @@ containing all information related to synonym. Or can be a list of
 rampId}
 
 \item{full}{return whole searching result or not (TRUE/FALSE)}
+
+\item{db}{a RaMP database object}
 }
 \value{
 a data frame that has all source Id in the column or the source table that has metabolites entry

@@ -5,32 +5,36 @@
 \title{getReactionsForAnalytes}
 \usage{
 getReactionsForAnalytes(
-  db = RaMP(),
   analytes,
   onlyHumanMets = F,
   humanProtein = T,
   includeTransportRxns = F,
   rxnDirs = c("UN"),
-  includeRxnURLs = F
+  includeRxnURLs = F,
+  db = RaMP()
 )
 }
 \arguments{
-\item{db}{a RaMP database object}
-
 \item{analytes}{list of analytes. chebi and/or uniprot ids are required.}
 
-\item{onlyHumanMets}{boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)}
+\item{onlyHumanMets}{boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev 
+in progress)}
 
-\item{humanProtein}{boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)}
+\item{humanProtein}{boolean to only control pathways catalyzed by a human proteins (having human Uniprot) 
+(dev in progress)}
 
 \item{includeTransportRxns}{if TRUE, returns metabolic and transport reactions}
 
-\item{rxnDirs}{character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", "BD", "ALL"), default = c("UN").}
+\item{rxnDirs}{character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", 
+"BD", "ALL"), default = c("UN").}
 
 \item{includeRxnURLs}{if TRUE, urls to Rhea.org will be delivered in the result dataframe for each reaction}
+
+\item{db}{a RaMP database object}
 }
 \value{
-a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and common reactions
+a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and 
+common reactions
 }
 \description{
 getReactionsForAnalytes
@@ -39,7 +43,7 @@ getReactionsForAnalytes
 \dontrun{
 analytes.of.interest <- c('chebi:57368', 'uniprot:Q96N66')
 
-reactionsLists <- RaMP::getReactionsForAnalytes(db = rampDB, analytes = analytes.of.interest,
-                                                  includeTransportRxns = F, humanProtein = T)
+reactionsLists <- RaMP::getReactionsForAnalytes(analytes = analytes.of.interest,
+    includeTransportRxns = F, humanProtein = T, db = rampDB )
 }
 }

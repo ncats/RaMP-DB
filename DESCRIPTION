@@ -5,46 +5,36 @@ Version: 3.0.2
 License: GPL-2
 Depends: R (>= 3.6.0)
 Authors@R: c(
-    person("John", "Braisted", email = "john.braisted@nih.gov", role = "aut"),
-    person("Ewy", "Mathe", email = "Ewy.Mathe@nih.gov", role = c("aut", "cre")),
     person("Andrew", "Patt", email = "andrew.patt@nih.gov", role = "aut"),
-    person("Kyle", "Spencer", email = "kyle.spencer@nih.gov", rol="aut"),
-    person("Cole", "Tindall", email = "cole.tindall@nih.gov", role = "aut"))
+    person("Ewy", "Mathe", email = "Ewy.Mathe@nih.gov", role = c("aut", "cre")),
+    person("Khyati", "Mehta", email = "khyati.mehta@nih.gov", rol="aut"))
 Description: The RaMP R package allows users to interact with the RaMP database, which integrates biological, reaction-level, ontologies, and chemical annoations from multiple resources (Reactome, HMDB, WikiPathways, KEGG, LipidMAPS, ChEBI).  The package allows users to query RaMP and to perform pathway and chemical overrepresentation analyses.  
 Imports:
+    R6,
     magrittr,
-    shiny,
     methods,
-    shinydashboard,
-    highcharter,
     dplyr,
     ggplot2,
-    plotly,
     tidyr,
     readr,
-    tidytext,
     data.table,
-    DT,
     rlang,
-    gt,
-    xtable,
-    visNetwork,
-    properties,
-    stringi,
     DBI,
     RSQLite,
-    RMariaDB,
     jsonlite,
-    readxl,
     tibble,
     BiocFileCache,
     R.utils,
     httr,
-    upsetjs,
-    Polychrome,
     pals
 Encoding: UTF-8
-RoxygenNote: 7.3.1
-Suggests: 
-    testthat (>= 3.0.0)
+RoxygenNote: 7.3.2
+Suggests:
+    visNetwork,	
+    testthat (>= 3.0.0),
+    tidytext,
+    Polychrome,
+    readxl,
+    upsetjs,
+    plotly
 Config/testthat/edition: 3

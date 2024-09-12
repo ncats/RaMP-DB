@@ -5,12 +5,12 @@
 \title{Use fast search algorithm to find all pathways from given analytes}
 \usage{
 getAnalyteFromPathway(
-  db = RaMP(),
   pathway,
   match = "exact",
-  analyte_type = "both",
-  max_pathway_size = Inf,
-  names_or_ids = "names"
+  analyteType = "both",
+  maxPathwaySize = Inf,
+  namesOrIds = "names",
+  db = RaMP()
 )
 }
 \arguments{
@@ -18,12 +18,14 @@ getAnalyteFromPathway(
 
 \item{match}{type of matching to use, options are "exact" or "fuzzy".  The default is "exact".}
 
-\item{analyte_type}{a string denoting the type of analyte to return ("gene", "metabolite", "both")}
+\item{analyteType}{a string denoting the type of analyte to return ("gene", "metabolite", "both")}
 
-\item{max_pathway_size}{(default Inf), trims returned results to pathways that have fewer than this number}
+\item{maxPathwaySize}{(default Inf), trims returned results to pathways that have fewer than this number}
 
-\item{names_or_ids}{are the input pathways input as pathway names or as pathway ids
+\item{namesOrIds}{are the input pathways input as pathway names or as pathway ids
 of genes and metabolites}
+
+\item{db}{a RaMP database object, if not specified a new one is created with RaMP::RaMP()}
 }
 \value{
 a data.frame that contains all search results
@@ -33,12 +35,8 @@ Use fast search algorithm to find all pathways from given analytes
 }
 \examples{
 \dontrun{
-# To query one pathway:
-myanalytes <- getAnalyteFromPathway2(pathway="sphingolipid metabolism")
 
-# To query multiple pathways:
-pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-myanalytes <- getAnalyteFromPathway2(pathway=c("De Novo Triacylglycerol Biosynthesis",
-"sphingolipid metabolism"))
+getAnalyteFromPathway( pathway=c("Wnt Signaling Pathway", "Sphingolipid Metabolism"), db = rampDB )
+
 }
 }

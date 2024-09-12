@@ -2,54 +2,69 @@
 % Please edit documentation in R/formattingFunctions.R
 \name{createRaMPInput}
 \alias{createRaMPInput}
-\title{Produce RaMP input from metabolite metadata data.frame or csv}
+\title{Produce RaMP input from metabolite metadata data.frame object or .csv/.xlsx files}
 \usage{
-createRaMPInput(db = RaMP(), data_frame = NULL, csv_path = NULL, ...)
+createRaMPInput(dataFrame = NULL, filePath = NULL, db = RaMP(), ...)
 }
 \arguments{
-\item{data_frame}{a data.frame object where the column names are prefixes that will be prepended to each identifier in that column. Please specify either this argument or csv_path. Supported prefixes can be found with getPrefixesFromAnalytes()}
+\item{dataFrame}{a data.frame object where the column names are prefixes that will be prepended to each identifier 
+in that column. Please specify either this argument or filePath. Supported prefixes can be found with 
+getPrefixesFromAnalytes()}
 
-\item{csv_path}{a string containing the file path to a csv that will be read and converted to RaMP data input format. Column names should be prefixes that will be prepended to each identifier in that column.}
+\item{filePath}{a string containing the file path to a csv that will be read and converted to RaMP data input 
+format. Column names should be prefixes that will be prepended to each identifier in that column.}
 
-\item{...}{additional arguments that will be passed to readr::read_csv()}
+\item{db}{a RaMP database object, if not specified a new one is created with RaMP::RaMP()}
+
+\item{...}{additional arguments that will be passed to readr::read_csv() or readxl::read_excel()}
 }
 \value{
-A vector object of type character() including each identifier in the input prepended to a supported prefix in the format "prefix:identifier". This result is designed to be input for several RaMP functions.
+A character() object including each identifier in the input prepended to a supported prefix in the 
+format "prefix:identifier". This result is designed to be input for several RaMP functions.
 }
 \description{
-Converts data.frame or csv formatted metabolite metadata into RaMP data input format. The input should have ID sources (e.g. hmdb, kegg, entrez) as column names and the corresponding rows filled with IDs from that source.
+Converts data.frame,  .csv, or .xlsx formatted metabolite metadata into RaMP data input format. The input should
+have ID sources (e.g. hmdb, kegg, entrez) as column names and the corresponding rows filled with IDs from that
+source.
 }
 \details{
-RaMP input format is a character() of entries that look like prefix:ID where the prefix is a code for the ID system the ID belongs to (e.g. hmdb, kegg, entrez).
-This function expects input with prefixes as column names, and IDs belonging to that prefix as rows in the corresponding column. Data can be supplied as a csv file or data.frame object.
-NA values, columns named with an usupported prefix, and columns named with a supported prefix but no data will be ignored by the function.
+RaMP input format is a character() of entries that look like prefix:ID where the prefix is a code for the ID 
+system the ID belongs to (e.g. hmdb, kegg, entrez). This function expects input with prefixes as column names, 
+with IDs belonging to that prefix as rows in the corresponding column. Data can be supplied as a csv file, excel
+file, or data.frame object. NA values, 'NA' values, columns named with an unsupported prefix, and columns named 
+with a supported prefix but no data will be ignored by the function. Two IDs in the same string separated by a 
+semicolon are separated into two entries.
 
-A complete and current list of currently supported prefixes for metabolites can be found by running the getPrefixesFromAnalytes() function, as shown in examples.
-These will include the following genes/proteins: ensembl, gene_symbol, uniprot, entrez, hmdb, wikidata, EN, ncbiprotein, brenda, chebi.
-They will also include the following metabolites: hmdb, chebi, chemspider, kegg, pubchem, CAS, wikidata, LIPIDMAPS, lipidbank, swisslipids, plantfa, kegg_glycan, rhea-comp, polymer
+A complete and current list of currently supported prefixes for metabolites can be found by running the 
+getPrefixesFromAnalytes() function, as shown in examples. These will include the following genes/proteins: ensembl,
+gene_symbol, uniprot, entrez, hmdb, wikidata, EN, ncbiprotein, brenda, chebi. They will also include the following 
+metabolites: hmdb, chebi, chemspider, kegg, pubchem, CAS, wikidata, LIPIDMAPS, lipidbank, swisslipids, plantfa, 
+kegg_glycan, rhea-comp, polymer
+
+The COMETS data format, which uses HMDB_ID and PUBCHEM as column names, is also supported.
 }
 \examples{
- \dontrun{
+\dontrun{
 # Retrieve supported ID source lists for metabolites and genes
 RaMP::getPrefixesFromAnalytes(analyteType = 'metabolite')
 
 RaMP::getPrefixesFromAnalytes(analyteType = 'gene')
 
-# Example use with demo data
-df <- data.frame(ensembl = c('ENSG00000135679', 'ENSG00000141510'),
-                hmdb = c('HMDB0000064', NA), fake_ID = c('123', NA))
+# Example use with demo dataframe data
+df <- data.frame(ensembl = c('ENSG00000135679', 'ENSG00000141510'), hmdb = c('HMDB0000064', NA), 
+     fake_ID = c('123', NA))
 
-dir <- system.file("extdata", package="RaMP", mustWork=TRUE)
-data_frame <- file.path(dir,"ExampleInputFileName.csv")
-
-RaMPInput <- createRaMPInput(data_frame = df)
+RaMPInput <- createRaMPInput(dataFrame = df)
 
 getPathwayFromAnalyte(RaMPInput)
 
-# Example use with csv
-RaMPInput <- createRaMPInput(csv_path = 'createRaMPInput_test_data.csv')
+# Example use with demo csv data
+
+dir <- system.file("extdata", package="RaMP", mustWork=TRUE)
+ExampleRaMPInputPath <- file.path(dir,"ExampleRaMPInput.csv")
+
+RaMPInput <- createRaMPInput(filePath = ExampleRaMPInputPath)
 
 getPathwayFromAnalyte(RaMPInput)
 }
-
 }

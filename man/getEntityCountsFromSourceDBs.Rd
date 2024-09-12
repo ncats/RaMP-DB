@@ -6,6 +6,9 @@
 \usage{
 getEntityCountsFromSourceDBs(db = RaMP())
 }
+\arguments{
+\item{db}{a RaMP database object}
+}
 \value{
 database sources and entity counts associated with each data source
 }

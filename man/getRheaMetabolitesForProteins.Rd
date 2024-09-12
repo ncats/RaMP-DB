@@ -6,20 +6,20 @@
 that are reaction participants with the input metabolite ids.}
 \usage{
 getRheaMetabolitesForProteins(
-  db = RaMP(),
   analytes,
   includeRheaRxnDetails = F,
-  humanProteins = T
+  humanProtein = T,
+  db = RaMP()
 )
 }
 \arguments{
-\item{db}{a RaMP databse object}
-
 \item{analytes}{analyte id vector}
 
 \item{includeRheaRxnDetails}{returns additional columns that inlucdes info in the reaction connecting mets and proteins}
 
-\item{humanProteins}{require reactions to have a human protein (enzyme or transporter), default True}
+\item{humanProtein}{require reactions to have a human protein (enzyme or transporter), default True}
+
+\item{db}{a RaMP database object}
 }
 \value{
 returns a dataframe object with input metabolites, and reaction and associated protein informatin.

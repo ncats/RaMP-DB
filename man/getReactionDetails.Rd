@@ -7,12 +7,12 @@ This utility methed can help extend information from previous queries.
 For instance, if a user queries for reactions related to a list of analytes, or filtered on reactions,
 this method can be used to return general reaction info on some subset of reaction ids of interest.}
 \usage{
-getReactionDetails(db = RaMP(), reactionList = c())
+getReactionDetails(reactionList = c(), db = RaMP())
 }
 \arguments{
-\item{db}{a RaMP databse object}
-
 \item{reactionList}{list of reaction ids}
+
+\item{db}{a RaMP database object}
 }
 \value{
 returns a dataframe object with reaction information.

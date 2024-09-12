@@ -4,7 +4,10 @@
 \alias{processData}
 \title{processData function generates pathway RampId frequency (gene or metabolite) based on pathway source (hmdb,kegg,reactome,wiki)}
 \usage{
-processData()
+processData(db = RaMP())
+}
+\arguments{
+\item{db}{a RaMP database object}
 }
 \value{
 R object (FT_data.Rdata) with dataframes (hmdb_metab,hmdb_gene,kegg_gene,kegg_metab,reactome_gene,reactome_metab,wiki_gene,wiki_metab)

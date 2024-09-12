@@ -15,3 +15,16 @@ An interactive HTML sunburst plot that allows the user to pan/zoom into reaction
 \description{
 Plots an interactive sunburst plot of reaction class
 }
+\examples{
+\dontrun{
+analytes.of.interest = c('chebi:58115', 'chebi:456215', 'chebi:58245', 'chebi:58450',
+'chebi:17596', 'chebi:16335', 'chebi:16750', 'chebi:172878',
+'chebi:62286', 'chebi:77897', 'uniprot:P30566','uniprot:P30520',
+'uniprot:P00568', 'uniprot:P23109', 'uniprot:P22102', 'uniprot:P15531')
+
+reaction.classes <- getReactionClassesForAnalytes( analytes = analytes.of.interest, db = RaMP())
+
+plotReactionClasses(reaction.classes)
+}
+
+}

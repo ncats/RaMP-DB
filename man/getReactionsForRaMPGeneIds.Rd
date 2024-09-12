@@ -5,12 +5,12 @@
 \title{getReactionsForRaMPGeneIds returns reactions for a collection of ramp compound ids}
 \usage{
 getReactionsForRaMPGeneIds(
-  db = RaMP(),
   rampGeneIds,
   onlyHumanMets = F,
-  humanProtein = F,
+  humanProtein = T,
   includeTransportRxns = F,
-  rxnDirs = c("UN")
+  rxnDirs = c("UN"),
+  db = RaMP()
 )
 }
 \arguments{
@@ -21,6 +21,10 @@ getReactionsForRaMPGeneIds(
 \item{humanProtein}{boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)}
 
 \item{includeTransportRxns}{if TRUE, returns metabolic and transport reactions}
+
+\item{rxnDirs}{character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", "BD", "ALL"), default = c("UN")}
+
+\item{db}{a RaMP database object}
 }
 \value{
 returns a dataframe of reaction information for each ramp compound id

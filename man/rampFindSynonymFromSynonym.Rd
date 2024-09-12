@@ -8,10 +8,10 @@ Now, this function only format the user input, so the user vector, dataframe,
 and entire string separated by comma are working.}
 \usage{
 rampFindSynonymFromSynonym(
-  db = RaMP(),
   synonym,
   full = FALSE,
-  return_rampIds = FALSE
+  return_rampIds = FALSE,
+  db = RaMP()
 )
 }
 \arguments{
@@ -21,6 +21,8 @@ rampFindSynonymFromSynonym(
 
 \item{return_rampIds}{bool to return ramp Ids with output
 (there are some common synonyms that will mess up whole searching)}
+
+\item{db}{a RaMP database object}
 }
 \value{
 a data frame that contains synonym in the first column rampId in the second column

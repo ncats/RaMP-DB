@@ -6,6 +6,9 @@
 \usage{
 getMetabClassDataSources(db = RaMP())
 }
+\arguments{
+\item{db}{a RaMP database object, if not specified a new one is created with RaMP::RaMP()}
+}
 \value{
 Returns list of data sources for metabolites
 }

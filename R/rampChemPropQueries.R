@@ -2,10 +2,11 @@
 
 #' Returns chemical properties given a metabolite list
 #'
-#' @param mets a list object of source prepended metaboite ids, representing a metabolite set of interest
+#' @param mets a list object of source prepended metabolite ids, representing a metabolite set of interest
 #' @param propertyList an optional list of specific properties to extract.  Options include 'all' (default),  'smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'.
 #' If a props list is not supplied, all property fields will be returned.
-#' @return Returns chemcial property information for the list of input metabolites and a query report reporting on the number of metabolite ids that were matched and the list of un-matched input ids.
+#' @param db a RaMP database object
+#' @return Returns chemical property information for the list of input metabolites and a query report reporting on the number of metabolite ids that were matched and the list of un-matched input ids.
 #'
 #' The returned object (return_obj below) contains two results. Use str(return_obj) to see the structure described here.
 #'
@@ -25,10 +26,10 @@
 #'                              "hmdb:HMDB0001138",
 #'                              "hmdb:HMDB0029412")
 #'
-#' chemical.classes <- chemicalClassSurvey(db = rampDB, mets = metabolites.of.interest)
+#' chemical.classes <- getChemicalProperties(mets = metabolites.of.interest, db = rampDB)
 #'}
 #' @export
-getChemicalProperties <- function(db = RaMP(), mets, propertyList = 'all'){
+getChemicalProperties <- function(mets, propertyList = 'all', db = RaMP() ){
 
   message("Starting Chemical Property Query")
 
@@ -52,7 +53,7 @@ getChemicalProperties <- function(db = RaMP(), mets, propertyList = 'all'){
                    "where chem_source_id in (",metStr,")")
   }
 
-  metsData <- RaMP:::runQuery(sql, db)
+  metsData <- runQuery(sql, db)
   foundMets <- unique(metsData$chem_source_id)
 
   result[['chem_props']] <- metsData
@@ -72,20 +73,21 @@ getChemicalProperties <- function(db = RaMP(), mets, propertyList = 'all'){
   return(result)
 }
 
-# Internal function to validate property list
-# @param propList an optional list of specific properties to extract.  Options include 'all' (default),  'iso_smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'.
-buildPropertyList <- function(db = RaMP(), propList) {
+#' Internal function to validate property list
+#' @param propList an optional list of specific properties to extract.  Options include 'all' (default),  'iso_smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'.
+#' @param db a RaMP database object
+buildPropertyList <- function( propList, db = RaMP()) {
 
   # validate that all properties are valid
   #  validProperties <- c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name')
 
   if(.is_sqlite(db)) {
     sql = 'pragma table_info(chem_props)'
-    ramptypes <- RaMP:::runQuery(sql, db)
+    ramptypes <- runQuery(sql, db)
     ramptypes <- unlist(ramptypes$name)
   } else {
     sql = 'describe chem_props'
-    ramptypes <- RaMP:::runQuery(sql, db)
+    ramptypes <- runQuery(sql, db)
     ramptypes <- unlist(ramptypes$Field)
   }
 

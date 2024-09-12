@@ -5,7 +5,6 @@
 \title{Cluster and plot significant pathways by FDR-adjusted pval}
 \usage{
 pathwayResultsPlot(
-  db = RaMP(),
   pathwaysSig,
   pval = "FDR",
   perc_analyte_overlap = 0.5,
@@ -13,11 +12,12 @@ pathwayResultsPlot(
   min_pathway_tocluster = 3,
   text_size = 8,
   sig_cutoff = 0.05,
-  interactive = FALSE
+  interactive = FALSE,
+  db = RaMP()
 )
 }
 \arguments{
-\item{pathwaysSig}{output of FilterFisherResults}
+\item{pathwaysSig}{output of FilterFishersResults}
 
 \item{pval}{Which p value to plot, choose from Raw, FDR or Holm-adjusted}
 
@@ -34,13 +34,15 @@ a cluster (medoid) (Default = 3)}
 \item{sig_cutoff}{Aesthetic, shows pvalue cutoff for significant pathways}
 
 \item{interactive}{If TRUE, return interactive plotly object instead of ggplot object}
+
+\item{db}{a RaMP database object}
 }
 \description{
 Cluster and plot significant pathways by FDR-adjusted pval
 }
 \examples{
 \dontrun{
-pathwayResultsPlot(db = rampDB, filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2,
-                    min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE)
+plotEnrichedPathways(filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2,
+   min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE, db = rampDB )
 }
 }

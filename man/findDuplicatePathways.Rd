@@ -6,6 +6,9 @@
 \usage{
 findDuplicatePathways(db = RaMP())
 }
+\arguments{
+\item{db}{a RaMP database object}
+}
 \value{
 List of duplicate Wikipathway IDs from Reactome.
 }

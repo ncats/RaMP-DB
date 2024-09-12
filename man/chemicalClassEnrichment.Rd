@@ -6,11 +6,11 @@
 enrichment p-values and FDR values.}
 \usage{
 chemicalClassEnrichment(
-  db = RaMP(),
   mets,
   background = "database",
   background_type = "database",
-  inferIdMapping = F
+  inferIdMapping = F,
+  db = RaMP()
 )
 }
 \arguments{
@@ -29,6 +29,8 @@ a RaMP HMDB metabolite ontology term (see background parameter, above. for the m
 If inferIdMapping is set to TRUE, the input ids are cross-referenced or mapped to other existing ids that contain metabolite class annotations.
 Following id cross references can expand coverage if the input type is other than HMDB ids or LIPIDMAPS ids.
 The default value is FALSE.}
+
+\item{db}{a RaMP database object}
 }
 \value{
 a list of dataframes, each holding chemical classs enrichment statistics for specific chemical classification systems,
@@ -51,6 +53,6 @@ metabolites.of.interest = c("pubchem:64969",
                             "hmdb:HMDB0001138",
                             "hmdb:HMDB0029412")
 
-chemical.enrichment <- chemicalClassEnrichment(db = rampDB, mets = metabolites.of.interest)
+chemical.enrichment <- chemicalClassEnrichment(mets = metabolites.of.interest, db = rampDB)
 }
 }

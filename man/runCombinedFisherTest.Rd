@@ -6,28 +6,26 @@
 clicked on highchart}
 \usage{
 runCombinedFisherTest(
-  db = RaMP(),
   analytes,
-  nameOrId = "ids",
+  namesOrIds = "ids",
   total_genes = 20000,
   min_analyte = 2,
   MCall = F,
   alternative = "less",
-  min_path_size = 5,
-  max_path_size = 150,
+  minPathwaySize = 5,
+  maxPathwaySize = 150,
   includeRaMPids = FALSE,
   background_type = "database",
   background = "database",
   pathway_definitions = "RaMP",
-  include_smpdb = FALSE
+  include_smpdb = FALSE,
+  db = RaMP()
 )
 }
 \arguments{
-\item{db}{a RaMP databse object}
-
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
-\item{nameOrId}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
+\item{namesOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
 
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
 
@@ -38,9 +36,9 @@ runCombinedFisherTest(
 
 \item{alternative}{alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")}
 
-\item{min_path_size}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
+\item{minPathwaySize}{the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)}
 
-\item{max_path_size}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
+\item{maxPathwaySize}{the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)}
 
 \item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
 
@@ -59,6 +57,8 @@ then users should specify one of the following: "Blood", "Adipose tissue", "Hear
 \item{pathway_definitions}{If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows. Please supply a .xls or .xlsx file. If supplying pathway definitions for genes and metabolites, ensure that metabolite definitions are on tab 1, and gene definitions are on tab2.}
 
 \item{include_smpdb}{Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant}
+
+\item{db}{a RaMP databse object}
 }
 \value{
 a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values
@@ -71,7 +71,7 @@ clicked on highchart
 }
 \examples{
 \dontrun{
-fisher.results <- runCombinedFisherTest(db = rampDB, analytes = c(
+fisher.results <- runCombinedFisherTest(analytes = c(
 "hmdb:HMDB0000033",
 "hmdb:HMDB0000052",
 "hmdb:HMDB0000094",
@@ -94,7 +94,8 @@ fisher.results <- runCombinedFisherTest(db = rampDB, analytes = c(
 "hmdb:HMDBP00283",
 "hmdb:HMDBP00284",
 "hmdb:HMDBP00850"
-))
+), db = rampDB )
 
+fisher.results <- runCombinedFisherTest(analytes = analyte.list, namesOrIds = "ids")
 }
 }

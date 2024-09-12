@@ -15,6 +15,7 @@
 #' @param inferIdMapping if FALSE, the survey only reports on class annotations made directly on the input ids.
 #' If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to related ids that contain metabolite class annotations.
 #' The default is TRUE.
+#' @param db a RaMP database object
 #' @return Returns chemical class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
 #' metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolved and listing those metabolite ids
 #' that are not found in the database.
@@ -62,7 +63,7 @@
 #' metClassResult$query_report
 #'}
 #' @export
-chemicalClassSurvey <- function(db = RaMP(), mets, background = "database", background_type="database", includeRaMPids = FALSE, inferIdMapping = TRUE){
+chemicalClassSurvey <- function(mets, background = "database", background_type="database", includeRaMPids = FALSE, inferIdMapping = TRUE, db = RaMP()){
 
   print("Starting Chemical Class Survey")
 
@@ -199,6 +200,7 @@ chemicalClassSurvey <- function(db = RaMP(), mets, background = "database", back
 #' If inferIdMapping is set to TRUE, the input ids are cross-referenced or mapped to other existing ids that contain metabolite class annotations.
 #' Following id cross references can expand coverage if the input type is other than HMDB ids or LIPIDMAPS ids.
 #' The default value is FALSE.
+#' @param db a RaMP database object
 #' @return a list of dataframes, each holding chemical classs enrichment statistics for specific chemical classification systems,
 #' such as HMDB Classyfire class categories and LIPIDMAPS class categories.  The results list chemical classes, metabolite hits counts,
 #' Fisher Exact p-values and Benjamini-Hochberg corrected p-values (FDR estimates)
@@ -215,10 +217,10 @@ chemicalClassSurvey <- function(db = RaMP(), mets, background = "database", back
 #'                             "hmdb:HMDB0001138",
 #'                             "hmdb:HMDB0029412")
 #'
-#' chemical.enrichment <- chemicalClassEnrichment(db = rampDB, mets = metabolites.of.interest)
+#' chemical.enrichment <- chemicalClassEnrichment(mets = metabolites.of.interest, db = rampDB)
 #'}
 #' @export
-chemicalClassEnrichment <- function(db = RaMP(), mets, background = "database", background_type = "database", inferIdMapping=F) {
+chemicalClassEnrichment <- function( mets, background = "database", background_type = "database", inferIdMapping=F, db = RaMP() ) {
   print("Starting Chemical Class Enrichment")
 
   # note that inferIdMapping is set to FALSE
@@ -258,9 +260,9 @@ chemicalClassEnrichment <- function(db = RaMP(), mets, background = "database", 
       totPopCnt <- as.integer(popInfo[popInfo$Var1 == category,2])
 
       contingencyMat <- matrix(nrow=2, ncol=2)
-      resultMat <- data.frame(matrix(ncol=7))
+      resultMat <- data.frame(matrix(ncol=8))
       colnames(resultMat) <- c("category", "class_name", "met_hits", "pop_hits",
-                               "met_size", "pop_size", "p-value")
+                               "met_size", "pop_size", "p-value","odds_ratio")
 
       for (i in 1:nrow(categoryData)) {
         if(categoryData[i,'mets_count'] >= 1) {
@@ -271,18 +273,18 @@ chemicalClassEnrichment <- function(db = RaMP(), mets, background = "database", 
           contingencyMat[2,2] <- totPopCnt - contingencyMat[2,1] - contingencyMat[1,2]
           className <- categoryData[i,'class_name']
 
-          p <- stats::fisher.test(contingencyMat, alternative = "greater")
-          p <- p$p.value
+          testres <- stats::fisher.test(contingencyMat, alternative = "greater")
+          p <- testres$p.value
+          oddsratio <- testres$estimate
 
           row = list(as.character(category), as.character(className), contingencyMat[1,1], contingencyMat[1,1] + contingencyMat[2,1],
-                     totMetCnt, totPopCnt, p)
+                     totMetCnt, totPopCnt, p, oddsratio)
 
           resultMat[resultRow, ] <- row
 
           resultRow <- resultRow + 1
         }
       }
-
       resultMat <- bhCorrect(resultMat)
       enrichmentStat[[as.character(category)]] <- resultMat
 

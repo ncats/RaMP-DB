@@ -2,20 +2,18 @@
 % Please edit documentation in R/rampReactionQueries.R
 \name{getReactionsForRaMPCompoundIds}
 \alias{getReactionsForRaMPCompoundIds}
-\title{getReactionsForRaMPCompoundIds returns reactions for a collection of RaMP compound ids}
+\title{The getReactionsForRaMPCompoundIds() function returns reactions for a collection of RaMP compound ids}
 \usage{
 getReactionsForRaMPCompoundIds(
-  db = RaMP(),
   rampCompoundIds,
   onlyHumanMets = F,
-  humanProtein = F,
+  humanProtein = T,
   includeTransportRxns = F,
-  rxnDirs = c("UN")
+  rxnDirs = c("UN"),
+  db = RaMP()
 )
 }
 \arguments{
-\item{db}{RaMP object}
-
 \item{rampCompoundIds}{list of ramp compound ids}
 
 \item{onlyHumanMets}{boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)}
@@ -23,10 +21,14 @@ getReactionsForRaMPCompoundIds(
 \item{humanProtein}{boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)}
 
 \item{includeTransportRxns}{if TRUE, returns metabolic and transport reactions}
+
+\item{rxnDirs}{character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL", "BD", "ALL"), default = c("UN")}
+
+\item{db}{a RaMP database object}
 }
 \value{
 returns a dataframe of reaction information for each ramp compound id
 }
 \description{
-getReactionsForRaMPCompoundIds returns reactions for a collection of RaMP compound ids
+The getReactionsForRaMPCompoundIds() function returns reactions for a collection of RaMP compound ids
 }
