@@ -19,7 +19,8 @@ setClass(
         host = "character",
         port = "integer",
         dbSummaryObjCache = "list",
-        versionSupport = "environment"
+        versionSupport = "environment",
+        api = "ANY"
     ),
     prototype = prototype(
         driver = NULL,
@@ -29,7 +30,8 @@ setClass(
         host = character(),
         port = integer(),
         dbSummaryObjCache = list(),
-        versionSupport = new.env()
+        versionSupport = new.env(),
+        api = NULL
     ))
 
 #' Helper function to return the connection to the database, defined by the
@@ -210,6 +212,8 @@ RaMP <- function(version = character(), branch = "main") {
     rampObj@dbSummaryObjCache <- setupRdataCache(db = rampObj)
 
     setupVersionSupport(rampObj)
+
+    rampObj@api <- DataAccessObject$new(db = rampObj)
 
     return(rampObj)
 }

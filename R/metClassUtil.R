@@ -10,13 +10,11 @@
 #' @export  getPrefixesFromAnalytes
 getPrefixesFromAnalytes<-function(analyteType="gene", db = RaMP()) {
   if (analyteType=="gene"){
-    query1 <- "select distinct(IDtype) from source where geneOrCompound ='gene';"
-    df1<- runQuery(sql = query1, db = db)
+    df1<- db@api$getGeneIDTypes()
     df1 <- data.frame(analyteType="Genes/Proteins", idTypes=paste(df1$IDtype,collapse=", "))
     }
   else if (analyteType=="metabolite"){
-    query2 <- "select distinct(IDtype) from source where geneOrCompound ='compound';"
-    df1 <- runQuery(sql = query2, db = db)
+    df1 <- db@api$getMetaboliteIDTypes()
     df1 <- data.frame(analyteType="Metabolites", idTypes=paste(df1$IDtype,collapse=", "))
     }
   else{
@@ -30,9 +28,7 @@ getPrefixesFromAnalytes<-function(analyteType="gene", db = RaMP()) {
 #' @param db a RaMP database object, if not specified a new one is created with RaMP::RaMP()
 #' @return Returns list of data sources for metabolites
 getMetabClassDataSources<-function(db = RaMP()){
-  query1<-"select distinct(source) from metabolite_class order by source asc"
-  results<- RaMP::runQuery(query1, db)
-  return(results)
+  return(db@api$getMetaboliteClassSources())
 }
 
 
@@ -41,9 +37,7 @@ getMetabClassDataSources<-function(db = RaMP()){
 #' @return Returns metabolite class types
 #' @export getMetabClassTypes
 getMetabClassTypes<-function(db = RaMP()){
-  query1<-"select distinct(class_level_name) from metabolite_class order by class_level_name asc"
-  results<- RaMP::runQuery(sql = query1, db = db)
-  return(results)
+  return(db@api$getMetaboliteClassTypes())
 }
 
 #' Returns chemical classes for classType
@@ -54,14 +48,12 @@ getMetabClassTypes<-function(db = RaMP()){
 #' @export getMetabChemClass
 getMetabChemClass <- function( classType= 'ClassyFire_super_class', db = RaMP() ) {
   if (!is.null(classType)) {
-    query1<- paste0("select class_level_name, class_name from metabolite_class where class_level_name = '",classType,"' group by class_level_name, class_name")
-    res <- RaMP::runQuery(sql = query1, db = db)
+    res <- db@api$getMetaboliteClassesForType(classType=classType)
     res <- split(res$class_name,res$class_level_name)
   }
 
   else if (is.null(classType)){
-    query1 <- "select class_level_name, class_name from metabolite_class group by class_level_name, class_name"
-    res <- RaMP::runQuery(sql = query1, db = db)
+    res <- db@api$getAllMetaboliteClasses()
     res <- split(res$class_name,res$class_level_name)
   }
 
@@ -81,9 +73,7 @@ getMetabChemClass <- function( classType= 'ClassyFire_super_class', db = RaMP() 
 #' @export getOntologies
 
 getOntologies <- function(db = RaMP()) {
-  query1 <- "select * from ontology"
-  OntoRes <- RaMP::runQuery(sql = query1, db = db)
-  return(OntoRes)
+  return (db@api$getOntologies())
 }
 
 

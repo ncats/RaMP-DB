@@ -129,7 +129,6 @@ getRaMPAnalyteIntersections<-function( analyteType='metabolites', format='json',
 #' }
 #' @export
 getPathwayNameList <- function(db = RaMP()){
-  data_access <- DataAccessObject$new(db = db)
-  pathwayNames <- data_access$getPathwayNames()
+  pathwayNames <- db@api$getPathwayNames()
   return(pathwayNames)
 }

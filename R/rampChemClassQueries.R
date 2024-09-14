@@ -104,18 +104,7 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
 
     print(paste0("Biospecimen background specified: ", background))
 
-    # if we id map, then we go through and extend the soruce ids via ramp ids
-    # else, we just pick up hmdb ids from the ao table.
-    if(inferIdMapping) {
-      query <- paste0("select distinct s.rampId, s.sourceId from source s, analytehasontology ao, ontology o
-      where o.commonName in ('", background, "') and o.rampOntologyId=ao.rampOntologyId and s.rampId = ao.rampCompoundId")
-    } else {
-      # how do we keep the direct mapping on the source HMDB ids? We don't capture that.
-      query <- paste0("select distinct s.rampId, s.sourceId from source s, analytehasontology ao, ontology o
-      where o.commonName in ('", background, "') and o.rampOntologyId=ao.rampOntologyId and s.rampId = ao.rampCompoundId")
-    }
-
-    bg = RaMP::runQuery(sql = query, db = db)
+    bg = db@api$getMetaboliteSourceIdsForOntology(biospecimen = background)
 
     # cases check if bg is empty (suggest to query for biospecimen types in ramp)
     if(is.null(bg) || nrow(bg) == 0) {
