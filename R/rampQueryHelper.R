@@ -1254,48 +1254,49 @@ buildReactionClassesSunburstDataframe <- function(reactionClassesResults) {
 #' @param includeCofactorMets whether or not to include metabolite cofactors (TRUE/FALSE)
 
 buildAnalyteOverlapPerRxnLevelUpsetDataframe <- function(reactionsResults, includeCofactorMets = FALSE) {
-
   if(nrow(reactionsResults$met2rxn)>0)
   {
-    reactionsResults$met2rxn <- reactionsResults$met2rxn %>% dplyr::filter(!dplyr::if_any(.data$ecNumber, is.na))
-    if(nrow(reactionsResults$met2rxn)>0)
+    met2rxn_EC <- reactionsResults$met2rxn %>% dplyr::filter(!dplyr::if_any(ecNumber, is.na))
+    if(nrow(met2rxn_EC)>0)
     {
-      EC_number_split_met <- unlist(strsplit(reactionsResults$met2rxn$ecNumber,split="\\."))
+      EC_number_split_met <- unlist(strsplit(met2rxn_EC$ecNumber,split="\\."))
       input2reactions_mets <- cbind(
-        c(reactionsResults$met2rxn$metSourceId),
-        c(reactionsResults$met2rxn$ecNumber),
+        c(met2rxn_EC$metSourceId),
+        c(met2rxn_EC$ecNumber),
         c(paste0(EC_number_split_met[seq(1, length(EC_number_split_met), 4)]))
       )
     }
+
+    met2rxn_NoEC <- reactionsResults$met2rxn %>% dplyr::filter(dplyr::if_any(ecNumber, is.na))
   }
   if (includeCofactorMets == FALSE)
   {
-    reactionsResults$met2rxn <- reactionsResults$met2rxn %>% dplyr::filter(.data$isCofactor == 0)
+    met2rxn_EC <- met2rxn_EC %>% dplyr::filter(isCofactor == 0)
   }
   if(nrow(reactionsResults$prot2rxn)>0)
   {
-    reactionsResults$prot2rxn <- reactionsResults$prot2rxn %>% dplyr::filter(!dplyr::if_any(.data$ecNumber, is.na))
-    if(nrow(reactionsResults$prot2rxn)>0)
+    prot2rxn_EC <- reactionsResults$prot2rxn %>% dplyr::filter(!dplyr::if_any(ecNumber, is.na))
+    if(nrow(prot2rxn_EC)>0)
     {
-      EC_number_split_prot <- unlist(strsplit(reactionsResults$prot2rxn$ecNumber,split="\\."))
+      EC_number_split_prot <- unlist(strsplit(prot2rxn_EC$ecNumber,split="\\."))
       input2reactions_prot <- cbind(
-        c(reactionsResults$prot2rxn$uniprot),
-        c(reactionsResults$prot2rxn$ecNumber),
+        c(prot2rxn_EC$uniprot),
+        c(prot2rxn_EC$ecNumber),
         c(paste0(EC_number_split_prot[seq(1, length(EC_number_split_prot), 4)]))
       )
     }
+
+    prot2rxn_NoEC <- reactionsResults$prot2rxn %>% dplyr::filter(dplyr::if_any(ecNumber, is.na))
   }
 
   if(exists("input2reactions_mets") && exists("input2reactions_prot"))
   {
     input2reactions <- as.data.frame(
       rbind(input2reactions_mets, input2reactions_prot))
-  }
-  else if (exists("input2reactions_mets"))
+  } else if (exists("input2reactions_mets"))
   {
     input2reactions <- as.data.frame(input2reactions_mets)
-  }
-  else if (exists("input2reactions_prot"))
+  } else if (exists("input2reactions_prot"))
   {
     input2reactions <- as.data.frame(input2reactions_prot)
   }
@@ -1346,6 +1347,19 @@ buildAnalyteOverlapPerRxnLevelUpsetDataframe <- function(reactionsResults, inclu
       names(input2reactions_list)[i] = "Translocases: 7.-.-.-"
     }
   }
+
+  if(nrow(met2rxn_NoEC) > 0 && nrow(prot2rxn_NoEC) >0)
+  {
+    NoEC <-c(met2rxn_NoEC$metSourceId, prot2rxn_NoEC$uniprot)
+  } else if (nrow(met2rxn_NoEC) > 0)
+  {
+    NoEC <- met2rxn_NoEC$metSourceId
+  } else if (nrow(prot2rxn_NoEC) >0)
+  {
+    NoEC <- prot2rxn_NoEC$uniprot
+  }
+
+  input2reactions_list$"Non-Enzymatic" <- NoEC
 
   return(input2reactions_list)
 }
