@@ -311,6 +311,7 @@ bhCorrect <- function(resultMat) {
 }
 
 #' Get class info for an input of metabolite source Ids
+#' @importFrom rlang .data
 #' @param sourceIds a vector of analytes (genes or metabolites) that need to be searched
 #' @param db a RaMP database object
 #' @return a dataframe of chemClass info
@@ -352,7 +353,7 @@ rampFindClassInfoFromSourceId<-function(sourceIds, db = RaMP()){
 
     metsData <- runQuery(sql = sql, db = db)
 
-    metsData <- subset(metsData, "sourceId" %in% sourceIds)
+    metsData <- dplyr::filter(metsData, .data$sourceId %in% sourceIds)
 
     return(metsData)
 }
@@ -703,6 +704,7 @@ FilterFishersResults <- function(fishers_df, pval_type = 'fdr', pval_cutoff = 0.
 
 #'chemicalClassSurveyRampIdsConn is a helper function that takes a list of metabolite ids, a list of 'population' metabolite ids
 #' and a MariaDB Connection object. The method returns metabolite class information for the metabolite list and a population of all ramp metabolites.
+#' @importFrom rlang .data
 #' @param mets a list object of prefixed metabolite ids of interest
 #' @param pop a list object of prefixed metabolite ids, representing a larger population of metabolites from which the mets were selected.
 #' @param inferIdMapping if FALSE, the survey only reports on class annotations made directly on the input ids.
@@ -768,10 +770,10 @@ chemicalClassSurveyRampIdsConn <- function( mets, pop, inferIdMapping=TRUE, db =
   # need to filter for our specific source ids
   # ID mapping uses a subset to report on found additional source ids, else matches on class_source_id (source ids directly mapped to chem class)
   if(inferIdMapping) {
-    metsData2 <- subset(metsData, "sourceId" %in% mets)
+    metsData2 <- dplyr::filter(metsData, .data$sourceId %in% mets)
     metsData <- metsData2
   } else {
-    metsData <- subset(metsData, "class_source_id" %in% mets)
+    metsData <- dplyr::filter(metsData, .data$class_source_id %in% mets)
   }
 
   # get query summary
@@ -819,13 +821,13 @@ chemicalClassSurveyRampIdsConn <- function( mets, pop, inferIdMapping=TRUE, db =
   popData <- runQuery(sql = sql, db = db)
 
   if(inferIdMapping) {
-    popData <- subset(popData, "sourceId" %in% pop)
+    popData <- dplyr::filter(popData, .data$sourceId %in% pop)
   } else {
-    popData <- subset(popData, "class_source_id" %in% pop)
+    popData <- dplyr::filter(popData, .data$class_source_id %in% pop)
   }
 
   #need to filter for our source ids
-  # popData <- subset(popData, "sourceId" %in% pop)
+  # popData <- dplyr::filter(popData, .data$sourceId %in% pop)
 
   # get query summary
   popQueryReport <- queryReport(queryList = pop, foundList = popData$sourceId)
@@ -879,6 +881,7 @@ chemicalClassSurveyRampIdsConn <- function( mets, pop, inferIdMapping=TRUE, db =
 
 #'chemicalClassSurveyRampIdsFullPopConn2 is a helper function that takes a list of metabolite ids and a MariaDB Connection object
 #'and returns metabolite class information for the metabolite list and a population of all ramp metabolites.
+#' @importFrom rlang .data
 #' @param mets a list object of prefixed metabolite ids of interest
 #' @param inferIdMapping if FALSE, the survey only reports on class annotations made directly on the input ids.
 #' If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to related ids that contain metabolite class annotations.
@@ -930,10 +933,10 @@ chemicalClassSurveyRampIdsFullPopConn <- function( mets, inferIdMapping=TRUE, db
 
   # need to filter for our specific source ids
   if(inferIdMapping) {
-    metsData2 <- subset(metsData, "sourceId" %in% mets)
+    metsData2 <- dplyr::filter(metsData, .data$sourceId %in% mets)
     metsData <- metsData2
   } else {
-    metsData <- subset(metsData, "class_source_id" %in% mets)
+    metsData <- dplyr::filter(metsData, .data$class_source_id %in% mets)
   }
 
   # get query summary
