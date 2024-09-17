@@ -42,7 +42,7 @@ The R packages and associated app perform  the following queries:
 	8. Chemical enrichment analyses
 
 ## Vignette
-Detailed instructions for installing RaMP locally are below.  We've also put together a vignette to get you started on the analyses.  Click here for [vignette](https://ncats.github.io/RaMP-DB/RaMP_v3.0_SQLite_Vignette.html).
+Detailed instructions for installing RaMP locally are below.  We've also put together a vignette to get you started on the analyses.  Click here for [vignette](https://ncats.github.io/RaMP-DB/Updated_RaMP_Vignette.html).
 
 
 ## Citation
