@@ -479,7 +479,7 @@ runFisherTest <- function(analytes,
     out <- data.frame(
       pathwayRampId = c(pidused, pidstorun)[keepers],
       Pval = c(pval, pval2)[keepers], # FDR.Adjusted.Pval=fdr,
-      Odds_Ratio = c(oddsratio, oddsratio2),
+      Odds_Ratio = c(oddsratio, oddsratio2)[keepers],
       # Holm.Adjusted.Pval=holm,
       Num_In_Path = c(userinpath, userinpath2)[keepers],
       Total_In_Path = c(totinpath, totinpath2)[keepers]
