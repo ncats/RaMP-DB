@@ -1019,13 +1019,13 @@ chemicalClassSurveyRampIdsFullPopConn <- function( mets, inferIdMapping=TRUE, db
 
 #' listToQueryString utility method to convert an id list to a comma separate string, with single quoted values.
 #'
-#' @param analytes list of analytes (can be names or ids)
+#' @param ids list of ids (can be names or ids)
 #'
-#' @return comma separated list of single quoted analyte ids or names
+#' @return comma separated list of single quoted ids or names
 #'
-listToQueryString <- function(analytes) {
-  analyteStr <- paste0("'", paste0(analytes, collapse = "','"), "'", sep="")
-  return (analyteStr)
+listToQueryString <- function(ids) {
+  isStr <- paste0("'", paste0(ids, collapse = "','"), "'", sep="")
+  return (isStr)
 }
 
 
@@ -1039,7 +1039,7 @@ listToQueryString <- function(analytes) {
 #' @param db a RaMP databse object
 filterPathwaysByAnalyteCount <- function( pathway_dataframe, pathway_ramp_id_col_name = 'pathwayRampId', minPathwaySize = 5, maxPathwaySize = 150, db = RaMP()) {
   pwIds <- unlist(pathway_dataframe[[pathway_ramp_id_col_name]])
-  pwIdsStr <- listToQueryString(analytes = pwIds)
+  pwIdsStr <- listToQueryString(ids = pwIds)
 
   sql <- paste0("select pathwayRampId, count(distinct(rampId)) as analyte_count from analytehaspathway where pathwayRampId in (", pwIdsStr,") group by pathwayRampId")
 

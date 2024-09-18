@@ -420,9 +420,8 @@ getReactionsForAnalytes <- function( analytes, onlyHumanMets=F, humanProtein=T, 
 #' @return returns a dataframe object with reaction to reaction participant mappings.
 #' @export
 getReactionParticipants <- function( reactionList = c(), db = RaMP()) {
-  reactionListStr <- listToQueryString(reactionList)
 
-  metResult <- db@api$getRxnMetParticipants(rxnString = reactionListStr)
+  metResult <- db@api$getRxnMetParticipants(reactionList = reactionList)
   metResult$participant_role <- 'substrate'
   metResult$participant_role_id <- 3
   metResult$participant_role[metResult$is_product == 1] <- 'product'
@@ -432,7 +431,7 @@ getReactionParticipants <- function( reactionList = c(), db = RaMP()) {
 
   metResult$reaction_type <- 'biochemical'
 
-  proteinResult <- db@api$getRxnGeneParticipants(reactionListStr)
+  proteinResult <- db@api$getRxnGeneParticipants(reactionList = reactionList)
   proteinResult$is_cofactor <- NA
   proteinResult$is_product <- NA
   proteinResult$iso_smiles <- NA
@@ -441,7 +440,7 @@ getReactionParticipants <- function( reactionList = c(), db = RaMP()) {
 
   proteinResult$reaction_type <- 'biochemical'
 
-  rxnResult <- db@api$getRxnIsTransport(rxnString=reactionListStr)
+  rxnResult <- db@api$getRxnIsTransport(reactionList = reactionList)
 
   if(nrow(rxnResult) > 0) {
     transportRxns <- unique(unlist(rxnResult$rxn_source_id))
@@ -745,20 +744,7 @@ getReactionSourceIdsFromReactionQuery <- function(reactions) {
 #' @param db a RaMP database object
 #'
 getReactionClassStats <- function(humanProtein=TRUE, db=RaMP()) {
-
-  humanProteinArg = ''
-
-  if(humanProtein){
-    humanProteinArg = ' and r.has_human_prot = 1'
-  }
-
-  sql = paste0("select rc.rxn_class, rc.rxn_class_hierarchy, rc.ec_level as stat_ec_level, rc.rxn_class_ec as stat_class_ec, count(distinct(rc.rxn_source_id)) as Total_Rxns_in_Class
-  from reaction_ec_class rc, reaction r
-  where rc.rxn_source_id = r.rxn_source_id ",
-  humanProteinArg,
-  " group by rxn_class, ec_level, rxn_class_ec")
-
-  result <- runQuery(sql=sql, db=db)
+  result <- db@api$getReactionClassStats(humanProtein = humanProtein)
   return(result)
 }
 
@@ -768,31 +754,8 @@ getReactionClassStats <- function(humanProtein=TRUE, db=RaMP()) {
 #' @param db a RaMP database object
 #'
 getReactionClassStatsOnAnalytes <- function( humanProtein=T, db=RaMP()) {
-
-  humanProteinArg = ''
-
-  if(humanProtein) {
-    humanProteinArg = ' and r.has_human_prot = 1'
-  }
-
-  sql = paste0("select rc.rxn_class, rc.rxn_class_hierarchy, rc.ec_level as stat_ec_level, rc.rxn_class_ec as stat_class_ec, count(distinct(rm.met_source_id)) as Total_in_RxnClass_Metab
-  from reaction_ec_class rc, reaction2met rm, reaction r
-  where rm.rxn_source_id = rc.rxn_source_id
-  and rc.rxn_source_id = r.rxn_source_id ",
-  humanProteinArg
-  , " group by rc.rxn_class, rc.ec_level, rc.rxn_class_ec")
-
-  metRes <- runQuery(sql=sql, db=db)
-
-  sql = paste0("select rc.rxn_class, rc.rxn_class_hierarchy, rc.ec_level as stat_ec_level, rc.rxn_class_ec as stat_class_ec,  count(distinct(rp.uniprot)) as Total_in_RxnClass_Protein
-  from reaction_ec_class rc, reaction2protein rp, reaction r
-  where rp.rxn_source_id = rc.rxn_source_id
-  and rc.rxn_source_id = r.rxn_source_id ",
-  humanProteinArg,
-  " group by rc.rxn_class, rc.ec_level, rc.rxn_class_ec")
-
-  protRes <- runQuery(sql=sql, db=db)
-
+  metRes <- db@api$getReactionClassStats(analyteType = 'metabolite', humanProtein = humanProtein)
+  protRes <- db@api$getReactionClassStats(analyteType = 'gene', humanProtein = humanProtein)
   return(list(metStats=metRes, protStats=protRes))
 }
 

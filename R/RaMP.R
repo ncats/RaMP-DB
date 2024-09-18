@@ -188,9 +188,6 @@ RaMP <- function(version = character(), branch = "main") {
     db <- .RaMP(SQLite(), dbname = .get_ramp_db(version = version, branch = branch))
     con <- .dbcon(db)
 
-    # add the cache of summary data objects for enrichment
-    db@dbSummaryObjCache <- setupRdataCache(db)
-
     on.exit(dbDisconnect(con))
     .valid_ramp_database(con, error = TRUE)
     db
@@ -208,12 +205,12 @@ RaMP <- function(version = character(), branch = "main") {
     rampObj <- new("RaMP", driver = driver, dbname = dbname, username = username,
         conpass = conpass, host = host, port = port, dbSummaryObjCache = list())
 
-    # creates the cache of R data objects
-    rampObj@dbSummaryObjCache <- setupRdataCache(db = rampObj)
-
     setupVersionSupport(rampObj)
 
     rampObj@api <- DataAccessObject$new(db = rampObj)
+
+    # creates the cache of R data objects
+    rampObj@dbSummaryObjCache <- setupRdataCache(db = rampObj)
 
     return(rampObj)
 }

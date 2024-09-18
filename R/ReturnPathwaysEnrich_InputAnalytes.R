@@ -96,21 +96,7 @@ runFisherTest <- function(analytes,
         biospecimen <- "Adipose tissue"
       }
 
-      # Get metabolites that belong to a specific biospecimen
-      # query <- paste0(
-      #   "SELECT analytehasontology.*, ontology.*, analytehaspathway.* from analytehasontology, ontology, analytehaspathway where ontology.commonName in ('",
-      #   biospecimen,
-      #   "') and ontology.rampOntologyId = analytehasontology.rampOntologyId and analytehasontology.rampCompoundId = analytehaspathway.rampId"
-      # )
-
-      # less data pull-back
-      query <- paste0(
-        "SELECT analytehaspathway.* from analytehasontology, ontology, analytehaspathway where ontology.commonName in ('",
-        biospecimen,
-        "') and analytehasontology.rampOntologyId = ontology.rampOntologyId and analytehasontology.rampCompoundId = analytehaspathway.rampId"
-      )
-
-      backgrounddf <- RaMP::runQuery(query, db)
+      backgrounddf <- db@api$getAnalytePathwaysWithOntology(biospecimen=biospecimen)
 
       if (nrow(backgrounddf) == 0) {
         stop("Biospecimen background not found. Choices are 'Blood', 'Adipose', 'Heart', 'Urine', 'Brain', 'Liver', 'Kidney', 'Saliva', and 'Feces'")
@@ -163,18 +149,9 @@ runFisherTest <- function(analytes,
   rownames(contingencyTb) <- c("All Metabolites", "User's Metabolites")
   ## Get pathway ids that contain the user analytes
   pid <- unique(pathwaydf$pathwayRampId)
-  list_pid <- sapply(pid, shQuote)
-  list_pid <- paste(list_pid, collapse = ",")
 
   # Get the total number of metabolites that are mapped to pathways in RaMP (that's the default background)
-  # added conditional to not pull hmdb ids
-  if(!include_smpdb){
-    query <- "select distinct rampId, pathwaySource from analytehaspathway where pathwaySource != 'hmdb';"
-  }else{
-    query <- "select distinct rampId, pathwaySource from analytehaspathway;"
-  }
-
-  allids <- runQuery(sql = query, db = db)
+  allids <- db@api$getRampIDsAndSourcesForPathways(includeSMPDB = include_smpdb)
   allids <- allids[!duplicated(allids), ]
 
   if ((analyte_type == "metabolites")) {
@@ -362,25 +339,12 @@ runFisherTest <- function(analytes,
   # Now run fisher's tests for all other pids (all pathways not covered in dataset)
   if (MCall == T) {
     # Now run fisher's tests for all other pids
-    query <- "select distinct(pathwayRampId) from analytehaspathway where pathwaySource != 'hmdb';"
-
-    allpids <- runQuery(sql = query, db = db)
+    allpids <- db@api$getAllPathwayRampIDs()
 
     pidstorun <- setdiff(allpids[, 1], pid)
-    pidstorunlist <- sapply(pidstorun, shQuote)
-    pidstorunlist <- paste(pidstorunlist, collapse = ",")
+    restcids <- db@api$getRampIDsForPathways(pathways = pidstorun)
 
-    query2 <- paste0(
-      "select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",
-      pidstorunlist, ")"
-    )
-
-    restcids <- runQuery(sql = query2, db = db) # [[1]]
-
-    # modify to not take hmdb pathways
-    query1 <- paste0("select rampId,pathwayRampId from analytehaspathway where pathwaySource != 'hmdb';")
-
-    allcids <- runQuery(sql = query1, db = db) # [[1]]
+    allcids <- db@api$getAllRampIDsForAllPathways()
 
     # We're collecting p-values for all pathways, now those with no analyte support at all - JCB:?
 
@@ -864,109 +828,12 @@ getPathwayFromAnalyte <- function( analytes = "none",
   }
 
   list_metabolite <- analytes
-  list_metabolite <- sapply(list_metabolite, shQuote)
-  list_metabolite <- paste(list_metabolite, collapse = ",")
-  if (list_metabolite == "") {
-    warning("Unable to retrieve metabolites")
-    return(NULL)
-  }
 
-  isSQLite = .is_sqlite(x = db)
+  df2 <- db@api$getPathwaysForAnalytes(analytes = analytes, namesOrIds = namesOrIds, includeSMPDB = include_smpdb)
 
-  if (namesOrIds == "ids") {
-
-    print("Working on ID List...")
-
-    sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, s.sourceId as inputId, group_concat(distinct s.commonName order by s.commonName separator '; ') as commonName, s.rampId, p.pathwayRampId from
-                  source s,
-                  analytehaspathway ap,
-                  pathway p
-                  where
-                  s.sourceId in (", list_metabolite, ")
-                  and
-                  ap.rampId = s.rampId
-                  and
-                  p.pathwayRampId = ap.pathwayRampId
-                  group by inputId, rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId
-                  order by pathwayName asc")
-
-    if(isSQLite) {
-      sql <- paste0("select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, s.sourceId as inputId, group_concat(distinct s.commonName COLLATE NOCASE) as commonName, s.rampId, p.pathwayRampId from
-                  source s,
-                  analytehaspathway ap,
-                  pathway p
-                  where
-                  s.sourceId in (", list_metabolite, ")
-                  and
-                  ap.rampId = s.rampId
-                  and
-                  p.pathwayRampId = ap.pathwayRampId
-                  group by inputId, s.rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId
-                  order by pathwayName asc")
-    }
-
-  } else {
-    print("Working on analyte name list...")
-    sql <- paste0(
-      "select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, lower(asyn.Synonym) as commonName, group_concat(distinct s.sourceId order by s.sourceId separator '; ') as sourceIds, s.rampId, p.pathwayRampId
-    from
-    source s,
-    analytesynonym asyn,
-    analytehaspathway ap,
-    pathway p
-    where
-    asyn.Synonym in (", list_metabolite, ")
-    and
-    s.rampId = asyn.rampId
-    and
-    ap.rampId = s.rampId
-    and
-    p.pathwayRampId = ap.pathwayRampId
-    group by commonName, s.rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId
-    order by pathwayName asc
-  "
-    )
-
-    if(isSQLite) {
-      sql <- paste0(
-        "select p.pathwayName, p.type as pathwaySource, p.sourceId as pathwayId, lower(asyn.Synonym) as commonName, group_concat(distinct s.sourceId COLLATE NOCASE) as sourceIds, s.rampId, p.pathwayRampId
-    from
-    source s,
-    analytesynonym asyn,
-    analytehaspathway ap,
-    pathway p
-    where
-    asyn.Synonym in (", list_metabolite, ")
-    and
-    s.rampId = asyn.rampId
-    and
-    ap.rampId = s.rampId
-    and
-    p.pathwayRampId = ap.pathwayRampId
-    group by commonName, s.rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId
-    order by pathwayName asc
-  "
-      )
-
-    }
-
-  }
-
-  df2 <- runQuery(sql = sql, db = db)
-  if(!include_smpdb){
-    df2 <- df2 %>% dplyr::filter(.data$pathwaySource != "hmdb")
-  }
   if (find_synonym && nrow(df2) > 0) {
     rampIds <- df2[, "rampId"]
-
-    rampIds <- sapply(rampIds, shQuote)
-    rampIds <- paste(rampIds, collapse = ",")
-
-    sql <- paste0("select rampId as rampId, group_concat(distinct Synonym order by Synonym separator '; ')
-     as synonyms from analytesynonym
-     where rampId in (", rampIds, ") group by rampId")
-
-    synonymsDf <- runQuery(sql = sql, db = db)
+    synonymsDf <- db@api$getSynonymsForAnalyte(rampIds = rampIds)
 
     if (nrow(synonymsDf) > 0) {
       df2 <- merge(df2, synonymsDf, by = "rampId")
@@ -1088,15 +955,8 @@ findCluster <- function(fishers_df, perc_analyte_overlap = 0.5,
   analyte_type <- fishers_df$analyte_type
   fishers_df <- fishers_df$fishresults
   list_pathways <- fishers_df %>% dplyr::pull("pathwayId")
-  list_pathways <- sapply(list_pathways, shQuote)
-  list_pathways <- paste(list_pathways, collapse = ",")
-  query <- paste0(
-    "SELECT pathwayRampId, sourceId from pathway where sourceId in (",
-    list_pathways,
-    ")"
-  )
 
-  idkey <- runQuery(sql = query, db = db) %>%
+  idkey <- db@api$getPathwayFromSourceId(pathwaySourceIDs = list_pathways) %>%
     dplyr::rename("pathwayId" = "sourceId") ##  %>%
   ## dplyr::rename("rampId" = "pathwayRampId")
 

@@ -10,12 +10,7 @@
 #' }
 #' @export
 getCurrentRaMPVersion<-function(justVersion=T, db = RaMP()){
-  if(justVersion) {
-    query<-"select ramp_version from db_version where load_timestamp order by load_timestamp desc limit 1"
-  } else {
-    query<-"select ramp_version, load_timestamp, version_notes, db_sql_url  from db_version where load_timestamp order by load_timestamp desc limit 1"
-  }
-  results <- runQuery(sql = query, db = db)
+  results <- db@api$getRaMPVersion(justVersion = justVersion)
   return(results)
 }
 
@@ -28,8 +23,7 @@ getCurrentRaMPVersion<-function(justVersion=T, db = RaMP()){
 #' }
 #' @export
 getCurrentRaMPSourceDBVersions<-function(db = RaMP()){
-  query1<- "select * from version_info where status = 'current'"
-  results<- runQuery(sql = query1, db = db)
+  results<- db@api$getCurrentSourceVersion()
   return(results)
 }
 
@@ -43,8 +37,7 @@ getCurrentRaMPSourceDBVersions<-function(db = RaMP()){
 #' @export
 getEntityCountsFromSourceDBs<-function(db = RaMP()){
   entity_source_name <- entity_count <- c()
-  query1<-"select * from entity_status_info"
-  results<- runQuery(sql = query1, db = db)
+  results<- db@api$getEntityCountsFromSources()
   results<-results[,-2]
   results<-results %>% tidyr::spread(unique(entity_source_name),entity_count)
   results[is.na(results)]=0
@@ -64,25 +57,13 @@ getEntityCountsFromSourceDBs<-function(db = RaMP()){
 #' }
 #' @export
 getRaMPAnalyteIntersections<-function( analyteType='metabolites', format='json', scope='mapped-to-pathway', db = RaMP()){
-  if(analyteType == 'metabolites') {
-    if(scope == 'global') {
-      query<-"select met_intersects_json from db_version where load_timestamp order by load_timestamp desc limit 1"
-    } else {
-      query<-"select met_intersects_json_pw_mapped from db_version where load_timestamp order by load_timestamp desc limit 1"
-    }
-  } else if (analyteType == 'genes') {
-    if(scope == 'global') {
-      query<-"select gene_intersects_json from db_version where load_timestamp order by load_timestamp desc limit 1"
-    } else {
-      query<-"select gene_intersects_json_pw_mapped from db_version where load_timestamp order by load_timestamp desc limit 1"
-    }
-  } else {
+  if (!(analyteType %in% c('metabolites', 'genes'))) {
     warning("The analyteType must be one of c('metabolites','genes')")
     #return an empty dataframe
     return(data.frame())
   }
 
-  results<-runQuery(sql = query, db = db)
+  results <- db@api$getAnalyteIntersects(analyteType = analyteType, scope = scope)
 
   if(format == 'json') {
     if(nrow(results)>0) {

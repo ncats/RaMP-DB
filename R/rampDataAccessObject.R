@@ -43,28 +43,31 @@ DataAccessObject <- R6::R6Class(
       return (RaMP::runQuery(sql = queryFunction(geneNames), db = self$db))
     },
     getRheaRxnPartnersFromMetIDs = function(metaboliteIDs, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN")) {
-      idStr <- listToQueryString(analytes = metaboliteIDs)
+      idStr <- listToQueryString(ids = metaboliteIDs)
       query <-  if (supportsCommonName(db = self$db)) rheaRxnPartnersFromMetIDsQuery(metaboliteIDs = idStr) else rheaRxnPartnersFromMetIDsQueryOld(metaboliteIDs = idStr)
       query <- private$addConstraintsToRxnPartnersQuery(query, onlyHumanMets, humanProtein, includeTransportRxns, rxnDirs)
       df <- RaMP::runQuery(query, self$db)
       return(df)
     },
     getRheaRxnPartnersFromGeneIDs = function(geneIDs, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN")) {
-      idStr <- listToQueryString(analytes = geneIDs)
+      idStr <- listToQueryString(ids = geneIDs)
       query <- if (supportsCommonName(db = self$db)) rheaRxnPartnersFromGeneIDsQuery(idStr) else rheaRxnPartnersFromGeneIDsQueryOld(idStr)
       query <- private$addConstraintsToRxnPartnersQuery(query = query, onlyHumanMets = onlyHumanMets, humanProtein = humanProtein, includeTransportRxns = includeTransportRxns, rxnDirs = rxnDirs)
       df <- RaMP::runQuery(sql = query, db = self$db)
       return(df)
     },
-    getRxnMetParticipants = function(rxnString) {
+    getRxnMetParticipants = function(reactionList) {
+      rxnString <- listToQueryString(ids = reactionList)
       queryFunction <- if (supportsCommonName(db = self$db)) rxnMetParticipantsQuery else rxnMetParticipantsQueryOld
       return (RaMP::runQuery(sql = queryFunction(rxnString), db = self$db))
     },
-    getRxnGeneParticipants = function(rxnString) {
+    getRxnGeneParticipants = function(reactionList) {
+      rxnString <- listToQueryString(ids = reactionList)
       queryFunction <- if (supportsCommonName(db = self$db)) rxnGeneParticipantsQuery else rxnGeneParticipantsQueryOld
       return (RaMP::runQuery(sql = queryFunction(rxnString), db = self$db))
     },
-    getRxnIsTransport = function(rxnString) {
+    getRxnIsTransport = function(reactionList) {
+      rxnString <- listToQueryString(ids = reactionList)
       return (RaMP::runQuery(sql = rxnTransportQuery(rxnString), db = self$db))
     },
     getPathwayNames = function() {
@@ -130,6 +133,77 @@ DataAccessObject <- R6::R6Class(
     },
     getSourceInfoForAnalyteIDs = function(analyteIDs) {
       return (RaMP::runQuery(sql = getSourceInfoForAnalyteIDsQuery(analyteIDs = analyteIDs), db = self$db))
+    },
+    getReactionClassStats = function(analyteType = 'all', humanProtein) {
+      return (RaMP::runQuery(sql = getReactionClassStatsQuery(analyteType = analyteType, humanProtein = humanProtein), db = self$db))
+    },
+    getAnalytesFromPathways = function(pathways, namesOrIds = 'names', match = "exact") {
+      if (supportsCommonName(db = self$db)) {
+        useCommonName = TRUE
+      } else {
+        useCommonName = FALSE
+      }
+      if (namesOrIds == 'names' && match == 'fuzzy') {
+        df = data.frame(matrix(nrow=0, ncol=7))
+        colnames(df) <- c('analyteName', 'sourceAnalyteIDs', 'geneOrCompound',
+                          'pathwayName', 'pathwayId', 'pathwayCategory', 'pathwayType')
+
+        for(p in pathways) {
+          if(nchar(p)>2) {
+            currSQL = getAnalytesFromPathwaysQuery(pathways = p, namesOrIds = namesOrIds, match = match, useCommonName = useCommonName)
+            subdf <- runQuery(sql = currSQL, db = self$db)
+            df <- rbind(df, subdf)
+          }
+        }
+        return (df)
+      }
+      pathway_list = parseListArgument(idList = pathways)
+      return (RaMP::runQuery(sql = getAnalytesFromPathwaysQuery(pathways = pathway_list, namesOrIds = namesOrIds, match = match, useCommonName = useCommonName), db = self$db))
+    },
+    getAnalytePathwaysWithOntology = function(biospecimen) {
+      return (RaMP::runQuery(sql = getAnalytePathwaysWithOntologyQuery(biospecimen = biospecimen), db = self$db))
+    },
+    getRampIDsAndSourcesForPathways = function(includeSMPDB = FALSE) {
+      return (RaMP::runQuery(sql = getRampIDsAndSourcesForPathwaysQuery(includeSMPDB = includeSMPDB), db = self$db))
+    },
+    getAllPathwayRampIDs = function(includeSPMDB = FALSE) {
+      return (RaMP::runQuery(sql = getAllPathwayRampIDsQuery(includeSMPDB = includeSPMDB), db = self$db))
+    },
+    getRampIDsForPathways = function(pathways) {
+      pathway_list = parseListArgument(idList = pathways)
+      return (RaMP::runQuery(sql = getRampIDsForPathwaysQuery(pathway_list = pathway_list), db = self$db))
+    },
+    getAllRampIDsForAllPathways = function(includeSMPDB = FALSE) {
+      return (RaMP::runQuery(sql = getAllRampIDsForAllPathwaysQuery(includeSMPDB = includeSMPDB), db = self$db))
+    },
+    getPathwaysForAnalytes = function(analytes, namesOrIds, includeSMPDB) {
+      if (supportsCommonName(db = self$db)) {
+        useCommonName = TRUE
+      } else {
+        useCommonName = FALSE
+      }
+      return (RaMP::runQuery(sql = getPathwaysForAnalytesQuery(analytes = analytes, namesOrIds = namesOrIds, includeSMPDB = includeSMPDB, useCommonName = useCommonName), db = self$db))
+    },
+    getSynonymsForAnalyte = function(rampIds) {
+      return (RaMP::runQuery(sql = getSynonymsForAnalyteQuery(rampIds = rampIds), db = self$db))
+    },
+    getPathwayFromSourceId = function(pathwaySourceIDs) {
+      return (RaMP::runQuery(sql = getPathwayFromSourceIdQuery(pathwaySourceIDs = pathwaySourceIDs), db = self$db))
+    },
+    getRaMPVersion = function(justVersion) {
+      return (RaMP::runQuery(sql = getRaMPVersionQuery(justVersion = justVersion), db = self$db))
+    },
+    getCurrentSourceVersion = function() {
+      return (RaMP::runQuery(sql = getCurrentSourceVersionQuery(), db = self$db))
+    },
+    getEntityCountsFromSources = function() {
+      return (RaMP::runQuery(sql = getEntityCountsFromSourcesQuery(), db = self$db))
+    },
+    getAnalyteIntersects = function(analyteType='metabolites', scope='mapped-to-pathway') {
+      return (RaMP::runQuery(sql = getAnalyteIntersectsQuery(analyteType=analyteType, scope=scope), db = self$db))
+    },
+    getSummaryData = function() {
+      return (RaMP::runQuery(sql = getSummaryDataQuery(), db = self$db))
     }
   ),
   private = list(
@@ -137,7 +211,7 @@ DataAccessObject <- R6::R6Class(
       if(length(rxnDirs) == 1) {
         query <- paste0(query, " and rxn.direction = '",rxnDirs[1],"'")
       } else if(length(rxnDirs)>1) {
-        query <- paste0(query, " and rxn.direction in (",listToQueryString(rxnDirs),")")
+        query <- paste0(query, " and rxn.direction in (",listToQueryString(ids = rxnDirs),")")
       } else {
         print("rxnDirs must be of length > 0")
       }
@@ -154,17 +228,97 @@ DataAccessObject <- R6::R6Class(
         query <- paste0(query, " and rxn.is_transport = 0")
       }
       return(query)
-    })
+    }
+  )
 )
 
+parseListArgument = function(idList) {
+  if(is.character(idList)){
+    if(grepl("\n",idList)[1]){
+      output_list <- strsplit(idList,"\n")
+      output_list <- unlist(output_list)
+    } else if(grepl(",",idList)[1]){
+      output_list <- strsplit(idList,"\n")
+      output_list <- unlist(output_list)
+    } else {
+      output_list <- idList
+    }
+  } else if(is.data.frame(idList)){
+    output_list <- unlist(idList)
+  } else {
+    return("Wrong Data Format")
+  }
+  return (formatListAsString(idList = output_list))
+}
+
+formatListAsString <- function(idList) {
+  output_list <- sapply(idList,shQuote)
+  output_list <- paste(output_list,collapse = ",")
+  return (output_list)
+}
+
+getSummaryDataQuery <- function() {
+  return ("select data_key, data_blob from ramp_data_object")
+}
+
+getAnalyteIntersectsQuery <- function(analyteType='metabolites', scope='mapped-to-pathway') {
+  if (analyteType == 'metabolites') {
+    if (scope == 'global') {
+      column = 'met_intersects_json'
+    } else {
+      column = 'met_intersects_json_pw_mapped'
+    }
+  } else {
+    if (scope == 'global') {
+      column = 'gene_intersects_json'
+    } else {
+      column = 'gene_intersects_json_pw_mapped'
+    }
+  }
+  return (paste0("select ",column," from db_version where load_timestamp order by load_timestamp desc limit 1"))
+}
+
+getEntityCountsFromSourcesQuery <- function() {
+  return ("select * from entity_status_info")
+}
+
+getCurrentSourceVersionQuery <- function() {
+  return ("select * from version_info where status = 'current'")
+}
+
+getRaMPVersionQuery <- function(justVersion = TRUE) {
+  if(justVersion) {
+    query<-"select ramp_version from db_version where load_timestamp order by load_timestamp desc limit 1"
+  } else {
+    query<-"select ramp_version, load_timestamp, version_notes, db_sql_url  from db_version where load_timestamp order by load_timestamp desc limit 1"
+  }
+  return(query)
+}
+
+getSynonymsForAnalyteQuery <- function(rampIds) {
+  ramp_id_list = formatListAsString(idList = rampIds)
+  return (paste0("select rampId as rampId, group_concat(distinct Synonym order by Synonym separator '; ')
+     as synonyms from analytesynonym
+     where rampId in (", ramp_id_list, ") group by rampId"))
+}
+
+
+getAnalytePathwaysWithOntologyQuery <- function(biospecimen) {
+  return(paste0(
+    "SELECT analytehaspathway.* from analytehasontology, ontology, analytehaspathway where ontology.commonName in ('",
+    biospecimen,
+    "') and analytehasontology.rampOntologyId = ontology.rampOntologyId and analytehasontology.rampCompoundId = analytehaspathway.rampId"
+  ))
+}
+
 getSourceInfoForAnalyteIDsQuery <- function(analyteIDs) {
-  return (paste("select distinct sourceId, rampId, geneOrCompound from source where sourceId in (",listToQueryString(analyteIDs),")"))
+  return (paste("select distinct sourceId, rampId, geneOrCompound from source where sourceId in (",listToQueryString(ids = analyteIDs),")"))
 }
 
 getReactionDetailsQuery <- function(reactionIDs) {
   return (
     paste0('select rxn_source_id, direction, is_transport, has_human_prot, ec_num, label, equation, html_equation
-           from reaction where rxn_source_id in (', listToQueryString(reactionIDs),");"))
+           from reaction where rxn_source_id in (', listToQueryString(ids = reactionIDs),");"))
 }
 
 getChemPropsForMetabolitesQuery <- function(properties, metaboliteIDs) {
@@ -272,6 +426,15 @@ getPathwayNamesQuery <- function() {
             where pathwayCategory != 'smpdb3'
             order by pathwayName;")
 }
+
+getPathwayFromSourceIdQuery <- function(pathwaySourceIDs) {
+  list_pathways <- sapply(pathwaySourceIDs, shQuote)
+  list_pathways <- paste(list_pathways, collapse = ",")
+  return (paste0("SELECT pathwayRampId, sourceId from pathway where sourceId in (",
+                 list_pathways,
+                 ")"))
+}
+
 rxnPartnersFromMetIDsQuery <- function(metaboliteIDs) {
   return (paste0("select cmp_source.sourceId as input_analyte,
                                cmp_analyte.common_name as input_common_name,
@@ -458,7 +621,8 @@ rxnTransportQuery <- function(rxnString) {
   return(paste0('select rxn_source_id, is_transport from reaction where rxn_source_id in (',rxnString,') and is_transport = 1'))
 }
 
-buildSimpleQuery <- function(selectClauses, distinct = FALSE, tables, whereClauses, groupByClause, orderByClause) {
+buildSimpleQuery <- function(selectClauses, distinct = FALSE, tables, whereClauses = NULL, groupByClause = NULL,
+                             orderByClause = NULL) {
   query <- paste("SELECT")
   if (distinct) {
     query <- paste(query, "DISTINCT")
@@ -473,11 +637,191 @@ buildSimpleQuery <- function(selectClauses, distinct = FALSE, tables, whereClaus
   if (!is.null(orderByClause) && nchar(orderByClause) > 0) {
     query <- paste(query, "ORDER  BY", orderByClause)
   }
+  print(query)
   return (query)
 }
 
+getPathwaysForAnalytesQuery <- function(analytes, namesOrIds, includeSMPDB, useCommonName = TRUE) {
+  analyte_list <- formatListAsString(idList = analytes)
+  selectClauses <- c(
+    'p.pathwayName',
+    'p.type as pathwaySource',
+    'p.sourceId as pathwayId'
+  )
+  tables <- c('source s', 'analytehaspathway ap', 'pathway p')
+  whereClauses <- c('ap.rampId = s.rampId',
+                    'p.pathwayRampId = ap.pathwayRampId')
+  if (!includeSMPDB) {
+    whereClauses <- c(whereClauses, 'ap.pathwaySource != "hmdb"')
+  }
+  if (namesOrIds == 'ids') {
+    selectClauses <- c(selectClauses,
+                       's.sourceId as inputId')
+    whereClauses <- c(whereClauses, paste0("s.sourceId in (", analyte_list, ")"))
+    if (useCommonName) {
+      tables <- c(tables, 'analyte')
+      selectClauses <- c(selectClauses, 'analyte.common_name as commonName')
+      whereClauses <- c(whereClauses, 's.rampId = analyte.rampId')
+    } else {
+      selectClauses <- c(selectClauses,
+                         'group_concat(distinct s.commonName COLLATE NOCASE) as commonName')
+    }
+    groupByClause <- 'inputId, s.rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId'
+  } else {
+    if (useCommonName) {
+      tables <- c(tables, 'analyte')
+      selectClauses <- c(selectClauses, 'analyte.common_name as commonName')
+      whereClauses <- c(whereClauses, 's.rampId = analyte.rampId')
+    } else {
+      selectClauses <- c(selectClauses,
+                         'lower(asyn.Synonym) as commonName')
+    }
+    selectClauses <- c(selectClauses,
+                       'group_concat(distinct s.sourceId COLLATE NOCASE) as sourceIds')
+    tables <- c(tables, 'analytesynonym asyn')
+    whereClauses <- c(whereClauses, 's.rampId = asyn.rampId', paste0("asyn.Synonym in (", analyte_list, ")"))
+    groupByClause <- 'commonName, s.rampId, pathwayId, p.pathwayName, p.type, p.pathwayRampId'
+  }
+  selectClauses <- c(selectClauses,
+                     's.rampId',
+                     'p.pathwayRampId')
+
+  orderByClause <- 'pathwayName asc'
+  return (buildSimpleQuery(selectClauses = selectClauses, tables = tables, whereClauses = whereClauses,
+                           groupByClause = groupByClause, orderByClause = orderByClause))
+}
+
+getRampIDsForPathwaysQuery <- function(pathway_list) {
+  return (paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",pathway_list, ")"
+  ))
+}
+
+getAllPathwayRampIDsQuery <- function(includeSMPDB = FALSE) {
+  selectClauses <- c('pathwayRampId')
+  tables <- c('analytehaspathway')
+
+  if (!includeSMPDB) {
+    return(buildSimpleQuery(distinct = TRUE, selectClauses = selectClauses, tables = tables, whereClauses = c("pathwaySource != 'hmdb'")))
+  }
+  return(buildSimpleQuery(distinct = TRUE, selectClauses = selectClauses, tables = tables))
+}
+
+getAllRampIDsForAllPathwaysQuery <- function(includeSMPDB = FALSE) {
+  selectClauses <- c('rampId', 'pathwayRampId')
+  tables <- c('analytehaspathway')
+
+  if (!includeSMPDB) {
+    return(buildSimpleQuery(selectClauses = selectClauses, tables = tables, whereClauses = c("pathwaySource != 'hmdb'")))
+  }
+  return(buildSimpleQuery(selectClauses = selectClauses, tables = tables))
+}
+
+getRampIDsAndSourcesForPathwaysQuery <- function(includeSMPDB = FALSE) {
+  selectClauses <- c('rampId', 'pathwaySource')
+  tables <- c('analytehaspathway')
+
+  if (!includeSMPDB) {
+    return(buildSimpleQuery(distinct = TRUE, selectClauses = selectClauses, tables = tables, whereClauses = c("pathwaySource != 'hmdb'")))
+  }
+  return(buildSimpleQuery(distinct = TRUE, selectClauses = selectClauses, tables = tables))
+}
+
+getAnalytesFromPathwaysQuery <- function(pathways, namesOrIds = 'names', match = "exact", useCommonName = TRUE) {
+
+  if (useCommonName) {
+    selectClauses <- c('analyte.common_name as analyteName')
+    tables <- c('analyte')
+    whereClauses <- c('analyte.rampId = s.rampId')
+  } else {
+    selectClauses <- c('group_concat(distinct s.commonName COLLATE NOCASE) as analyteName')
+    tables <- c()
+    whereClauses <- c()
+  }
+
+  selectClauses <- c(
+    selectClauses,
+    'group_concat(distinct s.sourceId COLLATE NOCASE) as sourceAnalyteIDs',
+    's.geneOrCompound as geneOrCompound',
+    'p.pathwayName as pathwayName',
+    'p.sourceId as pathwayId',
+    'p.pathwayCategory as pathwayCategory',
+    'p.type as pathwayType'
+  )
+  tables <- c( tables,
+    'pathway p',
+    'analytehaspathway ap',
+    'source s'
+  )
+  whereClauses <- c(whereClauses,
+    's.rampId = ap.rampID',
+    'ap.pathwayRampId = p.pathwayRampId',
+    "(p.pathwayCategory not like 'smpdb%' or p.pathwayCategory is Null)"
+  )
+  groupByClause = 's.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound'
+  orderByClause = 'p.type desc, p.pathwayName asc, s.geneOrCompound asc'
+
+  if (namesOrIds == 'names') {
+    matchColumn = 'pathwayName'
+  } else {
+    matchColumn = 'sourceId'
+    match = 'exact'
+  }
+
+  if (match == 'exact') {
+    whereClauses <- c(whereClauses, paste0('p.', matchColumn, ' in (', pathways, ')'))
+  } else {
+    whereClauses <- c(whereClauses, paste0('p.', matchColumn, ' like "%', pathways, '%"'))
+  }
+
+  return(buildSimpleQuery(
+    selectClauses = selectClauses,
+    distinct = FALSE,
+    tables = tables,
+    whereClauses = whereClauses,
+    groupByClause = groupByClause,
+    orderByClause = orderByClause))
+}
+
+getReactionClassStatsQuery <- function(analyteType = 'all', humanProtein = TRUE) {
+  selectClauses <- c(
+    'rc.rxn_class',
+    'rc.rxn_class_hierarchy',
+    'rc.ec_level as stat_ec_level',
+    'rc.rxn_class_ec as stat_class_ec'
+  )
+  tables <- c(
+    'reaction_ec_class rc',
+    'reaction r')
+  whereClauses <- c('rc.rxn_source_id = r.rxn_source_id')
+  groupByClause <- 'rc.rxn_class, rc.ec_level, rc.rxn_class_ec'
+
+  if (humanProtein) {
+    whereClauses <- c(whereClauses, 'r.has_human_prot = 1')
+  }
+
+  if (!is.null(analyteType) && analyteType == 'metabolite') {
+    selectClauses <- c(selectClauses, 'count(distinct(rm.met_source_id)) as Total_in_RxnClass_Metab')
+    tables <- c(tables, 'reaction2met rm')
+    whereClauses <- c(whereClauses, 'rm.rxn_source_id = rc.rxn_source_id')
+  } else if (!is.null(analyteType) && analyteType == 'gene') {
+    selectClauses <- c(selectClauses, 'count(distinct(rp.uniprot)) as Total_in_RxnClass_Protein')
+    tables <- c(tables, 'reaction2protein rp')
+    whereClauses <- c(whereClauses, 'rp.rxn_source_id = rc.rxn_source_id')
+  } else {
+    selectClauses <- c(selectClauses, 'count(distinct(rc.rxn_source_id)) as Total_Rxns_in_Class')
+  }
+
+  query = buildSimpleQuery(
+    selectClauses = selectClauses,
+    distinct = FALSE,
+    tables = tables,
+    whereClauses = whereClauses,
+    groupByClause = groupByClause)
+  return(query)
+}
+
 getReactionsForAnalytesQuery <- function(analytes, analyteType, useIdMapping, keeperRxns, humanProtein) {
-  analytesStr <- listToQueryString(analytes)
+  analytesStr <- listToQueryString(ids = analytes)
 
   selectClauses <- c(
     'c.rxn_class',
@@ -521,7 +865,7 @@ getReactionsForAnalytesQuery <- function(analytes, analyteType, useIdMapping, ke
     tables <- c(tables, 'reaction2protein r')
   }
   if (!is.null(keeperRxns) && nchar(keeperRxns) > 0) {
-    whereClauses <- c(whereClauses, paste0("r.rxn_source_id in (",listToQueryString(keeperRxns),")"))
+    whereClauses <- c(whereClauses, paste0("r.rxn_source_id in (",listToQueryString(ids = keeperRxns),")"))
   }
   if (useIdMapping) {
     tables <- c(tables, 'source s')
