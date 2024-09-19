@@ -26,41 +26,8 @@ runQuery <- function(
     dbGetQuery(conn = con, statement = sql)
 }
 
-
-# verifySQLite <- function() {
-#
-#   message("Checking for existing BiocFileCache entry for the RaMP SQLite Database.")
-#   bfc <- BiocFileCache::BiocFileCache(cache = BiocFileCache::getBFCOption("CACHE"), ask=F)
-#   cacheInfo <- BiocFileCache::bfcinfo()
-#   cacheInfo <- cacheInfo[grepl("RaMP", cacheInfo$rname),]
-#
-#   if(nrow(cacheInfo) < 1) {
-#     message("")
-#     message("RaMP Database is not in file cache. Performing a one-time SQLite file download.")
-#     url = packageDescription("RaMP")$Config_ramp_db_url
-#     message("One time retrieval of RaMP Database Cache. This will take about 1 minute to download and unzip.")
-#     path <- BiocFileCache::bfcadd(bfc, url, fname='exact')
-#     cid <- names(path)
-#     R.utils::gunzip(path, remove=F)
-#     newpath <- gsub(".gz", "", path)
-#     BiocFileCache::bfcremove(bfc, cid)
-#     bfcEntry = BiocFileCache::bfcadd(bfc, newpath, fname='exact')
-#     pkg.globals$sqlite_file_path = bfcEntry
-#     message("SQLite has been initialized. Using file cache entry:")
-#     message(bfcEntry)
-#   } else {
-#     message("RaMP DB found in BiocFileCache, SQLite File:")
-#     message(cacheInfo$rpath[1])
-#     pkg.globals$sqlite_file_path = cacheInfo$rpath[1]
-#   }
-# }
-
-
 setupRdataCache <- function(db = RaMP()) {
-
-  sql = "select data_key, data_blob from ramp_data_object"
-
-  objs <- runQuery(sql = sql, db = db)
+  objs <- db@api$getSummaryData()
 
   dbSummaryData = list()
 
@@ -75,6 +42,3 @@ setupRdataCache <- function(db = RaMP()) {
 
   return(dbSummaryData)
 }
-
-
-

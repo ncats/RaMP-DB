@@ -8,11 +8,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(
-#'   dbname = "ramp2", username = "root",
-#'   conpass = "", host = "localhost"
-#' )
-#' getOntoFromMeta("hmdb:HMDB0071437")
+#' rampDB <- RaMP()
+#' getOntoFromMeta("hmdb:HMDB0071437", db=rampDB)
 #' }
 #' @export
 getOntoFromMeta <- function(analytes, namesOrIds = "ids", includeRaMPids = FALSE, db = RaMP()) {
@@ -35,34 +32,26 @@ getOntoFromMeta <- function(analytes, namesOrIds = "ids", includeRaMPids = FALSE
     list_metabolite <- unlist(analytes)
   }
   list_metabolite <- unique(list_metabolite)
-  list_metabolite <- sapply(list_metabolite, shQuote)
-  list_metabolite <- paste(list_metabolite, collapse = ",")
 
   if (namesOrIds == "ids") {
-    sql <- paste0("select * from source where sourceId in (", list_metabolite, ");")
+    df <- db@api$getSourceDataForAnalyteIDs(analyteIDs = list_metabolite)
   } else if (namesOrIds == "names") {
-    sql <- paste0("select * from source where rampId in (select * from (select rampId from analytesynonym where Synonym in (", list_metabolite, ")) as subquery);")
-    cat(file = stderr(), "query sql in Package call with -- ", sql, "\n")
+    df <- db@api$getSourceDataForAnalyteNames(analyteNames = list_metabolite)
   }
 
-  df <- runQuery(sql = sql, db = db)
-
   if (nrow(df) == 0) {
-    message("This source id
-            does not exist in the source table")
+
+    if (namesOrIds == "ids") {
+      message("These ids do not exist in the source table")
+    } else {
+      message("These names do not exist in the analytesynonym table")
+    }
     return(NULL)
   }
 
   rampid <- unique(df$rampId)
-  rampid <- sapply(rampid, shQuote)
-  rampid <- paste(rampid, collapse = ",")
 
-  sql <- paste0(
-    "select * from analytehasontology where rampCompoundId in (",
-    rampid, ");"
-  )
-
-  df2 <- runQuery(sql = sql, db = db)
+  df2 <- db@api$getOntologiesForRampIDs(rampIds = rampid)
 
   if (nrow(df2) == 0) {
     message("No searching result because these metabolites are not linked to ontology")
@@ -70,14 +59,7 @@ getOntoFromMeta <- function(analytes, namesOrIds = "ids", includeRaMPids = FALSE
   }
 
   rampontoid <- unique(df2$rampOntologyId)
-  rampontoid <- sapply(rampontoid, shQuote)
-  rampontoid <- paste(rampontoid, collapse = ",")
-  sql <- paste0(
-    "select * from ontology where rampOntologyId in (",
-    rampontoid, ");"
-  )
-
-  df3 <- runQuery(sql = sql, db = db)
+  df3 <- db@api$getOntologyData(rampIds = rampontoid)
 
   mdf <- unique(merge(df3, df2, all.x = T))
   mdf <- unique(merge(mdf, df,
@@ -148,25 +130,7 @@ getMetaFromOnto <- function(ontology, db = RaMP()) {
 
     ontologyList <- paste0("'", paste(list_ontology, collapse = "','"), "'")
 
-    sql <- paste0("select rampId,
-          group_concat(distinct s.sourceId order by s.sourceId separator '; ') as source_ids,
-          group_concat(distinct s.commonName order by s.commonName separator '; ') as common_names, o.commonName, o.HMDBOntologyType
-          from source s, analytehasontology ao, ontology o where ao.rampOntologyId in (
-          select distinct rampOntologyId from ontology where commonName in (", ontologyList, "))
-          and o.rampOntologyId = ao.rampOntologyId and s.rampId = ao.rampCompoundId
-          group by o.commonName, s.rampId, o.HMDBOntologyType")
-
-    if (.is_sqlite(db)) {
-      sql <- paste0("select rampId,
-          group_concat(distinct s.sourceId COLLATE NOCASE) as source_ids,
-          group_concat(distinct s.commonName COLLATE NOCASE) as common_names, o.commonName, o.HMDBOntologyType
-          from source s, analytehasontology ao, ontology o where ao.rampOntologyId in (
-          select distinct rampOntologyId from ontology where commonName in (", ontologyList, "))
-          and o.rampOntologyId = ao.rampOntologyId and s.rampId = ao.rampCompoundId
-          group by o.commonName, s.rampId, o.HMDBOntologyType")
-    }
-
-    mdf_final <- runQuery(sql = sql, db = db)
+    mdf_final <- db@api$getMetabolitesForOntology(ontologyList = ontologyList)
 
     mdf_final <- unique(mdf_final)
     mdf_final <- mdf_final[, c(4, 5, 3, 2)]
@@ -254,22 +218,7 @@ runOntologyTest <- function(analytes,
       biospecimen <- "Adipose tissue"
     }
 
-
-    # Get metabolites that belong to a specific biospecimen
-    # query <- paste0(
-    #   "SELECT analytehasontology.*, ontology.*, analytehasontology.* from analytehasontology, ontology, analytehasontology where ontology.commonName in ('",
-    #   biospecimen,
-    #   "') and ontology.rampOntologyId = analytehasontology.rampOntologyId and analytehasontology.rampCompoundId = analytehasontology.rampId"
-    # )
-
-    # less data pull-back
-    query <- paste0(
-      "SELECT analytehasontology.* from analytehasontology, ontology, analytehasontology where ontology.commonName in ('",
-      biospecimen,
-      "') and analytehasontology.rampOntologyId = ontology.rampOntologyId and analytehasontology.rampCompoundId = analytehasontology.rampId"
-    )
-
-    backgrounddf <- runQuery(sql = query, db = db)
+    backgrounddf <- db@api$getAnalytesFromOntology(biospecimen = biospecimen)
 
     if (nrow(backgrounddf) == 0) {
       stop("Biospecimen background not found. Choices are 'Blood', 'Adipose', 'Heart', 'Urine', 'Brain', 'Liver', 'Kidney', 'Saliva', and 'Feces'")
@@ -278,7 +227,7 @@ runOntologyTest <- function(analytes,
     # only keep the input metabolites (converted into ontologydf in line above) that are in the biospecimen type specified
     ontologydf <- with(ontologydf, {
       ontologydf %>%
-        dplyr::filter(.data$rampId %in% .data$backgrounddf$rampId)
+        dplyr::filter(.data$rampCompoundId %in% backgrounddf$rampCompoundId)
     })
     if (nrow(ontologydf) == 0) {
       stop("There are no metabolites in your input that map to your selected biospecimen")
@@ -301,35 +250,18 @@ runOntologyTest <- function(analytes,
   contingencyTb <- matrix(0, nrow = 2, ncol = 2)
   colnames(contingencyTb) <- c("In Ontology", "Not In Ontology")
   rownames(contingencyTb) <- c("All Metabolites", "User's Metabolites")
-  ## Get ontology ids that contain the user analytes
-  pid <- unique(ontologydf$rampOntologyId)
-  list_pid <- sapply(pid, shQuote)
-  list_pid <- paste(list_pid, collapse = ",")
 
   # Get the total number of metabolites that are mapped to ontologys in RaMP (that's the default background)
-  # added conditional to not pull hmdb ids
-  query <- "select distinct rampCompoundId from analytehasontology;"
-
-  allids <- runQuery(sql = query, db = db)
-  allids <- allids[!duplicated(allids), ]
-
-  totanalytes <- length(allids)
+  totanalytes <- db@api$getMetaboliteWithOntologyCount()
 
   ## Input_RampIds is a table of all analytes included in ontologys represented in the user set
   ## "User" refers to significant analytes
 
   ## Get pathway ids that contain the user analytes
   pid <- unique(ontologydf$rampOntologyId)
-  list_pid <- sapply(pid, shQuote)
-  list_pid <- paste(list_pid, collapse = ",")
 
   ## Retrieve compound ids associated with background pathways and count
-  query <- paste0(
-    "select * from analytehasontology where rampOntologyId in (",
-    list_pid, ")"
-  )
-
-  input_RampIds <- runQuery(sql = query, db = db)
+  input_RampIds <- db@api$getRampIDsForOntologies(ontologyIDs = pid)
 
   if (is.null(input_RampIds)) {
     stop("Data doesn't exist")

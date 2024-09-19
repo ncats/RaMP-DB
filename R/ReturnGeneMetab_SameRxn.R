@@ -48,18 +48,16 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
   list_metabolite <- sapply(list_metabolite,shQuote)
   list_metabolite <- paste(list_metabolite,collapse = ",")
 
-  data_access <- DataAccessObject$new(db = db)
-
   if(namesOrIds == 'ids') {
 
     print("Analyte ID-based reaction partner query.")
 
-    df1 <- data_access$getRxnPartnersFromMetIDs(metaboliteIDs = list_metabolite)
+    df1 <- db@api$getRxnPartnersFromMetIDs(metaboliteIDs = list_metabolite)
     print("Building metabolite to gene relations.")
 
     print(paste0("Number of met2gene relations: ",(nrow(df1))))
 
-    df2 <- data_access$getRxnPartnersFromGeneIDs(geneIDs = list_metabolite)
+    df2 <- db@api$getRxnPartnersFromGeneIDs(geneIDs = list_metabolite)
     print("Building gene to metabolite relations.")
 
   } else {
@@ -69,10 +67,10 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
 
     print("Analyte name-based reaction partner query.")
     print("Building metabolite to gene relations.")
-    df1 <- data_access$getRxnPartnersFromMetNames(metaboliteNames = list_metabolite)
+    df1 <- db@api$getRxnPartnersFromMetNames(metaboliteNames = list_metabolite)
 
     print(paste0("Number of met2gene relations: ",(nrow(df1))))
-    df2 <- data_access$getRxnPartnersFromGeneNames(geneNames = list_metabolite)
+    df2 <- db@api$getRxnPartnersFromGeneNames(geneNames = list_metabolite)
 
     print("Building gene to metabolite relations.")
     print(paste0("Number of gene2met relations: ",(nrow(df2))))
