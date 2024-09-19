@@ -337,144 +337,29 @@ runFisherTest <- function(analytes,
   print("")
 
   # Now run fisher's tests for all other pids (all pathways not covered in dataset)
-  if (MCall == T) {
-    # Now run fisher's tests for all other pids
-    allpids <- db@api$getAllPathwayRampIDs()
 
-    pidstorun <- setdiff(allpids[, 1], pid)
-    restcids <- db@api$getRampIDsForPathways(pathways = pidstorun)
 
-    allcids <- db@api$getAllRampIDsForAllPathways()
+  # only keep pathways that have >= minPathwaySize or < maxPathwaySize compounds
+  keepers <- intersect(
+    which(c(totinpath) >= minPathwaySize),
+    which(c(totinpath) < maxPathwaySize)
+  )
 
-    # We're collecting p-values for all pathways, now those with no analyte support at all - JCB:?
+  # hist(totinpath,breaks=1000)
+  print(paste0("Keeping ", length(keepers), " pathways"))
+  # fdr <- stats::p.adjust(c(pval,pval2)[keepers],method="fdr")
+  # holm <- stats::p.adjust(c(pval,pval2)[keepers],method="holm")
+  print(paste0("Calculated p-values for ", length(pval), " pathways"))
 
-    # calculating p-values for all other pathways
-    kegg_metab <- db@dbSummaryObjCache$kegg_metab
-    kegg_gene <- db@dbSummaryObjCache$kegg_metab
-    wiki_metab <- db@dbSummaryObjCache$wiki_metab
-    wiki_gene <- db@dbSummaryObjCache$wiki_gene
-    reactome_metab <- db@dbSummaryObjCache$reactome_metab
-    reactome_gene <- db@dbSummaryObjCache$reactome_gene
-
-    count <- 1
-    pval2 <- oddsratio2 <- userinpath2 <- totinpath2 <- c()
-
-    for (i in pidstorun) {
-      if ((count %% 100) == 0) {
-        print(paste0("Processed ", count))
-      }
-      count <- count + 1
-      user_in_pathway <- 0
-      if (analyte_type == "metabolites") {
-        if (i %in% kegg_metab$pathwayRampId) {
-          tot_in_pathway <- kegg_metab[which(kegg_metab[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- totanalytes[["kegg"]]
-        } else if (i %in% wiki_metab$pathwayRampId) {
-          tot_in_pathway <- wiki_metab[which(wiki_metab[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- totanalytes[["wiki"]]
-        } else if (i %in% reactome_metab$pathwayRampId) {
-          tot_in_pathway <- reactome_metab[which(reactome_metab[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- totanalytes[["reactome"]]
-        } else {
-          tot_in_pathway <- 0
-          total_analytes <- NULL
-        }
-      } else {
-        if (i %in% kegg_gene$pathwayRampId) {
-          tot_in_pathway <- kegg_gene[which(kegg_gene[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- totanalytes[["kegg"]]
-        } else if (i %in% wiki_gene$pathwayRampId) {
-          tot_in_pathway <- wiki_gene[which(wiki_gene[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- totanalytes[["wiki"]]
-        } else if (i %in% reactome_gene$pathwayRampId) {
-          tot_in_pathway <- reactome_gene[which(reactome_gene[, "pathwayRampId"] == i), "Freq"]
-          total_analytes <- totanalytes[["reactome"]]
-        } else {
-          tot_in_pathway <- 0
-          total_analytes <- NULL
-        }
-      }
-
-      # Check that the pathway being considered has your analyte type, if not, move on
-
-      if (is.null(total_analytes)) {
-        next
-      }
-      tot_out_pathway <- total_analytes - tot_in_pathway
-      # fill the rest of the table out
-
-      # JCB: Another issue 10/7/2020
-      # This line was used for user_out_pathway
-      # This section of code is for all pathways that have no analyte support.
-      user_out_pathway <- length(unique(pathwaydf$rampId))
-
-      # This line was commented out in production *but* now we have total_analytes set properly
-      # not sure why this line was changed.
-      # user_out_pathway <- total_analytes - user_in_pathway
-
-      contingencyTb[1, 1] <- tot_in_pathway - user_in_pathway
-      contingencyTb[1, 2] <- tot_out_pathway - user_out_pathway
-      contingencyTb[2, 1] <- user_in_pathway
-      contingencyTb[2, 2] <- user_out_pathway
-      # Added try catch
-      tryCatch(
-        {
-          result <- stats::fisher.test(contingencyTb, alternative = alternative)
-        },
-        error = function(e) {
-          print(toString(e))
-          print(i)
-          print(contingencyTb)
-        }
-      )
-
-      pval2 <- c(pval2, result$p.value)
-      oddsratio2 <- c(oddsratio2, result$estimate)
-      userinpath2 <- c(userinpath2, user_in_pathway)
-      totinpath2 <- c(totinpath2, tot_in_pathway)
-      # pidused <- c(pidused,i)
-    } # end for loop
-    keepers <- intersect(
-      which(c(totinpath, totinpath2) >= minPathwaySize),
-      which(c(totinpath, totinpath2) < maxPathwaySize)
-    )
-
-    print(paste0("Calculated p-values for ", length(c(pval, pval2)), " pathways"))
-    out <- data.frame(
-      pathwayRampId = c(pidused, pidstorun)[keepers],
-      Pval = c(pval, pval2)[keepers], # FDR.Adjusted.Pval=fdr,
-      Odds_Ratio = c(oddsratio, oddsratio2),
-      # Holm.Adjusted.Pval=holm,
-      Num_In_Path = c(userinpath, userinpath2)[keepers],
-      Total_In_Path = c(totinpath, totinpath2)[keepers]
-    )
-  } # end if MCall is T and all pathways are being calculated, even ones that do not represent input analytes
-
-  else {
-
-    # only keep pathways that have >= minPathwaySize or < maxPathwaySize compounds
-    keepers <- intersect(
-      which(c(totinpath) >= minPathwaySize),
-      which(c(totinpath) < maxPathwaySize)
-    )
-
-    # hist(totinpath,breaks=1000)
-    print(paste0("Keeping ", length(keepers), " pathways"))
-    # fdr <- stats::p.adjust(c(pval,pval2)[keepers],method="fdr")
-    # holm <- stats::p.adjust(c(pval,pval2)[keepers],method="holm")
-    print(paste0("Calculated p-values for ", length(pval), " pathways"))
-
-    # format output (retrieve pathway name for each unique source id first
-    out <- data.frame(
-      pathwayRampId = pidused[keepers],
-      Pval = pval[keepers], # FDR.Adjusted.Pval=fdr,
-      # Holm.Adjusted.Pval=holm,
-      Odds_Ratio = oddsratio[keepers],
-      Num_In_Path = userinpath[keepers],
-      Total_In_Path = totinpath[keepers]
-    )
-  }
-  # End else if MCall (when False)
+  # format output (retrieve pathway name for each unique source id first
+  out <- data.frame(
+    pathwayRampId = pidused[keepers],
+    Pval = pval[keepers], # FDR.Adjusted.Pval=fdr,
+    # Holm.Adjusted.Pval=holm,
+    Odds_Ratio = oddsratio[keepers],
+    Num_In_Path = userinpath[keepers],
+    Total_In_Path = totinpath[keepers]
+  )
 
   # Remove duplicate pathways between wikipathways and reactome, only perfect overlaps
   # only make the dup list if it doesn't exist from a previous run in the session

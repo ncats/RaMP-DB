@@ -166,16 +166,6 @@ DataAccessObject <- R6::R6Class(
     getRampIDsAndSourcesForPathways = function(includeSMPDB = FALSE) {
       return (runQuery(sql = getRampIDsAndSourcesForPathwaysQuery(includeSMPDB = includeSMPDB), db = self$db))
     },
-    getAllPathwayRampIDs = function(includeSPMDB = FALSE) {
-      return (runQuery(sql = getAllPathwayRampIDsQuery(includeSMPDB = includeSPMDB), db = self$db))
-    },
-    getRampIDsForPathways = function(pathways) {
-      pathway_list = parseListArgument(idList = pathways)
-      return (runQuery(sql = getRampIDsForPathwaysQuery(pathway_list = pathway_list), db = self$db))
-    },
-    getAllRampIDsForAllPathways = function(includeSMPDB = FALSE) {
-      return (runQuery(sql = getAllRampIDsForAllPathwaysQuery(includeSMPDB = includeSMPDB), db = self$db))
-    },
     getPathwaysForAnalytes = function(analytes, namesOrIds, includeSMPDB) {
       if (supportsCommonName(db = self$db)) {
         useCommonName = TRUE
@@ -786,31 +776,6 @@ getPathwaysForAnalytesQuery <- function(analytes, namesOrIds, includeSMPDB, useC
   orderByClause <- 'pathwayName asc'
   return (buildSimpleQuery(selectClauses = selectClauses, tables = tables, whereClauses = whereClauses,
                            groupByClause = groupByClause, orderByClause = orderByClause))
-}
-
-getRampIDsForPathwaysQuery <- function(pathway_list) {
-  return (paste0("select rampId,pathwayRampId from analytehaspathway where pathwayRampId in (",pathway_list, ")"
-  ))
-}
-
-getAllPathwayRampIDsQuery <- function(includeSMPDB = FALSE) {
-  selectClauses <- c('pathwayRampId')
-  tables <- c('analytehaspathway')
-
-  if (!includeSMPDB) {
-    return(buildSimpleQuery(distinct = TRUE, selectClauses = selectClauses, tables = tables, whereClauses = c("pathwaySource != 'hmdb'")))
-  }
-  return(buildSimpleQuery(distinct = TRUE, selectClauses = selectClauses, tables = tables))
-}
-
-getAllRampIDsForAllPathwaysQuery <- function(includeSMPDB = FALSE) {
-  selectClauses <- c('rampId', 'pathwayRampId')
-  tables <- c('analytehaspathway')
-
-  if (!includeSMPDB) {
-    return(buildSimpleQuery(selectClauses = selectClauses, tables = tables, whereClauses = c("pathwaySource != 'hmdb'")))
-  }
-  return(buildSimpleQuery(selectClauses = selectClauses, tables = tables))
 }
 
 getRampIDsAndSourcesForPathwaysQuery <- function(includeSMPDB = FALSE) {
