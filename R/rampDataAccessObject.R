@@ -2,7 +2,7 @@
 
 dbHasAnalyteCommonName <- function(db) {
   query <- "PRAGMA table_info(analyte);"
-  table_info <- RaMP::runQuery(sql = query, db = db)
+  table_info <- runQuery(sql = query, db = db)
   return("common_name" %in% table_info$name)
 }
 
@@ -28,114 +28,114 @@ DataAccessObject <- R6::R6Class(
     },
     getRxnPartnersFromMetIDs = function(metaboliteIDs) {
       queryFunction <- if (supportsCommonName(db = self$db)) rxnPartnersFromMetIDsQuery else rxnPartnersFromMetIDsQueryOld
-      return (RaMP::runQuery(sql = queryFunction(metaboliteIDs), db = self$db))
+      return (runQuery(sql = queryFunction(metaboliteIDs), db = self$db))
     },
     getRxnPartnersFromGeneIDs = function(geneIDs) {
       queryFunction <- if (supportsCommonName(db = self$db)) rxnPartnersFromGeneIDsQuery else rxnPartnersFromGeneIDsQueryOld
-      return (RaMP::runQuery(sql = queryFunction(geneIDs), db = self$db))
+      return (runQuery(sql = queryFunction(geneIDs), db = self$db))
     },
     getRxnPartnersFromMetNames = function(metaboliteNames) {
       queryFunction <- if (supportsCommonName(db = self$db)) rxnPartnersFromMetNamesQuery else rxnPartnersFromMetNamesQueryOld
-      return (RaMP::runQuery(sql = queryFunction(metaboliteNames), db = self$db))
+      return (runQuery(sql = queryFunction(metaboliteNames), db = self$db))
     },
     getRxnPartnersFromGeneNames = function(geneNames) {
       queryFunction <- if (supportsCommonName(db = self$db)) rxnPartnersFromGeneNamesQuery else rxnPartnersFromGeneNamesQueryOld
-      return (RaMP::runQuery(sql = queryFunction(geneNames), db = self$db))
+      return (runQuery(sql = queryFunction(geneNames), db = self$db))
     },
     getRheaRxnPartnersFromMetIDs = function(metaboliteIDs, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN")) {
       idStr <- listToQueryString(ids = metaboliteIDs)
       query <-  if (supportsCommonName(db = self$db)) rheaRxnPartnersFromMetIDsQuery(metaboliteIDs = idStr) else rheaRxnPartnersFromMetIDsQueryOld(metaboliteIDs = idStr)
       query <- private$addConstraintsToRxnPartnersQuery(query, onlyHumanMets, humanProtein, includeTransportRxns, rxnDirs)
-      df <- RaMP::runQuery(query, self$db)
+      df <- runQuery(query, self$db)
       return(df)
     },
     getRheaRxnPartnersFromGeneIDs = function(geneIDs, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN")) {
       idStr <- listToQueryString(ids = geneIDs)
       query <- if (supportsCommonName(db = self$db)) rheaRxnPartnersFromGeneIDsQuery(idStr) else rheaRxnPartnersFromGeneIDsQueryOld(idStr)
       query <- private$addConstraintsToRxnPartnersQuery(query = query, onlyHumanMets = onlyHumanMets, humanProtein = humanProtein, includeTransportRxns = includeTransportRxns, rxnDirs = rxnDirs)
-      df <- RaMP::runQuery(sql = query, db = self$db)
+      df <- runQuery(sql = query, db = self$db)
       return(df)
     },
     getRxnMetParticipants = function(reactionList) {
       rxnString <- listToQueryString(ids = reactionList)
       queryFunction <- if (supportsCommonName(db = self$db)) rxnMetParticipantsQuery else rxnMetParticipantsQueryOld
-      return (RaMP::runQuery(sql = queryFunction(rxnString), db = self$db))
+      return (runQuery(sql = queryFunction(rxnString), db = self$db))
     },
     getRxnGeneParticipants = function(reactionList) {
       rxnString <- listToQueryString(ids = reactionList)
       queryFunction <- if (supportsCommonName(db = self$db)) rxnGeneParticipantsQuery else rxnGeneParticipantsQueryOld
-      return (RaMP::runQuery(sql = queryFunction(rxnString), db = self$db))
+      return (runQuery(sql = queryFunction(rxnString), db = self$db))
     },
     getRxnIsTransport = function(reactionList) {
       rxnString <- listToQueryString(ids = reactionList)
-      return (RaMP::runQuery(sql = rxnTransportQuery(rxnString), db = self$db))
+      return (runQuery(sql = rxnTransportQuery(rxnString), db = self$db))
     },
     getPathwayNames = function() {
-      return (RaMP::runQuery(sql = getPathwayNamesQuery(), db = self$db))
+      return (runQuery(sql = getPathwayNamesQuery(), db = self$db))
     },
     getMetaboliteIDTypes = function() {
-      return (RaMP::runQuery(sql = getMetaboliteIDTypesQuery(), db = self$db))
+      return (runQuery(sql = getMetaboliteIDTypesQuery(), db = self$db))
     },
     getGeneIDTypes = function() {
-      return (RaMP::runQuery(sql = getGeneIDTypesQuery(), db = self$db))
+      return (runQuery(sql = getGeneIDTypesQuery(), db = self$db))
     },
     getMetaboliteClassSources = function() {
-      return (RaMP::runQuery(sql = getMetaboliteClassSourcesQuery(), db = self$db))
+      return (runQuery(sql = getMetaboliteClassSourcesQuery(), db = self$db))
     },
     getMetaboliteClassTypes = function() {
-      return (RaMP::runQuery(sql = getMetaboliteClassTypesQuery(), db = self$db))
+      return (runQuery(sql = getMetaboliteClassTypesQuery(), db = self$db))
     },
     getAllMetaboliteClasses = function() {
-      return (RaMP::runQuery(sql = getAllMetaboliteClassesQuery(), db = self$db))
+      return (runQuery(sql = getAllMetaboliteClassesQuery(), db = self$db))
     },
     getMetaboliteClassesForType = function(classType) {
-      return (RaMP::runQuery(sql = getMetaboliteClassesForTypeQuery(classType = classType), db = self$db))
+      return (runQuery(sql = getMetaboliteClassesForTypeQuery(classType = classType), db = self$db))
     },
     getOntologies = function() {
-      return (RaMP::runQuery(sql = getOntologiesQuery(), db = self$db))
+      return (runQuery(sql = getInfoFromTableQuery(table = 'ontology'), db = self$db))
     },
     getSourceDataForAnalyteIDs = function(analyteIDs) {
-      return (RaMP::runQuery(sql = getSourceDataForAnalyteIDsQuery(analyteIDs = analyteIDs), db = self$db))
+      return (runQuery(sql = getInfoForIDsQuery(table = 'source', matchColumn = 'sourceId', idList = analyteIDs), db = self$db))
     },
     getSourceDataForAnalyteNames = function(analyteNames) {
-      return (RaMP::runQuery(sql = getSourceDataForAnalyteNamesQuery(analyteNames = analyteNames), db = self$db))
+      return (runQuery(sql = getSourceDataForAnalyteNamesQuery(analyteNames = analyteNames), db = self$db))
     },
-    getOntologiesForRampIDs = function(rampIDs) {
-      return (RaMP::runQuery(sql = getOntologiesForRampIDsQuery(rampIDs = rampIDs), db = self$db))
+    getOntologiesForRampIDs = function(rampIds) {
+      return (runQuery(sql = getInfoForIDsQuery(table = 'analytehasontology', matchColumn = 'rampCompoundId', idList = rampIds), db = self$db))
     },
-    getOntologyData = function(rampIDs) {
-      return (RaMP::runQuery(sql = getOntologyDataQuery(rampIDs = rampIDs), db = self$db))
+    getOntologyData = function(rampIds) {
+      return (runQuery(sql = getInfoForIDsQuery(table = 'ontology', matchColumn = 'rampOntologyId', idList = rampIds), db = self$db))
     },
     getMetabolitesForOntology = function(ontologyList) {
       queryFunction <- if (supportsCommonName(db = self$db)) getMetabolitesForOntologyQuery else getMetabolitesForOntologyQueryOld
-      return (RaMP::runQuery(sql = queryFunction(ontologyList = ontologyList), db = self$db))
+      return (runQuery(sql = queryFunction(ontologyList = ontologyList), db = self$db))
     },
     getAnalytesFromOntology = function(biospecimen) {
-      return (RaMP::runQuery(sql = getAnalytesFromOntologyQuery(biospecimen = biospecimen), db = self$db))
+      return (runQuery(sql = getAnalytesFromOntologyQuery(biospecimen = biospecimen), db = self$db))
     },
     getMetaboliteWithOntologyCount = function() {
-      return (RaMP::runQuery(sql = getMetaboliteWithOntologyCountQuery(), db = self$db)$count)
+      return (runQuery(sql = getMetaboliteWithOntologyCountQuery(), db = self$db)$count)
     },
     getRampIDsForOntologies = function(ontologyIDs) {
-      return (RaMP::runQuery(sql = getRampIDsForOntologiesQuery(ontologyIDs = ontologyIDs), db = self$db))
-    },
+      return (runQuery(sql = getInfoForIDsQuery(table = 'analytehasontology', matchColumn = 'rampOntologyId', idList = ontologyIDs), db = self$db))
+      },
     getMetaboliteSourceIdsForOntology = function(biospecimen) {
-      return (RaMP::runQuery(sql = getMetaboliteSourceIdsForOntologyQuery(biospecimen = biospecimen), db = self$db))
+      return (runQuery(sql = getMetaboliteSourceIdsForOntologyQuery(biospecimen = biospecimen), db = self$db))
     },
     getChemPropsForMetabolites = function(properties = properties, metaboliteIDs = metaboliteIDs) {
-      return (RaMP::runQuery(sql = getChemPropsForMetabolitesQuery(properties = properties, metaboliteIDs = metaboliteIDs), db = self$db))
+      return (runQuery(sql = getChemPropsForMetabolitesQuery(properties = properties, metaboliteIDs = metaboliteIDs), db = self$db))
     },
     getReactionsForAnalytes = function(analytes, analyteType, useIdMapping, keeperRxns, humanProtein) {
-      return (RaMP::runQuery(sql = getReactionsForAnalytesQuery(analytes = analytes, analyteType = analyteType, useIdMapping = useIdMapping, keeperRxns = keeperRxns, humanProtein = humanProtein), db = self$db))
+      return (runQuery(sql = getReactionsForAnalytesQuery(analytes = analytes, analyteType = analyteType, useIdMapping = useIdMapping, keeperRxns = keeperRxns, humanProtein = humanProtein), db = self$db))
     },
     getReactionDetails = function(reactionIDs) {
-      return (RaMP::runQuery(sql = getReactionDetailsQuery(reactionIDs = reactionIDs), db = self$db))
+      return (runQuery(sql = getReactionDetailsQuery(reactionIDs = reactionIDs), db = self$db))
     },
     getSourceInfoForAnalyteIDs = function(analyteIDs) {
-      return (RaMP::runQuery(sql = getSourceInfoForAnalyteIDsQuery(analyteIDs = analyteIDs), db = self$db))
+      return (runQuery(sql = getSourceInfoForAnalyteIDsQuery(analyteIDs = analyteIDs), db = self$db))
     },
     getReactionClassStats = function(analyteType = 'all', humanProtein) {
-      return (RaMP::runQuery(sql = getReactionClassStatsQuery(analyteType = analyteType, humanProtein = humanProtein), db = self$db))
+      return (runQuery(sql = getReactionClassStatsQuery(analyteType = analyteType, humanProtein = humanProtein), db = self$db))
     },
     getAnalytesFromPathways = function(pathways, namesOrIds = 'names', match = "exact") {
       if (supportsCommonName(db = self$db)) {
@@ -158,23 +158,23 @@ DataAccessObject <- R6::R6Class(
         return (df)
       }
       pathway_list = parseListArgument(idList = pathways)
-      return (RaMP::runQuery(sql = getAnalytesFromPathwaysQuery(pathways = pathway_list, namesOrIds = namesOrIds, match = match, useCommonName = useCommonName), db = self$db))
+      return (runQuery(sql = getAnalytesFromPathwaysQuery(pathways = pathway_list, namesOrIds = namesOrIds, match = match, useCommonName = useCommonName), db = self$db))
     },
     getAnalytePathwaysWithOntology = function(biospecimen) {
-      return (RaMP::runQuery(sql = getAnalytePathwaysWithOntologyQuery(biospecimen = biospecimen), db = self$db))
+      return (runQuery(sql = getAnalytePathwaysWithOntologyQuery(biospecimen = biospecimen), db = self$db))
     },
     getRampIDsAndSourcesForPathways = function(includeSMPDB = FALSE) {
-      return (RaMP::runQuery(sql = getRampIDsAndSourcesForPathwaysQuery(includeSMPDB = includeSMPDB), db = self$db))
+      return (runQuery(sql = getRampIDsAndSourcesForPathwaysQuery(includeSMPDB = includeSMPDB), db = self$db))
     },
     getAllPathwayRampIDs = function(includeSPMDB = FALSE) {
-      return (RaMP::runQuery(sql = getAllPathwayRampIDsQuery(includeSMPDB = includeSPMDB), db = self$db))
+      return (runQuery(sql = getAllPathwayRampIDsQuery(includeSMPDB = includeSPMDB), db = self$db))
     },
     getRampIDsForPathways = function(pathways) {
       pathway_list = parseListArgument(idList = pathways)
-      return (RaMP::runQuery(sql = getRampIDsForPathwaysQuery(pathway_list = pathway_list), db = self$db))
+      return (runQuery(sql = getRampIDsForPathwaysQuery(pathway_list = pathway_list), db = self$db))
     },
     getAllRampIDsForAllPathways = function(includeSMPDB = FALSE) {
-      return (RaMP::runQuery(sql = getAllRampIDsForAllPathwaysQuery(includeSMPDB = includeSMPDB), db = self$db))
+      return (runQuery(sql = getAllRampIDsForAllPathwaysQuery(includeSMPDB = includeSMPDB), db = self$db))
     },
     getPathwaysForAnalytes = function(analytes, namesOrIds, includeSMPDB) {
       if (supportsCommonName(db = self$db)) {
@@ -182,28 +182,72 @@ DataAccessObject <- R6::R6Class(
       } else {
         useCommonName = FALSE
       }
-      return (RaMP::runQuery(sql = getPathwaysForAnalytesQuery(analytes = analytes, namesOrIds = namesOrIds, includeSMPDB = includeSMPDB, useCommonName = useCommonName), db = self$db))
+      return (runQuery(sql = getPathwaysForAnalytesQuery(analytes = analytes, namesOrIds = namesOrIds, includeSMPDB = includeSMPDB, useCommonName = useCommonName), db = self$db))
     },
     getSynonymsForAnalyte = function(rampIds) {
-      return (RaMP::runQuery(sql = getSynonymsForAnalyteQuery(rampIds = rampIds), db = self$db))
+      return (runQuery(sql = getSynonymsForAnalyteQuery(rampIds = rampIds), db = self$db))
     },
     getPathwayFromSourceId = function(pathwaySourceIDs) {
-      return (RaMP::runQuery(sql = getPathwayFromSourceIdQuery(pathwaySourceIDs = pathwaySourceIDs), db = self$db))
+      return (runQuery(sql = getPathwayFromSourceIdQuery(pathwaySourceIDs = pathwaySourceIDs), db = self$db))
     },
     getRaMPVersion = function(justVersion) {
-      return (RaMP::runQuery(sql = getRaMPVersionQuery(justVersion = justVersion), db = self$db))
+      return (runQuery(sql = getRaMPVersionQuery(justVersion = justVersion), db = self$db))
     },
     getCurrentSourceVersion = function() {
-      return (RaMP::runQuery(sql = getCurrentSourceVersionQuery(), db = self$db))
+      return (runQuery(sql = getCurrentSourceVersionQuery(), db = self$db))
     },
     getEntityCountsFromSources = function() {
-      return (RaMP::runQuery(sql = getEntityCountsFromSourcesQuery(), db = self$db))
+      return (runQuery(sql = getInfoFromTableQuery('entity_status_info'), db = self$db))
     },
     getAnalyteIntersects = function(analyteType='metabolites', scope='mapped-to-pathway') {
-      return (RaMP::runQuery(sql = getAnalyteIntersectsQuery(analyteType=analyteType, scope=scope), db = self$db))
+      return (runQuery(sql = getAnalyteIntersectsQuery(analyteType=analyteType, scope=scope), db = self$db))
     },
     getSummaryData = function() {
-      return (RaMP::runQuery(sql = getSummaryDataQuery(), db = self$db))
+      return (runQuery(sql = getSummaryDataQuery(), db = self$db))
+    },
+    getSynonymsForSynonym = function(synonymList) {
+      return (runQuery(sql = getSynonymsForSynonymQuery(synonymList = synonymList), db = self$db))
+    },
+    getSynonymInfoForRampIDs = function(rampIds) {
+      return (runQuery(sql = getInfoForIDsQuery(table = 'analytesynonym', matchColumn = 'rampId', idList = rampIds), db = self$db))
+    },
+    getSourceInfoForRampIDs = function(rampIds) {
+      return (runQuery(sql = getInfoForIDsQuery(table = 'source', matchColumn = 'rampId', idList = rampIds), db = self$db))
+    },
+    getAllSourceInfoForSourceIDs = function(sourceIds) {
+      return (runQuery(sql = getInfoForIDsQuery(table = 'source', matchColumn = 'sourceid', idList = sourceIds), db = self$db))
+    },
+    getAllPathwaysForRampIDs = function(rampIds) {
+      return (runQuery(sql = getInfoForIDsQuery(table = 'analytehaspathway', matchColumn = 'rampId', idList = rampIds), db = self$db))
+    },
+    getAllRampIDsForAllPathwayRampIDs = function(pathwayRampIds) {
+      return (runQuery(sql = getInfoForIDsQuery(table = 'analytehaspathway', matchColumn = 'pathwayRampId', idList = pathwayRampIds), db = self$db))
+    },
+    getPathwayInfoForRampIDs = function(pathwayRampIds) {
+      return (runQuery(sql = getInfoForIDsQuery(table = 'pathway', matchColumn = 'pathwayRampId', idList = pathwayRampIds), db = self$db))
+    },
+    getSourceInfoFromSourceIDs = function(sourceIds) {
+      return (runQuery(sql = getSourceInfoFromSourceIDsQuery(sourceIds = sourceIds), db = self$db))
+    },
+    getChemicalClassFromSourceIDs = function(sourceIds) {
+      return (runQuery(sql = getChemicalClassFromSourceIDsQuery(sourceIds = sourceIds), db = self$db))
+    },
+    getRampIdsForPathways = function(pathwayType) {
+      return (runQuery(sql = getRampIdsForPathwaysQuery(pathwayType = pathwayType), db = self$db))
+    },
+    getAnalyteCountsForPathways = function(pathwayRampIds) {
+      return (runQuery(sql = getAnalyteCountsForPathwaysQuery(pathwayRampIds = pathwayRampIds), db = self$db))
+    },
+    getMetaboliteCountsForClasses = function() {
+      return (runQuery(sql = getMetaboliteCountsForClassesQuery(), db = self$db))
+    },
+    getClassesForAnalytes = function(analytes, inferIdMapping, includeAnalyteName) {
+      if (supportsCommonName(db = self$db)) {
+        useCommonName = TRUE
+      } else {
+        useCommonName = FALSE
+      }
+      return (runQuery(sql = getClassesForAnalytesQuery(analytes = analytes, inferIdMapping = inferIdMapping, includeAnalyteName = includeAnalyteName, useCommonName = useCommonName), db = self$db))
     }
   ),
   private = list(
@@ -257,6 +301,46 @@ formatListAsString <- function(idList) {
   return (output_list)
 }
 
+getInfoForIDsQuery <- function(table, matchColumn, idList) {
+  query_list = formatListAsString(idList = idList)
+  return (paste0('select * from ', table, ' where ', matchColumn, " in (", query_list,");"))
+}
+
+getInfoFromTableQuery <- function(table) {
+  return (paste0('select * from ', table))
+}
+
+getMetaboliteCountsForClassesQuery <- function() {
+  return ("select class_level_name, class_name, count(1) as pop_hits from metabolite_class
+                 group by class_level_name, class_name")
+}
+
+getAnalyteCountsForPathwaysQuery <- function(pathwayRampIds) {
+  pwIdsStr <- listToQueryString(ids = pathwayRampIds)
+  return (paste0("select pathwayRampId, count(distinct(rampId)) as analyte_count from analytehaspathway where pathwayRampId in (", pwIdsStr,") group by pathwayRampId"))
+}
+
+getRampIdsForPathwaysQuery <- function(pathwayType) {
+  return (paste0("select pathwayRampId from pathway where type = '", pathwayType, "';"))
+}
+
+getChemicalClassFromSourceIDsQuery <- function(sourceIds) {
+  query_list = formatListAsString(idList = sourceIds)
+  return(paste0("select distinct a.ramp_id, b.sourceId, a.class_level_name, a.class_name, a.source from metabolite_class a, source b
+          where b.rampId = a.ramp_id and b.sourceId in (",query_list,")"))
+}
+
+getSourceInfoFromSourceIDsQuery <- function(sourceIds) {
+  query_list = formatListAsString(idList = sourceIds)
+  return (paste0("select sourceId,IDtype as analytesource, rampId from source where sourceId in (",query_list,");"))
+}
+
+getSynonymsForSynonymQuery <- function(synonymList) {
+  query_list = formatListAsString(idList = synonymList)
+  return(paste0("select Synonym as origins, rampId from analytesynonym where Synonym COLLATE NOCASE in (",
+                  query_list, ");"))
+}
+
 getSummaryDataQuery <- function() {
   return ("select data_key, data_blob from ramp_data_object")
 }
@@ -276,10 +360,6 @@ getAnalyteIntersectsQuery <- function(analyteType='metabolites', scope='mapped-t
     }
   }
   return (paste0("select ",column," from db_version where load_timestamp order by load_timestamp desc limit 1"))
-}
-
-getEntityCountsFromSourcesQuery <- function() {
-  return ("select * from entity_status_info")
 }
 
 getCurrentSourceVersionQuery <- function() {
@@ -373,28 +453,8 @@ getMetabolitesForOntologyQueryOld <- function(ontologyList) {
         group by o.commonName, s.rampId, o.HMDBOntologyType"))
 }
 
-getOntologyDataQuery <- function(rampIDs) {
-  return (paste0("select * from ontology where rampOntologyId in (", rampIDs, ");"))
-}
-
-getOntologiesForRampIDsQuery <- function(rampIDs) {
-  return (paste0("select * from analytehasontology where rampCompoundId in (", rampIDs, ");"))
-}
-
-getRampIDsForOntologiesQuery <- function(ontologyIDs) {
-  return (paste0("select * from analytehasontology where rampOntologyId in (", ontologyIDs, ")"))
-}
-
 getSourceDataForAnalyteNamesQuery <- function(analyteNames) {
   return (paste0("select * from source where rampId in (select * from (select rampId from analytesynonym where Synonym in (", analyteNames, ")) as subquery);"))
-}
-
-getSourceDataForAnalyteIDsQuery <- function(analyteIDs) {
-  return (paste0("select * from source where sourceId in (", analyteIDs, ");"))
-}
-
-getOntologiesQuery <- function() {
-  return ("select * from ontology")
 }
 
 getMetaboliteClassesForTypeQuery <- function(classType) {
@@ -637,8 +697,45 @@ buildSimpleQuery <- function(selectClauses, distinct = FALSE, tables, whereClaus
   if (!is.null(orderByClause) && nchar(orderByClause) > 0) {
     query <- paste(query, "ORDER  BY", orderByClause)
   }
-  print(query)
   return (query)
+}
+
+getClassesForAnalytesQuery <- function(analytes, inferIdMapping, includeAnalyteName, useCommonName = TRUE) {
+  analyteStr = formatListAsString(idList = analytes)
+  selectClauses <- c(
+    'metabolite_class.ramp_id',
+    'source.sourceId'
+  )
+  tables <- c('metabolite_class', 'source')
+  if (inferIdMapping) {
+    whereClauses <- c(paste("source.sourceId in (",analyteStr,")"),
+                      'source.rampId = metabolite_class.ramp_id')
+  } else {
+    whereClauses <- c(paste("source.sourceId in (",analyteStr,")"),
+                      'source.sourceId = metabolite_class.class_source_id')
+  }
+  if (includeAnalyteName) {
+    if (useCommonName) {
+      selectClauses <- c(selectClauses, 'analyte.common_name as common_names')
+      tables <- c(tables, 'analyte')
+      whereClauses <- c(whereClauses, 'analyte.rampId = source.rampId')
+    } else {
+      selectClauses <- c(selectClauses, 'group_concat(distinct source.commonName COLLATE NOCASE) as common_names')
+    }
+  }
+  selectClauses <- c(selectClauses,
+                     'metabolite_class.class_level_name',
+                     'metabolite_class.class_name',
+                     'metabolite_class.source',
+                     'count(distinct(metabolite_class.class_source_id)) as directIdClassHits')
+  groupByClause = 'metabolite_class.class_name, metabolite_class.class_level_name, source.sourceId, metabolite_class.ramp_Id, metabolite_class.source'
+
+  return(buildSimpleQuery(
+    selectClauses = selectClauses,
+    distinct = TRUE,
+    tables = tables,
+    whereClauses = whereClauses,
+    groupByClause = groupByClause))
 }
 
 getPathwaysForAnalytesQuery <- function(analytes, namesOrIds, includeSMPDB, useCommonName = TRUE) {

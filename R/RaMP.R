@@ -14,10 +14,6 @@ setClass(
     slots = c(
         driver = "DBIDriverOrNULL",
         dbname = "character",
-        username = "character",
-        conpass = "character",
-        host = "character",
-        port = "integer",
         dbSummaryObjCache = "list",
         versionSupport = "environment",
         api = "ANY"
@@ -25,10 +21,6 @@ setClass(
     prototype = prototype(
         driver = NULL,
         dbname = character(),
-        username = character(),
-        conpass = character(),
-        host = character(),
-        port = integer(),
         dbSummaryObjCache = list(),
         versionSupport = new.env(),
         api = NULL
@@ -43,41 +35,12 @@ setClass(
 #'
 #' @noRd
 .dbcon <- function(x) {
-  con <- dbConnect(drv = x@driver, dbname = .dbname(x), username = .username(x),
-                            password = .conpass(x), host = .host(x), port = .port(x))
+  con <- dbConnect(drv = x@driver, dbname = .dbname(x))
 }
 
 .dbname <- function(x) {
     if (length(x@dbname)) x@dbname
     else NULL
-}
-
-.username <- function(x) {
-    if (length(x@username)) x@username
-    else NULL
-}
-
-.conpass <- function(x) {
-    if (length(x@conpass)) x@conpass
-    else NULL
-}
-
-.host <- function(x) {
-    if (length(x@host)) x@host
-    else NULL
-}
-
-.port <- function(x) {
-    if (length(x@port)) x@port
-    else NULL
-}
-
-#' Helper function to check if the connection is/will be to a
-#' SQLite database
-#'
-#' @noRd
-.is_sqlite <- function(x) {
-    inherits(x@driver, "SQLiteDriver")
 }
 
 #' @importMethodsFrom methods show
@@ -198,12 +161,9 @@ RaMP <- function(version = character(), branch = "main") {
 #' @importFrom RSQLite SQLite
 #'
 #' @noRd
-.RaMP <- function(driver = SQLite(), dbname = character(),
-                  username = character(), conpass = character(),
-                  host = character(), port = integer()) {
+.RaMP <- function(driver = SQLite(), dbname = character()) {
 
-    rampObj <- new("RaMP", driver = driver, dbname = dbname, username = username,
-        conpass = conpass, host = host, port = port, dbSummaryObjCache = list())
+    rampObj <- new("RaMP", driver = driver, dbname = dbname, dbSummaryObjCache = list())
 
     setupVersionSupport(rampObj)
 

@@ -8,11 +8,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(
-#'   dbname = "ramp2", username = "root",
-#'   conpass = "", host = "localhost"
-#' )
-#' getOntoFromMeta("hmdb:HMDB0071437")
+#' rampDB <- RaMP()
+#' getOntoFromMeta("hmdb:HMDB0071437", db=rampDB)
 #' }
 #' @export
 getOntoFromMeta <- function(analytes, namesOrIds = "ids", includeRaMPids = FALSE, db = RaMP()) {
@@ -35,8 +32,6 @@ getOntoFromMeta <- function(analytes, namesOrIds = "ids", includeRaMPids = FALSE
     list_metabolite <- unlist(analytes)
   }
   list_metabolite <- unique(list_metabolite)
-  list_metabolite <- sapply(list_metabolite, shQuote)
-  list_metabolite <- paste(list_metabolite, collapse = ",")
 
   if (namesOrIds == "ids") {
     df <- db@api$getSourceDataForAnalyteIDs(analyteIDs = list_metabolite)
@@ -55,10 +50,8 @@ getOntoFromMeta <- function(analytes, namesOrIds = "ids", includeRaMPids = FALSE
   }
 
   rampid <- unique(df$rampId)
-  rampid <- sapply(rampid, shQuote)
-  rampid <- paste(rampid, collapse = ",")
 
-  df2 <- db@api$getOntologiesForRampIDs(rampIDs = rampid)
+  df2 <- db@api$getOntologiesForRampIDs(rampIds = rampid)
 
   if (nrow(df2) == 0) {
     message("No searching result because these metabolites are not linked to ontology")
@@ -66,10 +59,7 @@ getOntoFromMeta <- function(analytes, namesOrIds = "ids", includeRaMPids = FALSE
   }
 
   rampontoid <- unique(df2$rampOntologyId)
-  rampontoid <- sapply(rampontoid, shQuote)
-  rampontoid <- paste(rampontoid, collapse = ",")
-
-  df3 <- db@api$getOntologyData(rampIDs = rampontoid)
+  df3 <- db@api$getOntologyData(rampIds = rampontoid)
 
   mdf <- unique(merge(df3, df2, all.x = T))
   mdf <- unique(merge(mdf, df,
@@ -260,10 +250,6 @@ runOntologyTest <- function(analytes,
   contingencyTb <- matrix(0, nrow = 2, ncol = 2)
   colnames(contingencyTb) <- c("In Ontology", "Not In Ontology")
   rownames(contingencyTb) <- c("All Metabolites", "User's Metabolites")
-  ## Get ontology ids that contain the user analytes
-  pid <- unique(ontologydf$rampOntologyId)
-  list_pid <- sapply(pid, shQuote)
-  list_pid <- paste(list_pid, collapse = ",")
 
   # Get the total number of metabolites that are mapped to ontologys in RaMP (that's the default background)
   totanalytes <- db@api$getMetaboliteWithOntologyCount()
@@ -273,11 +259,9 @@ runOntologyTest <- function(analytes,
 
   ## Get pathway ids that contain the user analytes
   pid <- unique(ontologydf$rampOntologyId)
-  list_pid <- sapply(pid, shQuote)
-  list_pid <- paste(list_pid, collapse = ",")
 
   ## Retrieve compound ids associated with background pathways and count
-  input_RampIds <- db@api$getRampIDsForOntologies(ontologyIDs = list_pid)
+  input_RampIds <- db@api$getRampIDsForOntologies(ontologyIDs = pid)
 
   if (is.null(input_RampIds)) {
     stop("Data doesn't exist")

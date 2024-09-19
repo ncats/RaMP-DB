@@ -5,8 +5,8 @@
 #' @return current ramp databse version
 #' @examples
 #' \dontrun{
-#' pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-#' getCurrentRaMPVersion()
+#' rampDB <- RaMP()
+#' getCurrentRaMPVersion(db = rampDB)
 #' }
 #' @export
 getCurrentRaMPVersion<-function(justVersion=T, db = RaMP()){

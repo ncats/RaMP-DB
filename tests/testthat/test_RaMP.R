@@ -36,10 +36,6 @@ test_that("RaMP works", {
 test_that(".RaMP and accessors work", {
     res <- .RaMP(dbname = dbf)
     expect_s4_class(res, "RaMP")
-    ## expect_identical(.host(res), NULL)
-    ## expect_identical(.username(res), NULL)
-    ## expect_identical(.port(res), NULL)
-    ## expect_identical(.conpass(res), NULL)
 
     expect_identical(.dbname(res), dbf)
 
