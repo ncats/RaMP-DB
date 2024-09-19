@@ -719,13 +719,14 @@ getClassesForAnalytesQuery <- function(analytes, inferIdMapping, includeAnalyteN
                      'metabolite_class.source',
                      'count(distinct(metabolite_class.class_source_id)) as directIdClassHits')
   groupByClause = 'metabolite_class.class_name, metabolite_class.class_level_name, source.sourceId, metabolite_class.ramp_Id, metabolite_class.source'
-
+  orderByClause = 'directIdClassHits desc'
   return(buildSimpleQuery(
     selectClauses = selectClauses,
     distinct = TRUE,
     tables = tables,
     whereClauses = whereClauses,
-    groupByClause = groupByClause))
+    groupByClause = groupByClause,
+    orderByClause = orderByClause))
 }
 
 getPathwaysForAnalytesQuery <- function(analytes, namesOrIds, includeSMPDB, useCommonName = TRUE) {
