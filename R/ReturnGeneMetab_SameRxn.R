@@ -45,8 +45,6 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
   } else {stop("The input 'analytes' is not a recognized format. Please check input.")}
 
   list_metabolite <- unique(list_metabolite)
-  list_metabolite <- sapply(list_metabolite,shQuote)
-  list_metabolite <- paste(list_metabolite,collapse = ",")
 
   if(namesOrIds == 'ids') {
 

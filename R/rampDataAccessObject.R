@@ -22,25 +22,29 @@ DataAccessObject <- R6::R6Class(
       self$db <- db
     },
     getValidChemProps = function() {
-      sql = 'pragma table_info(chem_props)'
+      sql <- 'pragma table_info(chem_props)'
       ramptypes <- runQuery(sql = sql, db = self$db)
       return (unlist(ramptypes$name))
     },
     getRxnPartnersFromMetIDs = function(metaboliteIDs) {
+      idStr <- listToQueryString(ids = metaboliteIDs)
       queryFunction <- if (supportsCommonName(db = self$db)) rxnPartnersFromMetIDsQuery else rxnPartnersFromMetIDsQueryOld
-      return (runQuery(sql = queryFunction(metaboliteIDs), db = self$db))
+      return (runQuery(sql = queryFunction(idStr), db = self$db))
     },
     getRxnPartnersFromGeneIDs = function(geneIDs) {
+      idStr <- listToQueryString(ids = geneIDs)
       queryFunction <- if (supportsCommonName(db = self$db)) rxnPartnersFromGeneIDsQuery else rxnPartnersFromGeneIDsQueryOld
-      return (runQuery(sql = queryFunction(geneIDs), db = self$db))
+      return (runQuery(sql = queryFunction(idStr), db = self$db))
     },
     getRxnPartnersFromMetNames = function(metaboliteNames) {
+      idStr <- listToQueryString(ids = metaboliteNames)
       queryFunction <- if (supportsCommonName(db = self$db)) rxnPartnersFromMetNamesQuery else rxnPartnersFromMetNamesQueryOld
-      return (runQuery(sql = queryFunction(metaboliteNames), db = self$db))
+      return (runQuery(sql = queryFunction(idStr), db = self$db))
     },
     getRxnPartnersFromGeneNames = function(geneNames) {
+      idStr <- listToQueryString(ids = geneNames)
       queryFunction <- if (supportsCommonName(db = self$db)) rxnPartnersFromGeneNamesQuery else rxnPartnersFromGeneNamesQueryOld
-      return (runQuery(sql = queryFunction(geneNames), db = self$db))
+      return (runQuery(sql = queryFunction(idStr), db = self$db))
     },
     getRheaRxnPartnersFromMetIDs = function(metaboliteIDs, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F, rxnDirs=c("UN")) {
       idStr <- listToQueryString(ids = metaboliteIDs)
@@ -718,8 +722,8 @@ getClassesForAnalytesQuery <- function(analytes, inferIdMapping, includeAnalyteN
                      'metabolite_class.class_name',
                      'metabolite_class.source',
                      'count(distinct(metabolite_class.class_source_id)) as directIdClassHits')
-  groupByClause = 'metabolite_class.class_name, metabolite_class.class_level_name, source.sourceId, metabolite_class.ramp_Id, metabolite_class.source'
-  orderByClause = 'directIdClassHits desc'
+  groupByClause <- 'metabolite_class.class_name, metabolite_class.class_level_name, source.sourceId, metabolite_class.ramp_Id, metabolite_class.source'
+  orderByClause <- 'directIdClassHits desc'
   return(buildSimpleQuery(
     selectClauses = selectClauses,
     distinct = TRUE,
