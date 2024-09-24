@@ -1,35 +1,35 @@
 #' Function that query database to find ontology information based on
-#' the given list of analytes
-#' @param analytes a vector of analytes or a analytes delimited by new line character
+#' the given list of metabolites
+#' @param mets a vector of metabolites or a metabolites delimited by new line character
 #' @param namesOrIds specify the type of given data
 #' @param includeRaMPids whether or not to include RaMP ids in the output (TRUE/FALSE)
 #' @param db a RaMP database object
-#' @return dataframe that contains searched ontology from given analytes
+#' @return dataframe that contains searched ontology from given metabolites
 #'
 #' @examples
 #' \dontrun{
 #' rampDB <- RaMP()
-#' getOntoFromMeta("hmdb:HMDB0071437", db=rampDB)
+#' getOntoFromMeta(mets = "hmdb:HMDB0071437", db=rampDB)
 #' }
 #' @export
-getOntoFromMeta <- function(analytes, namesOrIds = "ids", includeRaMPids = FALSE, db = RaMP()) {
+getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, db = RaMP()) {
   if (!(namesOrIds %in% c("ids", "names"))) {
     stop("Specifiy the type of given data to 'ids' or 'names'")
   }
 
   now <- proc.time()
-  if (is.character(analytes)) {
-    if (grepl("\n", analytes)[1]) {
-      list_metabolite <- strsplit(analytes, "\n")
+  if (is.character(mets)) {
+    if (grepl("\n", mets)[1]) {
+      list_metabolite <- strsplit(mets, "\n")
       list_metabolite <- unlist(list_metabolite)
-    } else if (grepl(",", analytes)[1]) {
-      list_metabolite <- strsplit(analytes, "\n")
+    } else if (grepl(",", mets)[1]) {
+      list_metabolite <- strsplit(mets, "\n")
       list_metabolite <- unlist(list_metabolite)
     } else {
-      list_metabolite <- analytes
+      list_metabolite <- mets
     }
-  } else if (is.data.frame(analytes)) {
-    list_metabolite <- unlist(analytes)
+  } else if (is.data.frame(mets)) {
+    list_metabolite <- unlist(mets)
   }
   list_metabolite <- unique(list_metabolite)
 
@@ -44,7 +44,7 @@ getOntoFromMeta <- function(analytes, namesOrIds = "ids", includeRaMPids = FALSE
     if (namesOrIds == "ids") {
       message("These ids do not exist in the source table")
     } else {
-      message("These names do not exist in the analytesynonym table")
+      message("These names do not exist in the metabolite synonym table")
     }
     return(NULL)
   }
@@ -182,7 +182,7 @@ runOntologyTest <- function(analytes,
   print("Fisher Testing ......")
 
   ontologydf <- getOntoFromMeta(
-    db = db, analytes = analytes,
+    db = db, mets = analytes,
     includeRaMPids = TRUE,
     namesOrIds = namesOrIds
   )
@@ -201,14 +201,14 @@ runOntologyTest <- function(analytes,
 
   if (background_type == "list") {
     backgrounddf <- getOntoFromMeta(
-      db = db, analytes = background,
+      db = db, mets = background,
       includeRaMPids = TRUE,
       namesOrIds = namesOrIds
     )
   } else if (background_type == "file") {
     userbkg <- utils::read.table(background, header = F)[, 1]
     backgrounddf <- getOntoFromMeta(
-      db = db, analytes = userbkg,
+      db = db, mets = userbkg,
       includeRaMPids = TRUE,
       namesOrIds = namesOrIds
     )

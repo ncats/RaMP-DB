@@ -4,13 +4,13 @@
 \alias{listToQueryString}
 \title{listToQueryString utility method to convert an id list to a comma separate string, with single quoted values.}
 \usage{
-listToQueryString(analytes)
+listToQueryString(ids)
 }
 \arguments{
-\item{analytes}{list of analytes (can be names or ids)}
+\item{ids}{list of ids (can be names or ids)}
 }
 \value{
-comma separated list of single quoted analyte ids or names
+comma separated list of single quoted ids or names
 }
 \description{
 listToQueryString utility method to convert an id list to a comma separate string, with single quoted values.

@@ -10,7 +10,6 @@ runCombinedFisherTest(
   namesOrIds = "ids",
   total_genes = 20000,
   min_analyte = 2,
-  MCall = F,
   alternative = "less",
   minPathwaySize = 5,
   maxPathwaySize = 150,
@@ -31,8 +30,6 @@ runCombinedFisherTest(
 
 \item{min_analyte}{if the number of analytes (gene or metabolite) in a pathway is
 < min_analyte, do not report}
-
-\item{MCall}{T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "F")}
 
 \item{alternative}{alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")}
 
