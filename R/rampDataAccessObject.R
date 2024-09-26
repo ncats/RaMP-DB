@@ -503,9 +503,8 @@ rxnPartnersFromMetIDsQuery <- function(metaboliteIDs) {
                       group by gene_source.rampId, cmp_source.sourceId"))
 }
 rxnPartnersFromMetIDsQueryOld <- function(metaboliteIDs) {
-  return (paste0("select c.sourceId as input_analyte, group_concat(distinct c.commonName COLLATE NOCASE) as input_common_names,
+  return (paste0("select c.sourceId as input_analyte, group_concat(distinct c.commonName COLLATE NOCASE) as input_common_name,
   group_concat(distinct g.commonName COLLATE NOCASE) as rxn_partner_common_name,
-  group_concat(distinct g.sourceId COLLATE NOCASE) as rxn_partner_ids,
   g.rampId from catalyzed r
   join source g on r.rampGeneId = g.rampId
   join source c on r.rampCompoundId = c.rampId
@@ -526,9 +525,8 @@ rxnPartnersFromGeneIDsQuery <- function(geneIDs) {
                           group by cmp_source.rampId, gene_source.sourceId"))
 }
 rxnPartnersFromGeneIDsQueryOld <- function(geneIDs) {
-  return (paste0("select g.sourceId as input_analyte, group_concat(distinct g.commonName COLLATE NOCASE) as input_common_names,
+  return (paste0("select g.sourceId as input_analyte, group_concat(distinct g.commonName COLLATE NOCASE) as input_common_name,
   group_concat(distinct c.commonName COLLATE NOCASE) as rxn_partner_common_name,
-  group_concat(distinct c.sourceId COLLATE NOCASE) as rxn_partner_ids,
   c.rampId from catalyzed r
   join source g on r.rampGeneId = g.rampId
   join source c on r.rampCompoundId = c.rampId
@@ -550,9 +548,8 @@ rxnPartnersFromMetNamesQuery <- function(metaboliteNames) {
                           group by gene_source.rampId, synonym.Synonym;"))
 }
 rxnPartnersFromMetNamesQueryOld <- function(metaboliteNames) {
-  return (paste0("select s.Synonym as input_analyte, group_concat(distinct c.commonName COLLATE NOCASE) as input_common_names,
+  return (paste0("select s.Synonym as input_analyte, group_concat(distinct c.commonName COLLATE NOCASE) as input_common_name,
   group_concat(distinct g.commonName COLLATE NOCASE) as rxn_partner_common_name,
-  group_concat(distinct g.sourceId COLLATE NOCASE) as rxn_partner_ids,
   g.rampId from catalyzed r
   join source g on r.rampGeneId = g.rampId
   join source c on r.rampCompoundId = c.rampId
@@ -575,9 +572,8 @@ rxnPartnersFromGeneNamesQuery <- function(geneNames) {
                         group by cmp_source.rampId, synonym.Synonym;"))
 }
 rxnPartnersFromGeneNamesQueryOld <- function(geneNames) {
-  return (paste0("select s.Synonym as input_analyte, group_concat(distinct g.commonName COLLATE NOCASE) as input_common_names,
+  return (paste0("select s.Synonym as input_analyte, group_concat(distinct g.commonName COLLATE NOCASE) as input_common_name,
   group_concat(distinct c.commonName COLLATE NOCASE) as rxn_partner_common_name,
-  group_concat(distinct c.sourceId COLLATE NOCASE) as rxn_partner_ids,
   c.rampId from catalyzed r
   join source g on r.rampGeneId = g.rampId
   join source c on r.rampCompoundId = c.rampId
