@@ -15,7 +15,7 @@ getRheaAnalyteReactionAssociations(
 \arguments{
 \item{analytes}{list of analyte ids}
 
-\item{includeRheaRxnDetails}{returns additional columns that inlucdes info in the reaction connecting mets and proteins}
+\item{includeRheaRxnDetails}{returns additional columns that includes info in the reaction connecting mets and proteins}
 
 \item{humanProtein}{require reactions to have a human protein (enzyme or transporter), default True}
 
