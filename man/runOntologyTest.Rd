@@ -5,10 +5,10 @@
 \title{Enrichment analysis for metabolite ontology mappings}
 \usage{
 runOntologyTest(
-  analytes,
+  mets,
   namesOrIds = "ids",
   alternative = "less",
-  min_analyte = 2,
+  min_mets = 2,
   min_ontology_size = 5,
   max_ontology_size = 1500,
   includeRaMPids = FALSE,
@@ -18,13 +18,13 @@ runOntologyTest(
 )
 }
 \arguments{
-\item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
+\item{mets}{a vector of metabolites that need to be searched}
 
-\item{namesOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)}
+\item{namesOrIds}{whether input is "names" or "ids" (default is "ids", must be the same for mets and background)}
 
 \item{alternative}{alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")}
 
-\item{min_analyte}{minimum number of analytes per pathway (pathways with < min_analyte analytes are filtered out).}
+\item{min_mets}{minimum number of mets per pathway (pathways with < min_mets mets are filtered out).}
 
 \item{min_ontology_size}{the minimum number of ontology members (genes and metabolites) to include the ontology in the output (default = 5)}
 
@@ -33,9 +33,9 @@ runOntologyTest(
 \item{includeRaMPids}{whether or not to include RaMP IDs in the output (TRUE/FALSE)}
 
 \item{background_type}{type of background that is input by the user.  Options are "database" if user wants all
-analytes from the RaMP database will be used; "file", if user wants to input a file with a list of background
-analytes; "list", if user wants to input a vector of analyte IDs; "biospecimen", if user wants to specify a
-biospecimen type (e.g. blood, adipose tissue, etc.) and have those biospecimen-specific analytes used.  For genes,
+mets from the RaMP database will be used; "file", if user wants to input a file with a list of background
+mets; "list", if user wants to input a vector of analyte IDs; "biospecimen", if user wants to specify a
+biospecimen type (e.g. blood, adipose tissue, etc.) and have those biospecimen-specific mets used.  For genes,
 only the "database" option is used.}
 
 \item{background}{background to be used for Fisher's tests.  If parameter 'background_type="database"', this parameter
@@ -47,7 +47,7 @@ then users should specify one of the following: "Blood", "Adipose tissue", "Hear
 \item{db}{a RaMP database object}
 }
 \value{
-a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
+a dataframe with columns containing pathway ID, fisher's p value, user mets in pathway, and total mets in pathway
 }
 \description{
 Enrichment analysis for metabolite ontology mappings

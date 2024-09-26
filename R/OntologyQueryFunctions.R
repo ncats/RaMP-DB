@@ -87,10 +87,10 @@ getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, db
 }
 
 
-#' function that query database to find analytes in given ontologies
+#' function that query database to find mets in given ontologies
 #' @param ontology a vector of ontology or ontologies delimited by new line character
 #' @param db a RaMP database object
-#' @return dataframe that contains searched analytes from given ontology
+#' @return dataframe that contains searched mets from given ontology
 #' @examples
 #' \dontrun{
 #' ontologies.of.interest <- c("Colon", "Liver", "Lung")
@@ -149,17 +149,17 @@ getMetaFromOnto <- function(ontology, db = RaMP()) {
 
 #' Enrichment analysis for metabolite ontology mappings
 #' @importFrom rlang .data
-#' @param analytes a vector of analytes (genes or metabolites) that need to be searched
-#' @param namesOrIds whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)
+#' @param mets a vector of metabolites that need to be searched
+#' @param namesOrIds whether input is "names" or "ids" (default is "ids", must be the same for mets and background)
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
-#' @param min_analyte minimum number of analytes per pathway (pathways with < min_analyte analytes are filtered out).
+#' @param min_mets minimum number of mets per pathway (pathways with < min_mets mets are filtered out).
 #' @param min_ontology_size the minimum number of ontology members (genes and metabolites) to include the ontology in the output (default = 5)
 #' @param max_ontology_size the maximum number of ontology members (genes and metabolites) to include the ontology in the output (default = 150)
 #' @param includeRaMPids whether or not to include RaMP IDs in the output (TRUE/FALSE)
 #' @param background_type type of background that is input by the user.  Options are "database" if user wants all
-#' analytes from the RaMP database will be used; "file", if user wants to input a file with a list of background
-#' analytes; "list", if user wants to input a vector of analyte IDs; "biospecimen", if user wants to specify a
-#' biospecimen type (e.g. blood, adipose tissue, etc.) and have those biospecimen-specific analytes used.  For genes,
+#' mets from the RaMP database will be used; "file", if user wants to input a file with a list of background
+#' mets; "list", if user wants to input a vector of analyte IDs; "biospecimen", if user wants to specify a
+#' biospecimen type (e.g. blood, adipose tissue, etc.) and have those biospecimen-specific mets used.  For genes,
 #' only the "database" option is used.
 #' @param background background to be used for Fisher's tests.  If parameter 'background_type="database"', this parameter
 #' is ignored (default="database"); if parameter 'background_type= "file"', then 'background' should be a file name (with
@@ -167,13 +167,13 @@ getMetaFromOnto <- function(ontology, db = RaMP()) {
 #' then users should specify one of the following: "Blood", "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney",
 #' "Saliva", and "Feces"
 #' @param db a RaMP database object
-#' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
+#' @return a dataframe with columns containing pathway ID, fisher's p value, user mets in pathway, and total mets in pathway
 #' @export
 #' @importFrom methods is
 
-runOntologyTest <- function(analytes,
+runOntologyTest <- function(mets,
                             namesOrIds = "ids",
-                            alternative = "less", min_analyte = 2,
+                            alternative = "less", min_mets = 2,
                             min_ontology_size = 5, max_ontology_size = 1500,
                             includeRaMPids = FALSE,
                             background_type = "database", background = "database",
@@ -182,14 +182,14 @@ runOntologyTest <- function(analytes,
   print("Fisher Testing ......")
 
   ontologydf <- getOntoFromMeta(
-    db = db, mets = analytes,
+    db = db, mets = mets,
     includeRaMPids = TRUE,
     namesOrIds = namesOrIds
   )
   ontologyRampId <- rampId <- c()
 
 
-  # moved this check until we determine if we have analytes of a given type.
+  # moved this check until we determine if we have mets of a given type.
   if (nrow(ontologydf) == 0) {
     return(NULL)
   }
@@ -242,7 +242,7 @@ runOntologyTest <- function(analytes,
   ## Check that all metabolites of interest are in the background
   if (background_type != "database") {
     if (length(setdiff(ontologydf$rampId, backgrounddf$rampId) != 0)) {
-      stop("All analytes in set of interest must also be in background")
+      stop("All mets in set of interest must also be in background")
     }
   }
 
@@ -254,10 +254,10 @@ runOntologyTest <- function(analytes,
   # Get the total number of metabolites that are mapped to ontologys in RaMP (that's the default background)
   totanalytes <- db@api$getMetaboliteWithOntologyCount()
 
-  ## Input_RampIds is a table of all analytes included in ontologys represented in the user set
-  ## "User" refers to significant analytes
+  ## Input_RampIds is a table of all mets included in ontologys represented in the user set
+  ## "User" refers to significant mets
 
-  ## Get pathway ids that contain the user analytes
+  ## Get pathway ids that contain the user mets
   pid <- unique(ontologydf$rampOntologyId)
 
   ## Retrieve compound ids associated with background pathways and count
@@ -397,7 +397,7 @@ runOntologyTest <- function(analytes,
   holm <- stats::p.adjust(out$Pval, method = "holm")
   out <- cbind(out, holm)
   colnames(out)[ncol(out)] <- "Pval_Holm"
-  keepers <- which(out$Num_In_Ontology >= min_analyte)
+  keepers <- which(out$Num_In_Ontology >= min_mets)
   out <- merge(
     ontologydf[, c(
       "Ontology", "rampOntologyId",
