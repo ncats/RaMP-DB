@@ -519,29 +519,29 @@ ontologyEnrichmentResultsPlot <- function(ontologiesSig, pval = "FDR",
 
 #' Plots an interactive sunburst plot of chemical classes
 #'
-#' @param chemicalClassSurveryResults output of chemicalClassSurvey()
+#' @param chemicalClassResults output of getChemClass()
 #' @param plotType choice of 'sunburst' or 'treemap' plot type (default = 'sunburst')
 #' @return  An interactive HTML sunburst plot that allows the user to pan/zoom into reaction classes of interest.
 #' @export
 
-plotChemicalClassSurvery <- function(chemicalClassSurveryResults, plotType = "sunburst") {
+plotChemicalClass <- function(chemicalClassResults, plotType = "sunburst") {
 
-  if (missing(chemicalClassSurveryResults)) {
+  if (missing(chemicalClassResults)) {
     stop("Input is missing. Please input the resulting list of dataframes returned by the chemicalClassSurvey() function")
   }
 
-  if(nrow(chemicalClassSurveryResults$met_classes) == 0) {
-    message("The input dataframe has no metabolites. plotChemicalClassSurvery function is returning without generating a plot.")
+  if(nrow(chemicalClassResults$met_classes) == 0) {
+    message("The input dataframe has no metabolites. plotChemicalClass function is returning without generating a plot.")
     return()
   }
 
-  if (length(intersect(c("count_summary","met_classes", "query_report"),names(chemicalClassSurveryResults)))!=3) {
+  if (length(intersect(c("count_summary","met_classes", "query_report"),names(chemicalClassResults)))!=3) {
     stop("Please make sure that the input is the resulting list of dataframes returned by the chemicalClassSurvey() function")
   }
 
 
 
-  sunburst_ontology_chemicalClass <- buildChemicalClassSurveryDataframe(chemicalClassSurveryResults = chemicalClassSurveryResults)
+  sunburst_ontology_chemicalClass <- buildChemicalClassDataframe(chemicalClassResults = chemicalClassResults)
 
   fig <- plotly::plot_ly(
     color = I("black")
