@@ -508,7 +508,7 @@ getRheaAnalyteReactionAssociations <- function( analytes, includeRheaRxnDetails=
 
     if(nrow(result) > 0) {
       if(!includeRheaRxnDetails) {
-        result <- result[order(result$input_common_names, result$rxn_partner_ids),]
+        result <- result[order(result$input_common_name, result$rxn_partner_ids),]
       } else {
         result <- result[order(result$reactionId, result$substrateProductFlag),]
       }
@@ -559,7 +559,7 @@ getRheaEnzymesAndTransportersForMetabolites <- function( analytes, includeRheaRx
       result <- result[, keeperCols]
       result$relation <- "met2protein"
       result <- result[,c(5,1,2,3,4)]
-      colnames(result) <- c("query_relation", "input_analyte", "input_common_names", "rxn_partner_common_name", "rxn_partner_ids")
+      colnames(result) <- c("query_relation", "input_analyte", "input_common_name", "rxn_partner_common_name", "rxn_partner_ids")
       result <- unique(result)
     } else {
       result$relation <- "met2protein"
@@ -614,7 +614,7 @@ getRheaMetabolitesForProteins <- function( analytes, includeRheaRxnDetails=F, hu
       result <- result[, keeperCols]
       result$relation <- "protein2met"
       result <- result[,c(5,1,2,3,4)]
-      colnames(result) <- c("query_relation", "input_analyte", "input_common_names", "rxn_partner_common_name", "rxn_partner_ids")
+      colnames(result) <- c("query_relation", "input_analyte", "input_common_name", "rxn_partner_common_name", "rxn_partner_ids")
       result <- unique(result)
     } else {
       result$relation <- "protein2met"
