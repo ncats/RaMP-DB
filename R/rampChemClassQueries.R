@@ -12,9 +12,10 @@
 #' or 'file' in which case the background parameter will be a file path, or 'biospecimen' where the specified background parameter is
 #' a RaMP HMDB metabolite ontology term (see background parameter, above, for the most common biospecimen background values).
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
-#' @param inferIdMapping if FALSE, the survey only reports on class annotations made directly on the input ids.
-#' If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to related ids that contain metabolite class annotations.
-#' The default is TRUE.
+#' @param inferIdMapping if FALSE, the method only reports on class annotations made directly on the input ids.
+#' If inferIdMapping is set to TRUE, the input ids are cross-referenced or mapped to other existing ids that contain metabolite class annotations.
+#' Following id cross references can expand coverage if the input type is other than HMDB ids or LIPIDMAPS ids.
+#' The default value is FALSE.
 #' @param db a RaMP database object
 #' @return Returns chemical class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
 #' metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolved and listing those metabolite ids
@@ -52,7 +53,7 @@
 #'                              "hmdb:HMDB0001138",
 #'                              "hmdb:HMDB0029412")
 #'
-#' metClassResult <- chemicalClassSurvey(mets = metabolites.of.interest)
+#' metClassResult <- getChemClass(mets = metabolites.of.interest)
 #'
 #' # show structure
 #' utils::str(metClassResult)
@@ -63,7 +64,7 @@
 #' metClassResult$query_report
 #'}
 #' @export
-chemicalClassSurvey <- function(mets, background = "database", background_type="database", includeRaMPids = FALSE, inferIdMapping = TRUE, db = RaMP()){
+getChemClass <- function(mets, background = "database", background_type="database", includeRaMPids = FALSE, inferIdMapping = FALSE, db = RaMP()){
 
   print("Starting Chemical Class Survey")
 
@@ -144,9 +145,9 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
   # note that for enrichment analysis the inferIdMapping for the class survey is set to FALSE
   # This means that only ids that have direct id-to-class annotations will contribute to results.
   if(background_type == "database"){
-    res <- chemicalClassSurveyRampIdsFullPopConn(db = db, mets=mets, inferIdMapping=inferIdMapping)
+    res <- getChemicalClassRampIdsFullPopConn(db = db, mets=mets, inferIdMapping=inferIdMapping)
   } else {
-    res <- chemicalClassSurveyRampIdsConn(db = db, mets=mets, pop=bkgrnd, inferIdMapping=inferIdMapping)
+    res <- getChemicalClassRampIdsConn(db = db, mets=mets, pop=bkgrnd, inferIdMapping=inferIdMapping)
   }
 
   print("Finished Chemical Class Survey")
@@ -213,7 +214,7 @@ chemicalClassEnrichment <- function( mets, background = "database", background_t
   # note that inferIdMapping is set to FALSE
   # enrichment will only be reported for input ids that have
   # a direct association with the chemical class.
-  classData <- chemicalClassSurvey(db = db, mets = mets,
+  classData <- getChemClass(db = db, mets = mets,
                                    background = background,
                                    background_type = background_type,
                                    includeRaMPids = TRUE, inferIdMapping = inferIdMapping)

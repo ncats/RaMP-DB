@@ -3,7 +3,7 @@
 \name{getTotalFoundInCategories}
 \alias{getTotalFoundInCategories}
 \title{Utility method to return metabolite counts found in compound class categories
-based on an input data compound class data object from the chemicalClassSurvey function
+based on an input data compound class data object from the getChemClass function
 The returned counts for each class category are for both the metabolite id query list
 and for the larger full or user-defined population of metabolite ids.
 This method is used in the exported chemicalClassEnrichment function}
@@ -11,7 +11,7 @@ This method is used in the exported chemicalClassEnrichment function}
 getTotalFoundInCategories(classData, inferIdMapping = FALSE)
 }
 \arguments{
-\item{classData}{Data object returned from a call to chemicalClassSurvey
+\item{classData}{Data object returned from a call to getChemClass
 This input contains lists of chemical classes that pertain to a query list of metabolites and pertaining to
 metabolites in a larger metabolite population.}
 
@@ -25,7 +25,7 @@ chemical classes and metabolite counts per class. This supports the chemicalClas
 }
 \description{
 Utility method to return metabolite counts found in compound class categories
-based on an input data compound class data object from the chemicalClassSurvey function
+based on an input data compound class data object from the getChemClass function
 The returned counts for each class category are for both the metabolite id query list
 and for the larger full or user-defined population of metabolite ids.
 This method is used in the exported chemicalClassEnrichment function

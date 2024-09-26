@@ -181,11 +181,11 @@ queryReport <- function(queryList, foundList) {
 }
 
 #' Utility method to return metabolite counts found in compound class categories
-#' based on an input data compound class data object from the chemicalClassSurvey function
+#' based on an input data compound class data object from the getChemClass function
 #' The returned counts for each class category are for both the metabolite id query list
 #' and for the larger full or user-defined population of metabolite ids.
 #' This method is used in the exported chemicalClassEnrichment function
-#' @param classData Data object returned from a call to chemicalClassSurvey
+#' @param classData Data object returned from a call to getChemClass
 #' This input contains lists of chemical classes that pertain to a query list of metabolites and pertaining to
 #' metabolites in a larger metabolite population.
 #' @param inferIdMapping if FALSE, the survey only reports on class annotations made directly on the input ids.
@@ -631,7 +631,7 @@ FilterFishersResults <- function(fishers_df, pval_type = 'fdr', pval_cutoff = 0.
 }
 
 
-#'chemicalClassSurveyRampIdsConn is a helper function that takes a list of metabolite ids, a list of 'population' metabolite ids
+#'getChemicalClassRampIdsConn is a helper function that takes a list of metabolite ids, a list of 'population' metabolite ids
 #' and a MariaDB Connection object. The method returns metabolite class information for the metabolite list and a population of all ramp metabolites.
 #' @importFrom rlang .data
 #' @param mets a list object of prefixed metabolite ids of interest
@@ -644,7 +644,7 @@ FilterFishersResults <- function(fishers_df, pval_type = 'fdr', pval_cutoff = 0.
 #' The met_classes is a detailed listing of compound classes associated with each input metabolite
 #' The met_query_report indicates the number of input metabolites, how many were found in the DB and the list of metabolites not found in RaMP DB.
 #' @param db a RaMP database object
-chemicalClassSurveyRampIdsConn <- function( mets, pop, inferIdMapping=TRUE, db = RaMP()) {
+getChemicalClassRampIdsConn <- function( mets, pop, inferIdMapping=TRUE, db = RaMP()) {
 
   mets <- unique(mets)
 
@@ -732,7 +732,7 @@ chemicalClassSurveyRampIdsConn <- function( mets, pop, inferIdMapping=TRUE, db =
 }
 
 
-#'chemicalClassSurveyRampIdsFullPopConn2 is a helper function that takes a list of metabolite ids and a MariaDB Connection object
+#'getChemicalClassRampIdsFullPopConn2 is a helper function that takes a list of metabolite ids and a MariaDB Connection object
 #'and returns metabolite class information for the metabolite list and a population of all ramp metabolites.
 #' @importFrom rlang .data
 #' @param mets a list object of prefixed metabolite ids of interest
@@ -744,7 +744,7 @@ chemicalClassSurveyRampIdsConn <- function( mets, pop, inferIdMapping=TRUE, db =
 #' The count_summary is a dataframe containing metabolite classes and number of metabolites in each class.
 #' The met_classes is a detailed listing of compound classes associated with each input metabolite
 #' The met_query_report indicates the number of input metabolites, how many were found in the DB and the list of metabolites not found in RaMP DB.
-chemicalClassSurveyRampIdsFullPopConn <- function( mets, inferIdMapping=TRUE, db = RaMP()) {
+getChemicalClassRampIdsFullPopConn <- function( mets, inferIdMapping=TRUE, db = RaMP()) {
 
   mets <- unique(mets)
 
@@ -1181,24 +1181,24 @@ buildAnalyteOverlapPerRxnLevelUpsetDataframe <- function(reactionsResults, inclu
 
 
 
-#' Creates the input dataframe for the interactive plot created in 'plotChemicalClassSurvery'
+#' Creates the input dataframe for the interactive plot created in 'plotChemicalClass'
 #'
-#' @param chemicalClassSurveryResults output of getReactionClassesForAnalytes()
+#' @param chemicalClassResults output of getChemClass()
 
-buildChemicalClassSurveryDataframe <- function(chemicalClassSurveryResults) {
+buildChemicalClassDataframe <- function(chemicalClassResults) {
 
-  chemicalClassSurveryResults_split <- split(chemicalClassSurveryResults$met_classes, chemicalClassSurveryResults$met_classes$source)
-
-  sunburst_ontology_chemicalClass <- data.frame(matrix(ncol = 3, nrow = 0))
-  colnames(sunburst_ontology_chemicalClass) <- c("ids", "labels", "parents")
+  chemicalClassResults_split <- split(chemicalClassResults$met_classes, chemicalClassResults$met_classes$source)
 
   sunburst_ontology_chemicalClass <- data.frame(matrix(ncol = 3, nrow = 0))
   colnames(sunburst_ontology_chemicalClass) <- c("ids", "labels", "parents")
 
-  if (length(chemicalClassSurveryResults_split) == 2)
+  sunburst_ontology_chemicalClass <- data.frame(matrix(ncol = 3, nrow = 0))
+  colnames(sunburst_ontology_chemicalClass) <- c("ids", "labels", "parents")
+
+  if (length(chemicalClassResults_split) == 2)
   {
-    hmdb_levels <- split(chemicalClassSurveryResults_split$hmdb, chemicalClassSurveryResults_split$hmdb$class_level_name)
-    lipidmaps_levels <- split(chemicalClassSurveryResults_split$lipidmaps, chemicalClassSurveryResults_split$lipidmaps$class_level_name)
+    hmdb_levels <- split(chemicalClassResults_split$hmdb, chemicalClassResults_split$hmdb$class_level_name)
+    lipidmaps_levels <- split(chemicalClassResults_split$lipidmaps, chemicalClassResults_split$lipidmaps$class_level_name)
 
     missing_level2 <- which(is.na(merge(hmdb_levels$ClassyFire_super_class, hmdb_levels$ClassyFire_class, by = 1, all = TRUE)$class_name.y)==TRUE)
 
@@ -1258,11 +1258,11 @@ buildChemicalClassSurveryDataframe <- function(chemicalClassSurveryResults) {
     sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(lipidmaps_collate$class_name, "-", lipidmaps_collate$common_names.x), "labels" = paste0(lipidmaps_collate$common_names.x, '\n', lipidmaps_collate[,1]), "parents"= paste0(lipidmaps_collate$class_name.y, "-", lipidmaps_collate$class_name))))
 
   }
-  if (length(chemicalClassSurveryResults_split) == 1)
+  if (length(chemicalClassResults_split) == 1)
   {
-    if(names(chemicalClassSurveryResults_split[1]) == "hmdb")
+    if(names(chemicalClassResults_split[1]) == "hmdb")
     {
-      hmdb_levels <- split(chemicalClassSurveryResults_split$hmdb, chemicalClassSurveryResults_split$hmdb$class_level_name)
+      hmdb_levels <- split(chemicalClassResults_split$hmdb, chemicalClassResults_split$hmdb$class_level_name)
 
       missing_level2 <- which(is.na(merge(hmdb_levels$ClassyFire_super_class, hmdb_levels$ClassyFire_class, by = 1, all = TRUE)$class_name.y)==TRUE)
 
@@ -1292,9 +1292,9 @@ buildChemicalClassSurveryDataframe <- function(chemicalClassSurveryResults) {
       sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = paste0(hmdb_collate$class_name,"-", hmdb_collate$common_names.x), "labels" = paste0(hmdb_collate$common_names.x, '\n', hmdb_collate[,1]), "parents"= paste0(hmdb_collate$class_name.y,"-", hmdb_collate$class_name))))
     }
 
-    else if (names(chemicalClassSurveryResults_split[1]) == "lipidmaps")
+    else if (names(chemicalClassResults_split[1]) == "lipidmaps")
     {
-      lipidmaps_levels <- split(chemicalClassSurveryResults_split$lipidmaps, chemicalClassSurveryResults_split$lipidmaps$class_level_name)
+      lipidmaps_levels <- split(chemicalClassResults_split$lipidmaps, chemicalClassResults_split$lipidmaps$class_level_name)
 
       sunburst_ontology_chemicalClass <- rbind(sunburst_ontology_chemicalClass, unique(data.frame("ids" = lipidmaps_levels$LipidMaps_category$class_name, "labels" = lipidmaps_levels$LipidMaps_category$class_name, "parents"= "")))
 
