@@ -21,7 +21,7 @@
 #' @param include_smpdb Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant
 #' @param db a RaMP databse object
 #' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, and total analytes in pathway
-
+#' @noRd
 runFisherTest <- function(analytes,
                           total_genes = 20000,
                           namesOrIds = "ids",
@@ -699,6 +699,7 @@ getPathwayFromAnalyte <- function( analytes = "none",
 #' @return A pathwaydf compatible with runFisherTest
 #' @importFrom rlang .data
 #' @author Andrew Patt
+#' @noRd
 getCustomPathwayFromAnalyte <- function(analytes, pathway_definitions, analyte_type) {
   print("Starting getCustomPathwayFromAnalyte()")
   tryCatch(

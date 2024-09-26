@@ -20,7 +20,7 @@ clicked on highchart"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RaMP</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
       </span>
     </div>
 
@@ -50,33 +50,29 @@ clicked on highchart</p>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">runCombinedFisherTest</span><span class="op">(</span></span>
-<span>  db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">analytes</span>,</span>
-<span>  NameOrIds <span class="op">=</span> <span class="st">"ids"</span>,</span>
+<span>  namesOrIds <span class="op">=</span> <span class="st">"ids"</span>,</span>
 <span>  total_genes <span class="op">=</span> <span class="fl">20000</span>,</span>
 <span>  min_analyte <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  MCall <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  alternative <span class="op">=</span> <span class="st">"less"</span>,</span>
-<span>  min_path_size <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  max_path_size <span class="op">=</span> <span class="fl">150</span>,</span>
+<span>  minPathwaySize <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  maxPathwaySize <span class="op">=</span> <span class="fl">150</span>,</span>
 <span>  includeRaMPids <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  background_type <span class="op">=</span> <span class="st">"database"</span>,</span>
 <span>  background <span class="op">=</span> <span class="st">"database"</span>,</span>
-<span>  pathway_definitions <span class="op">=</span> <span class="st">"RaMP"</span></span>
+<span>  pathway_definitions <span class="op">=</span> <span class="st">"RaMP"</span>,</span>
+<span>  include_smpdb <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>db</dt>
-<dd><p>a RaMP databse object</p></dd>
-
-
-<dt>analytes</dt>
+    <dl><dt>analytes</dt>
 <dd><p>a vector of analytes (genes or metabolites) that need to be searched</p></dd>
 
 
-<dt>NameOrIds</dt>
+<dt>namesOrIds</dt>
 <dd><p>whether input is "names" or "ids" (default is "ids", must be the same for analytes and background)</p></dd>
 
 
@@ -89,19 +85,15 @@ clicked on highchart</p>
 &lt; min_analyte, do not report</p></dd>
 
 
-<dt>MCall</dt>
-<dd><p>T/F if true, all pathways are used for multiple comparison corrections; if false, only pathways covering user analytes will be used (default is "F")</p></dd>
-
-
 <dt>alternative</dt>
 <dd><p>alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")</p></dd>
 
 
-<dt>min_path_size</dt>
+<dt>minPathwaySize</dt>
 <dd><p>the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)</p></dd>
 
 
-<dt>max_path_size</dt>
+<dt>maxPathwaySize</dt>
 <dd><p>the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)</p></dd>
 
 
@@ -128,6 +120,14 @@ then users should specify one of the following: "Blood", "Adipose tissue", "Hear
 <dt>pathway_definitions</dt>
 <dd><p>If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows. Please supply a .xls or .xlsx file. If supplying pathway definitions for genes and metabolites, ensure that metabolite definitions are on tab 1, and gene definitions are on tab2.</p></dd>
 
+
+<dt>include_smpdb</dt>
+<dd><p>Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are highly redundant</p></dd>
+
+
+<dt>db</dt>
+<dd><p>a RaMP databse object</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -141,16 +141,32 @@ and pathway source ID/database. [[2]] analyte_type, a string specifying the type
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="va">pkg.globals</span> <span class="op">&lt;-</span> <span class="fu">setConnectionToRaMP</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  dbname <span class="op">=</span> <span class="st">"ramp2"</span>, username <span class="op">=</span> <span class="st">"root"</span>,</span></span>
-<span class="r-in"><span>  conpass <span class="op">=</span> <span class="st">""</span>, host <span class="op">=</span> <span class="st">"localhost"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">analyte.list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="st">"chebi:15344"</span>, <span class="st">"chebi:10983"</span>, <span class="st">"chebi:15351"</span>,</span></span>
-<span class="r-in"><span>  <span class="st">"uniprot:Q86V21"</span>, <span class="st">"uniprot:Q02338"</span>, <span class="st">"uniprot:Q9BUT1"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fisher.results</span> <span class="op">&lt;-</span> <span class="fu">runCombinedFisherTest</span><span class="op">(</span>analytes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span><span class="st">"hmdb:HMDB0000033"</span>,</span></span>
+<span class="r-in"><span><span class="st">"hmdb:HMDB0000052"</span>,</span></span>
+<span class="r-in"><span><span class="st">"hmdb:HMDB0000094"</span>,</span></span>
+<span class="r-in"><span><span class="st">"hmdb:HMDB0000161"</span>,</span></span>
+<span class="r-in"><span><span class="st">"hmdb:HMDB0000168"</span>,</span></span>
+<span class="r-in"><span><span class="st">"hmdb:HMDB0000191"</span>,</span></span>
+<span class="r-in"><span><span class="st">"hmdb:HMDB0000201"</span>,</span></span>
+<span class="r-in"><span><span class="st">"chemspider:10026"</span>,</span></span>
+<span class="r-in"><span><span class="st">"hmdb:HMDB0006059"</span>,</span></span>
+<span class="r-in"><span><span class="st">"Chemspider:6405"</span>,</span></span>
+<span class="r-in"><span><span class="st">"CAS:5657-19-2"</span>,</span></span>
+<span class="r-in"><span><span class="st">"hmdb:HMDB0002511"</span>,</span></span>
+<span class="r-in"><span><span class="st">"chemspider:20171375"</span>, <span class="st">"CAS:133-32-4"</span>,</span></span>
+<span class="r-in"><span><span class="st">"CAS:5746-90-7"</span>,</span></span>
+<span class="r-in"><span><span class="st">"CAS:477251-67-5"</span>,</span></span>
+<span class="r-in"><span><span class="st">"hmdb:HMDB0000695"</span>,</span></span>
+<span class="r-in"><span><span class="st">"chebi:15934"</span>,</span></span>
+<span class="r-in"><span><span class="st">"CAS:838-07-3"</span>,</span></span>
+<span class="r-in"><span><span class="st">"hmdb:HMDBP00789"</span>,</span></span>
+<span class="r-in"><span><span class="st">"hmdb:HMDBP00283"</span>,</span></span>
+<span class="r-in"><span><span class="st">"hmdb:HMDBP00284"</span>,</span></span>
+<span class="r-in"><span><span class="st">"hmdb:HMDBP00850"</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, db <span class="op">=</span> <span class="va">rampDB</span> <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">fisher.results</span> <span class="op">&lt;-</span> <span class="fu">runCombinedFisherTest</span><span class="op">(</span>analytes <span class="op">=</span> <span class="va">analyte.list</span>, NameOrIds <span class="op">=</span> <span class="st">"ids"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fisher.results</span> <span class="op">&lt;-</span> <span class="fu">runCombinedFisherTest</span><span class="op">(</span>analytes <span class="op">=</span> <span class="va">analyte.list</span>, namesOrIds <span class="op">=</span> <span class="st">"ids"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
@@ -162,7 +178,7 @@ and pathway source ID/database. [[2]] analyte_type, a string specifying the type
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by John Braisted, Ewy Mathe, Andrew Patt, Kyle Spencer, Cole Tindall.</p>
+  <p></p><p>Developed by Andrew Patt, Ewy Mathe, Khyati Mehta.</p>
 </div>
 
 <div class="pkgdown">

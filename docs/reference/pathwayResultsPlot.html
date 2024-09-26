@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RaMP</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
       </span>
     </div>
 
@@ -45,22 +45,22 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">pathwayResultsPlot</span><span class="op">(</span></span>
-<span>  db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">pathwaysSig</span>,</span>
 <span>  pval <span class="op">=</span> <span class="st">"FDR"</span>,</span>
-<span>  perc_analyte_overlap <span class="op">=</span> <span class="fl">0.2</span>,</span>
-<span>  perc_pathway_overlap <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  perc_analyte_overlap <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  perc_pathway_overlap <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  min_pathway_tocluster <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  text_size <span class="op">=</span> <span class="fl">8</span>,</span>
 <span>  sig_cutoff <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>  interactive <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>pathwaysSig</dt>
-<dd><p>output of FilterFisherResults</p></dd>
+<dd><p>output of FilterFishersResults</p></dd>
 
 
 <dt>pval</dt>
@@ -92,8 +92,20 @@ a cluster (medoid) (Default = 3)</p></dd>
 <dt>interactive</dt>
 <dd><p>If TRUE, return interactive plotly object instead of ggplot object</p></dd>
 
+
+<dt>db</dt>
+<dd><p>a RaMP database object</p></dd>
+
 </dl></div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="fu">pathwayResultsPlot</span><span class="op">(</span>pathwaysSig <span class="op">=</span> <span class="va">filtered.fisher.results</span>, text_size <span class="op">=</span> <span class="fl">8</span>, perc_analyte_overlap <span class="op">=</span> <span class="fl">0.2</span>,</span></span>
+<span class="r-in"><span>   min_pathway_tocluster <span class="op">=</span> <span class="fl">2</span>, perc_pathway_overlap <span class="op">=</span> <span class="fl">0.2</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span>, db <span class="op">=</span> <span class="va">rampDB</span> <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>
@@ -102,7 +114,7 @@ a cluster (medoid) (Default = 3)</p></dd>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by John Braisted, Ewy Mathe, Andrew Patt, Kyle Spencer, Cole Tindall.</p>
+  <p></p><p>Developed by Andrew Patt, Ewy Mathe, Khyati Mehta.</p>
 </div>
 
 <div class="pkgdown">

@@ -1,5 +1,5 @@
 #' @importFrom R6 R6Class
-
+#' @noRd
 dbHasAnalyteCommonName <- function(db) {
   query <- "PRAGMA table_info(analyte);"
   table_info <- runQuery(sql = query, db = db)

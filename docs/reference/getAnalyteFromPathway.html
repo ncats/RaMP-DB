@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RaMP</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
       </span>
     </div>
 
@@ -45,12 +45,12 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getAnalyteFromPathway</span><span class="op">(</span></span>
-<span>  db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">pathway</span>,</span>
 <span>  match <span class="op">=</span> <span class="st">"exact"</span>,</span>
-<span>  analyte_type <span class="op">=</span> <span class="st">"both"</span>,</span>
-<span>  max_pathway_size <span class="op">=</span> <span class="cn">Inf</span>,</span>
-<span>  names_or_ids <span class="op">=</span> <span class="st">"names"</span></span>
+<span>  analyteType <span class="op">=</span> <span class="st">"both"</span>,</span>
+<span>  maxPathwaySize <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>  namesOrIds <span class="op">=</span> <span class="st">"names"</span>,</span>
+<span>  db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -64,17 +64,21 @@
 <dd><p>type of matching to use, options are "exact" or "fuzzy".  The default is "exact".</p></dd>
 
 
-<dt>analyte_type</dt>
+<dt>analyteType</dt>
 <dd><p>a string denoting the type of analyte to return ("gene", "metabolite", "both")</p></dd>
 
 
-<dt>max_pathway_size</dt>
+<dt>maxPathwaySize</dt>
 <dd><p>(default Inf), trims returned results to pathways that have fewer than this number</p></dd>
 
 
-<dt>names_or_ids</dt>
+<dt>namesOrIds</dt>
 <dd><p>are the input pathways input as pathway names or as pathway ids
 of genes and metabolites</p></dd>
+
+
+<dt>db</dt>
+<dd><p>a RaMP database object, if not specified a new one is created with RaMP::RaMP()</p></dd>
 
 </dl></div>
     <div id="value">
@@ -87,13 +91,9 @@ of genes and metabolites</p></dd>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="co"># To query one pathway:</span></span></span>
-<span class="r-in"><span><span class="va">myanalytes</span> <span class="op">&lt;-</span> <span class="fu">getAnalyteFromPathway2</span><span class="op">(</span>pathway<span class="op">=</span><span class="st">"sphingolipid metabolism"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># To query multiple pathways:</span></span></span>
-<span class="r-in"><span><span class="va">pkg.globals</span> <span class="op">&lt;-</span> <span class="fu">setConnectionToRaMP</span><span class="op">(</span>dbname<span class="op">=</span><span class="st">"ramp2"</span>,username<span class="op">=</span><span class="st">"root"</span>,conpass<span class="op">=</span><span class="st">""</span>,host <span class="op">=</span> <span class="st">"localhost"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">myanalytes</span> <span class="op">&lt;-</span> <span class="fu">getAnalyteFromPathway2</span><span class="op">(</span>pathway<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"De Novo Triacylglycerol Biosynthesis"</span>,</span></span>
-<span class="r-in"><span><span class="st">"sphingolipid metabolism"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">getAnalyteFromPathway</span><span class="op">(</span> pathway<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Wnt Signaling Pathway"</span>, <span class="st">"Sphingolipid Metabolism"</span><span class="op">)</span>, db <span class="op">=</span> <span class="va">rampDB</span> <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
@@ -105,7 +105,7 @@ of genes and metabolites</p></dd>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by John Braisted, Ewy Mathe, Andrew Patt, Kyle Spencer, Cole Tindall.</p>
+  <p></p><p>Developed by Andrew Patt, Ewy Mathe, Khyati Mehta.</p>
 </div>
 
 <div class="pkgdown">

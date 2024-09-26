@@ -76,6 +76,7 @@ getChemicalProperties <- function(mets, propertyList = 'all', db = RaMP() ){
 #' Internal function to validate property list
 #' @param propList an optional list of specific properties to extract.  Options include 'all' (default),  'iso_smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'.
 #' @param db a RaMP database object
+#' @noRd
 buildPropertyList <- function( propList, db = RaMP()) {
 
   # validate that all properties are valid

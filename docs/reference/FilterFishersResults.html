@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RaMP</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
       </span>
     </div>
 
@@ -73,7 +73,13 @@ Pathway enrichment also includes an optional 'holm' value for holm p-value corre
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">analyteList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MDM2"</span>, <span class="st">"TP53"</span>, <span class="st">"glutamate"</span>, <span class="st">"creatinine"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">fisher.results</span> <span class="op">&lt;-</span> <span class="fu"><a href="runCombinedFisherTest.html">runCombinedFisherTest</a></span><span class="op">(</span>analytes <span class="op">=</span> <span class="va">analyteList</span>, namesOrIds <span class="op">=</span> <span class="st">'names'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">filtered.fisher.results</span> <span class="op">&lt;-</span> <span class="fu">FilterFishersResults</span><span class="op">(</span><span class="va">fisher.results</span>, pval_type<span class="op">=</span><span class="st">'fdr'</span>, pval_cutoff <span class="op">=</span> <span class="fl">0.10</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+</code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -83,7 +89,7 @@ Pathway enrichment also includes an optional 'holm' value for holm p-value corre
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by John Braisted, Ewy Mathe, Andrew Patt, Kyle Spencer, Cole Tindall.</p>
+  <p></p><p>Developed by Andrew Patt, Ewy Mathe, Khyati Mehta.</p>
 </div>
 
 <div class="pkgdown">

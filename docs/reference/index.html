@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RaMP</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
       </span>
     </div>
 
@@ -42,92 +42,35 @@
           <p class="section-desc"></p>
         </th>
       </tr></tbody><tbody><tr><td>
-          <p><code><a href="bhCorrect.html">bhCorrect()</a></code> </p>
+          <p><code><a href="FilterFishersResults.html">FilterFishersResults()</a></code> </p>
         </td>
-        <td><p>Helper function to return a Benjamini-Hochberg (BH) corrected p-values. The method supports
-chemical class enrichment p-value corrections.</p></td>
+        <td><p>Filter pathways by p-value cutoff for display and clustering</p></td>
       </tr><tr><td>
-          <p><code><a href="buildAnalyteOverlapPerRxnLevelUpsetDatafarme.html">buildAnalyteOverlapPerRxnLevelUpsetDatafarme()</a></code> </p>
+          <p><code><a href="RaMP.html">show(<i>&lt;RaMP&gt;</i>)</a></code> <code><a href="RaMP.html">RaMP()</a></code> <code><a href="RaMP.html">listRaMPVersions()</a></code> </p>
         </td>
-        <td><p>Creates the input dataframe for the upset plot created in 'plotAnalyteOverlapPerRxnLevel'</p></td>
-      </tr><tr><td>
-          <p><code><a href="buildFrequencyTables.html">buildFrequencyTables()</a></code> </p>
-        </td>
-        <td><p>Return all analytes that map to unique pathways in a pathwaydf</p></td>
-      </tr><tr><td>
-          <p><code><a href="buildReactionClassesSunburstDatafarme.html">buildReactionClassesSunburstDatafarme()</a></code> </p>
-        </td>
-        <td><p>Creates the input dataframe for the sunburst plot created in 'plotReactionClasses'</p></td>
-      </tr><tr><td>
-          <p><code><a href="checkIdPrefixes.html">checkIdPrefixes()</a></code> </p>
-        </td>
-        <td><p>Check for id prefixes
-By default, the function checks on whether there are at least 90<!-- % of input user analytes with -->
-appropriate RaMP-supported prefixes.</p></td>
+        <td><p>Connection to a RaMP database</p></td>
       </tr><tr><td>
           <p><code><a href="chemicalClassEnrichment.html">chemicalClassEnrichment()</a></code> </p>
         </td>
         <td><p>Returns chemical class information comparing a metabolite subset to a metabolite population, including Fisher Exact Test
 enrichment p-values and FDR values.</p></td>
       </tr><tr><td>
-          <p><code><a href="chemicalClassSurvey.html">chemicalClassSurvey()</a></code> </p>
+          <p><code><a href="createRaMPInput.html">createRaMPInput()</a></code> </p>
         </td>
-        <td><p>Returns chemical class information comparing a metabolite subset to a larger metabolite population.</p></td>
-      </tr><tr><td>
-          <p><code><a href="chemicalClassSurveyRampIdsConn.html">chemicalClassSurveyRampIdsConn()</a></code> </p>
-        </td>
-        <td><p>chemicalClassSurveyRampIdsConn2 is a helper function that takes a list of metabolite ids, a list of 'population' metabolite ids
-and a MariaDB Connection object. The method returns metabolite class information for the metabolite list and a population of all ramp metabolites.</p></td>
-      </tr><tr><td>
-          <p><code><a href="chemicalClassSurveyRampIdsFullPopConn.html">chemicalClassSurveyRampIdsFullPopConn()</a></code> </p>
-        </td>
-        <td><p>chemicalClassSurveyRampIdsFullPopConn2 is a helper function that takes a list of metabolite ids and a MariaDB Connection object
-and returns metabolite class information for the metabolite list and a population of all ramp metabolites.</p></td>
-      </tr><tr><td>
-          <p><code><a href="cleanup.html">cleanup()</a></code> </p>
-        </td>
-        <td><p>Generic function for removing RaMP identifiers and making query results more pleasant to look at</p></td>
-      </tr><tr><td>
-          <p><code><a href="combineStringLists.html">combineStringLists()</a></code> </p>
-        </td>
-        <td><p>Utility method to combine two list to tally unique counts and combine lists into a string.
-This utility script specifically supports accounting in reaction class queries.</p></td>
-      </tr><tr><td>
-          <p><code><a href="compute_overlap_matrix.html">compute_overlap_matrix()</a></code> </p>
-        </td>
-        <td><p>Compute overlaping matrix based on given list return by findAnalyteHasPathway()</p></td>
-      </tr><tr><td>
-          <p><code><a href="FilterFishersResults.html">FilterFishersResults()</a></code> </p>
-        </td>
-        <td><p>Filter pathways by p-value cutoff for display and clustering</p></td>
-      </tr><tr><td>
-          <p><code><a href="filterPathwaysByAnalyteCount.html">filterPathwaysByAnalyteCount()</a></code> </p>
-        </td>
-        <td><p>filterPathwaysByAnalyteCount utility method filtered a dataframe based on the number of analytes associated with rampPathwayIds contained in the dataframe.
-Like fisher exact code, this one retains pathways with analyte count &gt;= min_path_size, and having analyte_count &lt; max_path_size</p></td>
-      </tr><tr><td>
-          <p><code><a href="findAnalyteHasPathway.html">findAnalyteHasPathway()</a></code> </p>
-        </td>
-        <td><p>Find table of analyte has pathway from given pathway IDs
-Aggregate ramp Id to ramp pathway Id
-GC is C or G</p></td>
+        <td><p>Produce RaMP input from metabolite metadata data.frame object or .csv/.xlsx files</p></td>
       </tr><tr><td>
           <p><code><a href="findCluster.html">findCluster()</a></code> </p>
         </td>
         <td><p>Perform fuzzy multiple linkage partitioning clustering on pathways
 identified by Fisher's test</p></td>
       </tr><tr><td>
-          <p><code><a href="findDuplicatePathways.html">findDuplicatePathways()</a></code> </p>
-        </td>
-        <td><p>Return list of duplicate Wikipathway IDs from Reactome. This may be unnecessary in the future</p></td>
-      </tr><tr><td>
-          <p><code><a href="find_duplicate_pathways.html">find_duplicate_pathways()</a></code> </p>
-        </td>
-        <td><p>Return list of duplicate Wikipathway IDs from Reactome. This may be unnecessary in the future</p></td>
-      </tr><tr><td>
           <p><code><a href="getAnalyteFromPathway.html">getAnalyteFromPathway()</a></code> </p>
         </td>
         <td><p>Use fast search algorithm to find all pathways from given analytes</p></td>
+      </tr><tr><td>
+          <p><code><a href="getChemClass.html">getChemClass()</a></code> </p>
+        </td>
+        <td><p>Returns chemical class information comparing a metabolite subset to a larger metabolite population.</p></td>
       </tr><tr><td>
           <p><code><a href="getChemicalProperties.html">getChemicalProperties()</a></code> </p>
         </td>
@@ -141,34 +84,26 @@ identified by Fisher's test</p></td>
         </td>
         <td><p>Retrieve RaMP version</p></td>
       </tr><tr><td>
-          <p><code><a href="getCustomPathwayFromAnalyte.html">getCustomPathwayFromAnalyte()</a></code> </p>
-        </td>
-        <td><p>Utility method supporting pathway analyses when file-based pathway lists are used rather than the ramp database.</p></td>
-      </tr><tr><td>
           <p><code><a href="getEntityCountsFromSourceDBs.html">getEntityCountsFromSourceDBs()</a></code> </p>
         </td>
         <td><p>Retrieve counts of entitites (e.g. Metabolites, Pathways, Metabolite-Pathway associations, etc.) for RaMP source databases</p></td>
+      </tr><tr><td>
+          <p><code><a href="getMetaFromOnto.html">getMetaFromOnto()</a></code> </p>
+        </td>
+        <td><p>function that query database to find mets in given ontologies</p></td>
       </tr><tr><td>
           <p><code><a href="getMetabChemClass.html">getMetabChemClass()</a></code> </p>
         </td>
         <td><p>Returns chemical classes for classType</p></td>
       </tr><tr><td>
-          <p><code><a href="getMetabClassDataSources.html">getMetabClassDataSources()</a></code> </p>
-        </td>
-        <td><p>Returns class data sources for metabolites</p></td>
-      </tr><tr><td>
           <p><code><a href="getMetabClassTypes.html">getMetabClassTypes()</a></code> </p>
         </td>
         <td><p>Returns class categories for metabolites</p></td>
       </tr><tr><td>
-          <p><code><a href="getMetaFromOnto.html">getMetaFromOnto()</a></code> </p>
-        </td>
-        <td><p>function that query database to find analytes in given ontologies</p></td>
-      </tr><tr><td>
           <p><code><a href="getOntoFromMeta.html">getOntoFromMeta()</a></code> </p>
         </td>
         <td><p>Function that query database to find ontology information based on
-the given list of analytes</p></td>
+the given list of metabolites</p></td>
       </tr><tr><td>
           <p><code><a href="getOntologies.html">getOntologies()</a></code> </p>
         </td>
@@ -191,25 +126,9 @@ returns associated pathways</p></td>
         </td>
         <td><p>Retrieve RaMP Analyte Source Intersections, these indicate the level of analyte overlaps between our sources</p></td>
       </tr><tr><td>
-          <p><code><a href="getRaMPInfoFromAnalytes.html">getRaMPInfoFromAnalytes()</a></code> </p>
-        </td>
-        <td><p>Internal function for extracting annotations, used by pathway and chemical enrichment test functions</p></td>
-      </tr><tr><td>
-          <p><code><a href="getRampSourceInfoFromAnalyteIDs.html">getRampSourceInfoFromAnalyteIDs()</a></code> </p>
-        </td>
-        <td><p>getRampSourceInfoFromAnalyteIDs Utility method to extract source table information from analyte ids</p></td>
-      </tr><tr><td>
           <p><code><a href="getReactionClassesForAnalytes.html">getReactionClassesForAnalytes()</a></code> </p>
         </td>
         <td><p>getReactionClassesForAnalytes returns reactions class and EC numbers for a collection of input compound ids</p></td>
-      </tr><tr><td>
-          <p><code><a href="getReactionClassStats.html">getReactionClassStats()</a></code> </p>
-        </td>
-        <td><p>Utility method that returns the number of rhea reaction count in each reaction class.</p></td>
-      </tr><tr><td>
-          <p><code><a href="getReactionClassStatsOnAnalytes.html">getReactionClassStatsOnAnalytes()</a></code> </p>
-        </td>
-        <td><p>Utility method that returns the number of rhea reaction count in each reaction class.</p></td>
       </tr><tr><td>
           <p><code><a href="getReactionDetails.html">getReactionDetails()</a></code> </p>
         </td>
@@ -225,69 +144,23 @@ This utility method can help extend information from previous queries.
 For instance, if a user queries for reactions related to a list of metabolites,
 this method can be used to return proteins on some subset of reaction ids to find related proteins.</p></td>
       </tr><tr><td>
-          <p><code><a href="getReactionParticpantCounts.html">getReactionParticpantCounts()</a></code> </p>
-        </td>
-        <td><p>Utility method that evalutates the mapping counts for analytes to reaction ids</p></td>
-      </tr><tr><td>
-          <p><code><a href="getReactionRheaURLs.html">getReactionRheaURLs()</a></code> </p>
-        </td>
-        <td><p>Utility method that returns rhea reaction urls</p></td>
-      </tr><tr><td>
           <p><code><a href="getReactionsForAnalytes.html">getReactionsForAnalytes()</a></code> </p>
         </td>
         <td><p>getReactionsForAnalytes</p></td>
-      </tr><tr><td>
-          <p><code><a href="getReactionsForRaMPCompoundIds.html">getReactionsForRaMPCompoundIds()</a></code> </p>
-        </td>
-        <td><p>getReactionsForRaMPCompoundIds returns reactions for a collection of RaMP compound ids</p></td>
-      </tr><tr><td>
-          <p><code><a href="getReactionsForRaMPGeneIds.html">getReactionsForRaMPGeneIds()</a></code> </p>
-        </td>
-        <td><p>getReactionsForRaMPGeneIds returns reactions for a collection of ramp compound ids</p></td>
-      </tr><tr><td>
-          <p><code><a href="getReactionsForSourceCompoundIds.html">getReactionsForSourceCompoundIds()</a></code> </p>
-        </td>
-        <td><p>getReactionsForSourceCompoundIds returns reactions for a collection of ChEBI input Ids</p></td>
-      </tr><tr><td>
-          <p><code><a href="getReactionsForSourceProteinIds.html">getReactionsForSourceProteinIds()</a></code> </p>
-        </td>
-        <td><p>getReactionsForSourceProteinIds returns reactions for a collection of source input compound ids</p></td>
-      </tr><tr><td>
-          <p><code><a href="getReactionSourceIdsFromReactionQuery.html">getReactionSourceIdsFromReactionQuery()</a></code> </p>
-        </td>
-        <td><p>Utility method that returns the reaction source ids for a given result from getReactionsForAnalytes</p></td>
       </tr><tr><td>
           <p><code><a href="getRheaAnalyteReactionAssociations.html">getRheaAnalyteReactionAssociations()</a></code> </p>
         </td>
         <td><p>getAnalyteReactionAssociations returns mets associated with input proteins, and proteins associated with input metabolites
 Associations are made through shared Rhea reactions</p></td>
       </tr><tr><td>
-          <p><code><a href="getRheaEnzymesAndTransportersForMetabolites.html">getRheaEnzymesAndTransportersForMetabolites()</a></code> </p>
-        </td>
-        <td><p>getRheaEnzymesAndTransportersForMetabolites returns proteins that are either enzymes or transporters
-that are reaction participants with the input metabolite ids.</p></td>
-      </tr><tr><td>
-          <p><code><a href="getRheaMetabolitesForProteins.html">getRheaMetabolitesForProteins()</a></code> </p>
-        </td>
-        <td><p>getRheaEnzymesAndTransportersForMetabolites returns proteins that are either enzymes or transporters
-that are reaction participants with the input metabolite ids.</p></td>
-      </tr><tr><td>
-          <p><code><a href="getTotalFoundInCategories.html">getTotalFoundInCategories()</a></code> </p>
-        </td>
-        <td><p>Utility method to return metabolite counts found in compound class categories
-based on an input data compound class data object from the chemicalClassSurvey function
-The returned counts for each class category are for both the metabolite id query list
-and for the larger full or user-defined population of metabolite ids.
-This method is used in the exported chemicalClassEnrichment function</p></td>
-      </tr><tr><td>
           <p><code><a href="listAvailableRaMPDbVersions.html">listAvailableRaMPDbVersions()</a></code> </p>
         </td>
         <td><p>Lists local and remotely available RaMP SQLite DB versions and prompts with
 message to download a new version if one exists.</p></td>
       </tr><tr><td>
-          <p><code><a href="listToQueryString.html">listToQueryString()</a></code> </p>
+          <p><code><a href="ontologyEnrichmentResultsPlot.html">ontologyEnrichmentResultsPlot()</a></code> </p>
         </td>
-        <td><p>listToQueryString utility method to convert an id list to a comma separate string, with single quoted values.</p></td>
+        <td><p>Cluster and plot significant ontologies by FDR-adjusted pval</p></td>
       </tr><tr><td>
           <p><code><a href="pathwayResultsPlot.html">pathwayResultsPlot()</a></code> </p>
         </td>
@@ -301,53 +174,17 @@ message to download a new version if one exists.</p></td>
         </td>
         <td><p>Plots a network based on gene-metabolite relationships</p></td>
       </tr><tr><td>
+          <p><code><a href="plotChemicalClass.html">plotChemicalClass()</a></code> </p>
+        </td>
+        <td><p>Plots an interactive sunburst plot of chemical classes</p></td>
+      </tr><tr><td>
           <p><code><a href="plotReactionClasses.html">plotReactionClasses()</a></code> </p>
         </td>
         <td><p>Plots an interactive sunburst plot of reaction class</p></td>
       </tr><tr><td>
-          <p><code><a href="processData.html">processData()</a></code> </p>
-        </td>
-        <td><p>processData function generates pathway RampId frequency (gene or metabolite) based on pathway source (hmdb,kegg,reactome,wiki)</p></td>
-      </tr><tr><td>
-          <p><code><a href="queryReport.html">queryReport()</a></code> </p>
-        </td>
-        <td><p>queryReport is a helper function to report on the number of query items that were found and missed, and the list of missed query values.</p></td>
-      </tr><tr><td>
-          <p><code><a href="RaMP.html">show(<i>&lt;RaMP&gt;</i>)</a></code> <code><a href="RaMP.html">RaMP()</a></code> <code><a href="RaMP.html">listRaMPVersions()</a></code> </p>
-        </td>
-        <td><p>Connection to a RaMP database</p></td>
-      </tr><tr><td>
           <p><code><a href="rampFastCata.html">rampFastCata()</a></code> </p>
         </td>
         <td><p>Retrieves analytes that involved in same reaction as input metabolite</p></td>
-      </tr><tr><td>
-          <p><code><a href="rampFastCataOriginal.html">rampFastCataOriginal()</a></code> </p>
-        </td>
-        <td><p>Retrieves analytes that involved in same reaction as input metabolite</p></td>
-      </tr><tr><td>
-          <p><code><a href="rampFastPathFromSource.html">rampFastPathFromSource()</a></code> </p>
-        </td>
-        <td><p>Fast search given a list of metabolites source Id</p></td>
-      </tr><tr><td>
-          <p><code><a href="rampFindClassInfoFromSourceId.html">rampFindClassInfoFromSourceId()</a></code> </p>
-        </td>
-        <td><p>Get class info for an input of metabolite source Ids</p></td>
-      </tr><tr><td>
-          <p><code><a href="rampFindSourceFromId.html">rampFindSourceFromId()</a></code> </p>
-        </td>
-        <td><p>Find all source from given list of RaMP Ids</p></td>
-      </tr><tr><td>
-          <p><code><a href="rampFindSourceRampId.html">rampFindSourceRampId()</a></code> </p>
-        </td>
-        <td><p>Find rampId from given source ID
-The rampId can be plugged in other functions to continue query</p></td>
-      </tr><tr><td>
-          <p><code><a href="rampFindSynonymFromSynonym.html">rampFindSynonymFromSynonym()</a></code> </p>
-        </td>
-        <td><p>Find all synonym from a given metabolite's name
-This function is used to filter out some super common synonyms like glyceride
-Now, this function only format the user input, so the user vector, dataframe,
-and entire string separated by comma are working.</p></td>
       </tr><tr><td>
           <p><code><a href="removeLocalRampDB.html">removeLocalRampDB()</a></code> </p>
         </td>
@@ -358,26 +195,13 @@ and entire string separated by comma are working.</p></td>
         <td><p>Do fisher test for only one pathway from search result
 clicked on highchart</p></td>
       </tr><tr><td>
-          <p><code><a href="runFisherTest.html">runFisherTest()</a></code> </p>
+          <p><code><a href="runOntologyTest.html">runOntologyTest()</a></code> </p>
         </td>
-        <td><p>Do fisher test for only one pathway from search result
-clicked on highchart</p></td>
+        <td><p>Enrichment analysis for metabolite ontology mappings</p></td>
       </tr><tr><td>
           <p><code><a href="runQuery.html">runQuery()</a></code> </p>
         </td>
         <td><p>Get results from an SQL query to a RaMP database</p></td>
-      </tr><tr><td>
-          <p><code><a href="segregateDataBySource.html">segregateDataBySource()</a></code> </p>
-        </td>
-        <td><p>Separate input ids into lists based on database of origin</p></td>
-      </tr><tr><td>
-          <p><code><a href="updateOverlapMatrices.html">updateOverlapMatrices()</a></code> </p>
-        </td>
-        <td><p>Update and save the overlap matrices based on current version of RaMP</p></td>
-      </tr><tr><td>
-          <p><code><a href="updateOverlapMatrix.html">updateOverlapMatrix()</a></code> </p>
-        </td>
-        <td><p>Update the overlap matrix for store in the shiny app directory</p></td>
       </tr><tr><td>
           <p><code><a href="writePathwaysToCSV.html">writePathwaysToCSV()</a></code> </p>
         </td>
@@ -395,7 +219,7 @@ clicked on highchart</p></td>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by John Braisted, Ewy Mathe, Andrew Patt, Kyle Spencer, Cole Tindall.</p>
+  <p></p><p>Developed by Andrew Patt, Ewy Mathe, Khyati Mehta.</p>
 </div>
 
 <div class="pkgdown">
