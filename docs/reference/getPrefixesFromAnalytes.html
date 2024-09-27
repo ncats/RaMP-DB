@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RaMP</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
       </span>
     </div>
 
@@ -44,13 +44,17 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getPrefixesFromAnalytes</span><span class="op">(</span>db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span>, analyteType <span class="op">=</span> <span class="st">"gene"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getPrefixesFromAnalytes</span><span class="op">(</span>analyteType <span class="op">=</span> <span class="st">"gene"</span>, db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>analyteType</dt>
 <dd><p>value to indicate the desired analyte type. Value one of 'gene' or 'metabolite'</p></dd>
+
+
+<dt>db</dt>
+<dd><p>a RaMP database object, if not specified a new one is created with RaMP::RaMP()</p></dd>
 
 </dl></div>
     <div id="value">
@@ -60,6 +64,14 @@
 <p>Returns list of database ID prefixes for selected 'gene' or 'metabolite'</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">metabprefixes</span> <span class="op">&lt;-</span> <span class="fu">getPrefixesFromAnalytes</span><span class="op">(</span> <span class="st">"metabolite"</span>, db <span class="op">=</span> <span class="va">rampDB</span> <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>
@@ -68,7 +80,7 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by John Braisted, Ewy Mathe, Andrew Patt, Kyle Spencer, Cole Tindall.</p>
+  <p></p><p>Developed by Andrew Patt, Ewy Mathe, Khyati Mehta.</p>
 </div>
 
 <div class="pkgdown">

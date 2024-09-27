@@ -20,7 +20,7 @@ Associations are made through shared Rhea reactions"><!-- mathjax --><script src
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RaMP</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
       </span>
     </div>
 
@@ -50,29 +50,29 @@ Associations are made through shared Rhea reactions</p>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getRheaAnalyteReactionAssociations</span><span class="op">(</span></span>
-<span>  db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">analytes</span>,</span>
 <span>  includeRheaRxnDetails <span class="op">=</span> <span class="cn">F</span>,</span>
-<span>  humanProteins <span class="op">=</span> <span class="cn">T</span></span>
+<span>  humanProtein <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>db</dt>
-<dd><p>a RaMP database object</p></dd>
-
-
-<dt>analytes</dt>
+    <dl><dt>analytes</dt>
 <dd><p>list of analyte ids</p></dd>
 
 
 <dt>includeRheaRxnDetails</dt>
-<dd><p>returns additional columns that inlucdes info in the reaction connecting mets and proteins</p></dd>
+<dd><p>returns additional columns that includes info in the reaction connecting mets and proteins</p></dd>
 
 
-<dt>humanProteins</dt>
+<dt>humanProtein</dt>
 <dd><p>require reactions to have a human protein (enzyme or transporter), default True</p></dd>
+
+
+<dt>db</dt>
+<dd><p>a RaMP database object</p></dd>
 
 </dl></div>
     <div id="value">
@@ -90,7 +90,7 @@ Associations are made through shared Rhea reactions</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by John Braisted, Ewy Mathe, Andrew Patt, Kyle Spencer, Cole Tindall.</p>
+  <p></p><p>Developed by Andrew Patt, Ewy Mathe, Khyati Mehta.</p>
 </div>
 
 <div class="pkgdown">

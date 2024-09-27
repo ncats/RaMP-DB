@@ -27,6 +27,7 @@ getPrefixesFromAnalytes<-function(analyteType="gene", db = RaMP()) {
 #' Returns class data sources for metabolites
 #' @param db a RaMP database object, if not specified a new one is created with RaMP::RaMP()
 #' @return Returns list of data sources for metabolites
+#' @noRd
 getMetabClassDataSources<-function(db = RaMP()){
   return(db@api$getMetaboliteClassSources())
 }

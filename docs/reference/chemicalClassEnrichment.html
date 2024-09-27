@@ -20,7 +20,7 @@ enrichment p-values and FDR values."><!-- mathjax --><script src="https://cdnjs.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RaMP</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
       </span>
     </div>
 
@@ -50,11 +50,11 @@ enrichment p-values and FDR values.</p>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">chemicalClassEnrichment</span><span class="op">(</span></span>
-<span>  db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">mets</span>,</span>
 <span>  background <span class="op">=</span> <span class="st">"database"</span>,</span>
 <span>  background_type <span class="op">=</span> <span class="st">"database"</span>,</span>
-<span>  inferIdMapping <span class="op">=</span> <span class="cn">F</span></span>
+<span>  inferIdMapping <span class="op">=</span> <span class="cn">F</span>,</span>
+<span>  db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -83,6 +83,10 @@ If inferIdMapping is set to TRUE, the input ids are cross-referenced or mapped t
 Following id cross references can expand coverage if the input type is other than HMDB ids or LIPIDMAPS ids.
 The default value is FALSE.</p></dd>
 
+
+<dt>db</dt>
+<dd><p>a RaMP database object</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -97,24 +101,16 @@ Fisher Exact p-values and Benjamini-Hochberg corrected p-values (FDR estimates)<
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="co"># metabolite list of interest</span></span></span>
-<span class="r-in"><span><span class="va">metList</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'hmdb:HMDB0000056'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0000439'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0000479'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0000532'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0001015'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0001138'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0029159'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0029412'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0034365'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0035227'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0007973'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0008057'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0011211'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">metabolites.of.interest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pubchem:64969"</span>,</span></span>
+<span class="r-in"><span>                            <span class="st">"chebi:16958"</span>,</span></span>
+<span class="r-in"><span>                            <span class="st">"chemspider:20549"</span>,</span></span>
+<span class="r-in"><span>                            <span class="st">"kegg:C05598"</span>,</span></span>
+<span class="r-in"><span>                            <span class="st">"chemspider:388809"</span>,</span></span>
+<span class="r-in"><span>                            <span class="st">"pubchem:53861142"</span>,</span></span>
+<span class="r-in"><span>                            <span class="st">"hmdb:HMDB0001138"</span>,</span></span>
+<span class="r-in"><span>                            <span class="st">"hmdb:HMDB0029412"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># the background population can be a separate ID list (preferred) or all database entries</span></span></span>
-<span class="r-in"><span><span class="co"># (skip pop parameter).</span></span></span>
-<span class="r-in"><span><span class="va">pkg.globals</span> <span class="op">&lt;-</span> <span class="fu">setConnectionToRaMP</span><span class="op">(</span>dbname<span class="op">=</span><span class="st">"ramp2"</span>,username<span class="op">=</span><span class="st">"root"</span>,conpass<span class="op">=</span><span class="st">""</span>,host <span class="op">=</span> <span class="st">"localhost"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">enrichedClassStats</span> <span class="op">&lt;-</span> <span class="fu">chemicalClassEnrichment</span><span class="op">(</span>mets <span class="op">=</span> <span class="va">metList</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">chemical.enrichment</span> <span class="op">&lt;-</span> <span class="fu">chemicalClassEnrichment</span><span class="op">(</span>mets <span class="op">=</span> <span class="va">metabolites.of.interest</span>, db <span class="op">=</span> <span class="va">rampDB</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
@@ -126,7 +122,7 @@ Fisher Exact p-values and Benjamini-Hochberg corrected p-values (FDR estimates)<
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by John Braisted, Ewy Mathe, Andrew Patt, Kyle Spencer, Cole Tindall.</p>
+  <p></p><p>Developed by Andrew Patt, Ewy Mathe, Khyati Mehta.</p>
 </div>
 
 <div class="pkgdown">

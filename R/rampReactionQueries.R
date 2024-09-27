@@ -532,6 +532,7 @@ getRheaAnalyteReactionAssociations <- function( analytes, includeRheaRxnDetails=
 #' @param db a RaMP database object
 #'
 #' @return returns a dataframe object with input metabolites, and reaction and associated protein information.
+#' @noRd
 getRheaEnzymesAndTransportersForMetabolites <- function( analytes, includeRheaRxnDetails=FALSE,
 	humanProtein=TRUE, db = RaMP()) {
 
@@ -587,6 +588,7 @@ getRheaEnzymesAndTransportersForMetabolites <- function( analytes, includeRheaRx
 #' @param db a RaMP database object
 #'
 #' @return returns a dataframe object with input metabolites, and reaction and associated protein informatin.
+#' @noRd
 getRheaMetabolitesForProteins <- function( analytes, includeRheaRxnDetails=F, humanProtein=T, db = RaMP()) {
 
   uniprotIds <- analytes[grepl("uniprot", analytes)]
@@ -645,6 +647,7 @@ getRheaMetabolitesForProteins <- function( analytes, includeRheaRxnDetails=F, hu
 #' @param x list1
 #' @param y list2
 #' @param sep what to split on
+#' @noRd
  combineStringLists <- function(x, y, sep=",") {
    reactions <- c()
    rxn_count <- c()
@@ -670,7 +673,7 @@ getRheaMetabolitesForProteins <- function( analytes, includeRheaRxnDetails=F, hu
 #' @param db RaMP Database object
 #' @param analytes list of analyte ids
 #' @return returns a dataframe of ramp analyte source information
-#'
+#' @noRd
 getRampSourceInfoFromAnalyteIDs <- function(db = RaMP(), analytes) {
   df <- db@api$getSourceInfoForAnalyteIDs(analytes)
   return(df)
@@ -680,7 +683,7 @@ getRampSourceInfoFromAnalyteIDs <- function(db = RaMP(), analytes) {
 #'
 #' @param analyte2Rxn result object from getReactionsForAnalytes
 #' @param minRxnParticipantCountFilter if > 1, the set of reactions is reduced to those with having this number of mapped analytes
-#'
+#' @noRd
 getReactionParticipantCounts <- function(analyte2Rxn, minRxnParticipantCountFilter=1) {
 
   metCounts <- data.frame(table(unlist(analyte2Rxn$met2rx$reactionId)))
@@ -725,7 +728,7 @@ getReactionParticipantCounts <- function(analyte2Rxn, minRxnParticipantCountFilt
 #' Utility method that returns the reaction source ids for a given result from getReactionsForAnalytes
 #'
 #' @param reactions input result from the getReactionsForAnalytes
-#'
+#' @noRd
 getReactionSourceIdsFromReactionQuery <- function(reactions) {
   rxns <- c()
   if(nrow(reactions$met2rxn) > 0) {
@@ -742,7 +745,7 @@ getReactionSourceIdsFromReactionQuery <- function(reactions) {
 #'
 #' @param humanProtein boolean value indicating if reactions should be constrained to those having human proteins
 #' @param db a RaMP database object
-#'
+#' @noRd
 getReactionClassStats <- function(humanProtein=TRUE, db=RaMP()) {
   result <- db@api$getReactionClassStats(humanProtein = humanProtein)
   return(result)
@@ -752,7 +755,7 @@ getReactionClassStats <- function(humanProtein=TRUE, db=RaMP()) {
 #'
 #' @param humanProtein boolean value indicating if reactions should be constrained to those having human proteins
 #' @param db a RaMP database object
-#'
+#' @noRd
 getReactionClassStatsOnAnalytes <- function( humanProtein=T, db=RaMP()) {
   metRes <- db@api$getReactionClassStats(analyteType = 'metabolite', humanProtein = humanProtein)
   protRes <- db@api$getReactionClassStats(analyteType = 'gene', humanProtein = humanProtein)
@@ -762,7 +765,7 @@ getReactionClassStatsOnAnalytes <- function( humanProtein=T, db=RaMP()) {
 #' Utility method that returns rhea reaction urls
 #'
 #' @param reactionList list of prefixed (rhea:) reaction ids
-#'
+#' @noRd
 getReactionRheaURLs <- function(reactionList) {
   baseURL = "https://www.rhea-db.org/"
   reactionList <- gsub(":","/",reactionList)

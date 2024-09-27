@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RaMP</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
       </span>
     </div>
 
@@ -44,25 +44,29 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getChemicalProperties</span><span class="op">(</span>db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">mets</span>, propertyList <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getChemicalProperties</span><span class="op">(</span><span class="va">mets</span>, propertyList <span class="op">=</span> <span class="st">"all"</span>, db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>mets</dt>
-<dd><p>a list object of source prepended metaboite ids, representing a metabolite set of interest</p></dd>
+<dd><p>a list object of source prepended metabolite ids, representing a metabolite set of interest</p></dd>
 
 
 <dt>propertyList</dt>
 <dd><p>an optional list of specific properties to extract.  Options include 'all' (default),  'smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'.
 If a props list is not supplied, all property fields will be returned.</p></dd>
 
+
+<dt>db</dt>
+<dd><p>a RaMP database object</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     
 
-<p>Returns chemcial property information for the list of input metabolites and a query report reporting on the number of metabolite ids that were matched and the list of un-matched input ids.</p>
+<p>Returns chemical property information for the list of input metabolites and a query report reporting on the number of metabolite ids that were matched and the list of un-matched input ids.</p>
 
 
 <p>The returned object (return_obj below) contains two results. Use str(return_obj) to see the structure described here.</p>
@@ -79,22 +83,16 @@ that were found in the database, and a list of metabolite ids that were not foun
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="co"># metabolite list of interest</span></span></span>
-<span class="r-in"><span><span class="va">mets</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'hmdb:HMDB0000056'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0000439'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0000479'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0000532'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0001015'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0001138'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0029159'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0029412'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0034365'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0035227'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0007973'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0008057'</span>,</span></span>
-<span class="r-in"><span>            <span class="st">'hmdb:HMDB0011211'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">pkg.globals</span> <span class="op">&lt;-</span> <span class="fu">setConnectionToRaMP</span><span class="op">(</span>dbname<span class="op">=</span><span class="st">"ramp2"</span>,username<span class="op">=</span><span class="st">"root"</span>,conpass<span class="op">=</span><span class="st">""</span>,host <span class="op">=</span> <span class="st">"localhost"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">chemProps</span> <span class="op">&lt;-</span> <span class="fu">getChemicalProperties</span><span class="op">(</span><span class="va">mets</span>, propertyList <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'iso_smiles'</span>, <span class="st">'inchi_key'</span>, <span class="st">'common_name'</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">chemProps</span><span class="op">$</span><span class="va">chem_props</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">metabolites.of.interest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pubchem:64969"</span>,</span></span>
+<span class="r-in"><span>                             <span class="st">"chebi:16958"</span>,</span></span>
+<span class="r-in"><span>                             <span class="st">"chemspider:20549"</span>,</span></span>
+<span class="r-in"><span>                             <span class="st">"kegg:C05598"</span>,</span></span>
+<span class="r-in"><span>                             <span class="st">"chemspider:388809"</span>,</span></span>
+<span class="r-in"><span>                             <span class="st">"pubchem:53861142"</span>,</span></span>
+<span class="r-in"><span>                             <span class="st">"hmdb:HMDB0001138"</span>,</span></span>
+<span class="r-in"><span>                             <span class="st">"hmdb:HMDB0029412"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">chemical.classes</span> <span class="op">&lt;-</span> <span class="fu">getChemicalProperties</span><span class="op">(</span>mets <span class="op">=</span> <span class="va">metabolites.of.interest</span>, db <span class="op">=</span> <span class="va">rampDB</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
@@ -106,7 +104,7 @@ that were found in the database, and a list of metabolite ids that were not foun
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by John Braisted, Ewy Mathe, Andrew Patt, Kyle Spencer, Cole Tindall.</p>
+  <p></p><p>Developed by Andrew Patt, Ewy Mathe, Khyati Mehta.</p>
 </div>
 
 <div class="pkgdown">

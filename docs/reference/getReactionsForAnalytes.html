@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RaMP</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
       </span>
     </div>
 
@@ -45,32 +45,30 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getReactionsForAnalytes</span><span class="op">(</span></span>
-<span>  db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">analytes</span>,</span>
 <span>  onlyHumanMets <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  humanProtein <span class="op">=</span> <span class="cn">T</span>,</span>
 <span>  includeTransportRxns <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  rxnDirs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"UN"</span><span class="op">)</span>,</span>
-<span>  includeRxnURLs <span class="op">=</span> <span class="cn">F</span></span>
+<span>  includeRxnURLs <span class="op">=</span> <span class="cn">F</span>,</span>
+<span>  db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>db</dt>
-<dd><p>a RaMP databse object</p></dd>
-
-
-<dt>analytes</dt>
-<dd><p>list of analytes</p></dd>
+    <dl><dt>analytes</dt>
+<dd><p>list of analytes. chebi and/or uniprot ids are required.</p></dd>
 
 
 <dt>onlyHumanMets</dt>
-<dd><p>boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev in progress)</p></dd>
+<dd><p>boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev
+in progress)</p></dd>
 
 
 <dt>humanProtein</dt>
-<dd><p>boolean to only control pathways catalyzed by a human proteins (having human Uniprot) (dev in progress)</p></dd>
+<dd><p>boolean to only control pathways catalyzed by a human proteins (having human Uniprot)
+(dev in progress)</p></dd>
 
 
 <dt>includeTransportRxns</dt>
@@ -78,20 +76,36 @@
 
 
 <dt>rxnDirs</dt>
-<dd><p>character vector of length &gt; 1, specifying reaction directions to return  c("UN", "LR", "RL", "BD", "ALL"), default = c("UN").</p></dd>
+<dd><p>character vector of length &gt; 1, specifying reaction directions to return  c("UN", "LR", "RL",
+"BD", "ALL"), default = c("UN").</p></dd>
 
 
-<dt>namesOrIds</dt>
-<dd><p>indicates if input analyte list contains identifiers or analyte names</p></dd>
+<dt>includeRxnURLs</dt>
+<dd><p>if TRUE, urls to Rhea.org will be delivered in the result dataframe for each reaction</p></dd>
+
+
+<dt>db</dt>
+<dd><p>a RaMP database object</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     
 
-<p>a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and common reactions</p>
+<p>a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and
+common reactions</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">analytes.of.interest</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'chebi:57368'</span>, <span class="st">'uniprot:Q96N66'</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">reactionsLists</span> <span class="op">&lt;-</span> <span class="fu">RaMP</span><span class="fu">::</span><span class="fu">getReactionsForAnalytes</span><span class="op">(</span>analytes <span class="op">=</span> <span class="va">analytes.of.interest</span>,</span></span>
+<span class="r-in"><span>    includeTransportRxns <span class="op">=</span> <span class="cn">F</span>, humanProtein <span class="op">=</span> <span class="cn">T</span>, db <span class="op">=</span> <span class="va">rampDB</span> <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>
@@ -100,7 +114,7 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by John Braisted, Ewy Mathe, Andrew Patt, Kyle Spencer, Cole Tindall.</p>
+  <p></p><p>Developed by Andrew Patt, Ewy Mathe, Khyati Mehta.</p>
 </div>
 
 <div class="pkgdown">

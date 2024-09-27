@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">RaMP</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
       </span>
     </div>
 
@@ -101,7 +101,7 @@
 <div class="section level2">
 <h2 id="vignette">Vignette<a class="anchor" aria-label="anchor" href="#vignette"></a>
 </h2>
-<p>Detailed instructions for installing RaMP locally are below. We’ve also put together a vignette to get you started on the analyses. Click here for <a href="https://ncats.github.io/RaMP-DB/RaMP_v3.0_SQLite_Vignette.html" class="external-link">vignette</a>.</p>
+<p>Detailed instructions for installing RaMP locally are below. We’ve also put together a vignette to get you started on the analyses. Click here for <a href="https://ncats.github.io/RaMP-DB/Updated_RaMP_Vignette.html" class="external-link">vignette</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
@@ -114,7 +114,7 @@
 <h2 id="installation-instructions">Installation Instructions<a class="anchor" aria-label="anchor" href="#installation-instructions"></a>
 </h2>
 <p>In order to use this R package locally, you will need to install the R code under this repository.</p>
-<p><em>Special Note:</em> There is incompatibility (reported here: <a href="https://stat.ethz.ch/pipermail/bioc-devel/2023-October/020003.html" class="external-link uri">https://stat.ethz.ch/pipermail/bioc-devel/2023-October/020003.html</a>) between the version of BiocFileCache installed using BiocManager (2.8.0) and the actual latest version (2.10.1). The latter is needed to be compatible with other dependencies in RaMP-DB. To install the latest version, you will need to download the source file from Bioconductor (<a href="https://bioconductor.org/packages/release/bioc/html/BiocFileCache.html" class="external-link uri">https://bioconductor.org/packages/release/bioc/html/BiocFileCache.html</a>), then install using the install.packages() function. For a Mac, this looks like this: </p>
+<p><em>Special Note:</em> There is incompatibility (reported here: <a href="https://stat.ethz.ch/pipermail/bioc-devel/2023-October/020003.html" class="external-link uri">https://stat.ethz.ch/pipermail/bioc-devel/2023-October/020003.html</a>) between the version of BiocFileCache installed using BiocManager (2.8.0) and the actual latest version (2.10.1). The latter is needed to be compatible with other dependencies in RaMP-DB. To install the latest version, you will need to download the source file from Bioconductor (<a href="https://bioconductor.org/packages/release/bioc/html/BiocFileCache.html" class="external-link uri">https://bioconductor.org/packages/release/bioc/html/BiocFileCache.html</a>), then install using the install.packages() function. For a Mac, this looks like this:</p>
 <pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"/Users/mathee/Downloads/BiocFileCache_2.10.1.tgz"</span><span class="op">)</span></span></code></pre>
 <div class="section level3">
 <h3 id="install-and-load-the-ramp-package">Install and load the RaMP package<a class="anchor" aria-label="anchor" href="#install-and-load-the-ramp-package"></a>
@@ -124,7 +124,7 @@
 <code class="sourceCode R"><span><span class="co"># Locally install RaMP</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ncats/RAMP-DB"</span>, ref<span class="op">=</span><span class="st">"sqlite"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ncats/RAMP-DB"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Load the package</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">RaMP</span><span class="op">)</span></span>
@@ -141,7 +141,7 @@
 <span><span class="co"># if the selected version is not available on your computer, but is in our remote repository at GitHub,</span></span>
 <span><span class="co"># the SQLite DB file will be automatically downloaded into local file cache.</span></span>
 <span><span class="co"># RaMP is using the BiocFileCache package to manage a local file cache.</span></span>
-<span><span class="va">rampDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/RaMP.html">RaMP</a></span><span class="op">(</span>version <span class="op">=</span> <span class="st">"2.3.1"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">rampDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/RaMP.html">RaMP</a></span><span class="op">(</span>version <span class="op">=</span> <span class="st">"2.5.4"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="important-notes">Important Notes<a class="anchor" aria-label="anchor" href="#important-notes"></a>
@@ -152,16 +152,16 @@
 <col width="45%">
 <col width="54%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th>Analyte Type</th>
 <th>ID Prefix Types</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>Metabolites</td>
 <td>hmdb, pubchem, chebi, chemspider, kegg, CAS, LIPIDMAPS, swisslipids, lipidbank, wikidata, plantfa, kegg_glycan</td>
 </tr>
-<tr class="even">
+<tr>
 <td>Genes/Proteins</td>
 <td>ensembl, entrez, gene_symbol, uniprot, hmdb, ncbiprotein, EN, wikidata, chebi</td>
 </tr>
@@ -238,11 +238,9 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>John Braisted <br><small class="roles"> Author </small>  </li>
-<li>Ewy Mathe <br><small class="roles"> Author, maintainer </small>  </li>
 <li>Andrew Patt <br><small class="roles"> Author </small>  </li>
-<li>Kyle Spencer <br><small class="roles"> Author </small>  </li>
-<li>Cole Tindall <br><small class="roles"> Author </small>  </li>
+<li>Ewy Mathe <br><small class="roles"> Author, maintainer </small>  </li>
+<li>Khyati Mehta <br><small class="roles"> Author </small>  </li>
 </ul>
 </div>
 
@@ -259,7 +257,7 @@
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by John Braisted, Ewy Mathe, Andrew Patt, Kyle Spencer, Cole Tindall.</p>
+<p>Developed by Andrew Patt, Ewy Mathe, Khyati Mehta.</p>
 </div>
 
 <div class="pkgdown">

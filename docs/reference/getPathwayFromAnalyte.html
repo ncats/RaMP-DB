@@ -20,7 +20,7 @@ returns associated pathways"><!-- mathjax --><script src="https://cdnjs.cloudfla
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RaMP</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
       </span>
     </div>
 
@@ -50,23 +50,20 @@ returns associated pathways</p>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getPathwayFromAnalyte</span><span class="op">(</span></span>
-<span>  db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  analytes <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  find_synonym <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  NameOrIds <span class="op">=</span> <span class="st">"ids"</span>,</span>
+<span>  namesOrIds <span class="op">=</span> <span class="st">"ids"</span>,</span>
 <span>  includeRaMPids <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  min_path_size <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  max_path_size <span class="op">=</span> <span class="fl">150</span></span>
+<span>  include_smpdb <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  minPathwaySize <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  maxPathwaySize <span class="op">=</span> <span class="fl">150</span>,</span>
+<span>  db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>db</dt>
-<dd><p>a RaMP databse object</p></dd>
-
-
-<dt>analytes</dt>
+    <dl><dt>analytes</dt>
 <dd><p>a vector of analytes (genes or metabolites) that need to be searched</p></dd>
 
 
@@ -74,7 +71,7 @@ returns associated pathways</p>
 <dd><p>find all synonyms or just return same synonym (T/F)</p></dd>
 
 
-<dt>NameOrIds</dt>
+<dt>namesOrIds</dt>
 <dd><p>whether input is "names" or "ids" (default is "ids")</p></dd>
 
 
@@ -82,12 +79,23 @@ returns associated pathways</p>
 <dd><p>include internal RaMP identifiers (default is "FALSE")</p></dd>
 
 
-<dt>min_path_size</dt>
-<dd><p>the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)</p></dd>
+<dt>include_smpdb</dt>
+<dd><p>Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are
+highly redundant</p></dd>
 
 
-<dt>max_path_size</dt>
-<dd><p>the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)</p></dd>
+<dt>minPathwaySize</dt>
+<dd><p>the minimum number of pathway members (genes and metabolites) to include the pathway in
+the output (default = 5)</p></dd>
+
+
+<dt>maxPathwaySize</dt>
+<dd><p>the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in
+the output (default = 150)</p></dd>
+
+
+<dt>db</dt>
+<dd><p>a RaMP database object</p></dd>
 
 </dl></div>
     <div id="value">
@@ -100,11 +108,12 @@ returns associated pathways</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="va">pkg.globals</span> <span class="op">&lt;-</span> <span class="fu">setConnectionToRaMP</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  dbname <span class="op">=</span> <span class="st">"ramp2"</span>, username <span class="op">=</span> <span class="st">"root"</span>,</span></span>
-<span class="r-in"><span>  conpass <span class="op">=</span> <span class="st">""</span>, host <span class="op">=</span> <span class="st">"localhost"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mypath</span> <span class="op">&lt;-</span> <span class="fu">getPathwayFromAnalyte</span><span class="op">(</span>analytes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2-hydroxyglutarate"</span>, <span class="st">"glutamate"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">getPathwayFromAnalyte</span><span class="op">(</span>db <span class="op">=</span> <span class="va">rampDB</span>, namesOrIds<span class="op">=</span><span class="st">"ids"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ensembl:ENSG00000135679"</span>,</span></span>
+<span class="r-in"><span>     <span class="st">"hmdb:HMDB0000064"</span>,</span></span>
+<span class="r-in"><span>     <span class="st">"hmdb:HMDB0000148"</span>,</span></span>
+<span class="r-in"><span>     <span class="st">"ensembl:ENSG00000141510"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">getPathwayFromAnalyte</span><span class="op">(</span>db <span class="op">=</span> <span class="va">rampDB</span>, namesOrIds <span class="op">=</span> <span class="st">"names"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Serotonin"</span>, <span class="st">"Bilirubin"</span>, <span class="st">"Urea"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
@@ -116,7 +125,7 @@ returns associated pathways</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by John Braisted, Ewy Mathe, Andrew Patt, Kyle Spencer, Cole Tindall.</p>
+  <p></p><p>Developed by Andrew Patt, Ewy Mathe, Khyati Mehta.</p>
 </div>
 
 <div class="pkgdown">

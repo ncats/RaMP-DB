@@ -4,6 +4,7 @@
 ##' @return Printed out and prettified version of input
 ##' @author Andrew Christopher Patt
 ## @import is from methods
+#' @noRd
 cleanup<- function(data, show_n_rows = 6) {
   if (!inherits(data,"data.frame") & (!inherits(data,"list") & length(data) != 1)) {
     stop("Input should be a dataframe resulting from runCombinedFishersTest, getAnalyteFromPathway, getPathwayFromAnalyte, chemicalClassSurvey, or getChemicalProperties")
