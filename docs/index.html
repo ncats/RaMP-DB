@@ -115,7 +115,7 @@
 </h2>
 <p>In order to use this R package locally, you will need to install the R code under this repository.</p>
 <p><em>Special Note:</em> There is incompatibility (reported here: <a href="https://stat.ethz.ch/pipermail/bioc-devel/2023-October/020003.html" class="external-link uri">https://stat.ethz.ch/pipermail/bioc-devel/2023-October/020003.html</a>) between the version of BiocFileCache installed using BiocManager (2.8.0) and the actual latest version (2.10.1). The latter is needed to be compatible with other dependencies in RaMP-DB. To install the latest version, you will need to download the source file from Bioconductor (<a href="https://bioconductor.org/packages/release/bioc/html/BiocFileCache.html" class="external-link uri">https://bioconductor.org/packages/release/bioc/html/BiocFileCache.html</a>), then install using the install.packages() function. For a Mac, this looks like this:</p>
-<pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"/Users/mathee/Downloads/BiocFileCache_2.10.1.tgz"</span><span class="op">)</span></span></code></pre>
+<pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'https://www.bioconductor.org/packages/3.18/bioc/src/contrib/Archive/BiocFileCache/BiocFileCache_2.10.1.tar.gz'</span>, repos<span class="op">=</span><span class="cn">NULL</span>, method<span class="op">=</span><span class="st">'libcurl'</span>, dependencies<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre>
 <div class="section level3">
 <h3 id="install-and-load-the-ramp-package">Install and load the RaMP package<a class="anchor" aria-label="anchor" href="#install-and-load-the-ramp-package"></a>
 </h3>
@@ -178,22 +178,22 @@
 </h2>
 <ul>
 <li>
-<strong>John Braisted</strong> - <a href="mailto:john.braisted@nih.gov" class="email">john.braisted@nih.gov</a>
-</li>
-<li>
-<strong>Tara Eicher</strong> - <a href="mailto:tara.eicher@nih.gov" class="email">tara.eicher@nih.gov</a>
-</li>
-<li>
 <strong>Ewy Mathé</strong> - <a href="mailto:ewy.mathe@nih.gov" class="email">ewy.mathe@nih.gov</a>
 </li>
 <li>
 <strong>Andrew Patt</strong> - <a href="mailto:andy.patt@nih.gov" class="email">andy.patt@nih.gov</a>
 </li>
 <li>
-<strong>Tim Sheils</strong> - <a href="mailto:tim.sheils@nih.gov" class="email">tim.sheils@nih.gov</a>
+<strong>Khyati Mehta</strong> - <a href="mailto:khyati.meta@nih.gov" class="email">khyati.meta@nih.gov</a>
 </li>
 <li>
-<strong>Kyle Spencer</strong> - <a href="mailto:kyle.spencer@nih.gov" class="email">kyle.spencer@nih.gov</a>
+<strong>Adam Tisch</strong> - <a href="mailto:adam.tisch@nih.gov" class="email">adam.tisch@nih.gov</a>
+</li>
+<li>
+<strong>Keith Kelleher</strong> - <a href="mailto:keith.kelleher@nih.gov" class="email">keith.kelleher@nih.gov</a>
+</li>
+<li>
+<strong>Tim Sheils</strong> - <a href="mailto:tim.sheils@nih.gov" class="email">tim.sheils@nih.gov</a>
 </li>
 </ul>
 </div>
@@ -201,6 +201,12 @@
 <h2 id="previous-authorstesters">Previous Authors/Testers<a class="anchor" aria-label="anchor" href="#previous-authorstesters"></a>
 </h2>
 <ul>
+<li>
+<strong>John Braisted</strong> -</li>
+<li>
+<strong>Tara Eicher</strong> -</li>
+<li>
+<strong>Kyle Spencer</strong> -</li>
 <li>
 <strong>Cole Tindall</strong> -</li>
 <li>
