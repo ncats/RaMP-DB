@@ -26,7 +26,7 @@ editor_options:
 
 This vignette will provide basic steps for interacting with [RaMP-DB](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5876005/) (Relational database of Metabolomic Pathways).
 
-Details on RaMP-DB installation are also avaialble through GitHub (https://github.com/RAMP-project/RAMP).
+Details on RaMP-DB installation are also avaialble through GitHub (https://github.com/ncats/RaMP-DB/).
 Questions can be asked through the Issues tab or by sending an email to [NCATSRaMP\@nih.gov](mailto:NCATSRaMP@nih.gov).
 
 RaMP-DB supports queries and enrichment analyses.
@@ -239,7 +239,7 @@ This function takes in a vector of metabolites as an input and returns a vector 
 ```{r}
 analytes.of.interest <- c("chebi:15422", "hmdb:HMDB0000064",
         "hmdb:HMDB0000148", "wikidata:Q426660")
-new.ontologies <- getOntoFromMeta(analytes = analytes.of.interest, db=rampDB)
+new.ontologies <- getOntoFromMeta(mets = analytes.of.interest, db=rampDB)
 datatable(new.ontologies)
 ```
 
@@ -333,11 +333,11 @@ Users can retrieve chemical classes and chemical property information from input
 
 ### Retrieve Chemical Classes from Input Metabolites
 RaMP incorporates Classyfire and lipidMAPS classes.
-The function chemicalClassSurvey() function takes as input a vector of metabolites and outputs the classes associated with each metabolite input.
+The function getChemClass() function takes as input a vector of metabolites and outputs the classes associated with each metabolite input.
 
 ```{r}
 metabolites.of.interest = c("pubchem:64969", "chebi:16958", "chemspider:20549", "kegg:C05598", "chemspider:388809", "pubchem:53861142", "hmdb:HMDB0001138", "hmdb:HMDB0029412")
-chemical.classes <- chemicalClassSurvey(mets = metabolites.of.interest, db=rampDB)
+chemical.classes <- getChemClass(mets = metabolites.of.interest, db=rampDB)
 
 metabolite.classes <- as.data.frame(chemical.classes$met_classes)
 datatable(metabolite.classes)
@@ -369,7 +369,7 @@ classy_fire_classes <- chemical.enrichment$ClassyFire_class
 datatable(classy_fire_classes)
 ```
 
-*Note*: To explicitly view the results of mapping input IDs to RaMP, users can run the chemicalClassSurvey() function as noted in above in the section "Retrieve Chemical Class from Input Metabolites".
+*Note*: To explicitly view the results of mapping input IDs to RaMP, users can run the getChemClass() function as noted in above in the section "Retrieve Chemical Class from Input Metabolites".
 
 ## Connect to Different Versions of RaMP
 Users are able to download previous versions of RaMP, and can input queries in these earlier versions. Some annotations have been added or changed since updated versions have been posted. 
