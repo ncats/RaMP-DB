@@ -927,8 +927,13 @@ getReactionsForAnalytesQuery <- function(analytes, analyteType, useIdMapping, ke
     selectClauses <- c(selectClauses, 'group_concat(distinct(r.rxn_source_id)) as protein_reactions')
     tables <- c(tables, 'reaction2protein r')
   }
-  if (!is.null(keeperRxns) && nchar(keeperRxns) > 0) {
-    whereClauses <- c(whereClauses, paste0("r.rxn_source_id in (",listToQueryString(ids = keeperRxns),")"))
+  if (!is.null(keeperRxns)) {
+    if (inherits(keeperRxns, "factor")) {
+      keeperRxnList = as.character(keeperRxns)
+    } else {
+      keeperRxnList = keeperRxns
+    }
+    whereClauses <- c(whereClauses, paste0("r.rxn_source_id in (",listToQueryString(ids = keeperRxnList),")"))
   }
   if (useIdMapping) {
     tables <- c(tables, 'source s')
