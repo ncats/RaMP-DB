@@ -1332,3 +1332,71 @@ buildChemicalClassDataframe <- function(chemicalClassResults) {
   return(sunburst_ontology_chemicalClass)
 
 }
+
+
+#' Creates the input dataframe for the interactive plot created in 'plotCataNetwork'
+#'
+#' @param rampFastCataResults output of getChemClass()
+#' @noRd
+buildCataNetworkDataframe <- function(rampFastCataResults)
+{
+  #Set Edges
+  myedges = rampFastCataResults[,c("query_relation", "input_common_name","rxn_partner_common_name", "Source")]
+  colnames(myedges)[2:3] <-c("from","to")
+
+  myedges$color <- ifelse(myedges$Source=="HMDB", "#ca1f7b", ifelse(myedges$Source=="Rhea", "#cc5500", "#008080"))
+  myedges$highlight <- myedges$color
+
+  #Set nodes
+  mynodes=c(unique(myedges$from),unique(myedges$to))
+  mycol=c(rep("black",length(unique(myedges$from))),
+          rep("#d2e5f6",length(unique(myedges$to))))
+  mynames <- mynodes
+
+  mynodes <- data.frame(color=mycol,id=mynames,label=mynames)
+
+  duplicates <- mynodes[mynodes[,3] %in% mynodes[duplicated(mynodes[3]),3],]
+
+  if(nrow(duplicates)>0)
+  {
+    mynodes <- mynodes[-c(as.numeric(rownames(duplicates))),]
+
+    duplicates <- split(duplicates, duplicates$id)
+
+    for (i in 1:length(duplicates))
+    {
+      if(length(which(grepl("black", duplicates[[i]]$color)))>0)
+      {
+        single <- unique(duplicates[[i]][grepl("black", duplicates[[i]]$color),])
+      } else
+      {
+        single <- duplicates[[i]][1,]
+      }
+
+      mynodes <- rbind(mynodes, single)
+    }
+  }
+
+  for (i in 1:nrow(mynodes))
+  {
+    if (mynodes[i,1] == "black")
+    {
+      if (myedges[which(myedges$from == mynodes[i,2])[1], 1]=="met2gene" | myedges[which(myedges$from == mynodes[i,2])[1], 1]=="met2protein")
+      {
+        mynodes$shape[i] <- "dot"
+      } else {
+        mynodes$shape[i] <- "square"
+      }
+    } else if (mynodes[i,1] == "#d2e5f6")
+    {
+      if (myedges[which(myedges$to == mynodes[i,2])[1], 1]=="met2gene" | myedges[which(myedges$to == mynodes[i,2])[1], 1]=="met2protein")
+      {
+        mynodes$shape[i] <- "square"
+      } else {
+        mynodes$shape[i] <- "dot"
+      }
+    }
+  }
+
+  return(list("mynodes" = mynodes, "myedges" = myedges))
+}
