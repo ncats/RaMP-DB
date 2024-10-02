@@ -25,64 +25,8 @@ plotCataNetwork <- function(catalyzedf = "") {
     stop("Please make sure that the input is the resulting data.frame returned by the rampFastCata() function")
   }
 
+  edges_nodes <- buildCataNetworkDataframe(catalyzedf)
 
-  #Set Edges
-  myedges = catalyzedf[,c("query_relation", "input_common_name","rxn_partner_common_name", "Source")]
-  colnames(myedges)[2:3] <-c("from","to")
-
-  myedges$color <- ifelse(myedges$Source=="HMDB", "#ca1f7b", ifelse(myedges$Source=="Rhea", "#cc5500", "#008080"))
-  myedges$highlight <- myedges$color
-
-  #Set nodes
-  mynodes=c(unique(myedges$from),unique(myedges$to))
-  mycol=c(rep("black",length(unique(myedges$from))),
-          rep("#d2e5f6",length(unique(myedges$to))))
-  mynames <- mynodes
-
-  mynodes <- data.frame(color=mycol,id=mynames,label=mynames)
-
-  duplicates <- mynodes[mynodes[,3] %in% mynodes[duplicated(mynodes[3]),3],]
-
-  if(nrow(duplicates)>0)
-  {
-    mynodes <- mynodes[-c(as.numeric(rownames(duplicates))),]
-
-    duplicates <- split(duplicates, duplicates$id)
-
-    for (i in 1:length(duplicates))
-    {
-      if(length(which(grepl("black", duplicates[[i]]$color)))>0)
-      {
-        single <- unique(duplicates[[i]][grepl("black", duplicates[[i]]$color),])
-      } else
-      {
-        single <- duplicates[[i]][1,]
-      }
-
-      mynodes <- rbind(mynodes, single)
-    }
-  }
-
-  for (i in 1:nrow(mynodes))
-  {
-    if (mynodes[i,1] == "black")
-    {
-      if (myedges[which(myedges$from == mynodes[i,2])[1], 1]=="met2gene" | myedges[which(myedges$from == mynodes[i,2])[1], 1]=="met2protein")
-      {
-        mynodes$shape[i] <- "dot"
-      } else {
-        mynodes$shape[i] <- "square"
-      }
-    } else if (mynodes[i,1] == "#d2e5f6")
-    {
-      if (myedges[which(myedges$to == mynodes[i,2])[1], 1]=="met2gene" | myedges[which(myedges$to == mynodes[i,2])[1], 1]=="met2protein")
-      {
-        mynodes$shape[i] <- "square"
-      } else {
-        mynodes$shape[i] <- "dot"
-      }
-    }
-  }
 
   #ledges <- data.frame(color = unique(myedges$color.color),
   #           label = c("From HMDB", "From Rhea", "From Both"))
@@ -106,14 +50,13 @@ plotCataNetwork <- function(catalyzedf = "") {
                                      icon.code = c("f111", "f0c8")))
 
   # Now plot
-  visNetwork::visNetwork(mynodes, myedges) %>%
+  visNetwork::visNetwork(edges_nodes$mynodes, edges_nodes$myedges) %>%
     visNetwork::visInteraction(dragNodes = TRUE,
                                dragView = TRUE,
                                navigationButtons=TRUE,zoomView = TRUE) %>%
     visNetwork::visLayout(randomSeed = 123) %>%
     visNetwork::visNodes(size = 20, font = list(size = 25, background = "white")) %>%
     visNetwork::visEdges(width = 1.5, dashes = TRUE, selectionWidth = 3) %>%
-    #visNetwork::visLegend(useGroups = F, addNodes = lnodes, addEdges = ledges, main = "Legend") %>%
     visNetwork::visLegend(useGroups = F, addNodes = lnodes, main = "Legend") %>%
     visNetwork::visGroups()%>%
     visNetwork::addFontAwesome(version = "5.13.0") %>%
