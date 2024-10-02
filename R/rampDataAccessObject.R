@@ -420,6 +420,7 @@ getAnalytesFromOntologyQuery <- function(biospecimen) {
 }
 
 getMetabolitesForOntologyQuery <- function(ontologyList) {
+  ontology_list = formatListAsString(idList = ontologyList)
   return (paste0("select source.rampId,
                        group_concat(distinct source.sourceId COLLATE NOCASE)   as source_ids,
                        analyte.common_name as common_names,
@@ -431,18 +432,19 @@ getMetabolitesForOntologyQuery <- function(ontologyList) {
                      ontology
                 where analytehasontology.rampOntologyId in (select distinct rampOntologyId
                                             from ontology
-                                            where commonName in (", ontologyList, "))
+                                            where commonName in (", ontology_list, "))
                   and ontology.rampOntologyId = analytehasontology.rampOntologyId
                   and source.rampId = analytehasontology.rampCompoundId
                   and analyte.rampId = source.rampId
                 group by ontology.commonName, source.rampId, ontology.HMDBOntologyType"))
 }
 getMetabolitesForOntologyQueryOld <- function(ontologyList) {
+  ontology_list = formatListAsString(idList = ontologyList)
   return (paste0("select rampId,
         group_concat(distinct s.sourceId COLLATE NOCASE) as source_ids,
         group_concat(distinct s.commonName COLLATE NOCASE) as common_names, o.commonName, o.HMDBOntologyType
         from source s, analytehasontology ao, ontology o where ao.rampOntologyId in (
-        select distinct rampOntologyId from ontology where commonName in (", ontologyList, "))
+        select distinct rampOntologyId from ontology where commonName in (", ontology_list, "))
         and o.rampOntologyId = ao.rampOntologyId and s.rampId = ao.rampCompoundId
         group by o.commonName, s.rampId, o.HMDBOntologyType"))
 }

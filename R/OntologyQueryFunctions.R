@@ -128,9 +128,7 @@ getMetaFromOnto <- function(ontology, db = RaMP()) {
   if (length(matched_ontos) > 0) {
     print(paste0("Found ", length(matched_ontos), " ontology term matches."))
 
-    ontologyList <- paste0("'", paste(list_ontology, collapse = "','"), "'")
-
-    mdf_final <- db@api$getMetabolitesForOntology(ontologyList = ontologyList)
+    mdf_final <- db@api$getMetabolitesForOntology(ontologyList = list_ontology)
 
     mdf_final <- unique(mdf_final)
     mdf_final <- mdf_final[, c(4, 5, 3, 2)]
