@@ -533,9 +533,6 @@ runReactionClassTest <- function( analytes,
                              includeRaMPids = FALSE,
                              db = RaMP())
 {
-  # Grab reactions that contain metabolites to run Fisher on metabolites
-  # This will return all pathways that have at 5-150 metabolites/genes in them
-  ## fishmetab <- pathwaydf[grep("RAMP_C_", pathwaydf$rampId), ]
 
   analytes_split <- matrix(unlist(strsplit(analytes,':')), ncol = 2L, byrow = TRUE)
   analytes_split <- split(data.frame(analytes_split), analytes_split[,1])
@@ -855,10 +852,6 @@ runReactionClassTest <- function( analytes,
       colnames(out)[ncol(out)] <- "Pval_Holm"
     }
   }
-
-
-
-
 
     return(out)
 }
