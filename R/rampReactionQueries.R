@@ -601,8 +601,6 @@ runReactionClassTest <- function( analytes,
     stop("Please make sure that the input is contains only chebi and uniprot ids")
   }
 
-
-
   if (length(analytes_split)==2)
   {
     metab_analytes <- paste(analytes_split$chebi$X1, analytes_split$chebi$X2, sep = ":")
@@ -713,44 +711,57 @@ runReactionClassTest <- function( analytes,
                               "prot_pval" = ec_level_2_stats$pvals_prot,
                               "prot_oddsratio" = as.numeric(ec_level_2_stats$oddsratio_prot))
 
-    reactionClass_stats <- data.frame(rbind(ec_level_1_stats, ec_level_2_stats))
-
-    for ( i in 1:nrow(reactionClass_stats))
+    #Calculate adjusted pvals independently for each EC level
+    combined_stats <- function(reactionClass_stats)
     {
-      if (reactionClass_stats$mets_pval[i] == 1 && reactionClass_stats$mets_oddsratio[i] == "Inf")
+      reactionClass_stats <- as.data.frame(reactionClass_stats)
+      for ( i in 1:nrow(reactionClass_stats))
       {
-        reactionClass_stats$mets_pval[i] = NA
-        reactionClass_stats$mets_oddsratio[i] = NA
+        if (reactionClass_stats$mets_pval[i] == 1 && reactionClass_stats$mets_oddsratio[i] == "Inf")
+        {
+          reactionClass_stats$mets_pval[i] = NA
+          reactionClass_stats$mets_oddsratio[i] = NA
+        }
+        if (reactionClass_stats$prot_pval[i] == 1 && reactionClass_stats$prot_oddsratio[i] == "Inf")
+        {
+          reactionClass_stats$prot_pval[i] = NA
+          reactionClass_stats$prot_oddsratio[i] = NA
+        }
       }
-      if (reactionClass_stats$prot_pval[i] == 1 && reactionClass_stats$prot_oddsratio[i] == "Inf")
-      {
-        reactionClass_stats$prot_pval[i] = NA
-        reactionClass_stats$prot_oddsratio[i] = NA
-      }
+
+      reactionClass_stats[-1:-2] <- sapply(reactionClass_stats[-1:-2],as.numeric)
+
+      # Calculate combined p-values for pathways that have both genes and metabolites
+      gm <- intersect(which(!is.na(reactionClass_stats$mets_pval)), which(!is.na(reactionClass_stats$prot_pval)))
+      combpval <- stats::pchisq(-2 * (log((reactionClass_stats$mets_pval[gm])) + log(reactionClass_stats$prot_pval[gm])),
+                                df = 2, lower.tail = FALSE
+      )
+
+      g <- which(is.na(reactionClass_stats$mets_pval))
+      gpval <- reactionClass_stats$prot_pval[g]
+      m <- which(is.na(reactionClass_stats$prot_pval))
+      mpval <- reactionClass_stats$mets_pval[m]
+
+      out <- rbind(reactionClass_stats[gm, ], reactionClass_stats[g, ], reactionClass_stats[m, ])
+      out <- cbind(out, c(combpval, gpval, mpval))
+      colnames(out)[ncol(out)] <- "Pval_combined"
+      fdr <- stats::p.adjust(out$Pval_combined, method = "fdr")
+      out <- cbind(out, fdr)
+      colnames(out)[ncol(out)] <- "Pval_combined_FDR"
+      holm <- stats::p.adjust(out$Pval_combined, method = "holm")
+      out <- cbind(out, holm)
+      colnames(out)[ncol(out)] <- "Pval_combined_Holm"
+
+      return(out)
     }
 
-    reactionClass_stats[-1:-2] <- sapply(reactionClass_stats[-1:-2],as.numeric)
 
-    # Calculate combined p-values for pathways that have both genes and metabolites
-    gm <- intersect(which(!is.na(reactionClass_stats$mets_pval)), which(!is.na(reactionClass_stats$prot_pval)))
-    combpval <- stats::pchisq(-2 * (log((reactionClass_stats$mets_pval[gm])) + log(reactionClass_stats$prot_pval[gm])),
-                              df = 2, lower.tail = FALSE
-    )
+    combined_ec_level_1_stats <- combined_stats(ec_level_1_stats)
+    combined_ec_level_2_stats <- combined_stats(ec_level_2_stats)
 
-    g <- which(is.na(reactionClass_stats$mets_pval))
-    gpval <- reactionClass_stats$prot_pval[g]
-    m <- which(is.na(reactionClass_stats$prot_pval))
-    mpval <- reactionClass_stats$mets_pval[m]
+    reactionClass_stats_df <- data.frame(rbind(combined_ec_level_1_stats, combined_ec_level_2_stats))
 
-    out <- rbind(reactionClass_stats[gm, ], reactionClass_stats[g, ], reactionClass_stats[m, ])
-    out <- cbind(out, c(combpval, gpval, mpval))
-    colnames(out)[ncol(out)] <- "Pval_combined"
-    fdr <- stats::p.adjust(out$Pval_combined, method = "fdr")
-    out <- cbind(out, fdr)
-    colnames(out)[ncol(out)] <- "Pval_combined_FDR"
-    holm <- stats::p.adjust(out$Pval_combined, method = "holm")
-    out <- cbind(out, holm)
-    colnames(out)[ncol(out)] <- "Pval_combined_Holm"
+
   }
   else if (length(analytes_split)==1)
   {
@@ -824,19 +835,28 @@ runReactionClassTest <- function( analytes,
                                 "prot_pval" = ec_level_2_stats$pvals_prot,
                                 "prot_oddsratio" = as.numeric(ec_level_2_stats$oddsratio_prot))
 
-      out <- data.frame(rbind(ec_level_1_stats, ec_level_2_stats))
+      #Calculate adjusted pvals independently for each EC level
+      adjusted_stats <- function(reactionClass_stats)
+      {
+        reactionClass_stats <- as.data.frame(reactionClass_stats)
+        reactionClass_stats[-1:-2] <- sapply(reactionClass_stats[-1:-2],as.numeric)
 
-      out[-1:-2] <- sapply(out[-1:-2],as.numeric)
+        fdr <- stats::p.adjust(reactionClass_stats$prot_pval, method = "fdr")
+        reactionClass_stats <- cbind(reactionClass_stats, fdr)
+        colnames(reactionClass_stats)[ncol(reactionClass_stats)] <- "Pval_FDR"
+        holm <- stats::p.adjust(reactionClass_stats$prot_pval, method = "holm")
+        reactionClass_stats <- cbind(reactionClass_stats, holm)
+        colnames(reactionClass_stats)[ncol(reactionClass_stats)] <- "Pval_Holm"
 
-      fdr <- stats::p.adjust(out$prot_pval, method = "fdr")
-      out <- cbind(out, fdr)
-      colnames(out)[ncol(out)] <- "Pval_FDR"
-      holm <- stats::p.adjust(out$prot_pval, method = "holm")
-      out <- cbind(out, holm)
-      colnames(out)[ncol(out)] <- "Pval_Holm"
+        return(reactionClass_stats)
+      }
+
+      ec_level_1_adjusted_stats <- adjusted_stats(ec_level_1_stats)
+      ec_level_2_adjusted_stats <- adjusted_stats(ec_level_2_stats)
+
+      reactionClass_stats_df <- data.frame(rbind(ec_level_1_adjusted_stats, ec_level_2_adjusted_stats))
 
     }
-
     else if (names(analytes_split[1]) == "chebi")
     {
       metab_analytes <- paste(analytes_split$chebi$X1, analytes_split$chebi$X2, sep = ":")
@@ -907,19 +927,30 @@ runReactionClassTest <- function( analytes,
                                 "mets_pval" = ec_level_2_stats$pvals_mets,
                                 "mets_oddsratio" = as.numeric(ec_level_2_stats$oddsratio_mets))
 
-      out <- data.frame(rbind(ec_level_1_stats, ec_level_2_stats))
+      #Calculate adjusted pvals independently for each EC level
+      adjusted_stats <- function(reactionClass_stats)
+      {
+        reactionClass_stats <- as.data.frame(reactionClass_stats)
+        reactionClass_stats[-1:-2] <- sapply(reactionClass_stats[-1:-2],as.numeric)
 
-      out[-1:-2] <- sapply(out[-1:-2],as.numeric)
-      fdr <- stats::p.adjust(out$mets_pval, method = "fdr")
-      out <- cbind(out, fdr)
-      colnames(out)[ncol(out)] <- "Pval_FDR"
-      holm <- stats::p.adjust(out$mets_pval, method = "holm")
-      out <- cbind(out, holm)
-      colnames(out)[ncol(out)] <- "Pval_Holm"
+        fdr <- stats::p.adjust(reactionClass_stats$mets_pval, method = "fdr")
+        reactionClass_stats <- cbind(reactionClass_stats, fdr)
+        colnames(reactionClass_stats)[ncol(reactionClass_stats)] <- "Pval_FDR"
+        holm <- stats::p.adjust(reactionClass_stats$mets_pval, method = "holm")
+        reactionClass_stats <- cbind(reactionClass_stats, holm)
+        colnames(reactionClass_stats)[ncol(reactionClass_stats)] <- "Pval_Holm"
+
+        return(reactionClass_stats)
+      }
+
+      ec_level_1_adjusted_stats <- adjusted_stats(ec_level_1_stats)
+      ec_level_2_adjusted_stats <- adjusted_stats(ec_level_2_stats)
+
+      reactionClass_stats_df <- data.frame(rbind(ec_level_1_adjusted_stats, ec_level_2_adjusted_stats))
     }
   }
 
-    return(out)
+    return(reactionClass_stats_df)
 }
 
 
