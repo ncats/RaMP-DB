@@ -13,7 +13,7 @@ runReactionClassTest(
 )
 }
 \arguments{
-\item{analytes}{a vector of analyte ids (genes or metabolites) that need to be searched}
+\item{analytes}{a vector of analyte ids (genes or metabolites) that need to be searched. ID types accepted: chebi and uniprot}
 
 \item{humanProtein}{require reactions to have a human protein (enzyme or transporter), default True}
 

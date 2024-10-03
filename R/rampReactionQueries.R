@@ -144,6 +144,52 @@ getReactionsForAnalytes <- function( analytes, onlyHumanMets=F, humanProtein=T, 
     }
   }
 
+  met2rxn <- resultList$met2rxn
+  prot2rxn <- resultList$prot2rxn
+  if(any(met2rxn$metHitCount>1)==TRUE)
+  {
+    met2rxn_edit <- met2rxn[which(met2rxn$metHitCount>1),]
+    met2rxn <- met2rxn[which(met2rxn$metHitCount==1),]
+
+    met2rxn_edit <- split(met2rxn_edit, met2rxn_edit$reactionId)
+
+    for (i in 1:length(met2rxn_edit))
+    {
+      metSourceId <- paste0(c(met2rxn_edit[[i]]$metSourceId), collapse = "|")
+      metName <- paste0(c(met2rxn_edit[[i]]$metName), collapse = "|")
+      line2add <- met2rxn_edit[[i]][1,]
+      line2add$metSourceId <- metSourceId
+      line2add$metName <- metName
+
+      met2rxn <- rbind(met2rxn, line2add)
+
+    }
+  }
+
+  if(any(duplicated(prot2rxn$reactionId))==TRUE)
+  {
+    duplicate_reactionId <- prot2rxn$reactionId[which(duplicated(prot2rxn$reactionId))]
+
+    prot2rxn_edit <- prot2rxn[which(is.element(prot2rxn$reactionId, duplicate_reactionId)),]
+    prot2rxn <- prot2rxn[-which(is.element(prot2rxn$reactionId, duplicate_reactionId)),]
+    prot2rxn_edit <- split(prot2rxn_edit, prot2rxn_edit$reactionId)
+
+    for (i in 1:length(prot2rxn_edit))
+    {
+      uniprot <- paste0(c(prot2rxn_edit[[i]]$uniprot), collapse = "|")
+      proteinName <- paste0(c(prot2rxn_edit[[i]]$proteinName), collapse = "|")
+      line2add <- prot2rxn_edit[[i]][1,]
+      line2add$uniprot <- uniprot
+      line2add$proteinName <- proteinName
+
+      prot2rxn <- rbind(prot2rxn, line2add)
+
+    }
+  }
+
+  resultList$met2rxn <- met2rxn
+  resultList$prot2rxn <- prot2rxn
+
   message("Finished getReactionsForAnalytes()")
 
   return(resultList)
@@ -519,7 +565,7 @@ getRheaAnalyteReactionAssociations <- function( analytes, includeRheaRxnDetails=
 
 #' runReactionClassTest Enrichment analysis for analyte-reaction class mappings
 #'
-#' @param analytes a vector of analyte ids (genes or metabolites) that need to be searched
+#' @param analytes a vector of analyte ids (genes or metabolites) that need to be searched. ID types accepted: chebi and uniprot
 #' @param humanProtein require reactions to have a human protein (enzyme or transporter), default True
 #' @param alternative alternative hypothesis test passed on to fisher.test(). Options are two.sided, greater, or less (default is "less")
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
@@ -536,6 +582,26 @@ runReactionClassTest <- function( analytes,
 
   analytes_split <- matrix(unlist(strsplit(analytes,':')), ncol = 2L, byrow = TRUE)
   analytes_split <- split(data.frame(analytes_split), analytes_split[,1])
+
+  if (length(analytes_split)>2)
+  {
+    stop("Please make sure that the input is contains only chebi and uniprot ids")
+  }
+
+  approved_ids <- c("chebi", "uniprot")
+
+  if (length(analytes_split) == 2 & length(intersect(c("chebi", "uniprot"),
+                                                     names(analytes_split)))!=2)
+  {
+    stop("Please make sure that the input is contains only chebi and uniprot ids")
+  }
+
+  if (all(names(analytes_split) %in% approved_ids) == FALSE)
+  {
+    stop("Please make sure that the input is contains only chebi and uniprot ids")
+  }
+
+
 
   if (length(analytes_split)==2)
   {
