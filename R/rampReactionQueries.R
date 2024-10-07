@@ -610,92 +610,10 @@ runReactionClassTest <- function( analytes,
                                                      humanProtein=humanProtein,
                                                      db = db)
 
-    reactionClassdf$class_ec_level_1 <-reactionClassdf$class_ec_level_1[-c(which(reactionClassdf$class_ec_level_1$metCount==0 & reactionClassdf$class_ec_level_1$proteinCount==0)),]
-
     print("Running Fisher's tests")
 
-    runFisherReaction <- function(ec_level_df)
-    {
-      ## Initialize empty contingency table for later
-      contingencyTb <- matrix(0, nrow = 2, ncol = 2)
-      colnames(contingencyTb) <- c("In Reaction Class", "Not In Reaction Class")
-      rownames(contingencyTb) <- c("All Analyte", "User's Analyte")
-
-      ## First Metabolites
-      pidCount <- 0
-      pval_mets <- oddsratio_mets <- totinpath <- userinpath <- pidused <- c()
-      for (i in 1:nrow(ec_level_df))
-      {
-        pidCount <- pidCount + 1
-        tot_in_reactionClass <- ec_level_df$totalMetsInRxnClass[i]
-        tot_out_reactionClass <- sum(ec_level_df$totalMetsInRxnClass) - tot_in_reactionClass
-        user_in_reactionClass <- ec_level_df$metCount[i]
-        user_out_reactionClass <- length(metab_analytes) - ec_level_df$metCount[i]
-
-        contingencyTb[1, 1] <- tot_in_reactionClass - user_in_reactionClass
-        contingencyTb[1, 2] <- tot_out_reactionClass - user_out_reactionClass
-        contingencyTb[2, 1] <- user_in_reactionClass
-        contingencyTb[2, 2] <- user_out_reactionClass
-
-        # Put the test into a try catch in case there's an issue, we'll have some details on the contingency matrix
-        tryCatch(
-          {
-            result <- stats::fisher.test(contingencyTb, alternative = alternative)
-          },
-          error = function(e) {
-            print(toString(e))
-            print(i)
-            print(contingencyTb)
-            print(tot_in_reactionClass)
-            print(tot_out_reactionClass)
-            print(user_in_reactionClass)
-            print(user_out_reactionClass)
-          }
-        )
-        pval_mets <- c(pval_mets, result$p.value)
-        oddsratio_mets <- c(oddsratio_mets, result$estimate)
-      }
-
-      ## Second Protiens
-      pidCount <- 0
-      pval_prot <- oddsratio_prot <- totinpath <- userinpath <- pidused <- c()
-      for (i in 1:nrow(ec_level_df))
-      {
-        pidCount <- pidCount + 1
-        tot_in_reactionClass <- ec_level_df$totalProteinsInRxnClass[i]
-        tot_out_reactionClass <- sum(ec_level_df$totalProteinsInRxnClass) - tot_in_reactionClass
-        user_in_reactionClass <- ec_level_df$proteinCount[i]
-        user_out_reactionClass <- length(prot_analytes) - ec_level_df$proteinCount[i]
-
-        contingencyTb[1, 1] <- tot_in_reactionClass - user_in_reactionClass
-        contingencyTb[1, 2] <- tot_out_reactionClass - user_out_reactionClass
-        contingencyTb[2, 1] <- user_in_reactionClass
-        contingencyTb[2, 2] <- user_out_reactionClass
-
-        # Put the test into a try catch in case there's an issue, we'll have some details on the contingency matrix
-        tryCatch(
-          {
-            result <- stats::fisher.test(contingencyTb, alternative = alternative)
-          },
-          error = function(e) {
-            print(toString(e))
-            print(i)
-            print(contingencyTb)
-            print(tot_in_reactionClass)
-            print(tot_out_reactionClass)
-            print(user_in_reactionClass)
-            print(user_out_reactionClass)
-          }
-        )
-        pval_prot <- c(pval_prot, result$p.value)
-        oddsratio_prot <- c(oddsratio_prot, result$estimate)
-      }
-
-      return(list("pvals_mets" = pval_mets, "oddsratio_mets" = oddsratio_mets, "pvals_prot" = pval_prot, "oddsratio_prot" = oddsratio_prot))
-    }
-
-    ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1)
-    ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2)
+    ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metab_analytes = metab_analytes, prot_analytes = prot_analytes, alternative = alternative)
+    ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2, metab_analytes = metab_analytes, prot_analytes = prot_analytes, alternative = alternative)
 
     ec_level_1_stats <- cbind("rxnClass" = reactionClassdf$class_ec_level_1$rxnClass,
                               "ecNumber" = reactionClassdf$class_ec_level_1$ecNumber,
@@ -712,56 +630,10 @@ runReactionClassTest <- function( analytes,
                               "prot_oddsratio" = as.numeric(ec_level_2_stats$oddsratio_prot))
 
     #Calculate adjusted pvals independently for each EC level
-    combined_stats <- function(reactionClass_stats)
-    {
-      reactionClass_stats <- as.data.frame(reactionClass_stats)
-      for ( i in 1:nrow(reactionClass_stats))
-      {
-        if (reactionClass_stats$mets_pval[i] == 1 && reactionClass_stats$mets_oddsratio[i] == "Inf")
-        {
-          reactionClass_stats$mets_pval[i] = NA
-          reactionClass_stats$mets_oddsratio[i] = NA
-        }
-        if (reactionClass_stats$prot_pval[i] == 1 && reactionClass_stats$prot_oddsratio[i] == "Inf")
-        {
-          reactionClass_stats$prot_pval[i] = NA
-          reactionClass_stats$prot_oddsratio[i] = NA
-        }
-      }
-
-      reactionClass_stats[-1:-2] <- sapply(reactionClass_stats[-1:-2],as.numeric)
-
-      # Calculate combined p-values for pathways that have both genes and metabolites
-      gm <- intersect(which(!is.na(reactionClass_stats$mets_pval)), which(!is.na(reactionClass_stats$prot_pval)))
-      combpval <- stats::pchisq(-2 * (log((reactionClass_stats$mets_pval[gm])) + log(reactionClass_stats$prot_pval[gm])),
-                                df = 2, lower.tail = FALSE
-      )
-
-      g <- which(is.na(reactionClass_stats$mets_pval))
-      gpval <- reactionClass_stats$prot_pval[g]
-      m <- which(is.na(reactionClass_stats$prot_pval))
-      mpval <- reactionClass_stats$mets_pval[m]
-
-      out <- rbind(reactionClass_stats[gm, ], reactionClass_stats[g, ], reactionClass_stats[m, ])
-      out <- cbind(out, c(combpval, gpval, mpval))
-      colnames(out)[ncol(out)] <- "Pval_combined"
-      fdr <- stats::p.adjust(out$Pval_combined, method = "fdr")
-      out <- cbind(out, fdr)
-      colnames(out)[ncol(out)] <- "Pval_combined_FDR"
-      holm <- stats::p.adjust(out$Pval_combined, method = "holm")
-      out <- cbind(out, holm)
-      colnames(out)[ncol(out)] <- "Pval_combined_Holm"
-
-      return(out)
-    }
-
-
-    combined_ec_level_1_stats <- combined_stats(ec_level_1_stats)
-    combined_ec_level_2_stats <- combined_stats(ec_level_2_stats)
+    combined_ec_level_1_stats <- adjusted_stats(ec_level_1_stats, analyte_type = "both")
+    combined_ec_level_2_stats <- adjusted_stats(ec_level_2_stats, analyte_type = "both")
 
     reactionClass_stats_df <- data.frame(rbind(combined_ec_level_1_stats, combined_ec_level_2_stats))
-
-
   }
   else if (length(analytes_split)==1)
   {
@@ -773,57 +645,10 @@ runReactionClassTest <- function( analytes,
                                                        humanProtein=humanProtein,
                                                        db = db)
 
-      reactionClassdf$class_ec_level_1 <-reactionClassdf$class_ec_level_1[-c(which(reactionClassdf$class_ec_level_1$proteinCount==0)),]
-
       print("Running Fisher's tests")
 
-      runFisherReaction <- function(ec_level_df)
-      {
-        ## Initialize empty contingency table for later
-        contingencyTb <- matrix(0, nrow = 2, ncol = 2)
-        colnames(contingencyTb) <- c("In Reaction Class", "Not In Reaction Class")
-        rownames(contingencyTb) <- c("All Analyte", "User's Analyte")
-
-        ## Second Protiens
-        pidCount <- 0
-        pval_prot <- oddsratio_prot <- totinpath <- userinpath <- pidused <- c()
-        for (i in 1:nrow(ec_level_df))
-        {
-          pidCount <- pidCount + 1
-          tot_in_reactionClass <- ec_level_df$totalProteinsInRxnClass[i]
-          tot_out_reactionClass <- sum(ec_level_df$totalProteinsInRxnClass) - tot_in_reactionClass
-          user_in_reactionClass <- ec_level_df$proteinCount[i]
-          user_out_reactionClass <- length(prot_analytes) - ec_level_df$proteinCount[i]
-
-          contingencyTb[1, 1] <- tot_in_reactionClass - user_in_reactionClass
-          contingencyTb[1, 2] <- tot_out_reactionClass - user_out_reactionClass
-          contingencyTb[2, 1] <- user_in_reactionClass
-          contingencyTb[2, 2] <- user_out_reactionClass
-
-          # Put the test into a try catch in case there's an issue, we'll have some details on the contingency matrix
-          tryCatch(
-            {
-              result <- stats::fisher.test(contingencyTb, alternative = alternative)
-            },
-            error = function(e) {
-              print(toString(e))
-              print(i)
-              print(contingencyTb)
-              print(tot_in_reactionClass)
-              print(tot_out_reactionClass)
-              print(user_in_reactionClass)
-              print(user_out_reactionClass)
-            }
-          )
-          pval_prot <- c(pval_prot, result$p.value)
-          oddsratio_prot <- c(oddsratio_prot, result$estimate)
-        }
-
-        return(list("pvals_prot" = pval_prot, "oddsratio_prot" = oddsratio_prot))
-      }
-
-      ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1)
-      ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2)
+      ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metab_analytes = NULL, prot_analytes = prot_analytes, alternative = alternative)
+      ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2, metab_analytes = NULL, prot_analytes = prot_analytes, alternative = alternative)
 
       ec_level_1_stats <- cbind("rxnClass" = reactionClassdf$class_ec_level_1$rxnClass,
                                 "ecNumber" = reactionClassdf$class_ec_level_1$ecNumber,
@@ -836,23 +661,8 @@ runReactionClassTest <- function( analytes,
                                 "prot_oddsratio" = as.numeric(ec_level_2_stats$oddsratio_prot))
 
       #Calculate adjusted pvals independently for each EC level
-      adjusted_stats <- function(reactionClass_stats)
-      {
-        reactionClass_stats <- as.data.frame(reactionClass_stats)
-        reactionClass_stats[-1:-2] <- sapply(reactionClass_stats[-1:-2],as.numeric)
-
-        fdr <- stats::p.adjust(reactionClass_stats$prot_pval, method = "fdr")
-        reactionClass_stats <- cbind(reactionClass_stats, fdr)
-        colnames(reactionClass_stats)[ncol(reactionClass_stats)] <- "Pval_FDR"
-        holm <- stats::p.adjust(reactionClass_stats$prot_pval, method = "holm")
-        reactionClass_stats <- cbind(reactionClass_stats, holm)
-        colnames(reactionClass_stats)[ncol(reactionClass_stats)] <- "Pval_Holm"
-
-        return(reactionClass_stats)
-      }
-
-      ec_level_1_adjusted_stats <- adjusted_stats(ec_level_1_stats)
-      ec_level_2_adjusted_stats <- adjusted_stats(ec_level_2_stats)
+      ec_level_1_adjusted_stats <- adjusted_stats(ec_level_1_stats, analyte_type = "uniprot")
+      ec_level_2_adjusted_stats <- adjusted_stats(ec_level_2_stats, analyte_type ="uniprot")
 
       reactionClass_stats_df <- data.frame(rbind(ec_level_1_adjusted_stats, ec_level_2_adjusted_stats))
 
@@ -864,58 +674,10 @@ runReactionClassTest <- function( analytes,
       reactionClassdf <- getReactionClassesForAnalytes(analytes,
                                                        humanProtein=humanProtein,
                                                        db = db)
-
-      reactionClassdf$class_ec_level_1 <- reactionClassdf$class_ec_level_1[-c(which(reactionClassdf$class_ec_level_1$metCount==0)),]
-
       print("Running Fisher's tests")
 
-      runFisherReaction <- function(ec_level_df)
-      {
-        ## Initialize empty contingency table for later
-        contingencyTb <- matrix(0, nrow = 2, ncol = 2)
-        colnames(contingencyTb) <- c("In Reaction Class", "Not In Reaction Class")
-        rownames(contingencyTb) <- c("All Analyte", "User's Analyte")
-
-        ## First Metabolites
-        pidCount <- 0
-        pval_mets <- oddsratio_mets <- totinpath <- userinpath <- pidused <- c()
-        for (i in 1:nrow(ec_level_df))
-        {
-          pidCount <- pidCount + 1
-          tot_in_reactionClass <- ec_level_df$totalMetsInRxnClass[i]
-          tot_out_reactionClass <- sum(ec_level_df$totalMetsInRxnClass) - tot_in_reactionClass
-          user_in_reactionClass <- ec_level_df$metCount[i]
-          user_out_reactionClass <- length(metab_analytes) - ec_level_df$metCount[i]
-
-          contingencyTb[1, 1] <- tot_in_reactionClass - user_in_reactionClass
-          contingencyTb[1, 2] <- tot_out_reactionClass - user_out_reactionClass
-          contingencyTb[2, 1] <- user_in_reactionClass
-          contingencyTb[2, 2] <- user_out_reactionClass
-
-          # Put the test into a try catch in case there's an issue, we'll have some details on the contingency matrix
-          tryCatch(
-            {
-              result <- stats::fisher.test(contingencyTb, alternative = alternative)
-            },
-            error = function(e) {
-              print(toString(e))
-              print(i)
-              print(contingencyTb)
-              print(tot_in_reactionClass)
-              print(tot_out_reactionClass)
-              print(user_in_reactionClass)
-              print(user_out_reactionClass)
-            }
-          )
-          pval_mets <- c(pval_mets, result$p.value)
-          oddsratio_mets <- c(oddsratio_mets, result$estimate)
-        }
-
-        return(list("pvals_mets" = pval_mets, "oddsratio_mets" = oddsratio_mets))
-      }
-
-      ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1)
-      ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2)
+      ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metab_analytes = metab_analytes, prot_analytes = NULL, alternative = alternative)
+      ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2, metab_analytes = metab_analytes, prot_analytes = NULL, alternative = alternative)
 
       ec_level_1_stats <- cbind("rxnClass" = reactionClassdf$class_ec_level_1$rxnClass,
                                 "ecNumber" = reactionClassdf$class_ec_level_1$ecNumber,
@@ -928,29 +690,15 @@ runReactionClassTest <- function( analytes,
                                 "mets_oddsratio" = as.numeric(ec_level_2_stats$oddsratio_mets))
 
       #Calculate adjusted pvals independently for each EC level
-      adjusted_stats <- function(reactionClass_stats)
-      {
-        reactionClass_stats <- as.data.frame(reactionClass_stats)
-        reactionClass_stats[-1:-2] <- sapply(reactionClass_stats[-1:-2],as.numeric)
 
-        fdr <- stats::p.adjust(reactionClass_stats$mets_pval, method = "fdr")
-        reactionClass_stats <- cbind(reactionClass_stats, fdr)
-        colnames(reactionClass_stats)[ncol(reactionClass_stats)] <- "Pval_FDR"
-        holm <- stats::p.adjust(reactionClass_stats$mets_pval, method = "holm")
-        reactionClass_stats <- cbind(reactionClass_stats, holm)
-        colnames(reactionClass_stats)[ncol(reactionClass_stats)] <- "Pval_Holm"
-
-        return(reactionClass_stats)
-      }
-
-      ec_level_1_adjusted_stats <- adjusted_stats(ec_level_1_stats)
-      ec_level_2_adjusted_stats <- adjusted_stats(ec_level_2_stats)
+      ec_level_1_adjusted_stats <- adjusted_stats(ec_level_1_stats, analyte_type ="chebi")
+      ec_level_2_adjusted_stats <- adjusted_stats(ec_level_2_stats, analyte_type ="chebi")
 
       reactionClass_stats_df <- data.frame(rbind(ec_level_1_adjusted_stats, ec_level_2_adjusted_stats))
     }
   }
 
-    return(reactionClass_stats_df)
+  return(reactionClass_stats_df)
 }
 
 
@@ -1234,3 +982,190 @@ checkReactionInputIds <- function(callingFunction, idList) {
   ids <- list(metIds = metIds, proteinIds = proteinIds)
   return(ids)
 }
+
+#' Utility method that runs Fisher's test of individual ec level classes
+#'
+#' @param ec_level_df EC level output from getReactionClassesForAnalytes
+#' @param metab_analytes metabolites input
+#' @param prot_analytes protein input
+#' @noRd
+runFisherReaction <- function(ec_level_df, metab_analytes, prot_analytes, alternative = alternative)
+{
+  ## Initialize empty contingency table for later
+  contingencyTb <- matrix(0, nrow = 2, ncol = 2)
+  colnames(contingencyTb) <- c("In Reaction Class", "Not In Reaction Class")
+  rownames(contingencyTb) <- c("All Analyte", "User's Analyte")
+
+  output <- list()
+
+  ## First Metabolites
+  if (is.null(metab_analytes) == FALSE)
+  {
+    pidCount <- 0
+    pval_mets <- oddsratio_mets <- totinpath <- userinpath <- pidused <- c()
+    for (i in 1:nrow(ec_level_df))
+    {
+      pidCount <- pidCount + 1
+      tot_in_reactionClass <- ec_level_df$totalMetsInRxnClass[i]
+      tot_out_reactionClass <- sum(ec_level_df$totalMetsInRxnClass) - tot_in_reactionClass
+      user_in_reactionClass <- ec_level_df$metCount[i]
+      user_out_reactionClass <- length(metab_analytes) - ec_level_df$metCount[i]
+
+      contingencyTb[1, 1] <- tot_in_reactionClass - user_in_reactionClass
+      contingencyTb[1, 2] <- tot_out_reactionClass - user_out_reactionClass
+      contingencyTb[2, 1] <- user_in_reactionClass
+      contingencyTb[2, 2] <- user_out_reactionClass
+
+      # Put the test into a try catch in case there's an issue, we'll have some details on the contingency matrix
+      tryCatch(
+        {
+          result <- stats::fisher.test(contingencyTb, alternative = alternative)
+        },
+        error = function(e) {
+          print(toString(e))
+          print(i)
+          print(contingencyTb)
+          print(tot_in_reactionClass)
+          print(tot_out_reactionClass)
+          print(user_in_reactionClass)
+          print(user_out_reactionClass)
+        }
+      )
+      pval_mets <- c(pval_mets, result$p.value)
+      oddsratio_mets <- c(oddsratio_mets, result$estimate)
+    }
+
+    output$pvals_mets = pval_mets
+    output$oddsratio_mets = oddsratio_mets
+
+  }
+
+  ## Second Protiens
+  if (is.null(prot_analytes) == FALSE)
+  {
+    pidCount <- 0
+    pval_prot <- oddsratio_prot <- totinpath <- userinpath <- pidused <- c()
+    for (i in 1:nrow(ec_level_df))
+    {
+      pidCount <- pidCount + 1
+      tot_in_reactionClass <- ec_level_df$totalProteinsInRxnClass[i]
+      tot_out_reactionClass <- sum(ec_level_df$totalProteinsInRxnClass) - tot_in_reactionClass
+      user_in_reactionClass <- ec_level_df$proteinCount[i]
+      user_out_reactionClass <- length(prot_analytes) - ec_level_df$proteinCount[i]
+
+      contingencyTb[1, 1] <- tot_in_reactionClass - user_in_reactionClass
+      contingencyTb[1, 2] <- tot_out_reactionClass - user_out_reactionClass
+      contingencyTb[2, 1] <- user_in_reactionClass
+      contingencyTb[2, 2] <- user_out_reactionClass
+
+      # Put the test into a try catch in case there's an issue, we'll have some details on the contingency matrix
+      tryCatch(
+        {
+          result <- stats::fisher.test(contingencyTb, alternative = alternative)
+        },
+        error = function(e) {
+          print(toString(e))
+          print(i)
+          print(contingencyTb)
+          print(tot_in_reactionClass)
+          print(tot_out_reactionClass)
+          print(user_in_reactionClass)
+          print(user_out_reactionClass)
+        }
+      )
+      pval_prot <- c(pval_prot, result$p.value)
+      oddsratio_prot <- c(oddsratio_prot, result$estimate)
+    }
+
+    output$pvals_prot = pval_prot
+    output$oddsratio_prot = oddsratio_prot
+  }
+
+  return(output)
+}
+
+#' Utility method that returns adjusted p-values when input is only metabolites or only proteins
+#'
+#' @param reactionClass_stats modified statistics output from runFisherReaction
+#' @param analyte_type whether the input is metabolites or proteins
+#' @noRd
+adjusted_stats <- function(reactionClass_stats, analyte_type)
+{
+  reactionClass_stats <- as.data.frame(reactionClass_stats)
+  reactionClass_stats[-1:-2] <- sapply(reactionClass_stats[-1:-2],as.numeric)
+
+  if (analyte_type == "chebi")
+  {
+    for ( i in 1:nrow(reactionClass_stats))
+    {
+      if (reactionClass_stats$mets_pval[i] == 1 && reactionClass_stats$mets_oddsratio[i] == "Inf")
+      {
+        reactionClass_stats$mets_pval[i] = NA
+        reactionClass_stats$mets_oddsratio[i] = NA
+      }
+    }
+    fdr <- stats::p.adjust(reactionClass_stats$mets_pval, method = "fdr")
+    reactionClass_stats <- cbind(reactionClass_stats, fdr)
+    colnames(reactionClass_stats)[ncol(reactionClass_stats)] <- "Pval_FDR"
+    holm <- stats::p.adjust(reactionClass_stats$mets_pval, method = "holm")
+    reactionClass_stats <- cbind(reactionClass_stats, holm)
+    colnames(reactionClass_stats)[ncol(reactionClass_stats)] <- "Pval_Holm"
+  } else if (analyte_type == "uniprot")
+  {
+    for ( i in 1:nrow(reactionClass_stats))
+    {
+      if (reactionClass_stats$prot_pval[i] == 1 && reactionClass_stats$prot_oddsratio[i] == "Inf")
+      {
+        reactionClass_stats$prot_pval[i] = NA
+        reactionClass_stats$prot_oddsratio[i] = NA
+      }
+    }
+    fdr <- stats::p.adjust(reactionClass_stats$prot_pval, method = "fdr")
+    reactionClass_stats <- cbind(reactionClass_stats, fdr)
+    colnames(reactionClass_stats)[ncol(reactionClass_stats)] <- "Pval_FDR"
+    holm <- stats::p.adjust(reactionClass_stats$prot_pval, method = "holm")
+    reactionClass_stats <- cbind(reactionClass_stats, holm)
+    colnames(reactionClass_stats)[ncol(reactionClass_stats)] <- "Pval_Holm"
+  } else if (analyte_type == "both")
+  {
+    for ( i in 1:nrow(reactionClass_stats))
+    {
+      if (reactionClass_stats$mets_pval[i] == 1 && reactionClass_stats$mets_oddsratio[i] == "Inf")
+      {
+        reactionClass_stats$mets_pval[i] = NA
+        reactionClass_stats$mets_oddsratio[i] = NA
+      }
+      if (reactionClass_stats$prot_pval[i] == 1 && reactionClass_stats$prot_oddsratio[i] == "Inf")
+      {
+        reactionClass_stats$prot_pval[i] = NA
+        reactionClass_stats$prot_oddsratio[i] = NA
+      }
+    }
+    # Calculate combined p-values for pathways that have both genes and metabolites
+    gm <- intersect(which(!is.na(reactionClass_stats$mets_pval)), which(!is.na(reactionClass_stats$prot_pval)))
+    combpval <- stats::pchisq(-2 * (log((reactionClass_stats$mets_pval[gm])) + log(reactionClass_stats$prot_pval[gm])),
+                              df = 2, lower.tail = FALSE
+    )
+
+    g <- which(is.na(reactionClass_stats$mets_pval))
+    gpval <- reactionClass_stats$prot_pval[g]
+    m <- which(is.na(reactionClass_stats$prot_pval))
+    mpval <- reactionClass_stats$mets_pval[m]
+
+    out <- rbind(reactionClass_stats[gm, ], reactionClass_stats[g, ], reactionClass_stats[m, ])
+    out <- cbind(out, c(combpval, gpval, mpval))
+    colnames(out)[ncol(out)] <- "Pval_combined"
+    fdr <- stats::p.adjust(out$Pval_combined, method = "fdr")
+    out <- cbind(out, fdr)
+    colnames(out)[ncol(out)] <- "Pval_combined_FDR"
+    holm <- stats::p.adjust(out$Pval_combined, method = "holm")
+    out <- cbind(out, holm)
+    colnames(out)[ncol(out)] <- "Pval_combined_Holm"
+
+    reactionClass_stats <- out
+  }
+
+  return(reactionClass_stats)
+}
+
+
