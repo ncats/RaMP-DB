@@ -53,7 +53,7 @@ getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, mi
 
   rampid <- unique(df$rampId)
 
-  temp_ontologies_df <- getOntologies() %>%
+  temp_ontologies_df <- getOntologies(db = db) %>%
     dplyr::filter(.data$metCount <= max_ontology_size,
                   .data$metCount > min_ontology_size)
 
@@ -167,7 +167,7 @@ getMetaFromOnto <- function(ontology, min_ontology_size = 1E3, max_ontology_size
   if (length(matched_ontos) > 0) {
     print(paste0("Found ", length(matched_ontos), " ontology term matches."))
 
-    mdf_final <- db@api$getMetabolitesForOntology(ontologyList = list_ontology)
+    mdf_final <- db@api$getMetabolitesForOntology(ontologyList = matched_ontos)
 
     mdf_final <- unique(mdf_final)
     mdf_final <- mdf_final[, c(4, 5, 3, 2)]
