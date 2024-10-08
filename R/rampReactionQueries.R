@@ -1084,6 +1084,43 @@ runFisherReaction <- function(ec_level_df, metab_analytes, prot_analytes, altern
   return(output)
 }
 
+#' Utility method that fixes statistics values from zero inputs
+#'
+#' @param stats dataframe of statistic results
+#' @param pval_field_name column name of p-value results
+#' @param or_field_name column name of odds ratio results
+#' @noRd
+
+fix_invalid_stats <- function(stats, pval_field_name, or_field_name) {
+  for ( i in 1:nrow(stats))
+  {
+    if (stats[[pval_field_name]][i] == 1 && stats[[or_field_name]][i] == 'Inf')
+    {
+      stats[[pval_field_name]][i] <- NA
+      stats[[or_field_name]][i] <- NA
+    }
+  }
+  return(stats)
+}
+
+
+#' Utility method that adds adjusted p-values
+#'
+#' @param stats dataframe of statistic results
+#' @param pval_field_name column name of p-value results
+#' @noRd
+
+add_adjusted_stats <- function(stats, pval_field_name) {
+  fdr <- stats::p.adjust(stats[[pval_field_name]], method = "fdr")
+  stats <- cbind(stats, fdr)
+  colnames(stats)[ncol(stats)] <- "Pval_FDR"
+  holm <- stats::p.adjust(stats[[pval_field_name]], method = "holm")
+  stats <- cbind(stats, holm)
+  colnames(stats)[ncol(stats)] <- "Pval_Holm"
+  return(stats)
+}
+
+
 #' Utility method that returns adjusted p-values when input is only metabolites or only proteins
 #'
 #' @param reactionClass_stats modified statistics output from runFisherReaction
@@ -1096,51 +1133,19 @@ adjusted_stats <- function(reactionClass_stats, analyte_type)
 
   if (analyte_type == "chebi")
   {
-    for ( i in 1:nrow(reactionClass_stats))
-    {
-      if (reactionClass_stats$mets_pval[i] == 1 && reactionClass_stats$mets_oddsratio[i] == "Inf")
-      {
-        reactionClass_stats$mets_pval[i] = NA
-        reactionClass_stats$mets_oddsratio[i] = NA
-      }
-    }
-    fdr <- stats::p.adjust(reactionClass_stats$mets_pval, method = "fdr")
-    reactionClass_stats <- cbind(reactionClass_stats, fdr)
-    colnames(reactionClass_stats)[ncol(reactionClass_stats)] <- "Pval_FDR"
-    holm <- stats::p.adjust(reactionClass_stats$mets_pval, method = "holm")
-    reactionClass_stats <- cbind(reactionClass_stats, holm)
-    colnames(reactionClass_stats)[ncol(reactionClass_stats)] <- "Pval_Holm"
+    reactionClass_stats <- fix_invalid_stats(reactionClass_stats, 'mets_pval', 'mets_oddsratio')
+    reactionClass_stats <- add_adjusted_stats(reactionClass_stats, 'mets_pval')
+
   } else if (analyte_type == "uniprot")
   {
-    for ( i in 1:nrow(reactionClass_stats))
-    {
-      if (reactionClass_stats$prot_pval[i] == 1 && reactionClass_stats$prot_oddsratio[i] == "Inf")
-      {
-        reactionClass_stats$prot_pval[i] = NA
-        reactionClass_stats$prot_oddsratio[i] = NA
-      }
-    }
-    fdr <- stats::p.adjust(reactionClass_stats$prot_pval, method = "fdr")
-    reactionClass_stats <- cbind(reactionClass_stats, fdr)
-    colnames(reactionClass_stats)[ncol(reactionClass_stats)] <- "Pval_FDR"
-    holm <- stats::p.adjust(reactionClass_stats$prot_pval, method = "holm")
-    reactionClass_stats <- cbind(reactionClass_stats, holm)
-    colnames(reactionClass_stats)[ncol(reactionClass_stats)] <- "Pval_Holm"
+    reactionClass_stats <- fix_invalid_stats(reactionClass_stats, 'prot_pval', 'prot_oddsratio')
+    reactionClass_stats <- add_adjusted_stats(reactionClass_stats, 'prot_pval')
+
   } else if (analyte_type == "both")
   {
-    for ( i in 1:nrow(reactionClass_stats))
-    {
-      if (reactionClass_stats$mets_pval[i] == 1 && reactionClass_stats$mets_oddsratio[i] == "Inf")
-      {
-        reactionClass_stats$mets_pval[i] = NA
-        reactionClass_stats$mets_oddsratio[i] = NA
-      }
-      if (reactionClass_stats$prot_pval[i] == 1 && reactionClass_stats$prot_oddsratio[i] == "Inf")
-      {
-        reactionClass_stats$prot_pval[i] = NA
-        reactionClass_stats$prot_oddsratio[i] = NA
-      }
-    }
+    reactionClass_stats <- fix_invalid_stats(reactionClass_stats, 'mets_pval', 'mets_oddsratio')
+    reactionClass_stats <- fix_invalid_stats(reactionClass_stats, 'prot_pval', 'prot_oddsratio')
+
     # Calculate combined p-values for pathways that have both genes and metabolites
     gm <- intersect(which(!is.na(reactionClass_stats$mets_pval)), which(!is.na(reactionClass_stats$prot_pval)))
     combpval <- stats::pchisq(-2 * (log((reactionClass_stats$mets_pval[gm])) + log(reactionClass_stats$prot_pval[gm])),
@@ -1155,14 +1160,8 @@ adjusted_stats <- function(reactionClass_stats, analyte_type)
     out <- rbind(reactionClass_stats[gm, ], reactionClass_stats[g, ], reactionClass_stats[m, ])
     out <- cbind(out, c(combpval, gpval, mpval))
     colnames(out)[ncol(out)] <- "Pval_combined"
-    fdr <- stats::p.adjust(out$Pval_combined, method = "fdr")
-    out <- cbind(out, fdr)
-    colnames(out)[ncol(out)] <- "Pval_combined_FDR"
-    holm <- stats::p.adjust(out$Pval_combined, method = "holm")
-    out <- cbind(out, holm)
-    colnames(out)[ncol(out)] <- "Pval_combined_Holm"
 
-    reactionClass_stats <- out
+    reactionClass_stats <- add_adjusted_stats(out, 'Pval_combined')
   }
 
   return(reactionClass_stats)
