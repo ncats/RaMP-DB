@@ -610,6 +610,13 @@ runReactionClassTest <- function( analytes,
                                                      humanProtein=humanProtein,
                                                      db = db)
 
+    if(length(reactionClassdf) == 0)
+    {
+      opt <- options(show.error.messages = FALSE)
+      on.exit(options(opt))
+      stop()
+    }
+
     print("Running Fisher's tests")
 
     ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metab_analytes = metab_analytes, prot_analytes = prot_analytes, alternative = alternative)
@@ -645,6 +652,13 @@ runReactionClassTest <- function( analytes,
                                                        humanProtein=humanProtein,
                                                        db = db)
 
+      if(length(reactionClassdf) == 0)
+      {
+        opt <- options(show.error.messages = FALSE)
+        on.exit(options(opt))
+        stop()
+      }
+
       print("Running Fisher's tests")
 
       ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metab_analytes = NULL, prot_analytes = prot_analytes, alternative = alternative)
@@ -674,6 +688,13 @@ runReactionClassTest <- function( analytes,
       reactionClassdf <- getReactionClassesForAnalytes(analytes,
                                                        humanProtein=humanProtein,
                                                        db = db)
+      if(length(reactionClassdf) == 0)
+      {
+        opt <- options(show.error.messages = FALSE)
+        on.exit(options(opt))
+        stop()
+      }
+
       print("Running Fisher's tests")
 
       ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metab_analytes = metab_analytes, prot_analytes = NULL, alternative = alternative)
