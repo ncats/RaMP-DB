@@ -5,7 +5,14 @@
 \title{Function that query database to find ontology information based on
 the given list of metabolites}
 \usage{
-getOntoFromMeta(mets, namesOrIds = "ids", includeRaMPids = FALSE, db = RaMP())
+getOntoFromMeta(
+  mets,
+  namesOrIds = "ids",
+  includeRaMPids = FALSE,
+  min_ontology_size = 1000,
+  max_ontology_size = Inf,
+  db = RaMP()
+)
 }
 \arguments{
 \item{mets}{a vector of metabolites or a metabolites delimited by new line character}
@@ -13,6 +20,10 @@ getOntoFromMeta(mets, namesOrIds = "ids", includeRaMPids = FALSE, db = RaMP())
 \item{namesOrIds}{specify the type of given data}
 
 \item{includeRaMPids}{whether or not to include RaMP ids in the output (TRUE/FALSE)}
+
+\item{min_ontology_size}{the minimum number of metabolites in an ontology for it to be included in results. Default is 1,000}
+
+\item{max_ontology_size}{the maximum number of metabolites in an ontology for it to be included in results. Default is Inf}
 
 \item{db}{a RaMP database object}
 }
