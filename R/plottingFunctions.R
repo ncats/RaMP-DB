@@ -74,32 +74,32 @@ plotCataNetwork <- function(catalyzedf = "") {
 #' Cluster and plot significant pathways by FDR-adjusted pval
 #' @param pathwaysSig output of FilterFishersResults
 #' @param pval Which p value to plot, choose from Raw, FDR or Holm-adjusted
-#' @param perc_analyte_overlap Minimum overlap for pathways to be considered similar
+#' @param percAnalyteOverlap Minimum overlap for pathways to be considered similar
 #' (Default = 0.2)
-#' @param perc_pathway_overlap Minimum overlap for clusters to merge (Default = 0.2)
-#' @param min_pathway_tocluster Minimum number of 'similar' pathways required to start
+#' @param percPathwayOverlap Minimum overlap for clusters to merge (Default = 0.2)
+#' @param minPathwayToCluster Minimum number of 'similar' pathways required to start
 #' a cluster (medoid) (Default = 3)
-#' @param text_size Scales all text in figure (Default=16)
-#' @param sig_cutoff Aesthetic, shows pvalue cutoff for significant pathways
+#' @param textSize Scales all text in figure (Default=16)
+#' @param sigCutoff Aesthetic, shows pvalue cutoff for significant pathways
 #' @param interactive If TRUE, return interactive plotly object instead of ggplot object
 #' @param db a RaMP database object
 #' @examples
 #' \dontrun{
-#' pathwayResultsPlot(pathwaysSig = filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2,
-#'    min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE, db = rampDB )
+#' pathwayResultsPlot(pathwaysSig = filtered.fisher.results, textSize = 8, percAnalyteOverlap = 0.2,
+#'    minPathwayToCluster = 2, percPathwayOverlap = 0.2, interactive = FALSE, db = rampDB )
 #' }
 #' @export
-pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.5,
-                                 perc_pathway_overlap = 0.5, min_pathway_tocluster = 3,
-                               text_size = 8, sig_cutoff = 0.05, interactive=FALSE,
+pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", percAnalyteOverlap = 0.5,
+                                 percPathwayOverlap = 0.5, minPathwayToCluster = 3,
+                               textSize = 8, sigCutoff = 0.05, interactive=FALSE,
                                db = RaMP()) {
 
 
   if( !('cluster_assignment' %in% colnames(pathwaysSig$fishresult))) {
-    fishClustering <- findCluster(db = db, fishers_df = pathwaysSig,
-                                  perc_analyte_overlap = perc_analyte_overlap,
-                                  perc_pathway_overlap = perc_pathway_overlap,
-                                  min_pathway_tocluster = min_pathway_tocluster
+    fishClustering <- findCluster(db = db, fishersDf = pathwaysSig,
+                                  percAnalyteOverlap = percAnalyteOverlap,
+                                  percPathwayOverlap = percPathwayOverlap,
+                                  minPathwayToCluster = minPathwayToCluster
     )
     # assign this here if clustering is preformed here...
     fishresult <- fishClustering$fishresults
@@ -108,7 +108,7 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
     fishresult <- pathwaysSig$fishresults
   }
 
-  if (pathwaysSig$analyte_type == "genes" | pathwaysSig$analyte_type == "metabolites") {
+  if (pathwaysSig$analyteType == "genes" | pathwaysSig$analyteType == "metabolites") {
     inPath <- fishresult$Num_In_Path
     totPath <- fishresult$Total_In_Path
   } else {
@@ -202,8 +202,8 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
         text = "analytes"
       )
     )) +
-    ggplot2::geom_hline(yintercept = -log10(sig_cutoff), linetype = "dotted") +
-    ggplot2::theme_bw(base_size = text_size) +
+    ggplot2::geom_hline(yintercept = -log10(sigCutoff), linetype = "dotted") +
+    ggplot2::theme_bw(base_size = textSize) +
     ggplot2::coord_flip() +
     tidytext::scale_x_reordered() +
     ggplot2::labs(x = "", y = ylab) +
@@ -357,14 +357,14 @@ plotAnalyteOverlapPerRxnLevel <- function(reactionsResults, includeCofactorMets 
 #' Cluster and plot significant ontologies by FDR-adjusted pval
 #' @param ontologiesSig output of FilterFishersResults
 #' @param pval Which p value to plot, choose from Raw, FDR or Holm-adjusted
-#' @param text_size Scales all text in figure (Default=16)
-#' @param sig_cutoff Aesthetic, shows pvalue cutoff for significant ontologies
+#' @param textSize Scales all text in figure (Default=16)
+#' @param sigCutoff Aesthetic, shows pvalue cutoff for significant ontologies
 #' @param interactive If TRUE, return interactive plotly object instead of ggplot object
 #' @param db a RaMP database object
 #' @export
 ontologyEnrichmentResultsPlot <- function(ontologiesSig, pval = "FDR",
-                                          text_size = 8,
-                                          sig_cutoff = 0.05, interactive=FALSE,
+                                          textSize = 8,
+                                          sigCutoff = 0.05, interactive=FALSE,
                                           db = RaMP()) {
 
   inOntology <- ontologiesSig$Num_In_Ontology
@@ -423,8 +423,8 @@ ontologyEnrichmentResultsPlot <- function(ontologiesSig, pval = "FDR",
         size = "inOntology",
       )
     )) +
-    ggplot2::geom_hline(yintercept = -log10(sig_cutoff), linetype = "dotted") +
-    ggplot2::theme_bw(base_size = text_size) +
+    ggplot2::geom_hline(yintercept = -log10(sigCutoff), linetype = "dotted") +
+    ggplot2::theme_bw(base_size = textSize) +
     ggplot2::coord_flip() +
     tidytext::scale_x_reordered() +
     ggplot2::labs(x = "", y = ylab) +

@@ -603,8 +603,8 @@ runReactionClassTest <- function( analytes,
 
   if (length(analytes_split)==2)
   {
-    metab_analytes <- paste(analytes_split$chebi$X1, analytes_split$chebi$X2, sep = ":")
-    prot_analytes <- paste(analytes_split$uniprot$X1, analytes_split$uniprot$X2, sep = ":")
+    metabAnalytes <- paste(analytes_split$chebi$X1, analytes_split$chebi$X2, sep = ":")
+    protAnalytes <- paste(analytes_split$uniprot$X1, analytes_split$uniprot$X2, sep = ":")
 
     reactionClassdf <- getReactionClassesForAnalytes(analytes,
                                                      humanProtein=humanProtein,
@@ -619,8 +619,8 @@ runReactionClassTest <- function( analytes,
 
     print("Running Fisher's tests")
 
-    ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metab_analytes = metab_analytes, prot_analytes = prot_analytes, alternative = alternative)
-    ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2, metab_analytes = metab_analytes, prot_analytes = prot_analytes, alternative = alternative)
+    ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metabAnalytes = metabAnalytes, protAnalytes = protAnalytes, alternative = alternative)
+    ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2, metabAnalytes = metabAnalytes, protAnalytes = protAnalytes, alternative = alternative)
 
     ec_level_1_stats <- cbind("rxnClass" = reactionClassdf$class_ec_level_1$rxnClass,
                               "ecNumber" = reactionClassdf$class_ec_level_1$ecNumber,
@@ -640,13 +640,13 @@ runReactionClassTest <- function( analytes,
     combined_ec_level_1_stats <- adjusted_stats(ec_level_1_stats, analyte_type = "both")
     combined_ec_level_2_stats <- adjusted_stats(ec_level_2_stats, analyte_type = "both")
 
-    reactionClass_stats_df <- data.frame(rbind(combined_ec_level_1_stats, combined_ec_level_2_stats))
+    reactionClassStats_df <- data.frame(rbind(combined_ec_level_1_stats, combined_ec_level_2_stats))
   }
   else if (length(analytes_split)==1)
   {
     if (names(analytes_split[1]) == "uniprot")
     {
-      prot_analytes <- paste(analytes_split$uniprot$X1, analytes_split$uniprot$X2, sep = ":")
+      protAnalytes <- paste(analytes_split$uniprot$X1, analytes_split$uniprot$X2, sep = ":")
 
       reactionClassdf <- getReactionClassesForAnalytes(analytes,
                                                        humanProtein=humanProtein,
@@ -661,8 +661,8 @@ runReactionClassTest <- function( analytes,
 
       print("Running Fisher's tests")
 
-      ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metab_analytes = NULL, prot_analytes = prot_analytes, alternative = alternative)
-      ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2, metab_analytes = NULL, prot_analytes = prot_analytes, alternative = alternative)
+      ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metabAnalytes = NULL, protAnalytes = protAnalytes, alternative = alternative)
+      ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2, metabAnalytes = NULL, protAnalytes = protAnalytes, alternative = alternative)
 
       ec_level_1_stats <- cbind("rxnClass" = reactionClassdf$class_ec_level_1$rxnClass,
                                 "ecNumber" = reactionClassdf$class_ec_level_1$ecNumber,
@@ -678,12 +678,12 @@ runReactionClassTest <- function( analytes,
       ec_level_1_adjusted_stats <- adjusted_stats(ec_level_1_stats, analyte_type = "uniprot")
       ec_level_2_adjusted_stats <- adjusted_stats(ec_level_2_stats, analyte_type ="uniprot")
 
-      reactionClass_stats_df <- data.frame(rbind(ec_level_1_adjusted_stats, ec_level_2_adjusted_stats))
+      reactionClassStats_df <- data.frame(rbind(ec_level_1_adjusted_stats, ec_level_2_adjusted_stats))
 
     }
     else if (names(analytes_split[1]) == "chebi")
     {
-      metab_analytes <- paste(analytes_split$chebi$X1, analytes_split$chebi$X2, sep = ":")
+      metabAnalytes <- paste(analytes_split$chebi$X1, analytes_split$chebi$X2, sep = ":")
 
       reactionClassdf <- getReactionClassesForAnalytes(analytes,
                                                        humanProtein=humanProtein,
@@ -697,8 +697,8 @@ runReactionClassTest <- function( analytes,
 
       print("Running Fisher's tests")
 
-      ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metab_analytes = metab_analytes, prot_analytes = NULL, alternative = alternative)
-      ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2, metab_analytes = metab_analytes, prot_analytes = NULL, alternative = alternative)
+      ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metabAnalytes = metabAnalytes, protAnalytes = NULL, alternative = alternative)
+      ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2, metabAnalytes = metabAnalytes, protAnalytes = NULL, alternative = alternative)
 
       ec_level_1_stats <- cbind("rxnClass" = reactionClassdf$class_ec_level_1$rxnClass,
                                 "ecNumber" = reactionClassdf$class_ec_level_1$ecNumber,
@@ -715,11 +715,11 @@ runReactionClassTest <- function( analytes,
       ec_level_1_adjusted_stats <- adjusted_stats(ec_level_1_stats, analyte_type ="chebi")
       ec_level_2_adjusted_stats <- adjusted_stats(ec_level_2_stats, analyte_type ="chebi")
 
-      reactionClass_stats_df <- data.frame(rbind(ec_level_1_adjusted_stats, ec_level_2_adjusted_stats))
+      reactionClassStats_df <- data.frame(rbind(ec_level_1_adjusted_stats, ec_level_2_adjusted_stats))
     }
   }
 
-  return(reactionClass_stats_df)
+  return(reactionClassStats_df)
 }
 
 
@@ -1006,11 +1006,11 @@ checkReactionInputIds <- function(callingFunction, idList) {
 
 #' Utility method that runs Fisher's test of individual ec level classes
 #'
-#' @param ec_level_df EC level output from getReactionClassesForAnalytes
-#' @param metab_analytes metabolites input
-#' @param prot_analytes protein input
+#' @param ecLevelDf EC level output from getReactionClassesForAnalytes
+#' @param metabAnalytes metabolites input
+#' @param protAnalytes protein input
 #' @noRd
-runFisherReaction <- function(ec_level_df, metab_analytes, prot_analytes, alternative = alternative)
+runFisherReaction <- function(ecLevelDf, metabAnalytes, protAnalytes, alternative = alternative)
 {
   ## Initialize empty contingency table for later
   contingencyTb <- matrix(0, nrow = 2, ncol = 2)
@@ -1020,17 +1020,17 @@ runFisherReaction <- function(ec_level_df, metab_analytes, prot_analytes, altern
   output <- list()
 
   ## First Metabolites
-  if (is.null(metab_analytes) == FALSE)
+  if (is.null(metabAnalytes) == FALSE)
   {
     pidCount <- 0
     pval_mets <- oddsratio_mets <- totinpath <- userinpath <- pidused <- c()
-    for (i in 1:nrow(ec_level_df))
+    for (i in 1:nrow(ecLevelDf))
     {
       pidCount <- pidCount + 1
-      tot_in_reactionClass <- ec_level_df$totalMetsInRxnClass[i]
-      tot_out_reactionClass <- sum(ec_level_df$totalMetsInRxnClass) - tot_in_reactionClass
-      user_in_reactionClass <- ec_level_df$metCount[i]
-      user_out_reactionClass <- length(metab_analytes) - ec_level_df$metCount[i]
+      tot_in_reactionClass <- ecLevelDf$totalMetsInRxnClass[i]
+      tot_out_reactionClass <- sum(ecLevelDf$totalMetsInRxnClass) - tot_in_reactionClass
+      user_in_reactionClass <- ecLevelDf$metCount[i]
+      user_out_reactionClass <- length(metabAnalytes) - ecLevelDf$metCount[i]
 
       contingencyTb[1, 1] <- tot_in_reactionClass - user_in_reactionClass
       contingencyTb[1, 2] <- tot_out_reactionClass - user_out_reactionClass
@@ -1062,17 +1062,17 @@ runFisherReaction <- function(ec_level_df, metab_analytes, prot_analytes, altern
   }
 
   ## Second Protiens
-  if (is.null(prot_analytes) == FALSE)
+  if (is.null(protAnalytes) == FALSE)
   {
     pidCount <- 0
     pval_prot <- oddsratio_prot <- totinpath <- userinpath <- pidused <- c()
-    for (i in 1:nrow(ec_level_df))
+    for (i in 1:nrow(ecLevelDf))
     {
       pidCount <- pidCount + 1
-      tot_in_reactionClass <- ec_level_df$totalProteinsInRxnClass[i]
-      tot_out_reactionClass <- sum(ec_level_df$totalProteinsInRxnClass) - tot_in_reactionClass
-      user_in_reactionClass <- ec_level_df$proteinCount[i]
-      user_out_reactionClass <- length(prot_analytes) - ec_level_df$proteinCount[i]
+      tot_in_reactionClass <- ecLevelDf$totalProteinsInRxnClass[i]
+      tot_out_reactionClass <- sum(ecLevelDf$totalProteinsInRxnClass) - tot_in_reactionClass
+      user_in_reactionClass <- ecLevelDf$proteinCount[i]
+      user_out_reactionClass <- length(protAnalytes) - ecLevelDf$proteinCount[i]
 
       contingencyTb[1, 1] <- tot_in_reactionClass - user_in_reactionClass
       contingencyTb[1, 2] <- tot_out_reactionClass - user_out_reactionClass
@@ -1108,17 +1108,17 @@ runFisherReaction <- function(ec_level_df, metab_analytes, prot_analytes, altern
 #' Utility method that fixes statistics values from zero inputs
 #'
 #' @param stats dataframe of statistic results
-#' @param pval_field_name column name of p-value results
-#' @param or_field_name column name of odds ratio results
+#' @param pValFieldName column name of p-value results
+#' @param orFieldName column name of odds ratio results
 #' @noRd
 
-fix_invalid_stats <- function(stats, pval_field_name, or_field_name) {
+fix_invalid_stats <- function(stats, pValFieldName, orFieldName) {
   for ( i in 1:nrow(stats))
   {
-    if (stats[[pval_field_name]][i] == 1 && stats[[or_field_name]][i] == 'Inf')
+    if (stats[[pValFieldName]][i] == 1 && stats[[orFieldName]][i] == 'Inf')
     {
-      stats[[pval_field_name]][i] <- NA
-      stats[[or_field_name]][i] <- NA
+      stats[[pValFieldName]][i] <- NA
+      stats[[orFieldName]][i] <- NA
     }
   }
   return(stats)
@@ -1128,14 +1128,14 @@ fix_invalid_stats <- function(stats, pval_field_name, or_field_name) {
 #' Utility method that adds adjusted p-values
 #'
 #' @param stats dataframe of statistic results
-#' @param pval_field_name column name of p-value results
+#' @param pValFieldName column name of p-value results
 #' @noRd
 
-add_adjusted_stats <- function(stats, pval_field_name) {
-  fdr <- stats::p.adjust(stats[[pval_field_name]], method = "fdr")
+add_adjusted_stats <- function(stats, pValFieldName) {
+  fdr <- stats::p.adjust(stats[[pValFieldName]], method = "fdr")
   stats <- cbind(stats, fdr)
   colnames(stats)[ncol(stats)] <- "Pval_FDR"
-  holm <- stats::p.adjust(stats[[pval_field_name]], method = "holm")
+  holm <- stats::p.adjust(stats[[pValFieldName]], method = "holm")
   stats <- cbind(stats, holm)
   colnames(stats)[ncol(stats)] <- "Pval_Holm"
   return(stats)
@@ -1144,48 +1144,48 @@ add_adjusted_stats <- function(stats, pval_field_name) {
 
 #' Utility method that returns adjusted p-values when input is only metabolites or only proteins
 #'
-#' @param reactionClass_stats modified statistics output from runFisherReaction
+#' @param reactionClassStats modified statistics output from runFisherReaction
 #' @param analyte_type whether the input is metabolites or proteins
 #' @noRd
-adjusted_stats <- function(reactionClass_stats, analyte_type)
+adjusted_stats <- function(reactionClassStats, analyte_type)
 {
-  reactionClass_stats <- as.data.frame(reactionClass_stats)
-  reactionClass_stats[-1:-2] <- sapply(reactionClass_stats[-1:-2],as.numeric)
+  reactionClassStats <- as.data.frame(reactionClassStats)
+  reactionClassStats[-1:-2] <- sapply(reactionClassStats[-1:-2],as.numeric)
 
   if (analyte_type == "chebi")
   {
-    reactionClass_stats <- fix_invalid_stats(reactionClass_stats, 'mets_pval', 'mets_oddsratio')
-    reactionClass_stats <- add_adjusted_stats(reactionClass_stats, 'mets_pval')
+    reactionClassStats <- fix_invalid_stats(reactionClassStats, 'mets_pval', 'mets_oddsratio')
+    reactionClassStats <- add_adjusted_stats(reactionClassStats, 'mets_pval')
 
   } else if (analyte_type == "uniprot")
   {
-    reactionClass_stats <- fix_invalid_stats(reactionClass_stats, 'prot_pval', 'prot_oddsratio')
-    reactionClass_stats <- add_adjusted_stats(reactionClass_stats, 'prot_pval')
+    reactionClassStats <- fix_invalid_stats(reactionClassStats, 'prot_pval', 'prot_oddsratio')
+    reactionClassStats <- add_adjusted_stats(reactionClassStats, 'prot_pval')
 
   } else if (analyte_type == "both")
   {
-    reactionClass_stats <- fix_invalid_stats(reactionClass_stats, 'mets_pval', 'mets_oddsratio')
-    reactionClass_stats <- fix_invalid_stats(reactionClass_stats, 'prot_pval', 'prot_oddsratio')
+    reactionClassStats <- fix_invalid_stats(reactionClassStats, 'mets_pval', 'mets_oddsratio')
+    reactionClassStats <- fix_invalid_stats(reactionClassStats, 'prot_pval', 'prot_oddsratio')
 
     # Calculate combined p-values for pathways that have both genes and metabolites
-    gm <- intersect(which(!is.na(reactionClass_stats$mets_pval)), which(!is.na(reactionClass_stats$prot_pval)))
-    combpval <- stats::pchisq(-2 * (log((reactionClass_stats$mets_pval[gm])) + log(reactionClass_stats$prot_pval[gm])),
+    gm <- intersect(which(!is.na(reactionClassStats$mets_pval)), which(!is.na(reactionClassStats$prot_pval)))
+    combpval <- stats::pchisq(-2 * (log((reactionClassStats$mets_pval[gm])) + log(reactionClassStats$prot_pval[gm])),
                               df = 2, lower.tail = FALSE
     )
 
-    g <- which(is.na(reactionClass_stats$mets_pval))
-    gpval <- reactionClass_stats$prot_pval[g]
-    m <- which(is.na(reactionClass_stats$prot_pval))
-    mpval <- reactionClass_stats$mets_pval[m]
+    g <- which(is.na(reactionClassStats$mets_pval))
+    gpval <- reactionClassStats$prot_pval[g]
+    m <- which(is.na(reactionClassStats$prot_pval))
+    mpval <- reactionClassStats$mets_pval[m]
 
-    out <- rbind(reactionClass_stats[gm, ], reactionClass_stats[g, ], reactionClass_stats[m, ])
+    out <- rbind(reactionClassStats[gm, ], reactionClassStats[g, ], reactionClassStats[m, ])
     out <- cbind(out, c(combpval, gpval, mpval))
     colnames(out)[ncol(out)] <- "Pval_combined"
 
-    reactionClass_stats <- add_adjusted_stats(out, 'Pval_combined')
+    reactionClassStats <- add_adjusted_stats(out, 'Pval_combined')
   }
 
-  return(reactionClass_stats)
+  return(reactionClassStats)
 }
 
 

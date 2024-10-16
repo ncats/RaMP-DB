@@ -4,12 +4,12 @@
 #' and entire string separated by comma are working.
 #' @param synonym name to search for
 #' @param full bool if return whole data.frame
-#' @param return_rampIds bool to return ramp Ids with output
+#' @param returnRampIds bool to return ramp Ids with output
 #' (there are some common synonyms that will mess up whole searching)
 #' @param db a RaMP database object
 #' @return a data frame that contains synonym in the first column rampId in the second column
 #' @noRd
-rampFindSynonymFromSynonym <- function( synonym, full = FALSE, return_rampIds = FALSE, db = RaMP()){
+rampFindSynonymFromSynonym <- function( synonym, full = FALSE, returnRampIds = FALSE, db = RaMP()){
   if(is.character(synonym)){
     if(grepl("\n",synonym)[1]){
       list_metabolite <- strsplit(synonym,"\n")
@@ -31,7 +31,7 @@ rampFindSynonymFromSynonym <- function( synonym, full = FALSE, return_rampIds = 
 
   df1 <- db@api$getSynonymsForSynonym(list_metabolite)
 
-  if(return_rampIds || nrow(df1) < 1) {
+  if(returnRampIds || nrow(df1) < 1) {
       return(df1)
   } else {
       rampid <- df1$rampId
@@ -151,9 +151,9 @@ rampFindSourceRampId <- function( sourceId, db = RaMP()){
 #' By default, the function checks on whether there are at least 90% of input user analytes with
 #' appropriate RaMP-supported prefixes.
 #' @param idList list of ids (typically input by user)
-#' @param perc_cutoff percent cutof used to throw a warning that many ids are missing
+#' @param percCutoff percent cutof used to throw a warning that many ids are missing
 #' @noRd
-checkIdPrefixes <- function(idList, perc_cutoff=0.9) {
+checkIdPrefixes <- function(idList, percCutoff=0.9) {
   idCount <- length(idList)
   prefixCount <- 0
   for(id in idList) {
@@ -161,7 +161,7 @@ checkIdPrefixes <- function(idList, perc_cutoff=0.9) {
       prefixCount <- prefixCount + 1
     }
   }
-  if(prefixCount/idCount < perc_cutoff) {
+  if(prefixCount/idCount < percCutoff) {
     print(paste("RaMP expects ids to be prefixed with the source database." + (idCount-prefixCount) + " of " + idCount + " ids lack prefixes.\n", sep=""))
     #warnObj <- Warning(warn, call=TRUE, immediate=TRUE)
     print("Common metabolite prefixes: CAS:, chebi:, chemspider:, hmdb:, kegg:, LIPIDMAPS:, pubchem:")
@@ -318,7 +318,7 @@ getRaMPInfoFromAnalytes<-function( analytes,
     if(PathOrChem == "path"){
         if(namesOrIds == "names"){
             synonym <- rampFindSynonymFromSynonym(synonym=analytes,
-                                                  return_rampIds=FALSE)
+                                                  returnRampIds=FALSE)
 
             colnames(synonym)[1]="commonName"
             synonym$commonName <- tolower(synonym$commonName)
@@ -352,16 +352,16 @@ getRaMPInfoFromAnalytes<-function( analytes,
 
 ##' Return all analytes that map to unique pathways in a pathwaydf
 ##' @param inputdf internal df with pathwayramp ids
-##' @param pathway_definitions If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows
-##' @param analyte_type "genes" or "metabolites"
+##' @param pathwayDefinitions If "RaMP" (default), use pathway definitions within RaMP-DB. Else, supply path to gmx file containing custom pathway definitions. GMX files are a tab-separated format that contain one analyte set per column, with the name of the set in the first row, and constituent analytes in subsequent rows
+##' @param analyteType "genes" or "metabolites"
 ##' @param db a RaMP database object
 ##' @return dataframe of all analytes that map to the input pathways
 ##' @author Andrew Christopher Patt
 #' @importFrom utils head
 #' @noRd
-buildFrequencyTables<-function( inputdf, pathway_definitions="RaMP", analyte_type, db = RaMP()) {
+buildFrequencyTables<-function( inputdf, pathwayDefinitions="RaMP", analyteType, db = RaMP()) {
 
-  if(pathway_definitions == "RaMP") {
+  if(pathwayDefinitions == "RaMP") {
 	print("Now in buildFrequencyTables function")
 	print(mode(inputdf))
 	print(class(inputdf))
@@ -369,50 +369,50 @@ buildFrequencyTables<-function( inputdf, pathway_definitions="RaMP", analyte_typ
 
     ## Get pathway ids that contain the user analytes
     pid <- unique(inputdf$pathwayRampId);
-    input_RampIds <- db@api$getAllRampIDsForAllPathwayRampIDs(pathwayRampIds = pid)
+    inputRampIds <- db@api$getAllRampIDsForAllPathwayRampIDs(pathwayRampIds = pid)
 
-    return(input_RampIds)
+    return(inputRampIds)
   } else {
     tryCatch(
       {
-        if (analyte_type == "metabolites") {
-          pathway_definitions <- readxl::read_excel(pathway_definitions, sheet = 1)
-        } else if (analyte_type == "genes") {
-          pathway_definitions <- readxl::read_excel(pathway_definitions, sheet = 2)
+        if (analyteType == "metabolites") {
+          pathwayDefinitions <- readxl::read_excel(pathwayDefinitions, sheet = 1)
+        } else if (analyteType == "genes") {
+          pathwayDefinitions <- readxl::read_excel(pathwayDefinitions, sheet = 2)
         }
       },
       error = function(e) {
         print("Pathway file could not be found or is improperly formatted. Please supply path to GMX file for custom pathway definitions")
       }
     )
-    input_RampIds <- data.frame(rampId=character(),
+    inputRampIds <- data.frame(rampId=character(),
                                 pathwayRampId=character())
     pid <- unique(inputdf$pathwayRampId)
 
     for(i in pid){
-      temp <- data.frame(rampId = pathway_definitions[,i][which(!is.na(pathway_definitions[,i])),],
+      temp <- data.frame(rampId = pathwayDefinitions[,i][which(!is.na(pathwayDefinitions[,i])),],
                          pathwayRampId = i)
       colnames(temp) <- c("rampId","pathwayRampId")
-      input_RampIds <- rbind(input_RampIds,temp)
+      inputRampIds <- rbind(inputRampIds,temp)
     }
-    input_RampIds$pathwaySource = "custom"
-    if(analyte_type == "metabolites"){
-      input_RampIds$rampId = paste0("RAMP_C",input_RampIds$rampId)
-    }else if(analyte_type == "genes"){
-      input_RampIds$rampId = paste0("RAMP_G",input_RampIds$rampId)
+    inputRampIds$pathwaySource = "custom"
+    if(analyteType == "metabolites"){
+      inputRampIds$rampId = paste0("RAMP_C",inputRampIds$rampId)
+    }else if(analyteType == "genes"){
+      inputRampIds$rampId = paste0("RAMP_G",inputRampIds$rampId)
     }
-    return(input_RampIds)
+    return(inputRampIds)
   }
 }
 
 ##' Separate input ids into lists based on database of origin
-##' @param input_RampIds list of analyte ramp IDs
+##' @param inputRampIds list of analyte ramp IDs
 ##' @return pathway lists separated by source db
 ##' @author Andrew Christopher Patt
 #' @noRd
-segregateDataBySource<-function(input_RampIds){
+segregateDataBySource<-function(inputRampIds){
   # data frames for metabolites with pathwayRampID, Freq based  on Source(kegg, reactome, wiki)
-  input_RampId_C <- input_RampIds[grep("RAMP_C", input_RampIds$rampId), ]
+  input_RampId_C <- inputRampIds[grep("RAMP_C", inputRampIds$rampId), ]
   unique_input_RampId_C <- unique(input_RampId_C[,c("rampId", "pathwayRampId")])
   unique_pathwayRampId_source <- unique(input_RampId_C[,c("pathwayRampId", "pathwaySource")])
 
@@ -441,7 +441,7 @@ segregateDataBySource<-function(input_RampIds){
 
   # data frames for Genes with pathawayRampID, Freq based  on Source(kegg, reactome, wiki, hmdb)
 
-  input_RampId_G <- input_RampIds[grep("RAMP_G", input_RampIds$rampId), ]
+  input_RampId_G <- inputRampIds[grep("RAMP_G", inputRampIds$rampId), ]
   unique_input_RampId_G <- unique(input_RampId_G[,c("rampId", "pathwayRampId")])
   unique_pathwayG_source <- unique(input_RampId_G[,c("pathwayRampId", "pathwaySource")])
 
@@ -558,11 +558,11 @@ findDuplicatePathways <- function(db = RaMP()) {
 
 
 #' Filter pathways by p-value cutoff for display and clustering
-#' @param fishers_df The data frame generated by runFisherTest
-#' @param pval_type Specifies which p-value to use as the filter threshold.
+#' @param fishersDf The data frame generated by runFisherTest
+#' @param pValType Specifies which p-value to use as the filter threshold.
 #' Permitted values are 'pval' and 'fdr' for chemical class and pathway enrichment.
 #' Pathway enrichment also includes an optional 'holm' value for holm p-value corrections. Default is 'fdr'.
-#' @param pval_cutoff return pathways where pval_type p-values are < pval_cutoff
+#' @param pValCutoff return pathways where pValType p-values are < pValCutoff
 #' @return list:[[1]]Dataframe with pathway enrichment results, only significant pathways
 #' [[2]]analyte type
 #' @examples
@@ -570,49 +570,49 @@ findDuplicatePathways <- function(db = RaMP()) {
 #' analyteList <- c("MDM2", "TP53", "glutamate", "creatinine")
 #'
 #' fisher.results <- runCombinedFisherTest(analytes = analyteList, namesOrIds = 'names')
-#' filtered.fisher.results <- FilterFishersResults(fisher.results, pval_type='fdr', pval_cutoff = 0.10)
+#' filtered.fisher.results <- FilterFishersResults(fisher.results, pValType='fdr', pValCutoff = 0.10)
 #' }
 #' @export
-FilterFishersResults <- function(fishers_df, pval_type = 'fdr', pval_cutoff = 0.1) {
+FilterFishersResults <- function(fishersDf, pValType = 'fdr', pValCutoff = 0.1) {
 
   print("Filtering Fisher Results...")
 
   # Check to see whether the output is from ORA performed on genes and metabolites
   # or genes or metabolites
-  result_type <- fishers_df$result_type
+  result_type <- fishersDf$result_type
 
   if(result_type == 'pathway_enrichment') {
-    analyte_type <- fishers_df$analyte_type
-    fishers_df <- fishers_df$fishresults
+    analyteType <- fishersDf$analyteType
+    fishersDf <- fishersDf$fishresults
 
     print("Fisher Result Type: Pathway Enrichment")
 
-    if (analyte_type != 'both') {
-      if (pval_type == 'holm') {
-        return(list(fishresults = fishers_df[which(fishers_df[, "Pval_Holm"] <=
-                                                     pval_cutoff), ], analyte_type = analyte_type))
-      } else if (pval_type == 'fdr') {
-        return(list(fishresults = fishers_df[which(fishers_df[, "Pval_FDR"] <=
-                                                     pval_cutoff), ], analyte_type = analyte_type))
-      } else if (pval_type == 'pval') {
-        return(list(fishresults = fishers_df[which(fishers_df[, "Pval"] <=
-                                                     pval_cutoff), ], analyte_type = analyte_type))
+    if (analyteType != 'both') {
+      if (pValType == 'holm') {
+        return(list(fishresults = fishersDf[which(fishersDf[, "Pval_Holm"] <=
+                                                     pValCutoff), ], analyteType = analyteType))
+      } else if (pValType == 'fdr') {
+        return(list(fishresults = fishersDf[which(fishersDf[, "Pval_FDR"] <=
+                                                     pValCutoff), ], analyteType = analyteType))
+      } else if (pValType == 'pval') {
+        return(list(fishresults = fishersDf[which(fishersDf[, "Pval"] <=
+                                                     pValCutoff), ], analyteType = analyteType))
       } else {
-        warning(paste0("The pval_type parameter should be one of three values, 'fdr', 'holm' or 'pval', entered value pval_type= ", pval_type))
+        warning(paste0("The pValType parameter should be one of three values, 'fdr', 'holm' or 'pval', entered value pValType= ", pValType))
         return(NULL)
       }
     } else { # ORA was performed on both genes and metabolites:
-      if (pval_type == 'holm') {
-        return(list(fishresults = fishers_df[which(fishers_df[, "Pval_combined_Holm"] <=
-                                                     pval_cutoff), ], analyte_type = analyte_type))
-      } else if (pval_type == 'fdr') {
-        return(list(fishresults = fishers_df[which(fishers_df[, "Pval_combined_FDR"] <=
-                                                     pval_cutoff), ], analyte_type = analyte_type))
-      } else if (pval_type == 'pval') {
-        return(list(fishresults = fishers_df[which(fishers_df[, "Pval_combined"] <=
-                                                     pval_cutoff), ], analyte_type = analyte_type))
+      if (pValType == 'holm') {
+        return(list(fishresults = fishersDf[which(fishersDf[, "Pval_combined_Holm"] <=
+                                                     pValCutoff), ], analyteType = analyteType))
+      } else if (pValType == 'fdr') {
+        return(list(fishresults = fishersDf[which(fishersDf[, "Pval_combined_FDR"] <=
+                                                     pValCutoff), ], analyteType = analyteType))
+      } else if (pValType == 'pval') {
+        return(list(fishresults = fishersDf[which(fishersDf[, "Pval_combined"] <=
+                                                     pValCutoff), ], analyteType = analyteType))
       } else {
-        warning(paste0("The pval_type parameter should be one of three values, 'fdr', 'holm' or 'pval', entered value pval_type= ", pval_type))
+        warning(paste0("The pValType parameter should be one of three values, 'fdr', 'holm' or 'pval', entered value pValType= ", pValType))
         return(NULL)
       }
     }
@@ -620,26 +620,26 @@ FilterFishersResults <- function(fishers_df, pval_type = 'fdr', pval_cutoff = 0.
 
     print("Fisher Result Type: Chemical Class Enrichstrment")
 
-    if(pval_type == 'pval') {
+    if(pValType == 'pval') {
       criteriaCol <- 'p-value'
-    } else if (pval_type == 'fdr') {
+    } else if (pValType == 'fdr') {
       criteriaCol <- 'adjP_BH'
     } else {
-      warning(paste0("The pval_type parameter should be one of three values, 'fdr' or 'pval' for chemical class enrichment, entered value pval_type= ", pval_type))
+      warning(paste0("The pValType parameter should be one of three values, 'fdr' or 'pval' for chemical class enrichment, entered value pValType= ", pValType))
       return(NULL)
     }
 
-    for(result in names(fishers_df)) {
+    for(result in names(fishersDf)) {
 
-      #if(class(fishers_df[[result]]) == 'data.frame') {
-       if(methods::is(fishers_df[[result]], 'data.frame')) {
+      #if(class(fishersDf[[result]]) == 'data.frame') {
+       if(methods::is(fishersDf[[result]], 'data.frame')) {
         print(result)
-        resultDf <- fishers_df[[result]]
-        resultDf <- subset(resultDf, resultDf[[criteriaCol]] <= pval_cutoff)
-        fishers_df[[result]] <- resultDf
+        resultDf <- fishersDf[[result]]
+        resultDf <- subset(resultDf, resultDf[[criteriaCol]] <= pValCutoff)
+        fishersDf[[result]] <- resultDf
       }
     }
-    return(fishers_df)
+    return(fishersDf)
   }
 }
 
@@ -862,20 +862,20 @@ listToQueryString <- function(ids) {
 #' filterPathwaysByAnalyteCount utility method filtered a dataframe based on the number of analytes associated with rampPathwayIds contained in the dataframe.
 #' Like fisher exact code, this one retains pathways with analyte count >= minPathwaySize, and having analyte_count < max_path_size
 #'
-#' @param pathway_dataframe a dataframe containing at least one column that contains rampPathwayIds
-#' @param pathway_ramp_id_col_name the column name containing the rampPathwayIds
+#' @param pathwayDataframe a dataframe containing at least one column that contains rampPathwayIds
+#' @param pathwayRampIdColName the column name containing the rampPathwayIds
 #' @param minPathwaySize the minimum number of pathway members (genes and metabolites) to include the pathway in the output (default = 5)
-#' @param maxPathwaySize the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in the output (default = 150)
-#' @param db a RaMP databse object
+#' @param maxPathwaySize the maximum number of pathway members (genes and metaboltes) to include the pathway in the output (default = 150)
+#' @param db a RaMP database object
 #' @noRd
-filterPathwaysByAnalyteCount <- function( pathway_dataframe, pathway_ramp_id_col_name = 'pathwayRampId', minPathwaySize = 5, maxPathwaySize = 150, db = RaMP()) {
-  pwIds <- unlist(pathway_dataframe[[pathway_ramp_id_col_name]])
+filterPathwaysByAnalyteCount <- function( pathwayDataframe, pathwayRampIdColName = 'pathwayRampId', minPathwaySize = 5, maxPathwaySize = 150, db = RaMP()) {
+  pwIds <- unlist(pathwayDataframe[[pathwayRampIdColName]])
 
   res <- db@api$getAnalyteCountsForPathways(pathwayRampIds = pwIds)
   res <- res[res$analyte_count >= minPathwaySize & res$analyte_count < maxPathwaySize,]
   keeperPW <- unlist(res$pathwayRampId)
-  pathway_dataframe <- pathway_dataframe[pathway_dataframe[[pathway_ramp_id_col_name]] %in% keeperPW, ]
-  return(pathway_dataframe)
+  pathwayDataframe <- pathwayDataframe[pathwayDataframe[[pathwayRampIdColName]] %in% keeperPW, ]
+  return(pathwayDataframe)
 }
 
 

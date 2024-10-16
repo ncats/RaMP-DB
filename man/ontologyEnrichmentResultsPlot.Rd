@@ -7,8 +7,8 @@
 ontologyEnrichmentResultsPlot(
   ontologiesSig,
   pval = "FDR",
-  text_size = 8,
-  sig_cutoff = 0.05,
+  textSize = 8,
+  sigCutoff = 0.05,
   interactive = FALSE,
   db = RaMP()
 )
@@ -18,9 +18,9 @@ ontologyEnrichmentResultsPlot(
 
 \item{pval}{Which p value to plot, choose from Raw, FDR or Holm-adjusted}
 
-\item{text_size}{Scales all text in figure (Default=16)}
+\item{textSize}{Scales all text in figure (Default=16)}
 
-\item{sig_cutoff}{Aesthetic, shows pvalue cutoff for significant ontologies}
+\item{sigCutoff}{Aesthetic, shows pvalue cutoff for significant ontologies}
 
 \item{interactive}{If TRUE, return interactive plotly object instead of ggplot object}
 

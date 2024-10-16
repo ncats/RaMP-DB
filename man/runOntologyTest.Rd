@@ -8,11 +8,11 @@ runOntologyTest(
   mets,
   namesOrIds = "ids",
   alternative = "less",
-  min_mets = 2,
-  min_ontology_size = 5,
-  max_ontology_size = 1500,
+  minMets = 2,
+  minOntologySize = 5,
+  maxOntologySize = 1500,
   includeRaMPids = FALSE,
-  background_type = "database",
+  backgroundType = "database",
   background = "database",
   db = RaMP()
 )
@@ -24,23 +24,23 @@ runOntologyTest(
 
 \item{alternative}{alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")}
 
-\item{min_mets}{minimum number of mets per pathway (pathways with < min_mets mets are filtered out).}
+\item{minMets}{minimum number of mets per pathway (pathways with < minMets mets are filtered out).}
 
-\item{min_ontology_size}{the minimum number of ontology members (genes and metabolites) to include the ontology in the output (default = 5)}
+\item{minOntologySize}{the minimum number of ontology members (genes and metabolites) to include the ontology in the output (default = 5)}
 
-\item{max_ontology_size}{the maximum number of ontology members (genes and metabolites) to include the ontology in the output (default = 150)}
+\item{maxOntologySize}{the maximum number of ontology members (genes and metabolites) to include the ontology in the output (default = 150)}
 
 \item{includeRaMPids}{whether or not to include RaMP IDs in the output (TRUE/FALSE)}
 
-\item{background_type}{type of background that is input by the user.  Options are "database" if user wants all
+\item{backgroundType}{type of background that is input by the user.  Options are "database" if user wants all
 mets from the RaMP database will be used; "file", if user wants to input a file with a list of background
 mets; "list", if user wants to input a vector of analyte IDs; "biospecimen", if user wants to specify a
 biospecimen type (e.g. blood, adipose tissue, etc.) and have those biospecimen-specific mets used.  For genes,
 only the "database" option is used.}
 
-\item{background}{background to be used for Fisher's tests.  If parameter 'background_type="database"', this parameter
-is ignored (default="database"); if parameter 'background_type= "file"', then 'background' should be a file name (with
-directory); if 'background_type="list"', then 'background' should be a vector of RaMP IDs; if 'background_type="biospecimen"'
+\item{background}{background to be used for Fisher's tests.  If parameter 'backgroundType="database"', this parameter
+is ignored (default="database"); if parameter 'backgroundType= "file"', then 'background' should be a file name (with
+directory); if 'backgroundType="list"', then 'background' should be a vector of RaMP IDs; if 'backgroundType="biospecimen"'
 then users should specify one of the following: "Blood", "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney",
 "Saliva", and "Feces"}
 
