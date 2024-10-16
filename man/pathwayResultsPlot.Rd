@@ -2,11 +2,11 @@
 % Please edit documentation in R/plottingFunctions.R
 \name{pathwayResultsPlot}
 \alias{pathwayResultsPlot}
-\title{Cluster and plot significant pathways by FDR-adjusted pval}
+\title{Cluster and plot significant pathways by FDR-adjusted pVal}
 \usage{
 pathwayResultsPlot(
   pathwaysSig,
-  pval = "FDR",
+  pVal = "FDR",
   percAnalyteOverlap = 0.5,
   percPathwayOverlap = 0.5,
   minPathwayToCluster = 3,
@@ -19,7 +19,7 @@ pathwayResultsPlot(
 \arguments{
 \item{pathwaysSig}{output of FilterFishersResults}
 
-\item{pval}{Which p value to plot, choose from Raw, FDR or Holm-adjusted}
+\item{pVal}{Which p value to plot, choose from Raw, FDR or Holm-adjusted}
 
 \item{percAnalyteOverlap}{Minimum overlap for pathways to be considered similar
 (Default = 0.2)}
@@ -38,7 +38,7 @@ a cluster (medoid) (Default = 3)}
 \item{db}{a RaMP database object}
 }
 \description{
-Cluster and plot significant pathways by FDR-adjusted pval
+Cluster and plot significant pathways by FDR-adjusted pVal
 }
 \examples{
 \dontrun{

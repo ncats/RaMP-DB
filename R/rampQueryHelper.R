@@ -85,17 +85,17 @@ rampFindSourceFromId <- function(rampId = "",full = TRUE, db = RaMP()){
 
 
 #' Fast search given a list of metabolites source Id
-#' @param sourceid a vector of synonym that need to be searched
+#' @param sourceId a vector of synonym that need to be searched
 #' @param db a RaMP database object
 #' @return a list contains all metabolits as name and pathway inside.
 #' @noRd
-rampFastPathFromSource<- function( sourceid, db = RaMP()){
+rampFastPathFromSource<- function( sourceId, db = RaMP()){
   # progress<- shiny::Progress$new()
   # progress$set(message = "Querying databases ...",value = 0)
   now <- proc.time()
   # on.exit(dbDisconnect(con))
 
-  list_metabolite <- unique(sourceid)
+  list_metabolite <- unique(sourceId)
 
   df1 <- db@api$getAllSourceInfoForSourceIDs(sourceIds = list_metabolite)
 

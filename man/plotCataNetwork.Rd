@@ -4,10 +4,10 @@
 \alias{plotCataNetwork}
 \title{Plots a network based on gene-metabolite relationships}
 \usage{
-plotCataNetwork(catalyzedf = "")
+plotCataNetwork(catalyzeDf = "")
 }
 \arguments{
-\item{catalyzedf}{a data.frame output by rampFastCata() that contains analytes that are in the same reaction}
+\item{catalyzeDf}{a data.frame output by rampFastCata() that contains analytes that are in the same reaction}
 }
 \value{
 An interactive HTML plot that allows the user to pan/zoom into regions of interest. User genes/
