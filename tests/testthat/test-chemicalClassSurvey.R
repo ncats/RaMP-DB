@@ -5,7 +5,7 @@
                               'hmdb:HMDB0034365','hmdb:HMDB0035227','hmdb:HMDB0007973','hmdb:HMDB0008057',
                               'hmdb:HMDB0011211')
 
-  chemical.classes<- getChemClass(db = rampDB, mets = metabolites.of.interest, background="NULL", background_type="database")
+  chemical.classes<- getChemClass(db = rampDB, mets = metabolites.of.interest, background="NULL", backgroundType="database")
 
   metabolite.classes <- as.data.frame(chemical.classes$met_classes)
 
@@ -25,7 +25,7 @@
                               'hmdb:HMDB0034365','hmdb:HMDB0035227','hmdb:HMDB0007973','hmdb:HMDB0008057',
                               'hmdb:HMDB0011211')
 
- chemical.classes<- getChemClass(db = rampDB, mets = metabolites.of.interest, background="NULL", background_type="database")
+ chemical.classes<- getChemClass(db = rampDB, mets = metabolites.of.interest, background="NULL", backgroundType="database")
  count_summary<-as.data.frame(chemical.classes$count_summary$ClassyFire_sub_class)
 
   expect_true(

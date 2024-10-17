@@ -2,13 +2,13 @@
 % Please edit documentation in R/plottingFunctions.R
 \name{ontologyEnrichmentResultsPlot}
 \alias{ontologyEnrichmentResultsPlot}
-\title{Cluster and plot significant ontologies by FDR-adjusted pval}
+\title{Cluster and plot significant ontologies by FDR-adjusted pVal}
 \usage{
 ontologyEnrichmentResultsPlot(
   ontologiesSig,
-  pval = "FDR",
-  text_size = 8,
-  sig_cutoff = 0.05,
+  pVal = "FDR",
+  textSize = 8,
+  sigCutoff = 0.05,
   interactive = FALSE,
   db = RaMP()
 )
@@ -16,16 +16,16 @@ ontologyEnrichmentResultsPlot(
 \arguments{
 \item{ontologiesSig}{output of FilterFishersResults}
 
-\item{pval}{Which p value to plot, choose from Raw, FDR or Holm-adjusted}
+\item{pVal}{Which p value to plot, choose from Raw, FDR or Holm-adjusted}
 
-\item{text_size}{Scales all text in figure (Default=16)}
+\item{textSize}{Scales all text in figure (Default=16)}
 
-\item{sig_cutoff}{Aesthetic, shows pvalue cutoff for significant ontologies}
+\item{sigCutoff}{Aesthetic, shows pvalue cutoff for significant ontologies}
 
 \item{interactive}{If TRUE, return interactive plotly object instead of ggplot object}
 
 \item{db}{a RaMP database object}
 }
 \description{
-Cluster and plot significant ontologies by FDR-adjusted pval
+Cluster and plot significant ontologies by FDR-adjusted pVal
 }

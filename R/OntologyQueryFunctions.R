@@ -3,8 +3,8 @@
 #' @param mets a vector of metabolites or a metabolites delimited by new line character
 #' @param namesOrIds specify the type of given data
 #' @param includeRaMPids whether or not to include RaMP ids in the output (TRUE/FALSE)
-#' @param min_ontology_size the minimum number of metabolites in an ontology for it to be included in results. Default is 1,000
-#' @param max_ontology_size the maximum number of metabolites in an ontology for it to be included in results. Default is Inf
+#' @param minOntologySize the minimum number of metabolites in an ontology for it to be included in results. Default is 1,000
+#' @param maxOntologySize the maximum number of metabolites in an ontology for it to be included in results. Default is Inf
 #' @param db a RaMP database object
 #' @return dataframe that contains searched ontology from given metabolites
 #'
@@ -14,7 +14,7 @@
 #' getOntoFromMeta(mets = "hmdb:HMDB0071437", db=rampDB)
 #' }
 #' @export
-getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, min_ontology_size = 1E3, max_ontology_size = Inf, db = RaMP()) {
+getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, minOntologySize = 1E3, maxOntologySize = Inf, db = RaMP()) {
   if (!(namesOrIds %in% c("ids", "names"))) {
     stop("Specifiy the type of given data to 'ids' or 'names'")
   }
@@ -54,8 +54,8 @@ getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, mi
   rampid <- unique(df$rampId)
 
   temp_ontologies_df <- getOntologies(db = db) %>%
-    dplyr::filter(.data$metCount <= max_ontology_size,
-                  .data$metCount > min_ontology_size)
+    dplyr::filter(.data$metCount <= maxOntologySize,
+                  .data$metCount > minOntologySize)
 
   df2 <- db@api$getOntologiesForRampIDs(rampIds = rampid) %>%
     dplyr::filter(.data$rampOntologyId %in% temp_ontologies_df$rampOntologyId)
@@ -96,8 +96,8 @@ getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, mi
 
 #' function that query database to find mets in given ontologies
 #' @param ontology a vector of ontology or ontologies delimited by new line character
-#' @param min_ontology_size the minimum number of metabolites in an ontology for it to be included in results. Default is 1,000
-#' @param max_ontology_size the maximum number of metabolites in an ontology for it to be included in results. Default is Inf
+#' @param minOntologySize the minimum number of metabolites in an ontology for it to be included in results. Default is 1,000
+#' @param maxOntologySize the maximum number of metabolites in an ontology for it to be included in results. Default is Inf
 #' @param curate filter searchable ontologies to only those visible to filter by when searching the HMDB website. Primarily for front-end UI use.
 #' @param db a RaMP database object
 #' @return dataframe that contains searched mets from given ontology
@@ -110,7 +110,7 @@ getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, mi
 #' @importFrom rlang .data
 #' @importFrom magrittr %>%
 #' @export
-getMetaFromOnto <- function(ontology, min_ontology_size = 1E3, max_ontology_size = Inf, curate = F, db = RaMP()) {
+getMetaFromOnto <- function(ontology, minOntologySize = 1E3, maxOntologySize = Inf, curate = F, db = RaMP()) {
   print("Retreiving Metabolites for input ontology terms.")
   now <- proc.time()
   if (is.character(ontology)) {
@@ -130,8 +130,8 @@ getMetaFromOnto <- function(ontology, min_ontology_size = 1E3, max_ontology_size
   list_ontology <- unique(list_ontology)
 
   allontos <- getOntologies(db = db) %>%
-    dplyr::filter(.data$metCount <= max_ontology_size,
-                  .data$metCount > min_ontology_size)
+    dplyr::filter(.data$metCount <= maxOntologySize,
+                  .data$metCount > minOntologySize)
 
   #This if statement is meant for use with the front end.
   #The idea is to limit the ontologies searchable in the RaMP UI to be the same ones HMDB lets the user filter by on their website.
@@ -189,18 +189,18 @@ getMetaFromOnto <- function(ontology, min_ontology_size = 1E3, max_ontology_size
 #' @param mets a vector of metabolites that need to be searched
 #' @param namesOrIds whether input is "names" or "ids" (default is "ids", must be the same for mets and background)
 #' @param alternative alternative hypothesis test passed on to fisher.test().  Options are two.sided, greater, or less (default is "less")
-#' @param min_mets minimum number of mets per pathway (pathways with < min_mets mets are filtered out).
-#' @param min_ontology_size the minimum number of ontology members (genes and metabolites) to include the ontology in the output (default = 5)
-#' @param max_ontology_size the maximum number of ontology members (genes and metabolites) to include the ontology in the output (default = 150)
+#' @param minMets minimum number of mets per pathway (pathways with < minMets mets are filtered out).
+#' @param minOntologySize the minimum number of ontology members (genes and metabolites) to include the ontology in the output (default = 5)
+#' @param maxOntologySize the maximum number of ontology members (genes and metabolites) to include the ontology in the output (default = 150)
 #' @param includeRaMPids whether or not to include RaMP IDs in the output (TRUE/FALSE)
-#' @param background_type type of background that is input by the user.  Options are "database" if user wants all
+#' @param backgroundType type of background that is input by the user.  Options are "database" if user wants all
 #' mets from the RaMP database will be used; "file", if user wants to input a file with a list of background
 #' mets; "list", if user wants to input a vector of analyte IDs; "biospecimen", if user wants to specify a
 #' biospecimen type (e.g. blood, adipose tissue, etc.) and have those biospecimen-specific mets used.  For genes,
 #' only the "database" option is used.
-#' @param background background to be used for Fisher's tests.  If parameter 'background_type="database"', this parameter
-#' is ignored (default="database"); if parameter 'background_type= "file"', then 'background' should be a file name (with
-#' directory); if 'background_type="list"', then 'background' should be a vector of RaMP IDs; if 'background_type="biospecimen"'
+#' @param background background to be used for Fisher's tests.  If parameter 'backgroundType="database"', this parameter
+#' is ignored (default="database"); if parameter 'backgroundType= "file"', then 'background' should be a file name (with
+#' directory); if 'backgroundType="list"', then 'background' should be a vector of RaMP IDs; if 'backgroundType="biospecimen"'
 #' then users should specify one of the following: "Blood", "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney",
 #' "Saliva", and "Feces"
 #' @param db a RaMP database object
@@ -210,10 +210,10 @@ getMetaFromOnto <- function(ontology, min_ontology_size = 1E3, max_ontology_size
 
 runOntologyTest <- function(mets,
                             namesOrIds = "ids",
-                            alternative = "less", min_mets = 2,
-                            min_ontology_size = 5, max_ontology_size = 1500,
+                            alternative = "less", minMets = 2,
+                            minOntologySize = 5, maxOntologySize = 1500,
                             includeRaMPids = FALSE,
-                            background_type = "database", background = "database",
+                            backgroundType = "database", background = "database",
                             db = RaMP()) {
   now <- proc.time()
   print("Fisher Testing ......")
@@ -231,25 +231,25 @@ runOntologyTest <- function(mets,
     return(NULL)
   }
 
-  #  if(class(background_type)=="list"){
-  if (is(background_type, "list")) {
+  #  if(class(backgroundType)=="list"){
+  if (is(backgroundType, "list")) {
     background <- unlist(background)
   }
 
-  if (background_type == "list") {
+  if (backgroundType == "list") {
     backgrounddf <- getOntoFromMeta(
       db = db, mets = background,
       includeRaMPids = TRUE,
       namesOrIds = namesOrIds
     )
-  } else if (background_type == "file") {
+  } else if (backgroundType == "file") {
     userbkg <- utils::read.table(background, header = F)[, 1]
     backgrounddf <- getOntoFromMeta(
       db = db, mets = userbkg,
       includeRaMPids = TRUE,
       namesOrIds = namesOrIds
     )
-  } else if (background_type == "biospecimen") {
+  } else if (backgroundType == "biospecimen") {
     biospecimen <- background
     if (biospecimen == "Adipose") {
       biospecimen <- "Adipose tissue"
@@ -269,15 +269,15 @@ runOntologyTest <- function(mets,
     if (nrow(ontologydf) == 0) {
       stop("There are no metabolites in your input that map to your selected biospecimen")
     }
-  } else if (background_type == "database") {
+  } else if (backgroundType == "database") {
     # do nothing, it's handled down below in if statements
   } else {
-    stop("background_type was not specified correctly.  Please specify one of the following options: database, file, list, biospecimen")
+    stop("backgroundType was not specified correctly.  Please specify one of the following options: database, file, list, biospecimen")
   }
 
 
   ## Check that all metabolites of interest are in the background
-  if (background_type != "database") {
+  if (backgroundType != "database") {
     if (length(setdiff(ontologydf$rampId, backgrounddf$rampId) != 0)) {
       stop("All mets in set of interest must also be in background")
     }
@@ -330,7 +330,7 @@ runOntologyTest <- function(mets,
       user_in_ontology <- 0
     } else {
       user_in_ontology <- length(unique(grep("RAMP_C", ids_inontology, value = TRUE)))
-      if (background_type != "database") {
+      if (backgroundType != "database") {
         ids_inontology_bg <- backgrounddf[which(backgrounddf$rampOntologyId == i), "rampId"]
         bg_in_ontology <- length(unique(grep("RAMP_C", ids_inontology_bg, value = TRUE)))
       }
@@ -338,7 +338,7 @@ runOntologyTest <- function(mets,
 
     if (pidCount == 1) {
       tot_user_analytes <- length(grep("RAMP_C", unique(ontologydf$rampCompoundId)))
-      if (background_type != "database") {
+      if (backgroundType != "database") {
         tot_bg_analytes <- length(grep("RAMP_C", unique(backgrounddf$rampCompoundId)))
       }
     }
@@ -354,23 +354,23 @@ runOntologyTest <- function(mets,
       # fill the rest of the table out
 
       ## user_in_ontology <- length(unique(ontologydf[which(ontologydf$rampOntologyId==i),"rampId"]))
-      if (background_type != "database") {
+      if (backgroundType != "database") {
         bg_in_ontology <- length(unique(backgrounddf[which(backgrounddf$rampOntologyId == i), "rampCompoundId"]))
       }
 
       user_out_ontology <- tot_user_analytes - user_in_ontology
 
-      if (background_type != "database") {
+      if (backgroundType != "database") {
         bg_in_ontology <- length(unique(backgrounddf[which(backgrounddf$rampOntologyId == i), "rampCompoundId"]))
         bg_out_ontology <- tot_bg_analytes - bg_in_ontology
       }
 
-      if (background_type == "database") {
+      if (backgroundType == "database") {
         contingencyTb[1, 1] <- tot_in_ontology - user_in_ontology
       } else {
         contingencyTb[1, 1] <- bg_in_ontology
       }
-      if (background_type == "database") {
+      if (backgroundType == "database") {
         contingencyTb[1, 2] <- tot_out_ontology - user_out_ontology
       } else {
         contingencyTb[1, 2] <- bg_out_ontology
@@ -406,10 +406,10 @@ runOntologyTest <- function(mets,
   print(now - proc.time())
   print("")
 
-  # only keep ontologys that have >= min_ontology_size or < max_ontology_size compounds
+  # only keep ontologys that have >= minOntologySize or < maxOntologySize compounds
   keepers <- intersect(
-    which(c(totinontology) >= min_ontology_size),
-    which(c(totinontology) < max_ontology_size)
+    which(c(totinontology) >= minOntologySize),
+    which(c(totinontology) < maxOntologySize)
   )
 
   # hist(totinontology,breaks=1000)
@@ -434,7 +434,7 @@ runOntologyTest <- function(mets,
   holm <- stats::p.adjust(out$Pval, method = "holm")
   out <- cbind(out, holm)
   colnames(out)[ncol(out)] <- "Pval_Holm"
-  keepers <- which(out$Num_In_Ontology >= min_mets)
+  keepers <- which(out$Num_In_Ontology >= minMets)
   out <- merge(
     ontologydf[, c(
       "Ontology", "rampOntologyId",

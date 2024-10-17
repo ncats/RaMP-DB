@@ -6,8 +6,8 @@
 \usage{
 getMetaFromOnto(
   ontology,
-  min_ontology_size = 1000,
-  max_ontology_size = Inf,
+  minOntologySize = 1000,
+  maxOntologySize = Inf,
   curate = F,
   db = RaMP()
 )
@@ -15,9 +15,9 @@ getMetaFromOnto(
 \arguments{
 \item{ontology}{a vector of ontology or ontologies delimited by new line character}
 
-\item{min_ontology_size}{the minimum number of metabolites in an ontology for it to be included in results. Default is 1,000}
+\item{minOntologySize}{the minimum number of metabolites in an ontology for it to be included in results. Default is 1,000}
 
-\item{max_ontology_size}{the maximum number of metabolites in an ontology for it to be included in results. Default is Inf}
+\item{maxOntologySize}{the maximum number of metabolites in an ontology for it to be included in results. Default is Inf}
 
 \item{curate}{filter searchable ontologies to only those visible to filter by when searching the HMDB website. Primarily for front-end UI use.}
 

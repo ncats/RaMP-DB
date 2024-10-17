@@ -13,7 +13,7 @@ test_that("Fisher test results does not equal filtered fisher test results, Filt
               runCombinedFisherTest(db = rampDB, analytes = analytes)
 
             filtered.fisher.results <-
-              FilterFishersResults(fisher.results, pval_type='holm', pval_cutoff  = 0.05)
+              FilterFishersResults(fisher.results, pValType='holm', pValCutoff  = 0.05)
 
              fisher.results <-
               fisher.results$fishresults[,

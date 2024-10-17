@@ -2,16 +2,16 @@
 % Please edit documentation in R/plottingFunctions.R
 \name{pathwayResultsPlot}
 \alias{pathwayResultsPlot}
-\title{Cluster and plot significant pathways by FDR-adjusted pval}
+\title{Cluster and plot significant pathways by FDR-adjusted pVal}
 \usage{
 pathwayResultsPlot(
   pathwaysSig,
-  pval = "FDR",
-  perc_analyte_overlap = 0.5,
-  perc_pathway_overlap = 0.5,
-  min_pathway_tocluster = 3,
-  text_size = 8,
-  sig_cutoff = 0.05,
+  pVal = "FDR",
+  percAnalyteOverlap = 0.5,
+  percPathwayOverlap = 0.5,
+  minPathwayToCluster = 3,
+  textSize = 8,
+  sigCutoff = 0.05,
   interactive = FALSE,
   db = RaMP()
 )
@@ -19,30 +19,30 @@ pathwayResultsPlot(
 \arguments{
 \item{pathwaysSig}{output of FilterFishersResults}
 
-\item{pval}{Which p value to plot, choose from Raw, FDR or Holm-adjusted}
+\item{pVal}{Which p value to plot, choose from Raw, FDR or Holm-adjusted}
 
-\item{perc_analyte_overlap}{Minimum overlap for pathways to be considered similar
+\item{percAnalyteOverlap}{Minimum overlap for pathways to be considered similar
 (Default = 0.2)}
 
-\item{perc_pathway_overlap}{Minimum overlap for clusters to merge (Default = 0.2)}
+\item{percPathwayOverlap}{Minimum overlap for clusters to merge (Default = 0.2)}
 
-\item{min_pathway_tocluster}{Minimum number of 'similar' pathways required to start
+\item{minPathwayToCluster}{Minimum number of 'similar' pathways required to start
 a cluster (medoid) (Default = 3)}
 
-\item{text_size}{Scales all text in figure (Default=16)}
+\item{textSize}{Scales all text in figure (Default=16)}
 
-\item{sig_cutoff}{Aesthetic, shows pvalue cutoff for significant pathways}
+\item{sigCutoff}{Aesthetic, shows pvalue cutoff for significant pathways}
 
 \item{interactive}{If TRUE, return interactive plotly object instead of ggplot object}
 
 \item{db}{a RaMP database object}
 }
 \description{
-Cluster and plot significant pathways by FDR-adjusted pval
+Cluster and plot significant pathways by FDR-adjusted pVal
 }
 \examples{
 \dontrun{
-pathwayResultsPlot(pathwaysSig = filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2,
-   min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE, db = rampDB )
+pathwayResultsPlot(pathwaysSig = filtered.fisher.results, textSize = 8, percAnalyteOverlap = 0.2,
+   minPathwayToCluster = 2, percPathwayOverlap = 0.2, interactive = FALSE, db = rampDB )
 }
 }

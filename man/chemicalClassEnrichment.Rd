@@ -8,7 +8,7 @@ enrichment p-values and FDR values.}
 chemicalClassEnrichment(
   mets,
   background = "database",
-  background_type = "database",
+  backgroundType = "database",
   inferIdMapping = F,
   db = RaMP()
 )
@@ -21,7 +21,7 @@ metabolites for enrichment. The background can be either a list of ids, a file n
 one id per column (no file header row) or a specificed biospecimen type (available biospecimen types: "Blood",
 "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney","Saliva", or "Feces").}
 
-\item{background_type}{one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
+\item{backgroundType}{one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
 or 'file' in which case the background parameter will be a file path, or 'biospecimen' where the specified background parameter is
 a RaMP HMDB metabolite ontology term (see background parameter, above. for the most common biospecimen background values).}
 

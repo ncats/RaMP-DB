@@ -4,14 +4,14 @@
 \alias{write_FishersResults}
 \title{Function that writes Fishers Test results, after clustering to a CSV file}
 \usage{
-write_FishersResults(fishResults = "none", outputfile = "none", rampid = FALSE)
+write_FishersResults(fishResults = "none", outputFile = "none", rampId = FALSE)
 }
 \arguments{
 \item{fishResults}{a data frame returned by function runCombinedFisherTest()}
 
-\item{outputfile}{name of output file}
+\item{outputFile}{name of output file}
 
-\item{rampid}{whether or not to include rampId (default is FALSE)}
+\item{rampId}{whether or not to include rampId (default is FALSE)}
 }
 \description{
 Function that writes Fishers Test results, after clustering to a CSV file

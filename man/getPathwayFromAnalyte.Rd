@@ -7,10 +7,10 @@ returns associated pathways}
 \usage{
 getPathwayFromAnalyte(
   analytes = "none",
-  find_synonym = FALSE,
+  findSynonym = FALSE,
   namesOrIds = "ids",
   includeRaMPids = FALSE,
-  include_smpdb = FALSE,
+  includeSmpdb = FALSE,
   minPathwaySize = 5,
   maxPathwaySize = 150,
   db = RaMP()
@@ -19,13 +19,13 @@ getPathwayFromAnalyte(
 \arguments{
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
 
-\item{find_synonym}{find all synonyms or just return same synonym (T/F)}
+\item{findSynonym}{find all synonyms or just return same synonym (T/F)}
 
 \item{namesOrIds}{whether input is "names" or "ids" (default is "ids")}
 
 \item{includeRaMPids}{include internal RaMP identifiers (default is "FALSE")}
 
-\item{include_smpdb}{Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are
+\item{includeSmpdb}{Include pathways from smpdb/hmdb in analysis. Excluded by default since definitions are
 highly redundant}
 
 \item{minPathwaySize}{the minimum number of pathway members (genes and metabolites) to include the pathway in

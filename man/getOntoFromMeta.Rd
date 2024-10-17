@@ -9,8 +9,8 @@ getOntoFromMeta(
   mets,
   namesOrIds = "ids",
   includeRaMPids = FALSE,
-  min_ontology_size = 1000,
-  max_ontology_size = Inf,
+  minOntologySize = 1000,
+  maxOntologySize = Inf,
   db = RaMP()
 )
 }
@@ -21,9 +21,9 @@ getOntoFromMeta(
 
 \item{includeRaMPids}{whether or not to include RaMP ids in the output (TRUE/FALSE)}
 
-\item{min_ontology_size}{the minimum number of metabolites in an ontology for it to be included in results. Default is 1,000}
+\item{minOntologySize}{the minimum number of metabolites in an ontology for it to be included in results. Default is 1,000}
 
-\item{max_ontology_size}{the maximum number of metabolites in an ontology for it to be included in results. Default is Inf}
+\item{maxOntologySize}{the maximum number of metabolites in an ontology for it to be included in results. Default is Inf}
 
 \item{db}{a RaMP database object}
 }
