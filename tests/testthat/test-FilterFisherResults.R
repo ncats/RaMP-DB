@@ -10,7 +10,7 @@ test_that("Fisher test results does not equal filtered fisher test results, Filt
                 )
 
             fisher.results <-
-              runCombinedFisherTest(db = rampDB, analytes = analytes)
+              runEnrichPathways(db = rampDB, analytes = analytes)
 
             filtered.fisher.results <-
               FilterFishersResults(fisher.results, pValType='holm', pValCutoff  = 0.05)
