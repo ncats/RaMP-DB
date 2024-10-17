@@ -1144,7 +1144,7 @@ buildAnalyteOverlapPerRxnLevelUpsetDataframe <- function(reactionsResults, inclu
 
     for(i in 1:length(missing_ecNum))
     {
-      input2reactions_list <- c(input2reactions_list, i = list(NULL))
+      input2reactions_list <- c(input2reactions_list, i = list(NA))
       names(input2reactions_list)[(length(input2reactions_list))] <- missing_ecNum[i]
     }
 
