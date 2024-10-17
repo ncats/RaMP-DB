@@ -610,6 +610,8 @@ runEnrichReactionClass <- function( analytes,
                                                      humanProtein=humanProtein,
                                                      db = db)
 
+    analyte_type = "both"
+
     if(length(reactionClassdf) == 0)
     {
       opt <- options(show.error.messages = FALSE)
@@ -645,6 +647,7 @@ runEnrichReactionClass <- function( analytes,
   {
     if (names(analytes_split[1]) == "uniprot")
     {
+      analyte_type = "uniprot"
       protAnalytes <- paste(analytes_split$uniprot$X1, analytes_split$uniprot$X2, sep = ":")
 
       reactionClassdf <- getReactionClassesForAnalytes(analytes,
@@ -679,6 +682,7 @@ runEnrichReactionClass <- function( analytes,
     }
     else if (names(analytes_split[1]) == "chebi")
     {
+      analyte_type = "chebi"
       metabAnalytes <- paste(analytes_split$chebi$X1, analytes_split$chebi$X2, sep = ":")
 
       reactionClassdf <- getReactionClassesForAnalytes(analytes,
@@ -714,7 +718,8 @@ runEnrichReactionClass <- function( analytes,
     }
   }
 
-  return(list(EC_Level1Stats = ec_level_1_adjusted_stats, EC_Level2Stats = ec_level_2_adjusted_stats , result_type = "reactionClass_enrichment"))
+
+  return(list(EC_Level1Stats = ec_level_1_adjusted_stats, EC_Level2Stats = ec_level_2_adjusted_stats , result_type = "reactionClass_enrichment", analyte_type))
 }
 
 
@@ -1067,7 +1072,7 @@ runFisherReaction <- function(ecLevelDf, metabAnalytes, protAnalytes, alternativ
     for (i in 1:nrow(ecLevelDf))
     {
       pidCount <- pidCount + 1
-      tot_prot = db@api$getCountOfChebiIdsInECReactions(humanProtein)
+      tot_prot = db@api$getCountOfUniprotIdsInECReactions(humanProtein)
       tot_in_reactionClass <- ecLevelDf$totalProteinsInRxnClass[i]
       tot_out_reactionClass <- tot_prot - tot_in_reactionClass
       user_in_reactionClass <- ecLevelDf$proteinCount[i]
