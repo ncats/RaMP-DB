@@ -141,6 +141,12 @@ DataAccessObject <- R6::R6Class(
     getReactionClassStats = function(analyteType = 'all', humanProtein) {
       return (runQuery(sql = getReactionClassStatsQuery(analyteType = analyteType, humanProtein = humanProtein), db = self$db))
     },
+    getCountOfChebiIdsInECReactions = function(humanProtein) {
+      return (runQuery(sql = getCountOfAnalytesInECReactionsQuery(analyteType = "metabolite", humanProtein = humanProtein), db = self$db)$count)
+    },
+    getCountOfUniprotIdsInECReactions = function(humanProtein) {
+      return (runQuery(sql = getCountOfAnalytesInECReactionsQuery(analyteType = "gene", humanProtein = humanProtein), db = self$db)$count)
+    },
     getAnalytesFromPathways = function(pathways, namesOrIds = 'names', match = "exact") {
       if (supportsCommonName(db = self$db)) {
         useCommonName = TRUE
@@ -307,6 +313,26 @@ getInfoFromTableQuery <- function(table) {
 getMetaboliteCountsForClassesQuery <- function() {
   return ("select class_level_name, class_name, count(1) as pop_hits from metabolite_class
                  group by class_level_name, class_name")
+}
+
+getCountOfAnalytesInECReactionsQuery <- function(analyteType, humanProtein) {
+  if (analyteType == 'metabolite') {
+    query <- "select count(distinct met_source_id) as count
+              from reaction2met, reaction
+              where met_source_id like 'chebi:%'
+              and reaction2met.ramp_rxn_id = reaction.ramp_rxn_id"
+  } else if (analyteType == 'gene') {
+    query <- "select count(distinct uniprot) as count
+              from reaction2protein, reaction
+              where uniprot like 'uniprot:%'
+              and reaction2protein.ramp_rxn_id = reaction.ramp_rxn_id"
+  } else {
+    stop('analyte type must be either "metabolite" or "gene"', analyteType)
+  }
+  if (humanProtein) {
+    query <- paste(query, "and has_human_prot = TRUE")
+  }
+  return (query)
 }
 
 getAnalyteCountsForPathwaysQuery <- function(pathwayRampIds) {
