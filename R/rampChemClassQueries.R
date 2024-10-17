@@ -205,10 +205,10 @@ getChemClass <- function(mets, background = "database", backgroundType="database
 #'                             "hmdb:HMDB0001138",
 #'                             "hmdb:HMDB0029412")
 #'
-#' chemical.enrichment <- chemicalClassEnrichment(mets = metabolites.of.interest, db = rampDB)
+#' chemical.enrichment <- runEnrichChemClass(mets = metabolites.of.interest, db = rampDB)
 #'}
 #' @export
-chemicalClassEnrichment <- function( mets, background = "database", backgroundType = "database", inferIdMapping=F, db = RaMP() ) {
+runEnrichChemClass <- function( mets, background = "database", backgroundType = "database", inferIdMapping=F, db = RaMP() ) {
   print("Starting Chemical Class Enrichment")
 
   # note that inferIdMapping is set to FALSE

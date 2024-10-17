@@ -8,7 +8,7 @@ test_that("chemical class enrichment data is returned correctly, ChemicalClassEn
 
   chemical.classes<-getChemClass(db = rampDB, mets = metabolites.of.interest, background="NULL", backgroundType="database")
 
-  enrichedClassSets <- chemicalClassEnrichment(db = rampDB, mets = metabolites.of.interest, background="NULL", backgroundType="database")
+  enrichedClassSets <- runEnrichChemClass(db = rampDB, mets = metabolites.of.interest, background="NULL", backgroundType="database")
 
   expect_true(
     NROW(enrichedClassSets)!=0
@@ -29,7 +29,7 @@ test_that("chemical class enrichment data is returned correctly, ChemicalClassEn
 
   chemical.classes<-getChemClass(db = rampDB, mets = metabolites.of.interest, background="NULL", backgroundType="database")
 
-  enrichedClassSets <- chemicalClassEnrichment(db = rampDB, mets = metabolites.of.interest, background="Saliva", backgroundType="biospecimen", inferIdMapping = F)
+  enrichedClassSets <- runEnrichChemClass(db = rampDB, mets = metabolites.of.interest, background="Saliva", backgroundType="biospecimen", inferIdMapping = F)
 
   expect_true(
     NROW(enrichedClassSets)!=0
@@ -49,7 +49,7 @@ test_that("chemical class enrichment data is returned correctly, ChemicalClassEn
                               'hmdb:HMDB0008057',
                               'hmdb:HMDB0011211')
    chemical.classes<-getChemClass(db = rampDB, mets = metabolites.of.interest, background="NULL", backgroundType="database")
-   enrichedClassSets <- chemicalClassEnrichment(db = rampDB, mets = metabolites.of.interest, background="NULL", backgroundType="database")
+   enrichedClassSets <- runEnrichChemClass(db = rampDB, mets = metabolites.of.interest, background="NULL", backgroundType="database")
   classy_fire_classes <- enrichedClassSets$ClassyFire_class
 
 
@@ -74,7 +74,7 @@ test_that("chemical class enrichment data is returned correctly, ChemicalClassEn
                                 'hmdb:HMDB0011211')
 
     chemical.classes<-getChemClass(db = rampDB, mets = metabolites.of.interest, background="Urine", backgroundType="biospecimen")
-    enrichedClassSets <- chemicalClassEnrichment(db = rampDB, mets = metabolites.of.interest, background="Urine", backgroundType="biospecimen")
+    enrichedClassSets <- runEnrichChemClass(db = rampDB, mets = metabolites.of.interest, background="Urine", backgroundType="biospecimen")
     classy_fire_classes <- enrichedClassSets$ClassyFire_class
 
 
@@ -97,7 +97,7 @@ test_that("chemical class enrichment data is returned correctly, ChemicalClassEn
                                 'hmdb:HMDB0008057',
                                 'hmdb:HMDB0011211')
     chemical.classes<-getChemClass(db = rampDB, mets = metabolites.of.interest, backgroundType="database", inferIdMapping = T)
-    enrichedClassSets <- chemicalClassEnrichment(db = rampDB, mets = metabolites.of.interest, backgroundType="database", inferIdMapping = T)
+    enrichedClassSets <- runEnrichChemClass(db = rampDB, mets = metabolites.of.interest, backgroundType="database", inferIdMapping = T)
     classy_fire_classes <- enrichedClassSets$ClassyFire_class
 
 
@@ -120,7 +120,7 @@ test_that("chemical class enrichment data is returned correctly, ChemicalClassEn
                                 'hmdb:HMDB0011211')
 
     chemical.classes<-getChemClass(db = rampDB, mets = metabolites.of.interest, backgroundType="database", inferIdMapping = T)
-    enrichedClassSets <- chemicalClassEnrichment(db = rampDB, mets = metabolites.of.interest, background = 'Urine', backgroundType="biospecimen", inferIdMapping = T)
+    enrichedClassSets <- runEnrichChemClass(db = rampDB, mets = metabolites.of.interest, background = 'Urine', backgroundType="biospecimen", inferIdMapping = T)
     classy_fire_classes <- enrichedClassSets$ClassyFire_class
 
     expect_true(
