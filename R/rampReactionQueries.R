@@ -619,8 +619,8 @@ runReactionClassTest <- function( analytes,
 
     print("Running Fisher's tests")
 
-    ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metab_analytes = metab_analytes, prot_analytes = prot_analytes, alternative = alternative)
-    ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2, metab_analytes = metab_analytes, prot_analytes = prot_analytes, alternative = alternative)
+    ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metab_analytes = metab_analytes, prot_analytes = prot_analytes, alternative = alternative, humanProtein=humanProtein, db = db)
+    ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2, metab_analytes = metab_analytes, prot_analytes = prot_analytes, alternative = alternative, humanProtein=humanProtein, db = db)
 
     ec_level_1_stats <- cbind("rxnClass" = reactionClassdf$class_ec_level_1$rxnClass,
                               "ecNumber" = reactionClassdf$class_ec_level_1$ecNumber,
@@ -661,8 +661,8 @@ runReactionClassTest <- function( analytes,
 
       print("Running Fisher's tests")
 
-      ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metab_analytes = NULL, prot_analytes = prot_analytes, alternative = alternative)
-      ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2, metab_analytes = NULL, prot_analytes = prot_analytes, alternative = alternative)
+      ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metab_analytes = NULL, prot_analytes = prot_analytes, alternative = alternative, humanProtein=humanProtein, db = db)
+      ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2, metab_analytes = NULL, prot_analytes = prot_analytes, alternative = alternative, humanProtein=humanProtein, db = db)
 
       ec_level_1_stats <- cbind("rxnClass" = reactionClassdf$class_ec_level_1$rxnClass,
                                 "ecNumber" = reactionClassdf$class_ec_level_1$ecNumber,
@@ -697,8 +697,8 @@ runReactionClassTest <- function( analytes,
 
       print("Running Fisher's tests")
 
-      ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metab_analytes = metab_analytes, prot_analytes = NULL, alternative = alternative)
-      ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2, metab_analytes = metab_analytes, prot_analytes = NULL, alternative = alternative)
+      ec_level_1_stats <- runFisherReaction(reactionClassdf$class_ec_level_1, metab_analytes = metab_analytes, prot_analytes = NULL, alternative = alternative, humanProtein=humanProtein, db = db)
+      ec_level_2_stats <- runFisherReaction(reactionClassdf$class_ec_level_2, metab_analytes = metab_analytes, prot_analytes = NULL, alternative = alternative, humanProtein=humanProtein, db = db)
 
       ec_level_1_stats <- cbind("rxnClass" = reactionClassdf$class_ec_level_1$rxnClass,
                                 "ecNumber" = reactionClassdf$class_ec_level_1$ecNumber,
@@ -1010,7 +1010,7 @@ checkReactionInputIds <- function(callingFunction, idList) {
 #' @param metab_analytes metabolites input
 #' @param prot_analytes protein input
 #' @noRd
-runFisherReaction <- function(ec_level_df, metab_analytes, prot_analytes, alternative = alternative)
+runFisherReaction <- function(ec_level_df, metab_analytes, prot_analytes, alternative = alternative, humanProtein = humanProtein, db = db)
 {
   ## Initialize empty contingency table for later
   contingencyTb <- matrix(0, nrow = 2, ncol = 2)
@@ -1027,8 +1027,14 @@ runFisherReaction <- function(ec_level_df, metab_analytes, prot_analytes, altern
     for (i in 1:nrow(ec_level_df))
     {
       pidCount <- pidCount + 1
+      if (humanProtein==TRUE)
+      {
+        tot_mets = db@api$getCountOfChebiIdsInECReactions(TRUE)
+      } else {
+        tot_mets = db@api$getCountOfChebiIdsInECReactions(FALSE)
+        }
       tot_in_reactionClass <- ec_level_df$totalMetsInRxnClass[i]
-      tot_out_reactionClass <- sum(ec_level_df$totalMetsInRxnClass) - tot_in_reactionClass
+      tot_out_reactionClass <- tot_mets - tot_in_reactionClass
       user_in_reactionClass <- ec_level_df$metCount[i]
       user_out_reactionClass <- length(metab_analytes) - ec_level_df$metCount[i]
 
@@ -1069,8 +1075,14 @@ runFisherReaction <- function(ec_level_df, metab_analytes, prot_analytes, altern
     for (i in 1:nrow(ec_level_df))
     {
       pidCount <- pidCount + 1
+      if (humanProtein==TRUE)
+      {
+        tot_prot = db@api$getCountOfChebiIdsInECReactions(TRUE)
+      } else {
+        tot_prot = db@api$getCountOfChebiIdsInECReactions(FALSE)
+      }
       tot_in_reactionClass <- ec_level_df$totalProteinsInRxnClass[i]
-      tot_out_reactionClass <- sum(ec_level_df$totalProteinsInRxnClass) - tot_in_reactionClass
+      tot_out_reactionClass <- tot_prot - tot_in_reactionClass
       user_in_reactionClass <- ec_level_df$proteinCount[i]
       user_out_reactionClass <- length(prot_analytes) - ec_level_df$proteinCount[i]
 

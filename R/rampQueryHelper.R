@@ -1086,6 +1086,10 @@ buildReactionClassesSunburstDataframe <- function(reactionClassesResults) {
 #' @param includeCofactorMets whether or not to include metabolite cofactors (TRUE/FALSE)
 #' @noRd
 buildAnalyteOverlapPerRxnLevelUpsetDataframe <- function(reactionsResults, includeCofactorMets = FALSE) {
+  if (includeCofactorMets == FALSE)
+  {
+    reactionsResults$met2rxn <- reactionsResults$met2rxn %>% dplyr::filter(isCofactor == 0)
+  }
   if(nrow(reactionsResults$met2rxn)>0)
   {
     met2rxn_EC <- reactionsResults$met2rxn %>% dplyr::filter(!dplyr::if_any("ecNumber", is.na))
@@ -1102,10 +1106,6 @@ buildAnalyteOverlapPerRxnLevelUpsetDataframe <- function(reactionsResults, inclu
     }
 
     met2rxn_NoEC <- reactionsResults$met2rxn %>% dplyr::filter(dplyr::if_any("ecNumber", is.na))
-  }
-  if (includeCofactorMets == FALSE)
-  {
-    met2rxn_EC <- met2rxn_EC %>% dplyr::filter("isCofactor" == 0)
   }
   if(nrow(reactionsResults$prot2rxn)>0)
   {
