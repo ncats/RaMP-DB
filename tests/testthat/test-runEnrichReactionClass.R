@@ -5,7 +5,7 @@ test_that("reaction enrichment data returns correctly formatted output", {
                'chebi:62286', 'chebi:77897', 'uniprot:P30566','uniprot:P30520',
                'uniprot:P00568', 'uniprot:P23109', 'uniprot:P22102', 'uniprot:P15531')
 
-  result <- runReactionClassTest(analytes = analytes, db = rampDB)
+  result <- runEnrichReactionClass(analytes = analytes, db = rampDB)
   expect_equal(
     (length(result)>1),
     TRUE
@@ -18,7 +18,7 @@ test_that("reaction enrichment data returns correctly formatted output", {
     !is.null(result))
 })
 
-test_that("reaction class enrichment data is returned correctly when selecting for specific EC level, runReactionClassTest", {
+test_that("reaction class enrichment data is returned correctly when selecting for specific EC level, runEnrichReactionClass", {
 
   analytes = c('chebi:58115', 'chebi:456215', 'chebi:58245', 'chebi:58450',
                'chebi:17596', 'chebi:16335', 'chebi:16750', 'chebi:172878',
@@ -26,7 +26,7 @@ test_that("reaction class enrichment data is returned correctly when selecting f
                'uniprot:P00568', 'uniprot:P23109', 'uniprot:P22102', 'uniprot:P15531')
 
   reaction.classes<-getReactionClassesForAnalytes(db = rampDB, analytes = analytes)
-  enrichedReactionSets <- runReactionClassTest(db = rampDB, analytes = analytes)
+  enrichedReactionSets <- runEnrichReactionClass(db = rampDB, analytes = analytes)
   EC_level1 <- enrichedReactionSets$EC_Level1Stats
 
 
@@ -45,7 +45,7 @@ test_that("enrichment in chebi data returns correctly formatted output", {
                'chebi:17596', 'chebi:16335', 'chebi:16750', 'chebi:172878',
                'chebi:62286', 'chebi:77897')
 
-  result <- runReactionClassTest(db = rampDB, analytes = chebi)
+  result <- runEnrichReactionClass(db = rampDB, analytes = chebi)
   expect_equal(
     (length(result)>1),
     TRUE
@@ -66,7 +66,7 @@ test_that("enrichment in uniprot data returns correctly formatted output", {
   uniprot = c('uniprot:P30566','uniprot:P30520',
                'uniprot:P00568', 'uniprot:P23109', 'uniprot:P22102', 'uniprot:P15531')
 
-  result <- runReactionClassTest(db = rampDB, analytes = uniprot)
+  result <- runEnrichReactionClass(db = rampDB, analytes = uniprot)
   expect_equal(
     (length(result)>1),
     TRUE
