@@ -273,7 +273,14 @@ runEnrichChemClass <- function( mets, background = "database", backgroundType = 
           resultRow <- resultRow + 1
         }
       }
-      resultMat <- bhCorrect(resultMat = resultMat)
+
+      resultMat <- resultMat[order(resultMat$`p-value`),]
+      bhPvals <- stats::p.adjust(resultMat$`p-value`, method = "BH")
+      resultMat$Pval_FDR <- bhPvals
+
+      holm <- stats::p.adjust(resultMat$`p-value`, method = "holm")
+      resultMat$Pval_Holm <- holm
+
       enrichmentStat[[as.character(category)]] <- resultMat
 
     }

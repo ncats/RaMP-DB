@@ -523,8 +523,8 @@ runEnrichPathways <- function(
     )
     colnames(allfish)[which(colnames(allfish) == "Pval.x")] <- "Pval_Metab"
     colnames(allfish)[which(colnames(allfish) == "Pval.y")] <- "Pval_Gene"
-    colnames(allfish)[which(colnames(allfish) == "Odds_Ratio.x")] <- "OR_Metab"
-    colnames(allfish)[which(colnames(allfish) == "Odds_Ratio.y")] <- "OR_Gene"
+    colnames(allfish)[which(colnames(allfish) == "OR.x")] <- "OR_Metab"
+    colnames(allfish)[which(colnames(allfish) == "OR.y")] <- "OR_Gene"
     colnames(allfish)[which(colnames(allfish) == "Total_In_Path.x")] <- "Total_In_Path_Metab"
     colnames(allfish)[which(colnames(allfish) == "Total_In_Path.y")] <- "Total_In_Path_Gene"
     colnames(allfish)[which(colnames(allfish) == "Num_In_Path.x")] <- "Num_In_Path_Metab"
