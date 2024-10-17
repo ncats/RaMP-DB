@@ -250,7 +250,7 @@ runEnrichChemClass <- function( mets, background = "database", backgroundType = 
       contingencyMat <- matrix(nrow=2, ncol=2)
       resultMat <- data.frame(matrix(ncol=8))
       colnames(resultMat) <- c("category", "class_name", "met_hits", "pop_hits",
-                               "met_size", "pop_size", "p-value","odds_ratio")
+                               "met_size", "pop_size", "p-value","OR")
 
       for (i in 1:nrow(categoryData)) {
         if(categoryData[i,'mets_count'] >= 1) {
