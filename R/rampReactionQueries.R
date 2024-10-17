@@ -1027,12 +1027,7 @@ runFisherReaction <- function(ec_level_df, metab_analytes, prot_analytes, altern
     for (i in 1:nrow(ec_level_df))
     {
       pidCount <- pidCount + 1
-      if (humanProtein==TRUE)
-      {
-        tot_mets = db@api$getCountOfChebiIdsInECReactions(TRUE)
-      } else {
-        tot_mets = db@api$getCountOfChebiIdsInECReactions(FALSE)
-        }
+      tot_mets = db@api$getCountOfChebiIdsInECReactions(humanProtein)
       tot_in_reactionClass <- ec_level_df$totalMetsInRxnClass[i]
       tot_out_reactionClass <- tot_mets - tot_in_reactionClass
       user_in_reactionClass <- ec_level_df$metCount[i]
@@ -1075,12 +1070,8 @@ runFisherReaction <- function(ec_level_df, metab_analytes, prot_analytes, altern
     for (i in 1:nrow(ec_level_df))
     {
       pidCount <- pidCount + 1
-      if (humanProtein==TRUE)
-      {
-        tot_prot = db@api$getCountOfChebiIdsInECReactions(TRUE)
-      } else {
-        tot_prot = db@api$getCountOfChebiIdsInECReactions(FALSE)
-      }
+
+      tot_prot = db@api$getCountOfChebiIdsInECReactions(humanProtein)
       tot_in_reactionClass <- ec_level_df$totalProteinsInRxnClass[i]
       tot_out_reactionClass <- tot_prot - tot_in_reactionClass
       user_in_reactionClass <- ec_level_df$proteinCount[i]
