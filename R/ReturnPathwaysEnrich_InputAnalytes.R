@@ -313,7 +313,7 @@ runFisherTest <- function(analytes,
     pathwayRampId = pidused[keepers],
     Pval = pval[keepers], # FDR.Adjusted.Pval=fdr,
     # Holm.Adjusted.Pval=holm,
-    Odds_Ratio = oddsratio[keepers],
+    OR = oddsratio[keepers],
     Num_In_Path = userinpath[keepers],
     Total_In_Path = totinpath[keepers]
   )
