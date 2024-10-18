@@ -208,7 +208,7 @@ getMetaFromOnto <- function(ontology, minOntologySize = 1E3, maxOntologySize = I
 #' @export
 #' @importFrom methods is
 
-runOntologyTest <- function(mets,
+runEnrichOntologies <- function(mets,
                             namesOrIds = "ids",
                             alternative = "less", minMets = 2,
                             minOntologySize = 5, maxOntologySize = 1500,
@@ -423,7 +423,7 @@ runOntologyTest <- function(mets,
     rampOntologyId = pidused[keepers],
     Pval = pval[keepers], # FDR.Adjusted.Pval=fdr,
     # Holm.Adjusted.Pval=holm,
-    Odds_Ratio = oddsratio[keepers],
+    OR = oddsratio[keepers],
     Num_In_Ontology = userinontology[keepers],
     Total_In_Ontology = totinontology[keepers]
   )
@@ -449,14 +449,14 @@ runOntologyTest <- function(mets,
     ontologyid <- x["rampOntologyId"]
     sigontologydf <- ontologydf[which(ontologydf$rampOntologyId == ontologyid), ]
     analytes <- sigontologydf[, "Metabolites"] %>%
-      paste0(collapse = ";")
+      paste0(collapse = "|")
     return(analytes)
   })
 
   # for user is the output needed, based on what user input
   if (includeRaMPids) {
-    return(out)
+    return(list(fishertresults = out, result_type = "ontology_enrichment"))
   } else {
-    return(cleanup(data = out))
+    return(list(fishertresults = cleanup(data = out), result_type = "ontology_enrichment" ))
   }
 }
