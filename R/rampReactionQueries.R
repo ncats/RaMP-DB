@@ -626,17 +626,17 @@ runEnrichReactionClass <- function( analytes,
 
     ec_level_1_stats <- cbind("rxnClass" = reactionClassdf$class_ec_level_1$rxnClass,
                               "ecNumber" = reactionClassdf$class_ec_level_1$ecNumber,
-                              "mets_pval" = ec_level_1_stats$pvals_mets,
-                              "mets_OR" = as.numeric(ec_level_1_stats$oddsratio_mets),
-                              "prot_pval" = ec_level_1_stats$pvals_prot,
-                              "prot_OR" = as.numeric(ec_level_1_stats$oddsratio_prot))
+                              "Pval_Metab" = ec_level_1_stats$pvals_mets,
+                              "Metab_OR" = as.numeric(ec_level_1_stats$oddsratio_mets),
+                              "Pval_Prot" = ec_level_1_stats$pvals_prot,
+                              "Prot_OR" = as.numeric(ec_level_1_stats$oddsratio_prot))
 
     ec_level_2_stats <- cbind("rxnClass" = reactionClassdf$class_ec_level_2$rxnClass,
                               "ecNumber" = reactionClassdf$class_ec_level_2$ecNumber,
-                              "mets_pval" = ec_level_2_stats$pvals_mets,
-                              "mets_OR" = as.numeric(ec_level_2_stats$oddsratio_mets),
-                              "prot_pval" = ec_level_2_stats$pvals_prot,
-                              "prot_OR" = as.numeric(ec_level_2_stats$oddsratio_prot))
+                              "Pval_Metab" = ec_level_2_stats$pvals_mets,
+                              "Metab_OR" = as.numeric(ec_level_2_stats$oddsratio_mets),
+                              "Pval_Prot" = ec_level_2_stats$pvals_prot,
+                              "Prot_OR" = as.numeric(ec_level_2_stats$oddsratio_prot))
 
     #Calculate adjusted pvals independently for each EC level
     ec_level_1_adjusted_stats <- adjusted_stats(ec_level_1_stats, analyte_type = "both")
@@ -668,13 +668,13 @@ runEnrichReactionClass <- function( analytes,
 
       ec_level_1_stats <- cbind("rxnClass" = reactionClassdf$class_ec_level_1$rxnClass,
                                 "ecNumber" = reactionClassdf$class_ec_level_1$ecNumber,
-                                "prot_pval" = ec_level_1_stats$pvals_prot,
-                                "prot_OR" = as.numeric(ec_level_1_stats$oddsratio_prot))
+                                "Pval_Prot" = ec_level_1_stats$pvals_prot,
+                                "Prot_OR" = as.numeric(ec_level_1_stats$oddsratio_prot))
 
       ec_level_2_stats <- cbind("rxnClass" = reactionClassdf$class_ec_level_2$rxnClass,
                                 "ecNumber" = reactionClassdf$class_ec_level_2$ecNumber,
-                                "prot_pval" = ec_level_2_stats$pvals_prot,
-                                "prot_OR" = as.numeric(ec_level_2_stats$oddsratio_prot))
+                                "Pval_Prot" = ec_level_2_stats$pvals_prot,
+                                "Prot_OR" = as.numeric(ec_level_2_stats$oddsratio_prot))
 
       #Calculate adjusted pvals independently for each EC level
       ec_level_1_adjusted_stats <- adjusted_stats(ec_level_1_stats, analyte_type = "uniprot")
@@ -703,13 +703,13 @@ runEnrichReactionClass <- function( analytes,
 
       ec_level_1_stats <- cbind("rxnClass" = reactionClassdf$class_ec_level_1$rxnClass,
                                 "ecNumber" = reactionClassdf$class_ec_level_1$ecNumber,
-                                "mets_pval" = ec_level_1_stats$pvals_mets,
-                                "mets_OR" = as.numeric(ec_level_1_stats$oddsratio_mets))
+                                "Pval_Metab" = ec_level_1_stats$pvals_mets,
+                                "Metab_OR" = as.numeric(ec_level_1_stats$oddsratio_mets))
 
       ec_level_2_stats <- cbind("rxnClass" = reactionClassdf$class_ec_level_2$rxnClass,
                                 "ecNumber" = reactionClassdf$class_ec_level_2$ecNumber,
-                                "mets_pval" = ec_level_2_stats$pvals_mets,
-                                "mets_OR" = as.numeric(ec_level_2_stats$oddsratio_mets))
+                                "Pval_Metab" = ec_level_2_stats$pvals_mets,
+                                "Metab_OR" = as.numeric(ec_level_2_stats$oddsratio_mets))
 
       #Calculate adjusted pvals independently for each EC level
 
@@ -719,7 +719,7 @@ runEnrichReactionClass <- function( analytes,
   }
 
 
-  return(list(EC_Level1Stats = ec_level_1_adjusted_stats, EC_Level2Stats = ec_level_2_adjusted_stats , result_type = "reactionClass_enrichment", analyte_type))
+  return(list(EC_Level1Stats = ec_level_1_adjusted_stats, EC_Level2Stats = ec_level_2_adjusted_stats , result_type = "reactionClass_enrichment", analyteType = analyte_type))
 }
 
 
@@ -1158,29 +1158,29 @@ adjusted_stats <- function(reactionClassStats, analyte_type)
 
   if (analyte_type == "chebi")
   {
-    reactionClassStats <- fix_invalid_stats(reactionClassStats, 'mets_pval', 'mets_OR')
-    reactionClassStats <- add_adjusted_stats(reactionClassStats, 'mets_pval')
+    reactionClassStats <- fix_invalid_stats(reactionClassStats, 'Pval_Metab', 'Metab_OR')
+    reactionClassStats <- add_adjusted_stats(reactionClassStats, 'Pval_Metab')
 
   } else if (analyte_type == "uniprot")
   {
-    reactionClassStats <- fix_invalid_stats(reactionClassStats, 'prot_pval', 'prot_OR')
-    reactionClassStats <- add_adjusted_stats(reactionClassStats, 'prot_pval')
+    reactionClassStats <- fix_invalid_stats(reactionClassStats, 'Pval_Prot', 'Prot_OR')
+    reactionClassStats <- add_adjusted_stats(reactionClassStats, 'Pval_Prot')
 
   } else if (analyte_type == "both")
   {
-    reactionClassStats <- fix_invalid_stats(reactionClassStats, 'mets_pval', 'mets_OR')
-    reactionClassStats <- fix_invalid_stats(reactionClassStats, 'prot_pval', 'prot_OR')
+    reactionClassStats <- fix_invalid_stats(reactionClassStats, 'Pval_Metab', 'Metab_OR')
+    reactionClassStats <- fix_invalid_stats(reactionClassStats, 'Pval_Prot', 'Prot_OR')
 
     # Calculate combined p-values for pathways that have both genes and metabolites
-    gm <- intersect(which(!is.na(reactionClassStats$mets_pval)), which(!is.na(reactionClassStats$prot_pval)))
-    combpval <- stats::pchisq(-2 * (log((reactionClassStats$mets_pval[gm])) + log(reactionClassStats$prot_pval[gm])),
+    gm <- intersect(which(!is.na(reactionClassStats$Pval_Metab)), which(!is.na(reactionClassStats$Pval_Prot)))
+    combpval <- stats::pchisq(-2 * (log((reactionClassStats$Pval_Metab[gm])) + log(reactionClassStats$Pval_Prot[gm])),
                               df = 2, lower.tail = FALSE
     )
 
-    g <- which(is.na(reactionClassStats$mets_pval))
-    gpval <- reactionClassStats$prot_pval[g]
-    m <- which(is.na(reactionClassStats$prot_pval))
-    mpval <- reactionClassStats$mets_pval[m]
+    g <- which(is.na(reactionClassStats$Pval_Metab))
+    gpval <- reactionClassStats$Pval_Prot[g]
+    m <- which(is.na(reactionClassStats$Pval_Prot))
+    mpval <- reactionClassStats$Pval_Metab[m]
 
     out <- rbind(reactionClassStats[gm, ], reactionClassStats[g, ], reactionClassStats[m, ])
     out <- cbind(out, c(combpval, gpval, mpval))

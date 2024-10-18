@@ -13,17 +13,17 @@ test_that("Fisher test results does not equal filtered fisher test results, Filt
               runEnrichPathways(db = rampDB, analytes = analytes)
 
             filtered.fisher.results <-
-              FilterFishersResults(fisher.results, pValType='holm', pValCutoff  = 0.05)
+              filterEnrichResults(fisher.results, pValType='holm', pValCutoff  = 0.05)
 
              fisher.results <-
               fisher.results$fishresults[,
                 c("pathwayName",
-                  "Pval_combined_Holm"
+                  "Pval_Holm"
                   )]
             filtered.fisher.results <-
               filtered.fisher.results$fishresults[,
                 c("pathwayName",
-                  "Pval_combined_Holm"
+                  "Pval_Holm"
                   )]
 
             Filt.Test <-

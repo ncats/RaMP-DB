@@ -546,10 +546,10 @@ runEnrichPathways <- function(
     colnames(out)[ncol(out)] <- "Pval_combined"
     fdr <- stats::p.adjust(out$Pval_combined, method = "fdr")
     out <- cbind(out, fdr)
-    colnames(out)[ncol(out)] <- "Pval_combined_FDR"
+    colnames(out)[ncol(out)] <- "Pval_FDR"
     holm <- stats::p.adjust(out$Pval_combined, method = "holm")
     out <- cbind(out, holm)
-    colnames(out)[ncol(out)] <- "Pval_combined_Holm"
+    colnames(out)[ncol(out)] <- "Pval_Holm"
 
     ## keepers <- intersect(
     ##   c(

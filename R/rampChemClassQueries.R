@@ -250,7 +250,7 @@ runEnrichChemClass <- function( mets, background = "database", backgroundType = 
       contingencyMat <- matrix(nrow=2, ncol=2)
       resultMat <- data.frame(matrix(ncol=8))
       colnames(resultMat) <- c("category", "class_name", "met_hits", "pop_hits",
-                               "met_size", "pop_size", "p-value","OR")
+                               "met_size", "pop_size", "Pval","OR")
 
       for (i in 1:nrow(categoryData)) {
         if(categoryData[i,'mets_count'] >= 1) {
@@ -274,11 +274,11 @@ runEnrichChemClass <- function( mets, background = "database", backgroundType = 
         }
       }
 
-      resultMat <- resultMat[order(resultMat$`p-value`),]
-      bhPvals <- stats::p.adjust(resultMat$`p-value`, method = "BH")
+      resultMat <- resultMat[order(resultMat$`Pval`),]
+      bhPvals <- stats::p.adjust(resultMat$`Pval`, method = "BH")
       resultMat$Pval_FDR <- bhPvals
 
-      holm <- stats::p.adjust(resultMat$`p-value`, method = "holm")
+      holm <- stats::p.adjust(resultMat$`Pval`, method = "holm")
       resultMat$Pval_Holm <- holm
 
       enrichmentStat[[as.character(category)]] <- resultMat

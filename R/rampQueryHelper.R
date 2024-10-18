@@ -573,74 +573,53 @@ findDuplicatePathways <- function(db = RaMP()) {
 #' filtered.fisher.results <- FilterFishersResults(fisher.results, pValType='fdr', pValCutoff = 0.10)
 #' }
 #' @export
-FilterFishersResults <- function(fishersDf, pValType = 'fdr', pValCutoff = 0.1) {
+filterEnrichResults <- function(enrichResults, pValType = 'fdr', pValCutoff = 0.1) {
 
   print("Filtering Fisher Results...")
 
-  # Check to see whether the output is from ORA performed on genes and metabolites
-  # or genes or metabolites
-  result_type <- fishersDf$result_type
+  result_type <- enrichResults$result_type
 
-  if(result_type == 'pathway_enrichment') {
-    analyteType <- fishersDf$analyteType
-    fishersDf <- fishersDf$fishresults
-
-    print("Fisher Result Type: Pathway Enrichment")
-
-    if (analyteType != 'both') {
-      if (pValType == 'holm') {
-        return(list(fishresults = fishersDf[which(fishersDf[, "Pval_Holm"] <=
-                                                     pValCutoff), ], analyteType = analyteType))
-      } else if (pValType == 'fdr') {
-        return(list(fishresults = fishersDf[which(fishersDf[, "Pval_FDR"] <=
-                                                     pValCutoff), ], analyteType = analyteType))
-      } else if (pValType == 'pval') {
-        return(list(fishresults = fishersDf[which(fishersDf[, "Pval"] <=
-                                                     pValCutoff), ], analyteType = analyteType))
-      } else {
-        warning(paste0("The pValType parameter should be one of three values, 'fdr', 'holm' or 'pval', entered value pValType= ", pValType))
-        return(NULL)
-      }
-    } else { # ORA was performed on both genes and metabolites:
-      if (pValType == 'holm') {
-        return(list(fishresults = fishersDf[which(fishersDf[, "Pval_combined_Holm"] <=
-                                                     pValCutoff), ], analyteType = analyteType))
-      } else if (pValType == 'fdr') {
-        return(list(fishresults = fishersDf[which(fishersDf[, "Pval_combined_FDR"] <=
-                                                     pValCutoff), ], analyteType = analyteType))
-      } else if (pValType == 'pval') {
-        return(list(fishresults = fishersDf[which(fishersDf[, "Pval_combined"] <=
-                                                     pValCutoff), ], analyteType = analyteType))
-      } else {
-        warning(paste0("The pValType parameter should be one of three values, 'fdr', 'holm' or 'pval', entered value pValType= ", pValType))
-        return(NULL)
-      }
-    }
-  } else if(result_type == "chemical_class_enrichment") {
-
-    print("Fisher Result Type: Chemical Class Enrichstrment")
-
-    if(pValType == 'pval') {
-      criteriaCol <- 'p-value'
-    } else if (pValType == 'fdr') {
-      criteriaCol <- 'adjP_BH'
-    } else {
-      warning(paste0("The pValType parameter should be one of three values, 'fdr' or 'pval' for chemical class enrichment, entered value pValType= ", pValType))
-      return(NULL)
-    }
-
-    for(result in names(fishersDf)) {
-
-      #if(class(fishersDf[[result]]) == 'data.frame') {
-       if(methods::is(fishersDf[[result]], 'data.frame')) {
-        print(result)
-        resultDf <- fishersDf[[result]]
-        resultDf <- subset(resultDf, resultDf[[criteriaCol]] <= pValCutoff)
-        fishersDf[[result]] <- resultDf
-      }
-    }
-    return(fishersDf)
+  if (pValType == "fdr")
+  {
+    pvalToFilter <- "Pval_FDR"
   }
+
+  if (pValType == "holm")
+  {
+    pvalToFilter <- "Pval_Holm"
+  }
+
+  if (pValType == "pval")
+  {
+    if (result_type == 'pathway_enrichment' | result_type == 'reactionClass_enrichment')
+    {
+      if (enrichResults$analyteType == 'both')
+      {
+        pvalToFilter <- "Pval_combined"
+      } else if (enrichResults$analyteType == 'genes') {
+        pvalToFilter <- "Pval_Gene"
+      } else if (enrichResults$analyteType == 'metabolites' | enrichResults$analyteType == 'chebi') {
+        pvalToFilter <- "Pval_Metab"
+      } else if (enrichResults$analyteType == 'uniprot') {
+        pvalToFilter <- "Pval_Prot"
+      }
+    } else if (result_type == 'ontology_enrichment' | result_type == 'chemical_class_enrichment')
+    {
+      pvalToFilter <- "Pval"
+    }
+  }
+
+  for (i in 1:length(enrichResults))
+  {
+    if (is(enrichResults[[i]], 'data.frame'))
+    {
+      resultDf <- enrichResults[[i]]
+      resultDf <- subset(resultDf, resultDf[[pvalToFilter]] <= pValCutoff)
+      enrichResults[[i]] <- resultDf
+    }
+  }
+
+  return(enrichResults)
 }
 
 
