@@ -25,20 +25,3 @@ runQuery <- function(
     on.exit(dbDisconnect(conn = con))
     dbGetQuery(conn = con, statement = sql)
 }
-
-setupRdataCache <- function(db = RaMP()) {
-  objs <- db@api$getSummaryData()
-
-  dbSummaryData = list()
-
-  for(i in 1:nrow(objs)) {
-    varName = objs[i,1]
-    blob = objs[i,2]
-    blob = blob[[1]]
-    obj = memDecompress(from=blob, type = 'gzip', asChar = T)
-    data = data.frame(data.table::fread(input = obj, sep="\t"), row.names = 1)
-    dbSummaryData[[varName]] <- data
-  }
-
-  return(dbSummaryData)
-}

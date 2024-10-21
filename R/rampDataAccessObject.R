@@ -6,12 +6,25 @@ dbHasAnalyteCommonName <- function(db) {
   return("common_name" %in% table_info$name)
 }
 
+#' @importFrom R6 R6Class
+#' @noRd
+dbHasPathwayOverlapTable <- function(db) {
+  query <- "SELECT name FROM sqlite_master WHERE type='table' AND name='pathway_overlap';"
+  result <- runQuery(sql = query, db = db)
+  return(nrow(result) > 0)
+}
+
 setupVersionSupport <- function(db) {
   db@versionSupport[["analyte.common_name"]] <- dbHasAnalyteCommonName(db = db)
+  db@versionSupport[["pathway_overlap"]] <- dbHasPathwayOverlapTable(db = db)
 }
 
 supportsCommonName <- function(db) {
   return (db@versionSupport[["analyte.common_name"]])
+}
+
+supportsPathwayOverlap <- function(db) {
+  return (db@versionSupport[["pathway_overlap"]])
 }
 
 DataAccessObject <- R6::R6Class(
@@ -203,6 +216,9 @@ DataAccessObject <- R6::R6Class(
       return (runQuery(sql = getAnalyteIntersectsQuery(analyteType=analyteType, scope=scope), db = self$db))
     },
     getSummaryData = function() {
+      if (supportsPathwayOverlap(db = self$db)) {
+        return()
+      }
       return (runQuery(sql = getSummaryDataQuery(), db = self$db))
     },
     getSynonymsForSynonym = function(synonymList) {
@@ -234,6 +250,48 @@ DataAccessObject <- R6::R6Class(
     },
     getRampIdsForPathways = function(pathwayType) {
       return (runQuery(sql = getRampIdsForPathwaysQuery(pathwayType = pathwayType), db = self$db))
+    },
+    getExactMatchingPathways = function() {
+      if (supportsPathwayOverlap(db = self$db)) {
+        paired_names = (runQuery(sql = getExactMatchingPathwaysQuery(), db = self$db))
+        return (paired_names %>% tidyr::separate("pathway_pair", into = c("rowHits", "colHits"), sep = "-"))
+      }
+
+      objs <- self$getSummaryData()
+
+      dbSummaryData = list()
+      if (!is.null(objs)) {
+        for(i in 1:nrow(objs)) {
+          varName = objs[i,1]
+          blob = objs[i,2]
+          blob = blob[[1]]
+          obj = memDecompress(from=blob, type = 'gzip', asChar = T)
+          data = data.frame(data.table::fread(input = obj, sep="\t"), row.names = 1)
+          dbSummaryData[[varName]] <- data
+        }
+      }
+
+      ar <- dbSummaryData$analyte_result
+      diag(ar) <- 0.0
+      ar[ar != 1.0] <- 0.0
+      colHits <- colnames(ar)[colSums(ar) >= 1.0]
+      rowHits <- colnames(ar)[rowSums(ar) >= 1.0]
+      ar2 <- ar[rowHits, colHits]
+      n = 0
+
+      for(r in rownames(ar2)) {
+        colHits <- colnames(ar2)[ar2[r,]==1.0]
+        rowHits <- rep(r, length(colHits))
+        df <- data.frame(colHits)
+        df <- cbind(df, rowHits)
+        if(n == 0) {
+          df2 <- df
+        } else {
+          df2 <- rbind(df2, df)
+        }
+        n = n + 1
+      }
+      return (df2)
     },
     getAnalyteCountsForPathways = function(pathwayRampIds) {
       return (runQuery(sql = getAnalyteCountsForPathwaysQuery(pathwayRampIds = pathwayRampIds), db = self$db))
@@ -342,6 +400,10 @@ getAnalyteCountsForPathwaysQuery <- function(pathwayRampIds) {
 
 getRampIdsForPathwaysQuery <- function(pathwayType) {
   return (paste0("select pathwayRampId from pathway where type = '", pathwayType, "';"))
+}
+
+getExactMatchingPathwaysQuery <- function() {
+  return ("select pathway_pair from pathway_overlap where analyte_overlap = 1000")
 }
 
 getChemicalClassFromSourceIDsQuery <- function(sourceIds) {

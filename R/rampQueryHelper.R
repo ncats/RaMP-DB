@@ -518,27 +518,7 @@ find_duplicate_pathways <- function(db = RaMP()){
 #' @noRd
 findDuplicatePathways <- function(db = RaMP()) {
   reactomePIDs <- db@api$getRampIdsForPathways(pathwayType = 'reactome')
-
-  ar <- db@dbSummaryObjCache$analyte_result
-  diag(ar) <- 0.0
-  ar[ar != 1.0] <- 0.0
-  colHits <- colnames(ar)[colSums(ar) >= 1.0]
-  rowHits <- colnames(ar)[rowSums(ar) >= 1.0]
-  ar2 <- ar[rowHits, colHits]
-  n = 0
-
-  for(r in rownames(ar2)) {
-    colHits <- colnames(ar2)[ar2[r,]==1.0]
-    rowHits <- rep(r, length(colHits))
-    df <- data.frame(colHits)
-    df <- cbind(df, rowHits)
-    if(n == 0) {
-      df2 <- df
-    } else {
-      df2 <- rbind(df2, df)
-    }
-    n = n + 1
-  }
+  df2 <- db@api$getExactMatchingPathways()
 
   dupReturnList <- list(nrow(df2))
   # preference for reactome over wiki or kegg
