@@ -25,3 +25,20 @@ runQuery <- function(
     on.exit(dbDisconnect(conn = con))
     dbGetQuery(conn = con, statement = sql)
 }
+
+setupLegacyRdataCache <- function(db = RaMP()) {
+  objs <- getLegacyRdata(db = db)
+
+  dbSummaryData = list()
+
+  for(i in 1:nrow(objs)) {
+    varName = objs[i,1]
+    blob = objs[i,2]
+    blob = blob[[1]]
+    obj = memDecompress(from=blob, type = 'gzip', asChar = T)
+    data = data.frame(data.table::fread(input = obj, sep="\t"), row.names = 1)
+    dbSummaryData[[varName]] <- data
+  }
+
+  return(dbSummaryData)
+}

@@ -819,31 +819,8 @@ findCluster <- function(fishersDf, percAnalyteOverlap = 0.5,
     output <- list(fishresults = fishersDf, analyteType = analyteType, cluster_list = "Did not cluster")
     return(output)
   } else {
-    # similarity_matrix_list<-loadOverlapMatrices()
-    similarity_matrix_gene <- db@dbSummaryObjCache$genes_result
-    similarity_matrix_analyte <- db@dbSummaryObjCache$analyte_result
-    similarity_matrix_metab <- db@dbSummaryObjCache$metabolites_result
-    if (analyteType == "both") {
-      # similarity_matrix = similarity_matrix_list[["analyte"]]
-      similarity_matrix <- similarity_matrix_analyte
-    } else if (analyteType == "metabolites") {
-      # similarity_matrix = similarity_matrix_list[["metab"]]
-      similarity_matrix <- similarity_matrix_metab
-    } else if (analyteType == "genes") {
-      # similarity_matrix = similarity_matrix_list[["gene"]]
-      similarity_matrix <- similarity_matrix_gene
-    } else {
-      stop("analyteType should be 'genes' or metabolites'")
-    }
     pathway_list <- fishersDf[, "pathwayRampId"]
-
-    pathway_indices <- match(pathway_list, rownames(similarity_matrix))
-
-    if (length(which(is.na(pathway_indices))) > 0) {
-      pathway_indices <- pathway_indices[-which(is.na(pathway_indices))]
-    }
-
-    pathway_matrix <- similarity_matrix[pathway_indices, pathway_indices]
+    pathway_matrix <- db@api$getSimilarityMatrix(pathwayRampIds = pathway_list, analyteType = analyteType)
     unmerged_clusters <- apply(pathway_matrix, 1, function(x) {
       # if(length(which(x>=percAnalyteOverlap))>(minPathwayToCluster+1)){
       if (length(which(x >= percAnalyteOverlap)) > (minPathwayToCluster - 1)) {

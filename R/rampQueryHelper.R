@@ -471,44 +471,8 @@ segregateDataBySource<-function(inputRampIds){
 ##' @author Andrew Patt
 #' @noRd
 find_duplicate_pathways <- function(db = RaMP()){
-
   .Deprecated("findDuplicatePathways")
-
-  pathway_overlap = db@dbSummaryObjCache$analyte_result
-  duplicate_pairs = data.frame(Pathway1=character(),Pathway2=character())
-  for(i in 1:ncol(pathway_overlap)){
-    duplicates <- which(pathway_overlap[,i]==1)
-    duplicates <- duplicates[-which(duplicates==i)]
-    if(length(duplicates!=0)){
-      duplicate_pairs <- rbind(duplicate_pairs,
-                               data.frame(Pathway1=colnames(pathway_overlap)[duplicates],
-                                          Pathway2=colnames(pathway_overlap)[i]))
-    }
-  }
-  query <- "select * from analytehaspathway where pathwaySource != 'hmdb';"
-
-  allpids <- runQuery(sql = query, db = db)
-
-  duplicate_pathways <- apply(duplicate_pairs, 1, function(x){
-    path1 <- x[1]
-    path2 <- x[2]
-    path1_source <- unique(allpids[which(allpids$pathwayRampId==path1),"pathwaySource"])
-    path2_source <- unique(allpids[which(allpids$pathwayRampId==path2),"pathwaySource"])
-    return(data.frame(path1=path1, path2=path2, path1_source=path1_source, path2_source=path2_source))
-  })
-  duplicate_pathways = do.call(rbind,duplicate_pathways)
-  # If one duplicate is wiki, return reactome. Else, return pathway two
-  duplicate_pathways <- apply(duplicate_pathways,1,function(x){
-    if(x[3]=="wiki" & x[4]=="reactome"){
-      return(x[1])
-    }else if(x[3]=="reactome" & x[4]=="wiki"){
-      return(x[2])
-    }else{
-      return(x[2])
-    }
-  })
-  names(duplicate_pathways)=NULL
-  return(duplicate_pathways)
+  return(findDuplicatePathways(db = db))
 }
 
 ##' Return list of duplicate Wikipathway IDs from Reactome. This may be unnecessary in the future
