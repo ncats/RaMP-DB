@@ -288,7 +288,7 @@ DataAccessObject <- R6::R6Class(
     getExactMatchingPathways = function() {
       if (supportsPathwayDuplicates(db = self$db)) {
         oneWayDuplicates <- runQuery(sql = getInfoFromTableQuery(table = 'pathway_duplicates'), db = self$db)
-        twoWayDuplicates <- rbind(oneWayDuplicates, oneWayDuplicates[, c(2, 1)])
+        twoWayDuplicates <- rbind(oneWayDuplicates, setNames(oneWayDuplicates[,c(2,1)], names(oneWayDuplicates)))
         return (twoWayDuplicates)
       }
 
