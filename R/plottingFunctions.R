@@ -85,11 +85,11 @@ plotCataNetwork <- function(catalyzeDf = "") {
 #' @param db a RaMP database object
 #' @examples
 #' \dontrun{
-#' pathwayResultsPlot(pathwaysSig = filtered.fisher.results, textSize = 8, percAnalyteOverlap = 0.2,
+#' plotPathwayResults(pathwaysSig = filtered.fisher.results, textSize = 8, percAnalyteOverlap = 0.2,
 #'    minPathwayToCluster = 2, percPathwayOverlap = 0.2, interactive = FALSE, db = rampDB )
 #' }
 #' @export
-pathwayResultsPlot <- function(pathwaysSig, pVal = "FDR", percAnalyteOverlap = 0.5,
+plotPathwayResults <- function(pathwaysSig, pVal = "FDR", percAnalyteOverlap = 0.5,
                                  percPathwayOverlap = 0.5, minPathwayToCluster = 3,
                                textSize = 8, sigCutoff = 0.05, interactive=FALSE,
                                db = RaMP()) {
@@ -362,7 +362,7 @@ plotAnalyteOverlapPerRxnLevel <- function(reactionsResults, includeCofactorMets 
 #' @param interactive If TRUE, return interactive plotly object instead of ggplot object
 #' @param db a RaMP database object
 #' @export
-ontologyEnrichmentResultsPlot <- function(ontologiesSig, pVal = "FDR",
+plotOntologyEnrichmentResults <- function(ontologiesSig, pVal = "FDR",
                                           textSize = 8,
                                           sigCutoff = 0.05, interactive=FALSE,
                                           db = RaMP()) {

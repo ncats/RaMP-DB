@@ -1,30 +1,29 @@
 # RaMP Reaction Queries
 
-#' getReactionsForAnalytes
+#' getReactionsForAnalytes returns all associated reactions for a collection of input compound ids
 #'
 #' @param analytes list of analytes. chebi and/or uniprot ids are required.
 #' @param onlyHumanMets boolean to only return pathways containing only human metabolites (ChEBI ontology) (dev
 #' in progress)
 #' @param humanProtein boolean to only control pathways catalyzed by a human proteins (having human Uniprot)
 #' (dev in progress)
-#' @param includeTransportRxns if TRUE, returns metabolic and transport reactions
+#' @param includeTransportRxns if TRUE, returns metabolic and transport reactions, default is TRUE
 #' @param rxnDirs character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL",
 #' "BD", "ALL"), default = c("UN").
 #' @param includeRxnURLs if TRUE, urls to Rhea.org will be delivered in the result dataframe for each reaction
 #' @param db a RaMP database object
 #'
-#' @return a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and
-#' common reactions
+#' @return a list of 3 dataframes [[1]] met2rxn, reaction information for all metabolite inputs (chebi),  [[2]] prot2rxn, reaction information for all protein inputs (uniprot), and [[3]] metProteinCommonReactions, common reactions found across both metabolite and protein inputs (overlap between met2rxn and prot2rxn)
 #' @examples
 #' \dontrun{
-#' analytes.of.interest <- c('chebi:57368', 'uniprot:Q96N66')
+#' analytes.of.interest <- c('chebi:58115', 'chebi:456215', 'chebi:58245', 'chebi:58450', 'chebi:17596', 'chebi:16335', 'chebi:16750', 'chebi:172878', 'chebi:62286', 'chebi:77897', 'uniprot:P30566','uniprot:P30520', 'uniprot:P00568', 'uniprot:P23109', 'uniprot:P22102', 'uniprot:P15531')
 #'
-#' reactionsLists <- RaMP::getReactionsForAnalytes(analytes = analytes.of.interest,
-#'     includeTransportRxns = F, humanProtein = T, db = rampDB )
+#' reactionsLists <- getReactionsForAnalytes(analytes = analytes.of.interest,
+#'     includeTransportRxns = T, humanProtein = T, db = rampDB )
 #' }
 #' @export
 #'
-getReactionsForAnalytes <- function( analytes, onlyHumanMets=F, humanProtein=T, includeTransportRxns=F,
+getReactionsForAnalytes <- function( analytes, onlyHumanMets=F, humanProtein=T, includeTransportRxns=T,
 	rxnDirs=c("UN"), includeRxnURLs=F, db = RaMP() ) {
 
   message("Running getReactionsForAnalytes()")
@@ -563,7 +562,7 @@ getRheaAnalyteReactionAssociations <- function( analytes, includeRheaRxnDetails=
 }
 
 
-#' runEnrichReactionClass Enrichment analysis for analyte-reaction class mappings
+#'Enrichment analysis for analyte-reaction class mappings
 #'
 #' @param analytes a vector of analyte ids (genes or metabolites) that need to be searched. ID types accepted: chebi and uniprot
 #' @param humanProtein require reactions to have a human protein (enzyme or transporter), default True
@@ -571,7 +570,7 @@ getRheaAnalyteReactionAssociations <- function( analytes, includeRheaRxnDetails=
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
 #' @param db a RaMP database object
 #'
-#' @return returns a 2 dataframes with columns containing reaction class ID, fisher's p value, user analytes in reaction class, and total analytes in reaction class
+#' @return returns a list of [[1]] EC_Level1Stats, dataframe with columns containing reaction class ID, fisher's p value, user analytes in reaction class, and total analytes in reaction class at the enzyme class level 1 , [[2]] EC_Level2Stats, dataframe with columns containing reaction class ID, fisher's p value, user analytes in reaction class, and total analytes in reaction class at the enzyme class level 2, [[3]] analyteType,  a string specifying the type of analyte input into the function ("genes", "metabolites", or "both"), and [[4]] result_type, a string specifying enrichment of reaction classes was performed
 #' @export
 runEnrichReactionClass <- function( analytes,
                              humanProtein=TRUE,
@@ -719,7 +718,7 @@ runEnrichReactionClass <- function( analytes,
   }
 
 
-  return(list(EC_Level1Stats = ec_level_1_adjusted_stats, EC_Level2Stats = ec_level_2_adjusted_stats , result_type = "reactionClass_enrichment", analyteType = analyte_type))
+  return(list(EC_Level1Stats = ec_level_1_adjusted_stats, EC_Level2Stats = ec_level_2_adjusted_stats , analyteType = analyte_type, result_type = "reactionClass_enrichment"))
 }
 
 
