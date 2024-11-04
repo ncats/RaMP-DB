@@ -2,7 +2,7 @@
 % Please edit documentation in R/rampReactionQueries.R
 \name{runEnrichReactionClass}
 \alias{runEnrichReactionClass}
-\title{runEnrichReactionClass Enrichment analysis for analyte-reaction class mappings}
+\title{Enrichment analysis for analyte-reaction class mappings}
 \usage{
 runEnrichReactionClass(
   analytes,
@@ -24,8 +24,8 @@ runEnrichReactionClass(
 \item{db}{a RaMP database object}
 }
 \value{
-returns a 2 dataframes with columns containing reaction class ID, fisher's p value, user analytes in reaction class, and total analytes in reaction class
+returns a list of [[1]] EC_Level1Stats, dataframe with columns containing reaction class ID, fisher's p value, user analytes in reaction class, and total analytes in reaction class at the enzyme class level 1 , [[2]] EC_Level2Stats, dataframe with columns containing reaction class ID, fisher's p value, user analytes in reaction class, and total analytes in reaction class at the enzyme class level 2, [[3]] analyteType,  a string specifying the type of analyte input into the function ("genes", "metabolites", or "both"), and [[4]] result_type, a string specifying enrichment of reaction classes was performed
 }
 \description{
-runEnrichReactionClass Enrichment analysis for analyte-reaction class mappings
+Enrichment analysis for analyte-reaction class mappings
 }

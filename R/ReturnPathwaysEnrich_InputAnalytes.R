@@ -362,7 +362,8 @@ runFisherTest <- function(analytes,
 #' and pathway source ID/database. [[2]] analyteType, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both") [[3]] result_type, a string specifying pathway enrichment was performed
 #' @examples
 #' \dontrun{
-#' fisher.results <- runEnrichPathways(analytes = c("ensembl:ENSG00000135679", "hmdb:HMDB0000064","hmdb:HMDB0000148", "ensembl:ENSG00000141510"))
+#' fisher.results <- runEnrichPathways(analytes = c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
+#' "hmdb:HMDB0000148", "ensembl:ENSG00000141510"))
 #'
 #' fisher.results <- runEnrichPathways(analytes = analyte.list, namesOrIds = "ids")
 #' }

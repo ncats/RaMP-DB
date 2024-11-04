@@ -38,8 +38,7 @@ such as HMDB Classyfire class categories and LIPIDMAPS class categories.  The re
 Fisher Exact p-values and Benjamini-Hochberg corrected p-values (FDR estimates)
 }
 \description{
-Returns chemical class information comparing a metabolite subset to a metabolite population, including Fisher Exact Test
-enrichment p-values and FDR values.
+The function performs enrichment analysis for Classyfire classes, sub-classess, and super-classes, and for #'LipidMaps categories, main classess, and sub classes.
 }
 \examples{
 \dontrun{
