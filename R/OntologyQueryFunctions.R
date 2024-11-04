@@ -103,7 +103,7 @@ getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, mi
 #' @return dataframe that contains searched mets from given ontology
 #' @examples
 #' \dontrun{
-#' ontologies.of.interest <- c("Colon", "Liver", "Lung")
+#' ontologies.of.interest <- "Urine"
 #'
 #' new.metabolites <- RaMP::getMetaFromOnto(db = rampDB, ontology = ontologies.of.interest)
 #' }
