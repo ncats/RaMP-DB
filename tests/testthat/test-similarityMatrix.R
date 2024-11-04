@@ -90,7 +90,7 @@ test_that("sparse matrix construction works", {
 })
 
 test_that('sparse matrix works with real data', {
-  db300 <- RaMP(branch = 'ramp3.0-restructure-pathway-overlaps')
+  db300 <- RaMP(branch = 'ramp3.0')
   pathwayNames <- c("RAMP_P_000000003", "RAMP_P_000000005")
   simMat <- SimilarityMatrix$new(names = pathwayNames)
   rawBlobs <- db300@api$getPathwayOverlapBlobs(pathwayNames, "both")

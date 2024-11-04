@@ -68,7 +68,8 @@ clicked on highchart
 }
 \examples{
 \dontrun{
-fisher.results <- runEnrichPathways(analytes = c("ensembl:ENSG00000135679", "hmdb:HMDB0000064","hmdb:HMDB0000148", "ensembl:ENSG00000141510"))
+fisher.results <- runEnrichPathways(analytes = c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
+"hmdb:HMDB0000148", "ensembl:ENSG00000141510"))
 
 fisher.results <- runEnrichPathways(analytes = analyte.list, namesOrIds = "ids")
 }
