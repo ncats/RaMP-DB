@@ -26,8 +26,8 @@ runQuery <- function(
     dbGetQuery(conn = con, statement = sql)
 }
 
-setupRdataCache <- function(db = RaMP()) {
-  objs <- db@api$getSummaryData()
+setupLegacyRdataCache <- function(db = RaMP()) {
+  objs <- getLegacyRdata(db = db)
 
   dbSummaryData = list()
 
