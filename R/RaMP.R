@@ -14,14 +14,12 @@ setClass(
     slots = c(
         driver = "DBIDriverOrNULL",
         dbname = "character",
-        dbSummaryObjCache = "list",
         versionSupport = "environment",
         api = "ANY"
     ),
     prototype = prototype(
         driver = NULL,
         dbname = character(),
-        dbSummaryObjCache = list(),
         versionSupport = new.env(),
         api = NULL
     ))
@@ -163,14 +161,11 @@ RaMP <- function(version = character(), branch = "main") {
 #' @noRd
 .RaMP <- function(driver = SQLite(), dbname = character()) {
 
-    rampObj <- new("RaMP", driver = driver, dbname = dbname, dbSummaryObjCache = list())
+    rampObj <- new("RaMP", driver = driver, dbname = dbname)
 
     setupVersionSupport(rampObj)
 
     rampObj@api <- DataAccessObject$new(db = rampObj)
-
-    # creates the cache of R data objects
-    rampObj@dbSummaryObjCache <- setupRdataCache(db = rampObj)
 
     return(rampObj)
 }

@@ -1,4 +1,10 @@
-#' @importFrom R6 R6Class
+
+setupVersionSupport <- function(db) {
+  db@versionSupport[["analyte.common_name"]] <- dbHasAnalyteCommonName(db = db)
+  db@versionSupport[["pathway_similarity"]] <- dbHasPathwaySimilarityTable(db = db)
+  db@versionSupport[["pathway_duplicates"]] <- dbHasPathawyDuplicatesTable(db = db)
+}
+
 #' @noRd
 dbHasAnalyteCommonName <- function(db) {
   query <- "PRAGMA table_info(analyte);"
@@ -6,20 +12,64 @@ dbHasAnalyteCommonName <- function(db) {
   return("common_name" %in% table_info$name)
 }
 
-setupVersionSupport <- function(db) {
-  db@versionSupport[["analyte.common_name"]] <- dbHasAnalyteCommonName(db = db)
+dbHasTable <- function(db, tableName) {
+  query <- paste0("SELECT name FROM sqlite_master WHERE type='table' AND name='", tableName, "';")
+  result <- runQuery(sql = query, db = db)
+  return(nrow(result) > 0)
+}
+
+#' @noRd
+dbHasPathwaySimilarityTable <- function(db) {
+  return(dbHasTable(db = db, tableName = 'pathway_similarity'))
+}
+
+#' @noRd
+dbHasPathawyDuplicatesTable <- function(db) {
+  return(dbHasTable(db = db, tableName = 'pathway_duplicates'))
 }
 
 supportsCommonName <- function(db) {
   return (db@versionSupport[["analyte.common_name"]])
 }
 
+supportsPathwaySimilarity <- function(db) {
+  return (db@versionSupport[["pathway_similarity"]])
+}
+
+supportsPathwayDuplicates <- function(db) {
+  return (db@versionSupport[["pathway_duplicates"]])
+}
+
+#' @importFrom R6 R6Class
 DataAccessObject <- R6::R6Class(
   "DataAccessObject",
   public = list(
     db = NULL,
+    legacySimMatrices = NULL,
     initialize = function(db = NULL) {
       self$db <- db
+      if (!supportsPathwaySimilarity(db)) {
+        self$legacySimMatrices <- setupLegacyRdataCache(db)
+      }
+    },
+    getSimilarityMatrix = function(pathwayRampIds, analyteType = 'both') {
+      simMatrix <- NULL
+      if (supportsPathwaySimilarity(db = self$db)) {
+        rawBlobs <- self$getPathwayOverlapBlobs(pathwayRampIds = pathwayRampIds, analyteType = analyteType)
+        if (nrow(rawBlobs) > 1) {
+          simMatrix <- getSimMatrixFromSparseData(rawBlobs)
+        }
+      } else {
+        if (analyteType == 'metabolites') {
+          fullMatrix <- self$legacySimMatrices$metabolites_result
+        } else if (analyteType == 'genes') {
+          fullMatrix <- self$legacySimMatrices$genes_result
+        } else {
+          fullMatrix <- self$legacySimMatrices$analyte_result
+        }
+        simMatrix <- getSimMatrixFromFullMatrix(fullMatrix = fullMatrix, pathwayRampIds = pathwayRampIds)
+      }
+      return(simMatrix)
     },
     getValidChemProps = function() {
       sql <- 'pragma table_info(chem_props)'
@@ -202,9 +252,6 @@ DataAccessObject <- R6::R6Class(
     getAnalyteIntersects = function(analyteType='metabolites', scope='mapped-to-pathway') {
       return (runQuery(sql = getAnalyteIntersectsQuery(analyteType=analyteType, scope=scope), db = self$db))
     },
-    getSummaryData = function() {
-      return (runQuery(sql = getSummaryDataQuery(), db = self$db))
-    },
     getSynonymsForSynonym = function(synonymList) {
       return (runQuery(sql = getSynonymsForSynonymQuery(synonymList = synonymList), db = self$db))
     },
@@ -226,6 +273,9 @@ DataAccessObject <- R6::R6Class(
     getPathwayInfoForRampIDs = function(pathwayRampIds) {
       return (runQuery(sql = getInfoForIDsQuery(table = 'pathway', matchColumn = 'pathwayRampId', idList = pathwayRampIds), db = self$db))
     },
+    getPathwayOverlapBlobs = function(pathwayRampIds, analyteType = 'both') {
+      return (runQuery(sql = getPathwayOverlapBlobsQuery(pathwayRampIds = pathwayRampIds, analyteType = analyteType), db = self$db))
+    },
     getSourceInfoFromSourceIDs = function(sourceIds) {
       return (runQuery(sql = getSourceInfoFromSourceIDsQuery(sourceIds = sourceIds), db = self$db))
     },
@@ -234,6 +284,36 @@ DataAccessObject <- R6::R6Class(
     },
     getRampIdsForPathways = function(pathwayType) {
       return (runQuery(sql = getRampIdsForPathwaysQuery(pathwayType = pathwayType), db = self$db))
+    },
+    getExactMatchingPathways = function() {
+      if (supportsPathwayDuplicates(db = self$db)) {
+        oneWayDuplicates <- runQuery(sql = getInfoFromTableQuery(table = 'pathway_duplicates'), db = self$db)
+        twoWayDuplicates <- rbind(oneWayDuplicates, setNames(oneWayDuplicates[,c(2,1)], names(oneWayDuplicates)))
+        return (twoWayDuplicates)
+      }
+
+      ar <- self$legacySimMatrices$analyte_result
+      diag(ar) <- 0.0
+      ar[ar != 1.0] <- 0.0
+      colHits <- colnames(ar)[colSums(ar) >= 1.0]
+      rowHits <- colnames(ar)[rowSums(ar) >= 1.0]
+      ar2 <- ar[rowHits, colHits]
+      n = 0
+
+      for(r in rownames(ar2)) {
+        colHits <- colnames(ar2)[ar2[r,]==1.0]
+        rowHits <- rep(r, length(colHits))
+        df <- data.frame(colHits)
+        df <- cbind(df, rowHits)
+        if(n == 0) {
+          df2 <- df
+        } else {
+          df2 <- rbind(df2, df)
+        }
+        n = n + 1
+      }
+      colnames(df2) <- c('pathwayRampId1', 'pathwayRampId2')
+      return (df2)
     },
     getAnalyteCountsForPathways = function(pathwayRampIds) {
       return (runQuery(sql = getAnalyteCountsForPathwaysQuery(pathwayRampIds = pathwayRampIds), db = self$db))
@@ -361,7 +441,13 @@ getSynonymsForSynonymQuery <- function(synonymList) {
                   query_list, ");"))
 }
 
-getSummaryDataQuery <- function() {
+getLegacyRdata = function(db) {
+  if (supportsPathwaySimilarity(db = db)) {
+    return()
+  }
+  return (runQuery(sql = getLegacyRdataQuery(), db = db))
+}
+getLegacyRdataQuery <- function() {
   return ("select data_key, data_blob from ramp_data_object")
 }
 
@@ -978,5 +1064,28 @@ getReactionsForAnalytesQuery <- function(analytes, analyteType, useIdMapping, ke
     tables = tables,
     whereClauses = whereClauses,
     groupByClause = groupByClause,
+    orderByClause = orderByClause))
+}
+
+getPathwayOverlapBlobsQuery <- function(pathwayRampIds, analyteType) {
+  selectClauses <- c('pathwayRampId')
+  if (analyteType == "metabolite") {
+    selectClauses <- c(selectClauses, 'metabolite_blob as blob')
+    whereClauses <- c('metabolite_blob is not null')
+  } else if (analyteType == "gene") {
+    selectClauses <- c(selectClauses, 'gene_blob as blob')
+    whereClauses <- c('gene_blob is not null')
+  } else {
+    selectClauses <- c(selectClauses, 'analyte_blob as blob')
+    whereClauses <- c('analyte_blob is not null')
+  }
+  tables <- c('pathway_similarity')
+  whereClauses <- c(whereClauses, paste0("pathwayRampId in (",listToQueryString(ids = pathwayRampIds),")"))
+  orderByClause <- 'pathwayRampId'
+
+  return(buildSimpleQuery(
+    selectClauses = selectClauses,
+    tables = tables,
+    whereClauses = whereClauses,
     orderByClause = orderByClause))
 }
