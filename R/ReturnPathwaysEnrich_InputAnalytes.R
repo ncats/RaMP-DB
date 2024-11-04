@@ -359,33 +359,11 @@ runFisherTest <- function(analytes,
 #' @param db a RaMP databse object
 #' @return a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values
 #' (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway,
-#' and pathway source ID/database. [[2]] analyteType, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")
+#' and pathway source ID/database. [[2]] analyteType, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both") [[3]] result_type, a string specifying pathway enrichment was performed
 #' @examples
 #' \dontrun{
-#' fisher.results <- runEnrichPathways(analytes = c(
-#' "hmdb:HMDB0000033",
-#' "hmdb:HMDB0000052",
-#' "hmdb:HMDB0000094",
-#' "hmdb:HMDB0000161",
-#' "hmdb:HMDB0000168",
-#' "hmdb:HMDB0000191",
-#' "hmdb:HMDB0000201",
-#' "chemspider:10026",
-#' "hmdb:HMDB0006059",
-#' "Chemspider:6405",
-#' "CAS:5657-19-2",
-#' "hmdb:HMDB0002511",
-#' "chemspider:20171375", "CAS:133-32-4",
-#' "CAS:5746-90-7",
-#' "CAS:477251-67-5",
-#' "hmdb:HMDB0000695",
-#' "chebi:15934",
-#' "CAS:838-07-3",
-#' "hmdb:HMDBP00789",
-#' "hmdb:HMDBP00283",
-#' "hmdb:HMDBP00284",
-#' "hmdb:HMDBP00850"
-#' ), db = rampDB )
+#' fisher.results <- runEnrichPathways(analytes = c("ensembl:ENSG00000135679", "hmdb:HMDB0000064",
+#' "hmdb:HMDB0000148", "ensembl:ENSG00000141510"))
 #'
 #' fisher.results <- runEnrichPathways(analytes = analyte.list, namesOrIds = "ids")
 #' }

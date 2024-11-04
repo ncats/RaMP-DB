@@ -2,13 +2,13 @@
 % Please edit documentation in R/rampReactionQueries.R
 \name{getReactionsForAnalytes}
 \alias{getReactionsForAnalytes}
-\title{getReactionsForAnalytes}
+\title{getReactionsForAnalytes returns all associated reactions for a collection of input compound ids}
 \usage{
 getReactionsForAnalytes(
   analytes,
   onlyHumanMets = F,
   humanProtein = T,
-  includeTransportRxns = F,
+  includeTransportRxns = T,
   rxnDirs = c("UN"),
   includeRxnURLs = F,
   db = RaMP()
@@ -23,7 +23,7 @@ in progress)}
 \item{humanProtein}{boolean to only control pathways catalyzed by a human proteins (having human Uniprot)
 (dev in progress)}
 
-\item{includeTransportRxns}{if TRUE, returns metabolic and transport reactions}
+\item{includeTransportRxns}{if TRUE, returns metabolic and transport reactions, default is TRUE}
 
 \item{rxnDirs}{character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL",
 "BD", "ALL"), default = c("UN").}
@@ -33,17 +33,8 @@ in progress)}
 \item{db}{a RaMP database object}
 }
 \value{
-a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and
-common reactions
+a list of 3 dataframes [[1]] met2rxn, reaction information for all metabolite inputs (chebi),  [[2]] prot2rxn, reaction information for all protein inputs (uniprot), and [[3]] metProteinCommonReactions, common reactions found across both metabolite and protein inputs (overlap between met2rxn and prot2rxn)
 }
 \description{
-getReactionsForAnalytes
-}
-\examples{
-\dontrun{
-analytes.of.interest <- c('chebi:57368', 'uniprot:Q96N66')
-
-reactionsLists <- RaMP::getReactionsForAnalytes(analytes = analytes.of.interest,
-    includeTransportRxns = F, humanProtein = T, db = rampDB )
-}
+getReactionsForAnalytes returns all associated reactions for a collection of input compound ids
 }

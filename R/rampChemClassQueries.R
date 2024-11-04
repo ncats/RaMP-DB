@@ -173,8 +173,10 @@ getChemClass <- function(mets, background = "database", backgroundType="database
 }
 
 
-#' Returns chemical class information comparing a metabolite subset to a metabolite population, including Fisher Exact Test
-#' enrichment p-values and FDR values.
+#'Returns chemical class information comparing a metabolite subset to a metabolite population, including Fisher Exact Test
+#'enrichment p-values and FDR values.
+#'
+#'The function performs enrichment analysis for Classyfire classes, sub-classess, and super-classes, and for #'LipidMaps categories, main classess, and sub classes.
 #'
 #' @param mets a vector of source prepended metabolite ids
 #' @param background an optional list of source prepended metaboite ids to be used as the background reference of

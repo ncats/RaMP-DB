@@ -103,7 +103,7 @@ getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, mi
 #' @return dataframe that contains searched mets from given ontology
 #' @examples
 #' \dontrun{
-#' ontologies.of.interest <- c("Colon", "Liver", "Lung")
+#' ontologies.of.interest <- "Urine"
 #'
 #' new.metabolites <- RaMP::getMetaFromOnto(db = rampDB, ontology = ontologies.of.interest)
 #' }
@@ -205,6 +205,15 @@ getMetaFromOnto <- function(ontology, minOntologySize = 1E3, maxOntologySize = I
 #' "Saliva", and "Feces"
 #' @param db a RaMP database object
 #' @return a dataframe with columns containing pathway ID, fisher's p value, user mets in pathway, and total mets in pathway
+#' @examples
+#' \dontrun{
+#' ontologies.enriched <- runEnrichOntologies(mets = c("hmdb:HMDB0000033","hmdb:HMDB0000052",
+#' "hmdb:HMDB0000094", "hmdb:HMDB0000161","hmdb:HMDB0000168","hmdb:HMDB0000191","hmdb:HMDB0000201",
+#' "chemspider:10026", "hmdb:HMDB0006059", "Chemspider:6405", "CAS:5657-19-2","hmdb:HMDB0002511",
+#' "chemspider:20171375", "CAS:133-32-4","CAS:5746-90-7", "CAS:477251-67-5", "hmdb:HMDB0000695",
+#' "chebi:15934", "CAS:838-07-3", "hmdb:HMDBP00789", "hmdb:HMDBP00283", "hmdb:HMDBP00284",
+#' "hmdb:HMDBP00850"))
+#' }
 #' @export
 #' @importFrom methods is
 
