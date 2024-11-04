@@ -562,7 +562,8 @@ getMetabolitesForOntologyQueryOld <- function(ontologyList) {
 }
 
 getSourceDataForAnalyteNamesQuery <- function(analyteNames) {
-  return (paste0("select * from source where rampId in (select * from (select rampId from analytesynonym where Synonym in (", analyteNames, ")) as subquery);"))
+  query_list = formatListAsString(idList = analyteNames)
+  return (paste0("select * from source where rampId in (select * from (select rampId from analytesynonym where Synonym in (", query_list, ")) as subquery);"))
 }
 
 getMetaboliteClassesForTypeQuery <- function(classType) {
