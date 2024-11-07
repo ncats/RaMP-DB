@@ -185,10 +185,10 @@ datatable(clusters$fishresults %>% mutate_if(is.numeric, ~ round(., 8)),
 
 See the findCluster() function documentation for a description of input parameters.  We suggest trying different values of perc_analyte_overlap and perc_pathway_overlap to obtain the meaningful clusters.
 
-To plot pathway results with clusters, use the function pathwayResultsPlot() as follows:
+To plot pathway results with clusters, use the function plotPathwayResults() as follows:
 
 ```{r, fig.height = 8}
-pathwayResultsPlot(pathwaysSig=clusters,  interactive = TRUE, db=rampDB)
+plotPathwayResults(pathwaysSig=clusters,  interactive = TRUE, db=rampDB)
 ```
 
 ## Ontologies
@@ -198,7 +198,7 @@ RaMP-DB contains ontology annotations, obtained from HMDB, which include the fol
 The function getMetaFromOnto() retrieves metabolites that are associated with user-input ontology(ies). 
 
 ```{r}
-ontologies.of.interest <- c("Colon", "Liver", "Lung")
+ontologies.of.interest <- "Urine"
 new.metabolites <- getMetaFromOnto(ontology = ontologies.of.interest, db=rampDB)
 # View the first 10 metabolites:
 datatable(head(new.metabolites, n=10))
@@ -290,7 +290,7 @@ datatable(subset(reactionsLists$metProteinCommonReactions))
 
 Notice that the output returns the reaction classes for each reaction.  The function plotAnalyteOverlapPerRxnLevel() generates an interactive UpSet plot showing the number of overlapping input analytes at each reaction class level 1. 
 
-```{r, eval=F}
+```{r}
 plotAnalyteOverlapPerRxnLevel(reactionsLists)
 ```
 
