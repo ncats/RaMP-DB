@@ -288,11 +288,14 @@ listRaMPVersions <- function(local = FALSE, branch = "main") {
   return(localVersions)
 }
 
-#' @importFrom httr HEAD GET
+#'
+#' List RaMP db versions
 #'
 #' @description returns the list of RaMP db versions available
-#'
-#' @noRd
+#' @param branch Which GitHub branch to pull a list of remote databases from
+#' @export
+#This function was exported at the request of Issue #134
+# - AT 11/8/24
 .get_remote_db_version_list <- function(branch = "main") {
 
   # a bit of a hack to parse html... and a regexpr could be cleaner...
