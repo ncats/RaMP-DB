@@ -52,8 +52,8 @@ test_that(".get_local_db_version_list works", {
 })
 
 
-test_that(".get_remote_db_version_list works", {
-  vList <- .get_remote_db_version_list()
+test_that("get_remote_db_version_list works", {
+  vList <- get_remote_db_version_list()
   testthat::expect_true(length(vList) > 0)
 })
 

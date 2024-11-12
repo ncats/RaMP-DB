@@ -201,7 +201,7 @@ listRaMPVersions <- function(local = FALSE, branch = "main") {
         ramps <- ci$rname[grepl("RaMP", ci$rname)]
         sort(unname(vapply(ramps, .version_from_db_file, character(1))))
     } else {
-       .get_remote_db_version_list(branch = branch)
+       get_remote_db_version_list(branch = branch)
     }
 }
 
@@ -288,15 +288,15 @@ listRaMPVersions <- function(local = FALSE, branch = "main") {
   return(localVersions)
 }
 
-#'
 #' List RaMP db versions
 #'
 #' @description returns the list of RaMP db versions available
 #' @param branch Which GitHub branch to pull a list of remote databases from
 #' @export
-#This function was exported at the request of Issue #134
-# - AT 11/8/24
-.get_remote_db_version_list <- function(branch = "main") {
+# This function was exported at the request of Issue #134.
+# I thought wrapping the existing function for export would be the best solution to avoiding breaking things.
+# - AT 11/12/24
+get_remote_db_version_list <- function(branch = "main") {
 
   # a bit of a hack to parse html... and a regexpr could be cleaner...
   remoteURL = paste0("https://github.com/ncats/RaMP-DB/raw/", branch, "/db/")
@@ -317,7 +317,7 @@ listRaMPVersions <- function(local = FALSE, branch = "main") {
   return(remoteVersions)
 }
 
-#'
+
 #' Lists local and remotely available RaMP SQLite DB versions and prompts with
 #' message to download a new version if one exists.
 #' @param branch specifies what branch versions should be taken from. Default is 'main'.
@@ -330,7 +330,7 @@ listRaMPVersions <- function(local = FALSE, branch = "main") {
 listAvailableRaMPDbVersions <- function(branch = "main") {
 
   localVersions <- .get_local_db_version_list()
-  remoteVersions <- .get_remote_db_version_list(branch = branch)
+  remoteVersions <- get_remote_db_version_list(branch = branch)
 
   newVersions <- setdiff(remoteVersions, localVersions)
   haveLocalVersions <- (length(localVersions)>0)
