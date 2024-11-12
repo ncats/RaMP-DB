@@ -16,9 +16,11 @@
 #' @return a list of 3 dataframes [[1]] met2rxn, reaction information for all metabolite inputs (chebi),  [[2]] prot2rxn, reaction information for all protein inputs (uniprot), and [[3]] metProteinCommonReactions, common reactions found across both metabolite and protein inputs (overlap between met2rxn and prot2rxn)
 #' @examples
 #' \dontrun{
-#' analytes.of.interest <- c('chebi:58115', 'chebi:456215', 'chebi:58245', 'chebi:58450', 'chebi:17596',
-#' 'chebi:16335', chebi:16750', 'chebi:172878', 'chebi:62286', 'chebi:77897', 'uniprot:P30566','uniprot:P30520',
-#' 'uniprot:P00568', 'uniprot:P23109', 'uniprot:P22102', 'uniprot:P15531')
+#' analytes.of.interest <- c('chebi:58115', 'chebi:456215',
+#'  'chebi:58245', 'chebi:58450', 'chebi:17596','uniprot:P30520',
+#' 'chebi:16335', 'chebi:16750', 'chebi:172878','uniprot:P22102',
+#'  'chebi:62286', 'chebi:77897', 'uniprot:P30566', 'uniprot:P15531',
+#' 'uniprot:P00568', 'uniprot:P23109')
 #'
 #' reactionsLists <- getReactionsForAnalytes(analytes = analytes.of.interest,
 #'     includeTransportRxns = T, humanProtein = T, db = rampDB )

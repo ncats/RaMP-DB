@@ -4,22 +4,10 @@
 \alias{getMetaFromOnto}
 \title{function that query database to find mets in given ontologies}
 \usage{
-getMetaFromOnto(
-  ontology,
-  minOntologySize = 1000,
-  maxOntologySize = Inf,
-  curate = F,
-  db = RaMP()
-)
+getMetaFromOnto(ontology, db = RaMP())
 }
 \arguments{
 \item{ontology}{a vector of ontology or ontologies delimited by new line character}
-
-\item{minOntologySize}{the minimum number of metabolites in an ontology for it to be included in results. Default is 1,000}
-
-\item{maxOntologySize}{the maximum number of metabolites in an ontology for it to be included in results. Default is Inf}
-
-\item{curate}{filter searchable ontologies to only those visible to filter by when searching the HMDB website. Primarily for front-end UI use.}
 
 \item{db}{a RaMP database object}
 }
@@ -31,7 +19,7 @@ function that query database to find mets in given ontologies
 }
 \examples{
 \dontrun{
-ontologies.of.interest <- c("Colon", "Liver", "Lung")
+ontologies.of.interest <- "Urine"
 
 new.metabolites <- RaMP::getMetaFromOnto(db = rampDB, ontology = ontologies.of.interest)
 }

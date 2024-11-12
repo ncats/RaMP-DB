@@ -3,8 +3,6 @@
 #' @param mets a vector of metabolites or a metabolites delimited by new line character
 #' @param namesOrIds specify the type of given data
 #' @param includeRaMPids whether or not to include RaMP ids in the output (TRUE/FALSE)
-#' @param minOntologySize the minimum number of metabolites in an ontology for it to be included in results. Default is 1,000
-#' @param maxOntologySize the maximum number of metabolites in an ontology for it to be included in results. Default is Inf
 #' @param db a RaMP database object
 #' @return dataframe that contains searched ontology from given metabolites
 #'
@@ -14,7 +12,7 @@
 #' getOntoFromMeta(mets = "hmdb:HMDB0071437", db=rampDB)
 #' }
 #' @export
-getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, minOntologySize = 1E3, maxOntologySize = Inf, db = RaMP()) {
+getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, db = RaMP()) {
   if (!(namesOrIds %in% c("ids", "names"))) {
     stop("Specifiy the type of given data to 'ids' or 'names'")
   }
@@ -53,12 +51,7 @@ getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, mi
 
   rampid <- unique(df$rampId)
 
-  temp_ontologies_df <- getOntologies(db = db) %>%
-    dplyr::filter(.data$metCount <= maxOntologySize,
-                  .data$metCount > minOntologySize)
-
-  df2 <- db@api$getOntologiesForRampIDs(rampIds = rampid) %>%
-    dplyr::filter(.data$rampOntologyId %in% temp_ontologies_df$rampOntologyId)
+  df2 <- db@api$getOntologiesForRampIDs(rampIds = rampid)
 
   if (nrow(df2) == 0) {
     message("No searching result because these metabolites are not linked to ontology in search parameters")
@@ -96,9 +89,6 @@ getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, mi
 
 #' function that query database to find mets in given ontologies
 #' @param ontology a vector of ontology or ontologies delimited by new line character
-#' @param minOntologySize the minimum number of metabolites in an ontology for it to be included in results. Default is 1,000
-#' @param maxOntologySize the maximum number of metabolites in an ontology for it to be included in results. Default is Inf
-#' @param curate filter searchable ontologies to only those visible to filter by when searching the HMDB website. Primarily for front-end UI use.
 #' @param db a RaMP database object
 #' @return dataframe that contains searched mets from given ontology
 #' @examples
@@ -110,7 +100,7 @@ getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, mi
 #' @importFrom rlang .data
 #' @importFrom magrittr %>%
 #' @export
-getMetaFromOnto <- function(ontology, minOntologySize = 1E3, maxOntologySize = Inf, curate = F, db = RaMP()) {
+getMetaFromOnto <- function(ontology, db = RaMP()) {
   print("Retreiving Metabolites for input ontology terms.")
   now <- proc.time()
   if (is.character(ontology)) {
@@ -129,37 +119,7 @@ getMetaFromOnto <- function(ontology, minOntologySize = 1E3, maxOntologySize = I
 
   list_ontology <- unique(list_ontology)
 
-  allontos <- getOntologies(db = db) %>%
-    dplyr::filter(.data$metCount <= maxOntologySize,
-                  .data$metCount > minOntologySize)
-
-  #This if statement is meant for use with the front end.
-  #The idea is to limit the ontologies searchable in the RaMP UI to be the same ones HMDB lets the user filter by on their website.
-  #This is hard-coded as a filter here and will need to be updated manually in the current form.
-  #The default 'curate' argument should be false.
-  #Adam 10/3/2024
-  if (curate) {
-    allontos <- allontos %>% dplyr::filter(.data$commonName %in% c('Blood',
-                                                'Urine',
-                                                'Saliva',
-                                                'Cerebrospinal fluid',
-                                                'Feces',
-                                                'Sweat',
-                                                'Breast milk',
-                                                'Bile',
-                                                'Amniotic fluid',
-                                                'Exogenous',
-                                                'Endogenous',
-                                                'Food',
-                                                'Plant',
-                                                'Microbe',
-                                                'Cosmetic',
-                                                'Drug',
-                                                'Cell membrane',
-                                                'Cytoplasm',
-                                                'Nucleus',
-                                                'Mitochondria'))
-  }
+  allontos <- getOntologies(db = db)
 
   matched_ontos <- list_ontology[list_ontology %in% allontos$commonName]
 
