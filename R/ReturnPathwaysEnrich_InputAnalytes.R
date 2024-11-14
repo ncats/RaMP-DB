@@ -605,6 +605,7 @@ runEnrichPathways <- function(
 #' @param maxPathwaySize the maximum number of pathway memnbers (genes and metaboltes) to include the pathway in
 #' the output (default = 150)
 #' @param db a RaMP database object
+#' @param ... Internal Use - for handling deprecated parameter names
 #' @importFrom rlang .data
 #' @return a list contains all metabolites as name and pathway inside.
 #' @examples
@@ -624,7 +625,13 @@ getPathwayFromAnalyte <- function( analytes = "none",
                                   includeSmpdb = FALSE,
                                   minPathwaySize = 5,
                                   maxPathwaySize = 150,
-                                  db = RaMP() ) {
+                                  db = RaMP(), ... ) {
+  findSynonym <- handleRenamedParameter(argument = findSynonym, oldName = "find_synonym", version = "3.0")
+  namesOrIds <- handleRenamedParameter(argument = namesOrIds, oldName = "NameOrIds", version = "3.0")
+  includeSmpdb <- handleRenamedParameter(argument = includeSmpdb, oldName = "include_smpdb", version = "3.0")
+  minPathwaySize <- handleRenamedParameter(argument = minPathwaySize, oldName = "min_path_size", version = "3.0")
+  maxPathwaySize <- handleRenamedParameter(argument = maxPathwaySize, oldName = "max_path_size", version = "3.0")
+  assertDBparamIsRight(firstParam = analytes, dbParam = db)
 
   rampId <- pathwayRampId <- c()
 
@@ -737,24 +744,37 @@ getCustomPathwayFromAnalyte <- function(analytes, pathwayDefinitions, analyteTyp
 #' a cluster (medoid) (Default = 3)
 #' @param percPathwayOverlap Minimum overlap for clusters to merge (Default = 0.5)
 #' @param db a RaMP database object
+#' @param ... Internal Use - for handling deprecated parameter names
 #'
 #' @return list:[[1]] Pathway enrichment result with dataframe having a cluster assignment column added
 #' [[2]] analyte type
 #' [[3]] cluster assignment in the list form
 #' @examples
 #' \dontrun{
-#' pathwaydf <- getPathwayFromAnalyte(c(
-#' "ensembl:ENSG00000135679", "hmdb:HMDB0000064",
-#' "hmdb:HMDB0000148", "ensembl:ENSG00000141510"
-#' ))
+#' pathways.enriched <- runEnrichPathways(
+#' analytes = c("hmdb:HMDB0000033","hmdb:HMDB0000052","hmdb:HMDB0000094",
+#'              "hmdb:HMDB0000161","hmdb:HMDB0000168","hmdb:HMDB0000191","hmdb:HMDB0000201",
+#'              "chemspider:10026","hmdb:HMDB0006059", "Chemspider:6405", "CAS:5657-19-2",
+#'              "hmdb:HMDB0002511", "chemspider:20171375","CAS:133-32-4", "CAS:5746-90-7",
+#'              "CAS:477251-67-5", "hmdb:HMDB0000695", "chebi:15934", "CAS:838-07-3",
+#'              "hmdb:HMDBP00789", "hmdb:HMDBP00283", "hmdb:HMDBP00284", "hmdb:HMDBP00850"),
+#' db=rampDB)
 #'
-#' fisher.results <- runEnrichPathways(pathwaydf = pathwaydf)
+#' filtered.pathways.enriched <- filterEnrichResults(enrichResults=pathways.enriched,
+#'                                                   pValType = 'holm', pValCutoff=0.05)
 #'
-#' clustered.fisher.results <- findCluster(fisher.results)
+#' clusters <- findCluster(filtered.pathways.enriched, percAnalyteOverlap = 0.2,
+#'                         percPathwayOverlap = 0.2, db=rampDB)
 #' }
 #' @export
 findCluster <- function(fishersDf, percAnalyteOverlap = 0.5,
-                        minPathwayToCluster = 2, percPathwayOverlap = 0.5, db = RaMP()) {
+                        minPathwayToCluster = 2, percPathwayOverlap = 0.5, db = RaMP(), ...) {
+  fishersDf <- handleRenamedParameter(argument = fishersDf, oldName = 'fishers_df', version = "3.0")
+  percAnalyteOverlap <- handleRenamedParameter(argument = percAnalyteOverlap, oldName = 'perc_analyte_overlap', version = "3.0")
+  minPathwayToCluster <- handleRenamedParameter(argument = minPathwayToCluster, oldName = 'min_pathway_tocluster', version = "3.0")
+  percPathwayOverlap <- handleRenamedParameter(argument = percPathwayOverlap, oldName = 'perc_pathway_overlap', version = "3.0")
+  assertDBparamIsRight(firstParam = fishersDf, dbParam = db)
+
   print("Clustering pathways...")
 
   if (percAnalyteOverlap <= 0 || percAnalyteOverlap >= 1 ||

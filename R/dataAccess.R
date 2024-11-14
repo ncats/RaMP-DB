@@ -483,7 +483,7 @@ getRaMPVersionQuery <- function(justVersion = TRUE) {
 
 getSynonymsForAnalyteQuery <- function(rampIds) {
   ramp_id_list = formatListAsString(idList = rampIds)
-  return (paste0("select rampId as rampId, group_concat(distinct Synonym order by Synonym separator '; ')
+  return (paste0("select rampId as rampId, group_concat(distinct Synonym order by Synonym)
      as synonyms from analytesynonym
      where rampId in (", ramp_id_list, ") group by rampId"))
 }

@@ -10,16 +10,13 @@
     <loc>/index.html</loc>
   </url>
   <url>
-    <loc>/reference/FilterFishersResults.html</loc>
-  </url>
-  <url>
     <loc>/reference/RaMP.html</loc>
   </url>
   <url>
-    <loc>/reference/chemicalClassEnrichment.html</loc>
+    <loc>/reference/createRaMPInput.html</loc>
   </url>
   <url>
-    <loc>/reference/createRaMPInput.html</loc>
+    <loc>/reference/filterEnrichResults.html</loc>
   </url>
   <url>
     <loc>/reference/findCluster.html</loc>
@@ -85,16 +82,16 @@
     <loc>/reference/getRheaAnalyteReactionAssociations.html</loc>
   </url>
   <url>
+    <loc>/reference/get_remote_db_version_list.html</loc>
+  </url>
+  <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
     <loc>/reference/listAvailableRaMPDbVersions.html</loc>
   </url>
   <url>
-    <loc>/reference/ontologyEnrichmentResultsPlot.html</loc>
-  </url>
-  <url>
-    <loc>/reference/pathwayResultsPlot.html</loc>
+    <loc>/reference/package-deprecated.html</loc>
   </url>
   <url>
     <loc>/reference/plotAnalyteOverlapPerRxnLevel.html</loc>
@@ -106,6 +103,12 @@
     <loc>/reference/plotChemicalClass.html</loc>
   </url>
   <url>
+    <loc>/reference/plotOntologyEnrichmentResults.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plotPathwayResults.html</loc>
+  </url>
+  <url>
     <loc>/reference/plotReactionClasses.html</loc>
   </url>
   <url>
@@ -115,18 +118,24 @@
     <loc>/reference/removeLocalRampDB.html</loc>
   </url>
   <url>
-    <loc>/reference/runCombinedFisherTest.html</loc>
+    <loc>/reference/runEnrichChemClass.html</loc>
   </url>
   <url>
-    <loc>/reference/runOntologyTest.html</loc>
+    <loc>/reference/runEnrichOntologies.html</loc>
+  </url>
+  <url>
+    <loc>/reference/runEnrichPathways.html</loc>
+  </url>
+  <url>
+    <loc>/reference/runEnrichReactionClass.html</loc>
   </url>
   <url>
     <loc>/reference/runQuery.html</loc>
   </url>
   <url>
-    <loc>/reference/writePathwaysToCSV.html</loc>
+    <loc>/reference/writeFishersResults.html</loc>
   </url>
   <url>
-    <loc>/reference/write_FishersResults.html</loc>
+    <loc>/reference/writePathwaysToCSV.html</loc>
   </url>
 </urlset>

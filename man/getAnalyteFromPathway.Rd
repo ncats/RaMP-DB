@@ -10,7 +10,8 @@ getAnalyteFromPathway(
   analyteType = "both",
   maxPathwaySize = Inf,
   namesOrIds = "names",
-  db = RaMP()
+  db = RaMP(),
+  ...
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ getAnalyteFromPathway(
 of genes and metabolites}
 
 \item{db}{a RaMP database object, if not specified a new one is created with RaMP::RaMP()}
+
+\item{...}{Internal Use - for handling deprecated parameter names}
 }
 \value{
 a data.frame that contains all search results

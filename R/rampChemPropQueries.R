@@ -30,7 +30,7 @@
 #'}
 #' @export
 getChemicalProperties <- function(mets, propertyList = 'all', db = RaMP() ){
-
+  assertDBparamIsRight(firstParam = mets, dbParam = db)
   message("Starting Chemical Property Query")
 
   mets <- unique(mets)

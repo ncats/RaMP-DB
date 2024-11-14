@@ -36,5 +36,6 @@ Suggests:
     Polychrome,
     readxl,
     upsetjs,
-    plotly
+    plotly,
+    roxygen2
 Config/testthat/edition: 3

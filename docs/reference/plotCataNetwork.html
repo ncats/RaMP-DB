@@ -44,13 +44,17 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotCataNetwork</span><span class="op">(</span>catalyzedf <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotCataNetwork</span><span class="op">(</span>catalyzeDf <span class="op">=</span> <span class="st">""</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>catalyzedf</dt>
+    <dl><dt>catalyzeDf</dt>
 <dd><p>a data.frame output by rampFastCata() that contains analytes that are in the same reaction</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Internal Use - for handling deprecated parameter names</p></dd>
 
 </dl></div>
     <div id="value">
@@ -69,7 +73,7 @@ metabolites are highlighted in blue, whereas analytes found by the function are 
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">new.transcripts</span> <span class="op">&lt;-</span> <span class="fu"><a href="rampFastCata.html">rampFastCata</a></span><span class="op">(</span>analytes <span class="op">=</span> <span class="va">inputs.of.interest</span>, db <span class="op">=</span> <span class="va">rampDB</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">plotCataNetwork</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">new.transcripts</span><span class="op">$</span><span class="va">HMDB_Analyte_Associations</span>, n<span class="op">=</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plotCataNetwork</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">new.transcripts</span>, n<span class="op">=</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>

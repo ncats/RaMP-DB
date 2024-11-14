@@ -4,6 +4,7 @@
 #' @param namesOrIds specify the type of given data
 #' @param includeRaMPids whether or not to include RaMP ids in the output (TRUE/FALSE)
 #' @param db a RaMP database object
+#' @param ... Internal Use - for handling deprecated parameter names
 #' @return dataframe that contains searched ontology from given metabolites
 #'
 #' @examples
@@ -12,7 +13,11 @@
 #' getOntoFromMeta(mets = "hmdb:HMDB0071437", db=rampDB)
 #' }
 #' @export
-getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, db = RaMP()) {
+getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, db = RaMP(), ...) {
+  mets <- handleRenamedParameter(argument = mets, oldName = 'analytes', version = '3.0')
+  namesOrIds <- handleRenamedParameter(argument = namesOrIds, oldName = 'NameOrIds', version = '3.0')
+  assertDBparamIsRight(firstParam = mets, dbParam = db)
+
   if (!(namesOrIds %in% c("ids", "names"))) {
     stop("Specifiy the type of given data to 'ids' or 'names'")
   }
@@ -101,6 +106,7 @@ getOntoFromMeta <- function(mets, namesOrIds = "ids", includeRaMPids = FALSE, db
 #' @importFrom magrittr %>%
 #' @export
 getMetaFromOnto <- function(ontology, db = RaMP()) {
+  assertDBparamIsRight(firstParam = ontology, dbParam = db)
   print("Retreiving Metabolites for input ontology terms.")
   now <- proc.time()
   if (is.character(ontology)) {

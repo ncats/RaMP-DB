@@ -4,10 +4,12 @@
 \alias{plotCataNetwork}
 \title{Plots a network based on gene-metabolite relationships}
 \usage{
-plotCataNetwork(catalyzeDf = "")
+plotCataNetwork(catalyzeDf = "", ...)
 }
 \arguments{
 \item{catalyzeDf}{a data.frame output by rampFastCata() that contains analytes that are in the same reaction}
+
+\item{...}{Internal Use - for handling deprecated parameter names}
 }
 \value{
 An interactive HTML plot that allows the user to pan/zoom into regions of interest. User genes/
@@ -23,6 +25,6 @@ inputs.of.interest <- c("kegg:C00186" , "hmdb:HMDB0000148", "kegg:C00780", "hmdb
 
 new.transcripts <- rampFastCata(analytes = inputs.of.interest, db = rampDB)
 
-plotCataNetwork(head(new.transcripts$HMDB_Analyte_Associations, n=100))
+plotCataNetwork(head(new.transcripts, n=100))
 }
 }

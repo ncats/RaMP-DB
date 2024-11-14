@@ -8,6 +8,7 @@
 #' @param namesOrIds are the input pathways input as pathway names or as pathway ids
 #' of genes and metabolites
 #' @param db a RaMP database object, if not specified a new one is created with RaMP::RaMP()
+#' @param ... Internal Use - for handling deprecated parameter names
 #' @return a data.frame that contains all search results
 #' @examples
 #' \dontrun{
@@ -16,7 +17,13 @@
 #'
 #' }
 #' @export
-getAnalyteFromPathway <- function(pathway, match="exact", analyteType="both", maxPathwaySize = Inf, namesOrIds="names", db = RaMP()) {
+getAnalyteFromPathway <- function(pathway, match="exact", analyteType="both", maxPathwaySize = Inf,
+                                  namesOrIds="names", db = RaMP(), ...) {
+  analyteType <- handleRenamedParameter(argument = analyteType, oldName = "analyte_type", version = "3.0")
+  maxPathwaySize <- handleRenamedParameter(argument = maxPathwaySize, oldName = "max_pathway_size", version = "3.0")
+  namesOrIds <- handleRenamedParameter(argument = namesOrIds, oldName = "names_or_ids", version = "3.0")
+  assertDBparamIsRight(firstParam = pathway, dbParam = db)
+
   now <- proc.time()
   print("fired!")
 

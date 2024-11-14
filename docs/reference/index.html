@@ -42,22 +42,17 @@
           <p class="section-desc"></p>
         </th>
       </tr></tbody><tbody><tr><td>
-          <p><code><a href="FilterFishersResults.html">FilterFishersResults()</a></code> </p>
-        </td>
-        <td><p>Filter pathways by p-value cutoff for display and clustering</p></td>
-      </tr><tr><td>
           <p><code><a href="RaMP.html">show(<i>&lt;RaMP&gt;</i>)</a></code> <code><a href="RaMP.html">RaMP()</a></code> <code><a href="RaMP.html">listRaMPVersions()</a></code> </p>
         </td>
         <td><p>Connection to a RaMP database</p></td>
       </tr><tr><td>
-          <p><code><a href="chemicalClassEnrichment.html">chemicalClassEnrichment()</a></code> </p>
-        </td>
-        <td><p>Returns chemical class information comparing a metabolite subset to a metabolite population, including Fisher Exact Test
-enrichment p-values and FDR values.</p></td>
-      </tr><tr><td>
           <p><code><a href="createRaMPInput.html">createRaMPInput()</a></code> </p>
         </td>
         <td><p>Produce RaMP input from metabolite metadata data.frame object or .csv/.xlsx files</p></td>
+      </tr><tr><td>
+          <p><code><a href="filterEnrichResults.html">filterEnrichResults()</a></code> </p>
+        </td>
+        <td><p>Filter enrichment results by p-value cutoff for display and clustering</p></td>
       </tr><tr><td>
           <p><code><a href="findCluster.html">findCluster()</a></code> </p>
         </td>
@@ -146,25 +141,25 @@ this method can be used to return proteins on some subset of reaction ids to fin
       </tr><tr><td>
           <p><code><a href="getReactionsForAnalytes.html">getReactionsForAnalytes()</a></code> </p>
         </td>
-        <td><p>getReactionsForAnalytes</p></td>
+        <td><p>getReactionsForAnalytes returns all associated reactions for a collection of input compound ids</p></td>
       </tr><tr><td>
           <p><code><a href="getRheaAnalyteReactionAssociations.html">getRheaAnalyteReactionAssociations()</a></code> </p>
         </td>
         <td><p>getAnalyteReactionAssociations returns mets associated with input proteins, and proteins associated with input metabolites
 Associations are made through shared Rhea reactions</p></td>
       </tr><tr><td>
+          <p><code><a href="get_remote_db_version_list.html">get_remote_db_version_list()</a></code> </p>
+        </td>
+        <td><p>List RaMP db versions</p></td>
+      </tr><tr><td>
           <p><code><a href="listAvailableRaMPDbVersions.html">listAvailableRaMPDbVersions()</a></code> </p>
         </td>
         <td><p>Lists local and remotely available RaMP SQLite DB versions and prompts with
 message to download a new version if one exists.</p></td>
       </tr><tr><td>
-          <p><code><a href="ontologyEnrichmentResultsPlot.html">ontologyEnrichmentResultsPlot()</a></code> </p>
+          <p><code><a href="package-deprecated.html">pathwayResultsPlot()</a></code> <code><a href="package-deprecated.html">chemicalClassSurvey()</a></code> <code><a href="package-deprecated.html">chemicalClassEnrichment()</a></code> <code><a href="package-deprecated.html">FilterFishersResults()</a></code> <code><a href="package-deprecated.html">write_FishersResults()</a></code> <code><a href="package-deprecated.html">runCombinedFisherTest()</a></code> </p>
         </td>
-        <td><p>Cluster and plot significant ontologies by FDR-adjusted pval</p></td>
-      </tr><tr><td>
-          <p><code><a href="pathwayResultsPlot.html">pathwayResultsPlot()</a></code> </p>
-        </td>
-        <td><p>Cluster and plot significant pathways by FDR-adjusted pval</p></td>
+        <td><p>deprecated functions - to be removed in RaMP 4.0</p></td>
       </tr><tr><td>
           <p><code><a href="plotAnalyteOverlapPerRxnLevel.html">plotAnalyteOverlapPerRxnLevel()</a></code> </p>
         </td>
@@ -178,6 +173,14 @@ message to download a new version if one exists.</p></td>
         </td>
         <td><p>Plots an interactive sunburst plot of chemical classes</p></td>
       </tr><tr><td>
+          <p><code><a href="plotOntologyEnrichmentResults.html">plotOntologyEnrichmentResults()</a></code> </p>
+        </td>
+        <td><p>Cluster and plot significant ontologies by FDR-adjusted pVal</p></td>
+      </tr><tr><td>
+          <p><code><a href="plotPathwayResults.html">plotPathwayResults()</a></code> </p>
+        </td>
+        <td><p>Cluster and plot significant pathways by FDR-adjusted pVal</p></td>
+      </tr><tr><td>
           <p><code><a href="plotReactionClasses.html">plotReactionClasses()</a></code> </p>
         </td>
         <td><p>Plots an interactive sunburst plot of reaction class</p></td>
@@ -190,26 +193,35 @@ message to download a new version if one exists.</p></td>
         </td>
         <td><p>Remove a RaMP database version from local file cache</p></td>
       </tr><tr><td>
-          <p><code><a href="runCombinedFisherTest.html">runCombinedFisherTest()</a></code> </p>
+          <p><code><a href="runEnrichChemClass.html">runEnrichChemClass()</a></code> </p>
+        </td>
+        <td><p>Returns chemical class information comparing a metabolite subset to a metabolite population, including Fisher Exact Test
+enrichment p-values and FDR values.</p></td>
+      </tr><tr><td>
+          <p><code><a href="runEnrichOntologies.html">runEnrichOntologies()</a></code> </p>
+        </td>
+        <td><p>Enrichment analysis for metabolite ontology mappings</p></td>
+      </tr><tr><td>
+          <p><code><a href="runEnrichPathways.html">runEnrichPathways()</a></code> </p>
         </td>
         <td><p>Do fisher test for only one pathway from search result
 clicked on highchart</p></td>
       </tr><tr><td>
-          <p><code><a href="runOntologyTest.html">runOntologyTest()</a></code> </p>
+          <p><code><a href="runEnrichReactionClass.html">runEnrichReactionClass()</a></code> </p>
         </td>
-        <td><p>Enrichment analysis for metabolite ontology mappings</p></td>
+        <td><p>Enrichment analysis for analyte-reaction class mappings</p></td>
       </tr><tr><td>
           <p><code><a href="runQuery.html">runQuery()</a></code> </p>
         </td>
         <td><p>Get results from an SQL query to a RaMP database</p></td>
       </tr><tr><td>
+          <p><code><a href="writeFishersResults.html">writeFishersResults()</a></code> </p>
+        </td>
+        <td><p>Function that writes Fishers Test results, after clustering to a CSV file</p></td>
+      </tr><tr><td>
           <p><code><a href="writePathwaysToCSV.html">writePathwaysToCSV()</a></code> </p>
         </td>
         <td><p>Function that writes output from getPathwayFromAnalyte() to a CSV file</p></td>
-      </tr><tr><td>
-          <p><code><a href="write_FishersResults.html">write_FishersResults()</a></code> </p>
-        </td>
-        <td><p>Function that writes Fishers Test results, after clustering to a CSV file</p></td>
       </tr></tbody></table></div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
