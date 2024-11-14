@@ -47,7 +47,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getChemClass</span><span class="op">(</span></span>
 <span>  <span class="va">mets</span>,</span>
 <span>  background <span class="op">=</span> <span class="st">"database"</span>,</span>
-<span>  background_type <span class="op">=</span> <span class="st">"database"</span>,</span>
+<span>  backgroundType <span class="op">=</span> <span class="st">"database"</span>,</span>
 <span>  includeRaMPids <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  inferIdMapping <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -67,7 +67,7 @@ one id per column (no file header row) or a specificed biospecimen type (availab
 "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney","Saliva", or "Feces").</p></dd>
 
 
-<dt>background_type</dt>
+<dt>backgroundType</dt>
 <dd><p>one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
 or 'file' in which case the background parameter will be a file path, or 'biospecimen' where the specified background parameter is
 a RaMP HMDB metabolite ontology term (see background parameter, above, for the most common biospecimen background values).</p></dd>

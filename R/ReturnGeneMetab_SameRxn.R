@@ -3,6 +3,7 @@
 #' @param analytes a vector of analytes that need to be searched
 #' @param namesOrIds whether input is "names" or "ids" (default is "ids")
 #' @param db a RaMP database object
+#' @param ... Internal Use - for handling deprecated parameter names
 #' @return a list of two dataframes containing query results from HMDB and Rhea. If the input is a metabolite, the function will output
 #' gene transcript common names and source IDs that are known to catalyze
 #' reactions in the same pathway as that metabolite. Conversely, if the input
@@ -18,7 +19,9 @@
 #' new.transcripts <- rampFastCata( analytes = inputs.of.interest, db = rampDB )
 #' }
 #' @export
-rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
+rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP(), ...) {
+  namesOrIds <- handleRenamedParameter(argument = namesOrIds, oldName = 'NameOrIds', version = '3.0')
+  assertDBparamIsRight(firstParam = analytes, dbParam = db)
 
   rampId <- pathwayRampId <- c()
   if(length(analytes)==1){

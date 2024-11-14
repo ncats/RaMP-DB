@@ -9,6 +9,7 @@
 #'
 #' @export  getPrefixesFromAnalytes
 getPrefixesFromAnalytes<-function(analyteType="gene", db = RaMP()) {
+  assertDBparamIsRight(firstParam = analyteType, dbParam = db)
   if (analyteType=="gene"){
     df1<- db@api$getGeneIDTypes()
     df1 <- data.frame(analyteType="Genes/Proteins", idTypes=paste(df1$IDtype,collapse=", "))
@@ -48,6 +49,7 @@ getMetabClassTypes<-function(db = RaMP()){
 #' @return Returns metabolite classes for classTypes
 #' @export getMetabChemClass
 getMetabChemClass <- function( classType= 'ClassyFire_super_class', db = RaMP() ) {
+  assertDBparamIsRight(firstParam = classType, dbParam = db)
   if (!is.null(classType)) {
     res <- db@api$getMetaboliteClassesForType(classType=classType)
     res <- split(res$class_name,res$class_level_name)

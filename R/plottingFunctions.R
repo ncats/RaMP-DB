@@ -2,6 +2,7 @@
 #' @importFrom magrittr %>%
 #'
 #' @param catalyzeDf a data.frame output by rampFastCata() that contains analytes that are in the same reaction
+#' @param ... Internal Use - for handling deprecated parameter names
 #' @return  An interactive HTML plot that allows the user to pan/zoom into regions of interest. User genes/
 #' metabolites are highlighted in blue, whereas analytes found by the function are orange.
 #' @examples
@@ -11,10 +12,11 @@
 #'
 #' new.transcripts <- rampFastCata(analytes = inputs.of.interest, db = rampDB)
 #'
-#' plotCataNetwork(head(new.transcripts$HMDB_Analyte_Associations, n=100))
+#' plotCataNetwork(head(new.transcripts, n=100))
 #' }
 #' @export
-plotCataNetwork <- function(catalyzeDf = "") {
+plotCataNetwork <- function(catalyzeDf = "", ...) {
+  catalyzeDf <- handleRenamedParameter(argument = catalyzeDf, oldName = "catalyzedf", version = "3.0")
 
   if(nrow(catalyzeDf) == 0) {
     message("The input data has 0 rows. plotCataNetwork function is returning without generating a plot.")

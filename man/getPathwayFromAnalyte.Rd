@@ -13,7 +13,8 @@ getPathwayFromAnalyte(
   includeSmpdb = FALSE,
   minPathwaySize = 5,
   maxPathwaySize = 150,
-  db = RaMP()
+  db = RaMP(),
+  ...
 )
 }
 \arguments{
@@ -35,6 +36,8 @@ the output (default = 5)}
 the output (default = 150)}
 
 \item{db}{a RaMP database object}
+
+\item{...}{Internal Use - for handling deprecated parameter names}
 }
 \value{
 a list contains all metabolites as name and pathway inside.

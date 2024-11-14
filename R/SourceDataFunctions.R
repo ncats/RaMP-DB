@@ -10,6 +10,7 @@
 #' }
 #' @export
 getCurrentRaMPVersion<-function(justVersion=T, db = RaMP()){
+  assertDBparamIsRight(firstParam = justVersion, dbParam = db)
   results <- db@api$getRaMPVersion(justVersion = justVersion)
   return(results)
 }
@@ -57,6 +58,7 @@ getEntityCountsFromSourceDBs<-function(db = RaMP()){
 #' }
 #' @export
 getRaMPAnalyteIntersections<-function( analyteType='metabolites', format='json', scope='mapped-to-pathway', db = RaMP()){
+  assertDBparamIsRight(firstParam = analyteType, dbParam = db)
   if (!(analyteType %in% c('metabolites', 'genes'))) {
     warning("The analyteType must be one of c('metabolites','genes')")
     #return an empty dataframe

@@ -4,7 +4,7 @@
 \alias{rampFastCata}
 \title{Retrieves analytes that involved in same reaction as input metabolite}
 \usage{
-rampFastCata(analytes = "none", namesOrIds = "ids", db = RaMP())
+rampFastCata(analytes = "none", namesOrIds = "ids", db = RaMP(), ...)
 }
 \arguments{
 \item{analytes}{a vector of analytes that need to be searched}
@@ -12,6 +12,8 @@ rampFastCata(analytes = "none", namesOrIds = "ids", db = RaMP())
 \item{namesOrIds}{whether input is "names" or "ids" (default is "ids")}
 
 \item{db}{a RaMP database object}
+
+\item{...}{Internal Use - for handling deprecated parameter names}
 }
 \value{
 a list of two dataframes containing query results from HMDB and Rhea. If the input is a metabolite, the function will output

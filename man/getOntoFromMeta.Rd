@@ -5,7 +5,13 @@
 \title{Function that query database to find ontology information based on
 the given list of metabolites}
 \usage{
-getOntoFromMeta(mets, namesOrIds = "ids", includeRaMPids = FALSE, db = RaMP())
+getOntoFromMeta(
+  mets,
+  namesOrIds = "ids",
+  includeRaMPids = FALSE,
+  db = RaMP(),
+  ...
+)
 }
 \arguments{
 \item{mets}{a vector of metabolites or a metabolites delimited by new line character}
@@ -15,6 +21,8 @@ getOntoFromMeta(mets, namesOrIds = "ids", includeRaMPids = FALSE, db = RaMP())
 \item{includeRaMPids}{whether or not to include RaMP ids in the output (TRUE/FALSE)}
 
 \item{db}{a RaMP database object}
+
+\item{...}{Internal Use - for handling deprecated parameter names}
 }
 \value{
 dataframe that contains searched ontology from given metabolites

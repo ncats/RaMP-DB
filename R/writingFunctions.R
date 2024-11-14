@@ -2,8 +2,12 @@
 #'
 #' @param myPathways data frame returned by function getPathwayFromAnalyte()
 #' @param outputFile name of output file
+#' @param ... Internal Use - for handling deprecated parameter names
 #' @export
-writePathwaysToCSV <- function(myPathways = "none", outputFile = "none") {
+writePathwaysToCSV <- function(myPathways = "none", outputFile = "none", ...) {
+  myPathways <- handleRenamedParameter(argument = myPathways, oldName = "mypathways", version = "3.0")
+  outputFile <- handleRenamedParameter(argument = outputFile, oldName = "outputfile", version = "3.0")
+
   if(length(myPathways) == 1){
     if (myPathways == "") {
       stop("Be sure to specify the output of the function getPathwayFromAnalyte() and an output file")
@@ -30,10 +34,9 @@ writePathwaysToCSV <- function(myPathways = "none", outputFile = "none") {
 #'
 #' @param fishResults a data frame returned by function runCombinedFisherTest()
 #' @param outputFile name of output file
-#' @param rampId whether or not to include rampId (default is FALSE)
+#' @param includeRaMPids whether or not to include rampIds (default is FALSE)
 #' @export
-write_FishersResults <- function(fishResults = "none", outputFile = "none", rampId = FALSE) {
-
+writeFishersResults <- function(fishResults = "none", outputFile = "none", includeRaMPids = FALSE) {
   if(length(fishResults) == 1){
     if (fishResults == "") {
       stop("Be sure to specify the output of the function findCluster()")
@@ -83,7 +86,7 @@ write_FishersResults <- function(fishResults = "none", outputFile = "none", ramp
     }
   }
 
-  if (!rampId) {
+  if (!includeRaMPids) {
     rampOut <- rampOut[, -ncol(rampOut)]
   }
   if (outputFile=="none") {

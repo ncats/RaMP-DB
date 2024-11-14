@@ -29,6 +29,7 @@
 #'
 getReactionsForAnalytes <- function( analytes, onlyHumanMets=F, humanProtein=T, includeTransportRxns=T,
 	rxnDirs=c("UN"), includeRxnURLs=F, db = RaMP() ) {
+  assertDBparamIsRight(firstParam = analytes, dbParam = db)
 
   message("Running getReactionsForAnalytes()")
 
@@ -221,6 +222,7 @@ getReactionsForAnalytes <- function( analytes, onlyHumanMets=F, humanProtein=T, 
 #' @export
  getReactionClassesForAnalytes <- function(analytes, multiRxnParticipantCount=1, humanProtein=TRUE,
                                            concatResults=F, includeReactionIDs=F, useIdMapping = F, db = RaMP()) {
+  assertDBparamIsRight(firstParam = analytes, dbParam = db)
 
   print("Starting reaction class query...")
 
@@ -469,6 +471,7 @@ getReactionsForAnalytes <- function( analytes, onlyHumanMets=F, humanProtein=T, 
 #' @return returns a dataframe object with reaction to reaction participant mappings.
 #' @export
 getReactionParticipants <- function( reactionList = c(), db = RaMP()) {
+  assertDBparamIsRight(firstParam = reactionList, dbParam = db)
 
   metResult <- db@api$getRxnMetParticipants(reactionList = reactionList)
   metResult$participant_role <- 'substrate'
@@ -524,6 +527,7 @@ getReactionParticipants <- function( reactionList = c(), db = RaMP()) {
 #' @return returns a dataframe object with reaction information.
 #' @export
 getReactionDetails <- function( reactionList = c(), db = RaMP()) {
+  assertDBparamIsRight(firstParam = reactionList, dbParam = db)
   result <- db@api$getReactionDetails(reactionIDs = reactionList)
 
   colnames(result) <- c("reactionId", "direction", "isTransport", "hasHumanProtein", "ecNumber", "label", "equation", "htmlEquation")
@@ -543,6 +547,7 @@ getReactionDetails <- function( reactionList = c(), db = RaMP()) {
 #' @return returns a three dataframes of reaction EC classe information, one for each EC level
 #' @export
 getRheaAnalyteReactionAssociations <- function( analytes, includeRheaRxnDetails=F, humanProtein=TRUE, db = RaMP()) {
+  assertDBparamIsRight(firstParam = analytes, dbParam = db)
 
     m2p <- getRheaEnzymesAndTransportersForMetabolites(db = db, analytes=analytes, includeRheaRxnDetails=includeRheaRxnDetails, humanProtein=humanProtein)
     p2m <- getRheaMetabolitesForProteins(db = db, analytes=analytes, includeRheaRxnDetails=includeRheaRxnDetails, humanProtein=humanProtein)

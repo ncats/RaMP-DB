@@ -49,7 +49,13 @@ the given list of metabolites</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getOntoFromMeta</span><span class="op">(</span><span class="va">mets</span>, namesOrIds <span class="op">=</span> <span class="st">"ids"</span>, includeRaMPids <span class="op">=</span> <span class="cn">FALSE</span>, db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getOntoFromMeta</span><span class="op">(</span></span>
+<span>  <span class="va">mets</span>,</span>
+<span>  namesOrIds <span class="op">=</span> <span class="st">"ids"</span>,</span>
+<span>  includeRaMPids <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -68,6 +74,10 @@ the given list of metabolites</p>
 
 <dt>db</dt>
 <dd><p>a RaMP database object</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Internal Use - for handling deprecated parameter names</p></dd>
 
 </dl></div>
     <div id="value">

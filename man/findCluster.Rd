@@ -10,7 +10,8 @@ findCluster(
   percAnalyteOverlap = 0.5,
   minPathwayToCluster = 2,
   percPathwayOverlap = 0.5,
-  db = RaMP()
+  db = RaMP(),
+  ...
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ a cluster (medoid) (Default = 3)}
 \item{percPathwayOverlap}{Minimum overlap for clusters to merge (Default = 0.5)}
 
 \item{db}{a RaMP database object}
+
+\item{...}{Internal Use - for handling deprecated parameter names}
 }
 \value{
 list:[[1]] Pathway enrichment result with dataframe having a cluster assignment column added
@@ -37,13 +40,19 @@ identified by Fisher's test
 }
 \examples{
 \dontrun{
-pathwaydf <- getPathwayFromAnalyte(c(
-"ensembl:ENSG00000135679", "hmdb:HMDB0000064",
-"hmdb:HMDB0000148", "ensembl:ENSG00000141510"
-))
+pathways.enriched <- runEnrichPathways(
+analytes = c("hmdb:HMDB0000033","hmdb:HMDB0000052","hmdb:HMDB0000094",
+             "hmdb:HMDB0000161","hmdb:HMDB0000168","hmdb:HMDB0000191","hmdb:HMDB0000201",
+             "chemspider:10026","hmdb:HMDB0006059", "Chemspider:6405", "CAS:5657-19-2",
+             "hmdb:HMDB0002511", "chemspider:20171375","CAS:133-32-4", "CAS:5746-90-7",
+             "CAS:477251-67-5", "hmdb:HMDB0000695", "chebi:15934", "CAS:838-07-3",
+             "hmdb:HMDBP00789", "hmdb:HMDBP00283", "hmdb:HMDBP00284", "hmdb:HMDBP00850"),
+db=rampDB)
 
-fisher.results <- runEnrichPathways(pathwaydf = pathwaydf)
+filtered.pathways.enriched <- filterEnrichResults(enrichResults=pathways.enriched,
+                                                  pValType = 'holm', pValCutoff=0.05)
 
-clustered.fisher.results <- findCluster(fisher.results)
+clusters <- findCluster(filtered.pathways.enriched, percAnalyteOverlap = 0.2,
+                        percPathwayOverlap = 0.2, db=rampDB)
 }
 }
