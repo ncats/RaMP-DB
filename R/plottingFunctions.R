@@ -232,7 +232,6 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
   }
 
   clusterDF <- clusterDF[order(clusterDF$y, decreasing = TRUE), ]
-  browser()
   clusterDF <- clusterDF %>% tidyr::separate_rows("cluster", sep = ", ")
 
   clusterDF$cluster <- sapply(clusterDF$cluster, function(x) {
