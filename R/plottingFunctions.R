@@ -232,7 +232,7 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
   }
 
   clusterDF <- clusterDF[order(clusterDF$y, decreasing = TRUE), ]
-  ## browser()
+  browser()
   clusterDF <- clusterDF %>% tidyr::separate_rows("cluster", sep = ", ")
 
   clusterDF$cluster <- sapply(clusterDF$cluster, function(x) {
@@ -242,6 +242,10 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
   clusterDF$pathway.db <- with(clusterDF, {
     paste0(y," (", pathwaysource,")")
   })
+
+  longestName <- max(sapply(clusterDF$y,nchar))
+  textSizeDynamic <- 800/longestName
+  
   p <- clusterDF %>%
     dplyr::mutate("pathway.db" =
                     with(clusterDF,{tidytext::reorder_within(pathway.db,
@@ -271,7 +275,7 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
       panel.grid.minor = ggplot2::element_blank(),
       panel.background = ggplot2::element_blank(),
       strip.text.y = ggplot2::element_text(angle = 0),
-      axis.text = ggplot2::element_text(face = "bold")
+      axis.text = ggplot2::element_text(face = "bold", size = min(c(textSizeDynamic,10)))
     ) +
     with(clusterDF, {
       ggplot2::facet_grid(cluster ~ ., space = "free", scales = "free")
