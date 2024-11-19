@@ -2,7 +2,7 @@
 % Please edit documentation in R/OntologyQueryFunctions.R
 \name{getMetaFromOnto}
 \alias{getMetaFromOnto}
-\title{function that query database to find analytes in given ontologies}
+\title{function that query database to find mets in given ontologies}
 \usage{
 getMetaFromOnto(ontology, db = RaMP())
 }
@@ -12,14 +12,14 @@ getMetaFromOnto(ontology, db = RaMP())
 \item{db}{a RaMP database object}
 }
 \value{
-dataframe that contains searched analytes from given ontology
+dataframe that contains searched mets from given ontology
 }
 \description{
-function that query database to find analytes in given ontologies
+function that query database to find mets in given ontologies
 }
 \examples{
 \dontrun{
-ontologies.of.interest <- c("Colon", "Liver", "Lung")
+ontologies.of.interest <- "Urine"
 
 new.metabolites <- RaMP::getMetaFromOnto(db = rampDB, ontology = ontologies.of.interest)
 }

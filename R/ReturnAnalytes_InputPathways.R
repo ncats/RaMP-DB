@@ -8,6 +8,7 @@
 #' @param namesOrIds are the input pathways input as pathway names or as pathway ids
 #' of genes and metabolites
 #' @param db a RaMP database object, if not specified a new one is created with RaMP::RaMP()
+#' @param ... Internal Use - for handling deprecated parameter names
 #' @return a data.frame that contains all search results
 #' @examples
 #' \dontrun{
@@ -16,120 +17,18 @@
 #'
 #' }
 #' @export
-getAnalyteFromPathway <- function(pathway, match="exact", analyteType="both", maxPathwaySize = Inf, namesOrIds="names", db = RaMP()) {
+getAnalyteFromPathway <- function(pathway, match="exact", analyteType="both", maxPathwaySize = Inf,
+                                  namesOrIds="names", db = RaMP(), ...) {
+  analyteType <- handleRenamedParameter(argument = analyteType, oldName = "analyte_type", version = "3.0")
+  maxPathwaySize <- handleRenamedParameter(argument = maxPathwaySize, oldName = "max_pathway_size", version = "3.0")
+  namesOrIds <- handleRenamedParameter(argument = namesOrIds, oldName = "names_or_ids", version = "3.0")
+  assertDBparamIsRight(firstParam = pathway, dbParam = db)
+
   now <- proc.time()
   print("fired!")
-  if(is.character(pathway)){
-    if(grepl("\n",pathway)[1]){
-      list_pathway <- strsplit(pathway,"\n")
-      list_pathway <- unlist(list_pathway)
-    } else if(grepl(",",pathway)[1]){
-      list_pathway <- strsplit(pathway,"\n")
-      list_pathway <- unlist(list_pathway)
-    } else {
-      list_pathway <- pathway
-    }
-  } else if(is.data.frame(pathway)){
-    list_pathway <- unlist(pathway)
-  } else {
-    return("Wrong Data Format")
-  }
-  list_pathway <- sapply(list_pathway,shQuote)
-  list_pathway <- paste(list_pathway,collapse = ",")
-
-  pathwayMatchCol = 'pathwayName'
-  if(namesOrIds == 'ids') {
-    pathwayMatchCol = 'sourceId'
-    match = 'exact'
-  }
-
-  isSQLite = .is_sqlite(x = db)
 
   # Retrieve pathway RaMP ids
-  if (match=='exact') {
-
-    # return pathway name, pathway type, analyte name, source analyte ids, analyte type/class
-    sql = paste0("select
-    group_concat(distinct s.commonName order by s.commonName asc separator '; ') as analyteName,
-    group_concat(distinct s.sourceId order by s.sourceId asc separator '; ') as sourceAnalyteIDs,
-    s.geneOrCompound as geneOrCompound,
-    p.pathwayName as pathwayName,
-    p.sourceId as pathwayId,
-    p.pathwayCategory as pathwayCategory,
-    p.type as pathwayType
-    from pathway p, analytehaspathway ap, source s
-    where s.rampId = ap.rampID
-    and ap.pathwayRampId = p.pathwayRampId
-    and (p.pathwayCategory not like 'smpdb%' or p.pathwayCategory is Null)
-    and p.",pathwayMatchCol," in (",list_pathway,") ",
-                 "group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
-    order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;")
-
-    if(isSQLite) {
-      sql = paste0("select
-    group_concat(distinct s.commonName COLLATE NOCASE) as analyteName,
-    group_concat(distinct s.sourceId COLLATE NOCASE) as sourceAnalyteIDs,
-    s.geneOrCompound as geneOrCompound,
-    p.pathwayName as pathwayName,
-    p.sourceId as pathwayId,
-    p.pathwayCategory as pathwayCategory,
-    p.type as pathwayType
-    from pathway p, analytehaspathway ap, source s
-    where s.rampId = ap.rampID
-    and ap.pathwayRampId = p.pathwayRampId
-    and (p.pathwayCategory not like 'smpdb%' or p.pathwayCategory is Null)
-    and p.",pathwayMatchCol," in (",list_pathway,") ",
-                   "group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
-    order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;")
-    }
-
-    df <- runQuery(sql = sql, db = db)
-
-  } else if(match == 'fuzzy') {
-    df = data.frame(matrix(nrow=0, ncol=7))
-    colnames(df) <- c('analyteName', 'sourceAnalyteIDs', 'geneOrCompound',
-                      'pathwayName', 'pathwayId', 'pathwayCategory', 'pathwayType')
-    sql = paste0("select
-    group_concat(distinct s.commonName order by s.commonName asc separator '; ') as analyteName,
-    group_concat(distinct s.sourceId order by s.sourceId asc separator '; ') as sourceAnalyteIDs,
-    s.geneOrCompound as geneOrCompound,
-    p.pathwayName as pathwayName,
-    p.sourceId as pathwayId,
-    p.pathwayCategory as pathwayCategory,
-    p.type as pathwayType
-    from pathway p, analytehaspathway ap, source s
-    where s.rampId = ap.rampID
-    and ap.pathwayRampId = p.pathwayRampId
-    and (p.pathwayCategory not like 'smpdb%' or p.pathwayCategory is Null)
-    and p.",pathwayMatchCol," like '%[SOME_PW_NAME]%' group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
-    order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;")
-
-    if(isSQLite) {
-      sql = paste0("select
-    group_concat(distinct s.commonName COLLATE NOCASE) as analyteName,
-    group_concat(distinct s.sourceId COLLATE NOCASE) as sourceAnalyteIDs,
-    s.geneOrCompound as geneOrCompound,
-    p.pathwayName as pathwayName,
-    p.sourceId as pathwayId,
-    p.pathwayCategory as pathwayCategory,
-    p.type as pathwayType
-    from pathway p, analytehaspathway ap, source s
-    where s.rampId = ap.rampID
-    and ap.pathwayRampId = p.pathwayRampId
-    and (p.pathwayCategory not like 'smpdb%' or p.pathwayCategory is Null)
-    and p.",pathwayMatchCol," like '%[SOME_PW_NAME]%' group by s.rampId, p.pathwayName, p.sourceId, p.type, s.geneOrCompound
-    order by p.type desc, p.pathwayName asc, s.geneOrCompound asc;")
-    }
-
-    for(p in pathway) {
-      if(nchar(p)>2) {
-        currSQL = gsub(pattern = '[SOME_PW_NAME]', replacement = p, x= sql, fixed = T )
-        subdf <- runQuery(sql = currSQL, db = db)
-        df <- rbind(df, subdf)
-      }
-    }
-
-  }
+  df <- db@api$getAnalytesFromPathways(pathways = pathway, namesOrIds = namesOrIds, match = match)
 
   # if we have a result and max_pathway size is not Infinite, filter pathway results by pathway size
   if(nrow(df) > 0 && maxPathwaySize != Inf) {

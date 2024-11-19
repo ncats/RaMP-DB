@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RaMP</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
       </span>
     </div>
 
@@ -44,7 +44,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getCurrentRaMPVersion</span><span class="op">(</span>db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span>, justVersion <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getCurrentRaMPVersion</span><span class="op">(</span>justVersion <span class="op">=</span> <span class="cn">T</span>, db <span class="op">=</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -52,6 +52,10 @@
     <dl><dt>justVersion</dt>
 <dd><p>boolean value indicating if the method should just return the version id (default, justVersion = T),
 or a table that includes db_version_id, load_timestamp (update time/date), version_notes, and the db_sql_url (a url for mysql schema download)</p></dd>
+
+
+<dt>db</dt>
+<dd><p>a RaMP database object</p></dd>
 
 </dl></div>
     <div id="value">
@@ -64,8 +68,8 @@ or a table that includes db_version_id, load_timestamp (update time/date), versi
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="va">pkg.globals</span> <span class="op">&lt;-</span> <span class="fu">setConnectionToRaMP</span><span class="op">(</span>dbname<span class="op">=</span><span class="st">"ramp2"</span>,username<span class="op">=</span><span class="st">"root"</span>,conpass<span class="op">=</span><span class="st">""</span>,host <span class="op">=</span> <span class="st">"localhost"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">getCurrentRaMPVersion</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">rampDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="RaMP.html">RaMP</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">getCurrentRaMPVersion</span><span class="op">(</span>db <span class="op">=</span> <span class="va">rampDB</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
@@ -77,7 +81,7 @@ or a table that includes db_version_id, load_timestamp (update time/date), versi
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by John Braisted, Ewy Mathe, Andrew Patt, Kyle Spencer, Cole Tindall.</p>
+  <p></p><p>Developed by Andrew Patt, Ewy Mathe, Khyati Mehta.</p>
 </div>
 
 <div class="pkgdown">

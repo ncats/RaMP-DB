@@ -8,13 +8,14 @@
 #' metabolites for enrichment. The background can be either a list of ids, a file name containing the id list,
 #' one id per column (no file header row) or a specificed biospecimen type (available biospecimen types: "Blood",
 #' "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney","Saliva", or "Feces").
-#' @param background_type one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
+#' @param backgroundType one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
 #' or 'file' in which case the background parameter will be a file path, or 'biospecimen' where the specified background parameter is
 #' a RaMP HMDB metabolite ontology term (see background parameter, above, for the most common biospecimen background values).
 #' @param includeRaMPids include internal RaMP identifiers (default is "FALSE")
-#' @param inferIdMapping if FALSE, the survey only reports on class annotations made directly on the input ids.
-#' If inferIdMapping is set to TRUE, the ids are cross-referenced or mapped to related ids that contain metabolite class annotations.
-#' The default is TRUE.
+#' @param inferIdMapping if FALSE, the method only reports on class annotations made directly on the input ids.
+#' If inferIdMapping is set to TRUE, the input ids are cross-referenced or mapped to other existing ids that contain metabolite class annotations.
+#' Following id cross references can expand coverage if the input type is other than HMDB ids or LIPIDMAPS ids.
+#' The default value is FALSE.
 #' @param db a RaMP database object
 #' @return Returns chemical class information data including class count tallies and comparisons between metabolites of interest and the metabolite population,
 #' metabolite mappings to classes, and query summary report indicating the number of input metabolites that were resolved and listing those metabolite ids
@@ -52,7 +53,7 @@
 #'                              "hmdb:HMDB0001138",
 #'                              "hmdb:HMDB0029412")
 #'
-#' metClassResult <- chemicalClassSurvey(mets = metabolites.of.interest)
+#' metClassResult <- getChemClass(mets = metabolites.of.interest)
 #'
 #' # show structure
 #' utils::str(metClassResult)
@@ -63,11 +64,11 @@
 #' metClassResult$query_report
 #'}
 #' @export
-chemicalClassSurvey <- function(mets, background = "database", background_type="database", includeRaMPids = FALSE, inferIdMapping = TRUE, db = RaMP()){
+getChemClass <- function(mets, background = "database", backgroundType="database", includeRaMPids = FALSE, inferIdMapping = FALSE, db = RaMP()){
 
   print("Starting Chemical Class Survey")
 
-  if(background_type == "file") {
+  if(backgroundType == "file") {
     bkgrnd <- utils::read.table(background, header=F)[,1]
 
     filteredMets <- mets[mets %in% bkgrnd]
@@ -82,7 +83,7 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
 
     mets <- filteredMets
 
-  } else if(background_type == "list") {
+  } else if(backgroundType == "list") {
     bkgrnd = background
 
     filteredMets <- mets[mets %in% bkgrnd]
@@ -97,25 +98,14 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
 
     mets <- filteredMets
 
-  } else if(background_type == "database") {
+  } else if(backgroundType == "database") {
     # use the full database as background
     bkgrnd = 'database'
-  } else if (background_type == "biospecimen") {
+  } else if (backgroundType == "biospecimen") {
 
     print(paste0("Biospecimen background specified: ", background))
 
-    # if we id map, then we go through and extend the soruce ids via ramp ids
-    # else, we just pick up hmdb ids from the ao table.
-    if(inferIdMapping) {
-      query <- paste0("select distinct s.rampId, s.sourceId from source s, analytehasontology ao, ontology o
-      where o.commonName in ('", background, "') and o.rampOntologyId=ao.rampOntologyId and s.rampId = ao.rampCompoundId")
-    } else {
-      # how do we keep the direct mapping on the source HMDB ids? We don't capture that.
-      query <- paste0("select distinct s.rampId, s.sourceId from source s, analytehasontology ao, ontology o
-      where o.commonName in ('", background, "') and o.rampOntologyId=ao.rampOntologyId and s.rampId = ao.rampCompoundId")
-    }
-
-    bg = RaMP::runQuery(sql = query, db = db)
+    bg = db@api$getMetaboliteSourceIdsForOntology(biospecimen = background)
 
     # cases check if bg is empty (suggest to query for biospecimen types in ramp)
     if(is.null(bg) || nrow(bg) == 0) {
@@ -149,15 +139,15 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
     mets <- filteredMets
   }
   else {
-    stop("background_type was not specified correctly. Please specify one of the following options: 'database', 'file', 'list', or 'biospecimen'.")
+    stop("backgroundType was not specified correctly. Please specify one of the following options: 'database', 'file', 'list', or 'biospecimen'.")
   }
 
   # note that for enrichment analysis the inferIdMapping for the class survey is set to FALSE
   # This means that only ids that have direct id-to-class annotations will contribute to results.
-  if(background_type == "database"){
-    res <- chemicalClassSurveyRampIdsFullPopConn(db = db, mets=mets, inferIdMapping=inferIdMapping)
+  if(backgroundType == "database"){
+    res <- getChemicalClassRampIdsFullPopConn(db = db, mets=mets, inferIdMapping=inferIdMapping)
   } else {
-    res <- chemicalClassSurveyRampIdsConn(db = db, mets=mets, pop=bkgrnd, inferIdMapping=inferIdMapping)
+    res <- getChemicalClassRampIdsConn(db = db, mets=mets, pop=bkgrnd, inferIdMapping=inferIdMapping)
   }
 
   print("Finished Chemical Class Survey")
@@ -183,15 +173,17 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
 }
 
 
-#' Returns chemical class information comparing a metabolite subset to a metabolite population, including Fisher Exact Test
-#' enrichment p-values and FDR values.
+#'Returns chemical class information comparing a metabolite subset to a metabolite population, including Fisher Exact Test
+#'enrichment p-values and FDR values.
+#'
+#'The function performs enrichment analysis for Classyfire classes, sub-classess, and super-classes, and for #'LipidMaps categories, main classess, and sub classes.
 #'
 #' @param mets a vector of source prepended metabolite ids
 #' @param background an optional list of source prepended metaboite ids to be used as the background reference of
 #' metabolites for enrichment. The background can be either a list of ids, a file name containing the id list,
 #' one id per column (no file header row) or a specificed biospecimen type (available biospecimen types: "Blood",
 #' "Adipose tissue", "Heart", "Urine", "Brain", "Liver", "Kidney","Saliva", or "Feces").
-#' @param background_type one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
+#' @param backgroundType one of 'database' (all analytes in the RaMP Database), 'list' (a list of input ids),
 #' or 'file' in which case the background parameter will be a file path, or 'biospecimen' where the specified background parameter is
 #' a RaMP HMDB metabolite ontology term (see background parameter, above. for the most common biospecimen background values).
 #' @param inferIdMapping if FALSE, the method only reports on class annotations made directly on the input ids.
@@ -215,18 +207,18 @@ chemicalClassSurvey <- function(mets, background = "database", background_type="
 #'                             "hmdb:HMDB0001138",
 #'                             "hmdb:HMDB0029412")
 #'
-#' chemical.enrichment <- chemicalClassEnrichment(mets = metabolites.of.interest, db = rampDB)
+#' chemical.enrichment <- runEnrichChemClass(mets = metabolites.of.interest, db = rampDB)
 #'}
 #' @export
-chemicalClassEnrichment <- function( mets, background = "database", background_type = "database", inferIdMapping=F, db = RaMP() ) {
+runEnrichChemClass <- function( mets, background = "database", backgroundType = "database", inferIdMapping=F, db = RaMP() ) {
   print("Starting Chemical Class Enrichment")
 
   # note that inferIdMapping is set to FALSE
   # enrichment will only be reported for input ids that have
   # a direct association with the chemical class.
-  classData <- chemicalClassSurvey(db = db, mets = mets,
+  classData <- getChemClass(db = db, mets = mets,
                                    background = background,
-                                   background_type = background_type,
+                                   backgroundType = backgroundType,
                                    includeRaMPids = TRUE, inferIdMapping = inferIdMapping)
 
   # Quit if empty survey result
@@ -260,7 +252,7 @@ chemicalClassEnrichment <- function( mets, background = "database", background_t
       contingencyMat <- matrix(nrow=2, ncol=2)
       resultMat <- data.frame(matrix(ncol=8))
       colnames(resultMat) <- c("category", "class_name", "met_hits", "pop_hits",
-                               "met_size", "pop_size", "p-value","odds_ratio")
+                               "met_size", "pop_size", "Pval","OR")
 
       for (i in 1:nrow(categoryData)) {
         if(categoryData[i,'mets_count'] >= 1) {
@@ -283,7 +275,14 @@ chemicalClassEnrichment <- function( mets, background = "database", background_t
           resultRow <- resultRow + 1
         }
       }
-      resultMat <- bhCorrect(resultMat = resultMat)
+
+      resultMat <- resultMat[order(resultMat$`Pval`),]
+      bhPvals <- stats::p.adjust(resultMat$`Pval`, method = "BH")
+      resultMat$Pval_FDR <- bhPvals
+
+      holm <- stats::p.adjust(resultMat$`Pval`, method = "holm")
+      resultMat$Pval_Holm <- holm
+
       enrichmentStat[[as.character(category)]] <- resultMat
 
     }

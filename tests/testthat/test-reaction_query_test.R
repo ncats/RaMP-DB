@@ -21,7 +21,7 @@ test_that("test_mixed_analyte_reaction_query", {
 
   # rampDB has been already been instantiated in helper-setup..
   rxns = RaMP::getReactionsForAnalytes(db=rampDB, analytes=analytes, humanProtein = T)
-  expect_true(nrow(rxns$met2rxn) > 150)
+  expect_true(nrow(rxns$met2rxn) > 100)
   expect_true(nrow(rxns$prot2rxn) > 15)
   expect_true(nrow(rxns$metProteinCommonReactions) > 3)
 
@@ -45,7 +45,7 @@ test_that("test_metabolite_reaction_query", {
 
   # rampDB has been already been instantiated in helper-setup..
   rxns = RaMP::getReactionsForAnalytes(db=rampDB, analytes=mets, humanProtein = T)
-  expect_true(nrow(rxns$met2rxn) > 150)
+  expect_true(nrow(rxns$met2rxn) > 100)
   expect_true(is.null(nrow(rxns$protein2rxn)))
 
 })

@@ -8,7 +8,9 @@ message to download a new version if one exists.}
 listAvailableRaMPDbVersions(branch = "main")
 }
 \arguments{
-\item{branch}{specifies what branch versions should be taken from. Default is 'main'.}
+\item{branch}{`character(1)` specifying the RaMP repository branch to load
+the database from. by default (`version = "main"`) for the released versions
+of the database.}
 }
 \description{
 Lists local and remotely available RaMP SQLite DB versions and prompts with

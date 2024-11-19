@@ -17,6 +17,6 @@ Retrieve list of pathway names
 }
 \examples{
 \dontrun{
-getPathwayNameList()
+getPathwayNameList(db = rampDB)
 }
 }

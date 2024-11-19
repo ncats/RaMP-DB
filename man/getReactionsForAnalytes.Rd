@@ -2,13 +2,13 @@
 % Please edit documentation in R/rampReactionQueries.R
 \name{getReactionsForAnalytes}
 \alias{getReactionsForAnalytes}
-\title{getReactionsForAnalytes}
+\title{getReactionsForAnalytes returns all associated reactions for a collection of input compound ids}
 \usage{
 getReactionsForAnalytes(
   analytes,
   onlyHumanMets = F,
   humanProtein = T,
-  includeTransportRxns = F,
+  includeTransportRxns = T,
   rxnDirs = c("UN"),
   includeRxnURLs = F,
   db = RaMP()
@@ -23,7 +23,7 @@ in progress)}
 \item{humanProtein}{boolean to only control pathways catalyzed by a human proteins (having human Uniprot)
 (dev in progress)}
 
-\item{includeTransportRxns}{if TRUE, returns metabolic and transport reactions}
+\item{includeTransportRxns}{if TRUE, returns metabolic and transport reactions, default is TRUE}
 
 \item{rxnDirs}{character vector of length > 1, specifying reaction directions to return  c("UN", "LR", "RL",
 "BD", "ALL"), default = c("UN").}
@@ -33,17 +33,20 @@ in progress)}
 \item{db}{a RaMP database object}
 }
 \value{
-a list of reaction information on each input analyte, separate data.frame for metabolites, genes, and
-common reactions
+a list of 3 dataframes [[1]] met2rxn, reaction information for all metabolite inputs (chebi),  [[2]] prot2rxn, reaction information for all protein inputs (uniprot), and [[3]] metProteinCommonReactions, common reactions found across both metabolite and protein inputs (overlap between met2rxn and prot2rxn)
 }
 \description{
-getReactionsForAnalytes
+getReactionsForAnalytes returns all associated reactions for a collection of input compound ids
 }
 \examples{
 \dontrun{
-analytes.of.interest <- c('chebi:57368', 'uniprot:Q96N66')
+analytes.of.interest <- c('chebi:58115', 'chebi:456215',
+ 'chebi:58245', 'chebi:58450', 'chebi:17596','uniprot:P30520',
+'chebi:16335', 'chebi:16750', 'chebi:172878','uniprot:P22102',
+ 'chebi:62286', 'chebi:77897', 'uniprot:P30566', 'uniprot:P15531',
+'uniprot:P00568', 'uniprot:P23109')
 
-reactionsLists <- RaMP::getReactionsForAnalytes(analytes = analytes.of.interest,
-    includeTransportRxns = F, humanProtein = T, db = rampDB )
+reactionsLists <- getReactionsForAnalytes(analytes = analytes.of.interest,
+    includeTransportRxns = T, humanProtein = T, db = rampDB )
 }
 }

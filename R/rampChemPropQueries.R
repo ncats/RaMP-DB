@@ -30,7 +30,7 @@
 #'}
 #' @export
 getChemicalProperties <- function(mets, propertyList = 'all', db = RaMP() ){
-
+  assertDBparamIsRight(firstParam = mets, dbParam = db)
   message("Starting Chemical Property Query")
 
   mets <- unique(mets)
@@ -41,19 +41,19 @@ getChemicalProperties <- function(mets, propertyList = 'all', db = RaMP() ){
   metStr <- paste(mets, collapse = "','")
   metStr <- paste("'" ,metStr, "'", sep = "")
 
+
   if(length(grep("all",propertyList))==1) {
-    sql <- paste0("select * from chem_props where chem_source_id in (",metStr,")")
+    propList = '*'
   } else {
       propList <- buildPropertyList(db = db, propList = propertyList);
       if(startsWith(propList, "Error")) {
         message(propList)
         return(NULL)
       }
-      sql <- paste("select",propList,"from chem_props",
-                   "where chem_source_id in (",metStr,")")
   }
 
-  metsData <- runQuery(sql = sql, db = db)
+  metsData = db@api$getChemPropsForMetabolites(propList, metStr)
+
   foundMets <- unique(metsData$chem_source_id)
 
   result[['chem_props']] <- metsData
@@ -76,26 +76,15 @@ getChemicalProperties <- function(mets, propertyList = 'all', db = RaMP() ){
 #' Internal function to validate property list
 #' @param propList an optional list of specific properties to extract.  Options include 'all' (default),  'iso_smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'.
 #' @param db a RaMP database object
+#' @noRd
 buildPropertyList <- function( propList, db = RaMP()) {
 
   # validate that all properties are valid
   #  validProperties <- c('smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name')
 
-  if(.is_sqlite(x = db)) {
-    sql = 'pragma table_info(chem_props)'
-    ramptypes <- runQuery(sql = sql, db = db)
-    ramptypes <- unlist(ramptypes$name)
-  } else {
-    sql = 'describe chem_props'
-    ramptypes <- runQuery(sql = sql, db = db)
-    ramptypes <- unlist(ramptypes$Field)
-  }
-
-
-
+  ramptypes <- db@api$getValidChemProps()
 
   validProperties <- setdiff(ramptypes, c("ramp_id", "chem_data_source", "chem_source_id"))
-
 
   haveInvalidProps = FALSE
 

@@ -1,7 +1,8 @@
 #' Plots a network based on gene-metabolite relationships
 #' @importFrom magrittr %>%
 #'
-#' @param catalyzedf a data.frame output by rampFastCata() that contains analytes that are in the same reaction
+#' @param catalyzeDf a data.frame output by rampFastCata() that contains analytes that are in the same reaction
+#' @param ... Internal Use - for handling deprecated parameter names
 #' @return  An interactive HTML plot that allows the user to pan/zoom into regions of interest. User genes/
 #' metabolites are highlighted in blue, whereas analytes found by the function are orange.
 #' @examples
@@ -11,78 +12,23 @@
 #'
 #' new.transcripts <- rampFastCata(analytes = inputs.of.interest, db = rampDB)
 #'
-#' plotCataNetwork(head(new.transcripts$HMDB_Analyte_Associations, n=100))
+#' plotCataNetwork(head(new.transcripts, n=100))
 #' }
 #' @export
-plotCataNetwork <- function(catalyzedf = "") {
+plotCataNetwork <- function(catalyzeDf = "", ...) {
+  catalyzeDf <- handleRenamedParameter(argument = catalyzeDf, oldName = "catalyzedf", version = "3.0")
 
-  if(nrow(catalyzedf) == 0) {
+  if(nrow(catalyzeDf) == 0) {
     message("The input data has 0 rows. plotCataNetwork function is returning without generating a plot.")
     return()
   }
   if (length(intersect(c("query_relation", "input_analyte", "input_common_name", "rxn_partner_common_name", "rxn_partner_ids", "Source" ),
-                       names(catalyzedf)))!=6) {
+                       names(catalyzeDf)))!=6) {
     stop("Please make sure that the input is the resulting data.frame returned by the rampFastCata() function")
   }
 
+  edges_nodes <- buildCataNetworkDataframe(catalyzeDf)
 
-  #Set Edges
-  myedges = catalyzedf[,c("query_relation", "input_common_name","rxn_partner_common_name", "Source")]
-  colnames(myedges)[2:3] <-c("from","to")
-
-  myedges$color <- ifelse(myedges$Source=="HMDB", "#ca1f7b", ifelse(myedges$Source=="Rhea", "#cc5500", "#008080"))
-  myedges$highlight <- myedges$color
-
-  #Set nodes
-  mynodes=c(unique(myedges$from),unique(myedges$to))
-  mycol=c(rep("black",length(unique(myedges$from))),
-          rep("#d2e5f6",length(unique(myedges$to))))
-  mynames <- mynodes
-
-  mynodes <- data.frame(color=mycol,id=mynames,label=mynames)
-
-  duplicates <- mynodes[mynodes[,3] %in% mynodes[duplicated(mynodes[3]),3],]
-
-  if(nrow(duplicates)>0)
-  {
-    mynodes <- mynodes[-c(as.numeric(rownames(duplicates))),]
-
-    duplicates <- split(duplicates, duplicates$id)
-
-    for (i in 1:length(duplicates))
-    {
-      if(length(which(grepl("black", duplicates[[i]]$color)))>0)
-      {
-        single <- unique(duplicates[[i]][grepl("black", duplicates[[i]]$color),])
-      } else
-      {
-        single <- duplicates[[i]][1,]
-      }
-
-      mynodes <- rbind(mynodes, single)
-    }
-  }
-
-  for (i in 1:nrow(mynodes))
-  {
-    if (mynodes[i,1] == "black")
-    {
-      if (myedges[which(myedges$from == mynodes[i,2])[1], 1]=="met2gene" | myedges[which(myedges$from == mynodes[i,2])[1], 1]=="met2protein")
-      {
-        mynodes$shape[i] <- "dot"
-      } else {
-        mynodes$shape[i] <- "square"
-      }
-    } else if (mynodes[i,1] == "#d2e5f6")
-    {
-      if (myedges[which(myedges$to == mynodes[i,2])[1], 1]=="met2gene" | myedges[which(myedges$to == mynodes[i,2])[1], 1]=="met2protein")
-      {
-        mynodes$shape[i] <- "square"
-      } else {
-        mynodes$shape[i] <- "dot"
-      }
-    }
-  }
 
   #ledges <- data.frame(color = unique(myedges$color.color),
   #           label = c("From HMDB", "From Rhea", "From Both"))
@@ -106,14 +52,13 @@ plotCataNetwork <- function(catalyzedf = "") {
                                      icon.code = c("f111", "f0c8")))
 
   # Now plot
-  visNetwork::visNetwork(mynodes, myedges) %>%
+  visNetwork::visNetwork(edges_nodes$mynodes, edges_nodes$myedges) %>%
     visNetwork::visInteraction(dragNodes = TRUE,
                                dragView = TRUE,
                                navigationButtons=TRUE,zoomView = TRUE) %>%
     visNetwork::visLayout(randomSeed = 123) %>%
     visNetwork::visNodes(size = 20, font = list(size = 25, background = "white")) %>%
     visNetwork::visEdges(width = 1.5, dashes = TRUE, selectionWidth = 3) %>%
-    #visNetwork::visLegend(useGroups = F, addNodes = lnodes, addEdges = ledges, main = "Legend") %>%
     visNetwork::visLegend(useGroups = F, addNodes = lnodes, main = "Legend") %>%
     visNetwork::visGroups()%>%
     visNetwork::addFontAwesome(version = "5.13.0") %>%
@@ -128,35 +73,35 @@ plotCataNetwork <- function(catalyzedf = "") {
                                                    labelOnly = FALSE, hover = TRUE))
 }
 
-#' Cluster and plot significant pathways by FDR-adjusted pval
+#' Cluster and plot significant pathways by FDR-adjusted pVal
 #' @param pathwaysSig output of FilterFishersResults
-#' @param pval Which p value to plot, choose from Raw, FDR or Holm-adjusted
-#' @param perc_analyte_overlap Minimum overlap for pathways to be considered similar
+#' @param pVal Which p value to plot, choose from Raw, FDR or Holm-adjusted
+#' @param percAnalyteOverlap Minimum overlap for pathways to be considered similar
 #' (Default = 0.2)
-#' @param perc_pathway_overlap Minimum overlap for clusters to merge (Default = 0.2)
-#' @param min_pathway_tocluster Minimum number of 'similar' pathways required to start
+#' @param percPathwayOverlap Minimum overlap for clusters to merge (Default = 0.2)
+#' @param minPathwayToCluster Minimum number of 'similar' pathways required to start
 #' a cluster (medoid) (Default = 3)
-#' @param text_size Scales all text in figure (Default=16)
-#' @param sig_cutoff Aesthetic, shows pvalue cutoff for significant pathways
+#' @param textSize Scales all text in figure (Default=16)
+#' @param sigCutoff Aesthetic, shows pvalue cutoff for significant pathways
 #' @param interactive If TRUE, return interactive plotly object instead of ggplot object
 #' @param db a RaMP database object
 #' @examples
 #' \dontrun{
-#' pathwayResultsPlot(pathwaysSig = filtered.fisher.results, text_size = 8, perc_analyte_overlap = 0.2,
-#'    min_pathway_tocluster = 2, perc_pathway_overlap = 0.2, interactive = FALSE, db = rampDB )
+#' plotPathwayResults(pathwaysSig = filtered.fisher.results, textSize = 8, percAnalyteOverlap = 0.2,
+#'    minPathwayToCluster = 2, percPathwayOverlap = 0.2, interactive = FALSE, db = rampDB )
 #' }
 #' @export
-pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap = 0.5,
-                                 perc_pathway_overlap = 0.5, min_pathway_tocluster = 3,
-                               text_size = 8, sig_cutoff = 0.05, interactive=FALSE,
+plotPathwayResults <- function(pathwaysSig, pVal = "FDR", percAnalyteOverlap = 0.5,
+                                 percPathwayOverlap = 0.5, minPathwayToCluster = 3,
+                               textSize = 8, sigCutoff = 0.05, interactive=FALSE,
                                db = RaMP()) {
 
 
   if( !('cluster_assignment' %in% colnames(pathwaysSig$fishresult))) {
-    fishClustering <- findCluster(db = db, fishers_df = pathwaysSig,
-                                  perc_analyte_overlap = perc_analyte_overlap,
-                                  perc_pathway_overlap = perc_pathway_overlap,
-                                  min_pathway_tocluster = min_pathway_tocluster
+    fishClustering <- findCluster(db = db, fishersDf = pathwaysSig,
+                                  percAnalyteOverlap = percAnalyteOverlap,
+                                  percPathwayOverlap = percPathwayOverlap,
+                                  minPathwayToCluster = minPathwayToCluster
     )
     # assign this here if clustering is preformed here...
     fishresult <- fishClustering$fishresults
@@ -165,7 +110,7 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
     fishresult <- pathwaysSig$fishresults
   }
 
-  if (pathwaysSig$analyte_type == "genes" | pathwaysSig$analyte_type == "metabolites") {
+  if (pathwaysSig$analyteType == "genes" | pathwaysSig$analyteType == "metabolites") {
     inPath <- fishresult$Num_In_Path
     totPath <- fishresult$Total_In_Path
   } else {
@@ -189,7 +134,7 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
     })
   }
 
-  if (pval == "FDR") {
+  if (pVal == "FDR") {
     clusterDF <- data.frame(
       x = -log10(fishresult[, grepl("FDR", colnames(fishresult))]),
       y = fishresult$pathwayName,
@@ -199,8 +144,8 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
       pathwaysource = fishresult$pathwaySource,
       analytes = fishresult$analytes
     )
-    ylab <- "-log10(FDR pval)"
-  } else if (pval == "Holm") {
+    ylab <- "-log10(FDR pVal)"
+  } else if (pVal == "Holm") {
     clusterDF <- data.frame(
       x = -log10(fishresult[, grepl("Holm", colnames(fishresult))]),
       y = fishresult$pathwayName, inPath <- fishresult$Num_In_Path,
@@ -209,8 +154,8 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
       pathwaysource = fishresult$pathwaysource,
       analytes = fishresult$analytes
     )
-    ylab <- "-log10(Holm pval)"
-  } else if (pval == "Raw") {
+    ylab <- "-log10(Holm pVal)"
+  } else if (pVal == "Raw") {
     clusterDF <- data.frame(
       x = -log10(fishresult[
         ,
@@ -225,7 +170,7 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
       pathwaysource = fishresult$pathwaysource,
       analytes = fishresult$analytes
     )
-    ylab <- "-log10(pval)"
+    ylab <- "-log10(pVal)"
   } else {
     print("Invalid p value selection, choose from 'Raw', 'FDR' or 'Holm'")
     stop()
@@ -262,8 +207,8 @@ pathwayResultsPlot <- function(pathwaysSig, pval = "FDR", perc_analyte_overlap =
         text = "analytes"
       )
     )) +
-    ggplot2::geom_hline(yintercept = -log10(sig_cutoff), linetype = "dotted") +
-    ggplot2::theme_bw(base_size = text_size) +
+    ggplot2::geom_hline(yintercept = -log10(sigCutoff), linetype = "dotted") +
+    ggplot2::theme_bw(base_size = textSize) +
     ggplot2::coord_flip() +
     tidytext::scale_x_reordered() +
     ggplot2::labs(x = "", y = ylab) +
@@ -414,24 +359,24 @@ plotAnalyteOverlapPerRxnLevel <- function(reactionsResults, includeCofactorMets 
 
 }
 
-#' Cluster and plot significant ontologies by FDR-adjusted pval
+#' Cluster and plot significant ontologies by FDR-adjusted pVal
 #' @param ontologiesSig output of FilterFishersResults
-#' @param pval Which p value to plot, choose from Raw, FDR or Holm-adjusted
-#' @param text_size Scales all text in figure (Default=16)
-#' @param sig_cutoff Aesthetic, shows pvalue cutoff for significant ontologies
+#' @param pVal Which p value to plot, choose from Raw, FDR or Holm-adjusted
+#' @param textSize Scales all text in figure (Default=16)
+#' @param sigCutoff Aesthetic, shows pvalue cutoff for significant ontologies
 #' @param interactive If TRUE, return interactive plotly object instead of ggplot object
 #' @param db a RaMP database object
 #' @export
-ontologyEnrichmentResultsPlot <- function(ontologiesSig, pval = "FDR",
-                                          text_size = 8,
-                                          sig_cutoff = 0.05, interactive=FALSE,
+plotOntologyEnrichmentResults <- function(ontologiesSig, pVal = "FDR",
+                                          textSize = 8,
+                                          sigCutoff = 0.05, interactive=FALSE,
                                           db = RaMP()) {
 
   inOntology <- ontologiesSig$Num_In_Ontology
   totOntology <- ontologiesSig$Total_In_Ontology
 
 
-  if (pval == "FDR") {
+  if (pVal == "FDR") {
     plotDF <- data.frame(
       x = -log10(ontologiesSig[, grepl("FDR", colnames(ontologiesSig))]),
       y = ontologiesSig$Ontology,
@@ -439,16 +384,16 @@ ontologyEnrichmentResultsPlot <- function(ontologiesSig, pval = "FDR",
       totOntology = totOntology,
       ontologytype = ontologiesSig$HMDBOntologyType
     )
-    ylab <- "-log10(FDR pval)"
-  } else if (pval == "Holm") {
+    ylab <- "-log10(FDR pVal)"
+  } else if (pVal == "Holm") {
     plotDF <- data.frame(
       x = -log10(ontologiesSig[, grepl("Holm", colnames(ontologiesSig))]),
       y = ontologiesSig$Ontology, inOntology <- ontologiesSig$Num_In_Ontology,
       totOntology <- ontologiesSig$Total_In_Ontology,
       ontologytype = ontologiesSig$HMDBOntologyType
     )
-    ylab <- "-log10(Holm pval)"
-  } else if (pval == "Raw") {
+    ylab <- "-log10(Holm pVal)"
+  } else if (pVal == "Raw") {
     plotDF <- data.frame(
       x = -log10(ontologiesSig[
         ,
@@ -461,7 +406,7 @@ ontologyEnrichmentResultsPlot <- function(ontologiesSig, pval = "FDR",
       totOntology <- ontologiesSig$Total_In_Ontology,
       ontologytype = ontologiesSig$HMDBOntologyType
     )
-    ylab <- "-log10(pval)"
+    ylab <- "-log10(pVal)"
   } else {
     print("Invalid p value selection, choose from 'Raw', 'FDR' or 'Holm'")
     stop()
@@ -483,8 +428,8 @@ ontologyEnrichmentResultsPlot <- function(ontologiesSig, pval = "FDR",
         size = "inOntology",
       )
     )) +
-    ggplot2::geom_hline(yintercept = -log10(sig_cutoff), linetype = "dotted") +
-    ggplot2::theme_bw(base_size = text_size) +
+    ggplot2::geom_hline(yintercept = -log10(sigCutoff), linetype = "dotted") +
+    ggplot2::theme_bw(base_size = textSize) +
     ggplot2::coord_flip() +
     tidytext::scale_x_reordered() +
     ggplot2::labs(x = "", y = ylab) +
@@ -522,29 +467,29 @@ ontologyEnrichmentResultsPlot <- function(ontologiesSig, pval = "FDR",
 
 #' Plots an interactive sunburst plot of chemical classes
 #'
-#' @param chemicalClassSurveryResults output of chemicalClassSurvey()
+#' @param chemicalClassResults output of getChemClass()
 #' @param plotType choice of 'sunburst' or 'treemap' plot type (default = 'sunburst')
 #' @return  An interactive HTML sunburst plot that allows the user to pan/zoom into reaction classes of interest.
 #' @export
 
-plotChemicalClassSurvery <- function(chemicalClassSurveryResults, plotType = "sunburst") {
+plotChemicalClass <- function(chemicalClassResults, plotType = "sunburst") {
 
-  if (missing(chemicalClassSurveryResults)) {
+  if (missing(chemicalClassResults)) {
     stop("Input is missing. Please input the resulting list of dataframes returned by the chemicalClassSurvey() function")
   }
 
-  if(nrow(chemicalClassSurveryResults$met_classes) == 0) {
-    message("The input dataframe has no metabolites. plotChemicalClassSurvery function is returning without generating a plot.")
+  if(nrow(chemicalClassResults$met_classes) == 0) {
+    message("The input dataframe has no metabolites. plotChemicalClass function is returning without generating a plot.")
     return()
   }
 
-  if (length(intersect(c("count_summary","met_classes", "query_report"),names(chemicalClassSurveryResults)))!=3) {
+  if (length(intersect(c("count_summary","met_classes", "query_report"),names(chemicalClassResults)))!=3) {
     stop("Please make sure that the input is the resulting list of dataframes returned by the chemicalClassSurvey() function")
   }
 
 
 
-  sunburst_ontology_chemicalClass <- buildChemicalClassSurveryDataframe(chemicalClassSurveryResults = chemicalClassSurveryResults)
+  sunburst_ontology_chemicalClass <- buildChemicalClassDataframe(chemicalClassResults = chemicalClassResults)
 
   fig <- plotly::plot_ly(
     color = I("black")

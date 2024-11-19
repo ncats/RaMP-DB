@@ -10,58 +10,22 @@
     <loc>/index.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>/reference/RaMP.html</loc>
   </url>
   <url>
-    <loc>/reference/bhCorrect.html</loc>
+    <loc>/reference/createRaMPInput.html</loc>
   </url>
   <url>
-    <loc>/reference/buildFrequencyTables.html</loc>
-  </url>
-  <url>
-    <loc>/reference/checkIdPrefixes.html</loc>
-  </url>
-  <url>
-    <loc>/reference/chemicalClassEnrichment.html</loc>
-  </url>
-  <url>
-    <loc>/reference/chemicalClassSurvey.html</loc>
-  </url>
-  <url>
-    <loc>/reference/chemicalClassSurveyRampIdsConn.html</loc>
-  </url>
-  <url>
-    <loc>/reference/chemicalClassSurveyRampIdsFullPopConn.html</loc>
-  </url>
-  <url>
-    <loc>/reference/cleanup.html</loc>
-  </url>
-  <url>
-    <loc>/reference/combineStringLists.html</loc>
-  </url>
-  <url>
-    <loc>/reference/compute_overlap_matrix.html</loc>
-  </url>
-  <url>
-    <loc>/reference/FilterFishersResults.html</loc>
-  </url>
-  <url>
-    <loc>/reference/filterPathwaysByAnalyteCount.html</loc>
-  </url>
-  <url>
-    <loc>/reference/findAnalyteHasPathway.html</loc>
+    <loc>/reference/filterEnrichResults.html</loc>
   </url>
   <url>
     <loc>/reference/findCluster.html</loc>
   </url>
   <url>
-    <loc>/reference/findDuplicatePathways.html</loc>
-  </url>
-  <url>
-    <loc>/reference/find_duplicate_pathways.html</loc>
-  </url>
-  <url>
     <loc>/reference/getAnalyteFromPathway.html</loc>
+  </url>
+  <url>
+    <loc>/reference/getChemClass.html</loc>
   </url>
   <url>
     <loc>/reference/getChemicalProperties.html</loc>
@@ -73,22 +37,16 @@
     <loc>/reference/getCurrentRaMPVersion.html</loc>
   </url>
   <url>
-    <loc>/reference/getCustomPathwayFromAnalyte.html</loc>
+    <loc>/reference/getEntityCountsFromSourceDBs.html</loc>
   </url>
   <url>
-    <loc>/reference/getEntityCountsFromSourceDBs.html</loc>
+    <loc>/reference/getMetaFromOnto.html</loc>
   </url>
   <url>
     <loc>/reference/getMetabChemClass.html</loc>
   </url>
   <url>
-    <loc>/reference/getMetabClassDataSources.html</loc>
-  </url>
-  <url>
     <loc>/reference/getMetabClassTypes.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getMetaFromOnto.html</loc>
   </url>
   <url>
     <loc>/reference/getOntoFromMeta.html</loc>
@@ -109,19 +67,7 @@
     <loc>/reference/getRaMPAnalyteIntersections.html</loc>
   </url>
   <url>
-    <loc>/reference/getRaMPInfoFromAnalytes.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getRampSourceInfoFromAnalyteIDs.html</loc>
-  </url>
-  <url>
     <loc>/reference/getReactionClassesForAnalytes.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getReactionClassStats.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getReactionClassStatsOnAnalytes.html</loc>
   </url>
   <url>
     <loc>/reference/getReactionDetails.html</loc>
@@ -130,120 +76,66 @@
     <loc>/reference/getReactionParticipants.html</loc>
   </url>
   <url>
-    <loc>/reference/getReactionParticpantCounts.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getReactionRheaURLs.html</loc>
-  </url>
-  <url>
     <loc>/reference/getReactionsForAnalytes.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getReactionsForRaMPCompoundIds.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getReactionsForRaMPGeneIds.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getReactionsForSourceCompoundIds.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getReactionsForSourceProteinIds.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getTotalFoundInCategories.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getReactionSourceIdsFromReactionQuery.html</loc>
   </url>
   <url>
     <loc>/reference/getRheaAnalyteReactionAssociations.html</loc>
   </url>
   <url>
-    <loc>/reference/getRheaEnzymesAndTransportersForMetabolites.html</loc>
+    <loc>/reference/get_remote_db_version_list.html</loc>
   </url>
   <url>
-    <loc>/reference/getRheaMetabolitesForProteins.html</loc>
+    <loc>/reference/index.html</loc>
   </url>
   <url>
     <loc>/reference/listAvailableRaMPDbVersions.html</loc>
   </url>
   <url>
-    <loc>/reference/listToQueryString.html</loc>
-  </url>
-  <url>
-    <loc>/reference/pathwayResultsPlot.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plotCataNetwork.html</loc>
-  </url>
-  <url>
-    <loc>/reference/processData.html</loc>
-  </url>
-  <url>
-    <loc>/reference/queryReport.html</loc>
-  </url>
-  <url>
-    <loc>/reference/RaMP.html</loc>
-  </url>
-  <url>
-    <loc>/reference/rampFastCata.html</loc>
-  </url>
-  <url>
-    <loc>/reference/rampFastCataOriginal.html</loc>
-  </url>
-  <url>
-    <loc>/reference/rampFastPathFromSource.html</loc>
-  </url>
-  <url>
-    <loc>/reference/rampFindClassInfoFromSourceId.html</loc>
-  </url>
-  <url>
-    <loc>/reference/rampFindSourceFromId.html</loc>
-  </url>
-  <url>
-    <loc>/reference/rampFindSourceRampId.html</loc>
-  </url>
-  <url>
-    <loc>/reference/rampFindSynonymFromSynonym.html</loc>
-  </url>
-  <url>
-    <loc>/reference/removeLocalRampDB.html</loc>
-  </url>
-  <url>
-    <loc>/reference/runCombinedFisherTest.html</loc>
-  </url>
-  <url>
-    <loc>/reference/runFisherTest.html</loc>
-  </url>
-  <url>
-    <loc>/reference/runQuery.html</loc>
-  </url>
-  <url>
-    <loc>/reference/segregateDataBySource.html</loc>
-  </url>
-  <url>
-    <loc>/reference/updateOverlapMatrices.html</loc>
-  </url>
-  <url>
-    <loc>/reference/updateOverlapMatrix.html</loc>
-  </url>
-  <url>
-    <loc>/reference/writePathwaysToCSV.html</loc>
-  </url>
-  <url>
-    <loc>/reference/write_FishersResults.html</loc>
-  </url>
-  <url>
-    <loc>/reference/buildAnalyteOverlapPerRxnLevelUpsetDatafarme.html</loc>
-  </url>
-  <url>
-    <loc>/reference/buildReactionClassesSunburstDatafarme.html</loc>
+    <loc>/reference/package-deprecated.html</loc>
   </url>
   <url>
     <loc>/reference/plotAnalyteOverlapPerRxnLevel.html</loc>
   </url>
   <url>
+    <loc>/reference/plotCataNetwork.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plotChemicalClass.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plotOntologyEnrichmentResults.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plotPathwayResults.html</loc>
+  </url>
+  <url>
     <loc>/reference/plotReactionClasses.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rampFastCata.html</loc>
+  </url>
+  <url>
+    <loc>/reference/removeLocalRampDB.html</loc>
+  </url>
+  <url>
+    <loc>/reference/runEnrichChemClass.html</loc>
+  </url>
+  <url>
+    <loc>/reference/runEnrichOntologies.html</loc>
+  </url>
+  <url>
+    <loc>/reference/runEnrichPathways.html</loc>
+  </url>
+  <url>
+    <loc>/reference/runEnrichReactionClass.html</loc>
+  </url>
+  <url>
+    <loc>/reference/runQuery.html</loc>
+  </url>
+  <url>
+    <loc>/reference/writeFishersResults.html</loc>
+  </url>
+  <url>
+    <loc>/reference/writePathwaysToCSV.html</loc>
   </url>
 </urlset>

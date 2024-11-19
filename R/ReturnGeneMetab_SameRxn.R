@@ -3,6 +3,7 @@
 #' @param analytes a vector of analytes that need to be searched
 #' @param namesOrIds whether input is "names" or "ids" (default is "ids")
 #' @param db a RaMP database object
+#' @param ... Internal Use - for handling deprecated parameter names
 #' @return a list of two dataframes containing query results from HMDB and Rhea. If the input is a metabolite, the function will output
 #' gene transcript common names and source IDs that are known to catalyze
 #' reactions in the same pathway as that metabolite. Conversely, if the input
@@ -18,7 +19,9 @@
 #' new.transcripts <- rampFastCata( analytes = inputs.of.interest, db = rampDB )
 #' }
 #' @export
-rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
+rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP(), ...) {
+  namesOrIds <- handleRenamedParameter(argument = namesOrIds, oldName = 'NameOrIds', version = '3.0')
+  assertDBparamIsRight(firstParam = analytes, dbParam = db)
 
   rampId <- pathwayRampId <- c()
   if(length(analytes)==1){
@@ -45,21 +48,17 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
   } else {stop("The input 'analytes' is not a recognized format. Please check input.")}
 
   list_metabolite <- unique(list_metabolite)
-  list_metabolite <- sapply(list_metabolite,shQuote)
-  list_metabolite <- paste(list_metabolite,collapse = ",")
-
-  data_access <- DataAccessObject$new(db = db)
 
   if(namesOrIds == 'ids') {
 
     print("Analyte ID-based reaction partner query.")
 
-    df1 <- data_access$getRxnPartnersFromMetIDs(metaboliteIDs = list_metabolite)
+    df1 <- db@api$getRxnPartnersFromMetIDs(metaboliteIDs = list_metabolite)
     print("Building metabolite to gene relations.")
 
     print(paste0("Number of met2gene relations: ",(nrow(df1))))
 
-    df2 <- data_access$getRxnPartnersFromGeneIDs(geneIDs = list_metabolite)
+    df2 <- db@api$getRxnPartnersFromGeneIDs(geneIDs = list_metabolite)
     print("Building gene to metabolite relations.")
 
   } else {
@@ -69,10 +68,10 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
 
     print("Analyte name-based reaction partner query.")
     print("Building metabolite to gene relations.")
-    df1 <- data_access$getRxnPartnersFromMetNames(metaboliteNames = list_metabolite)
+    df1 <- db@api$getRxnPartnersFromMetNames(metaboliteNames = list_metabolite)
 
     print(paste0("Number of met2gene relations: ",(nrow(df1))))
-    df2 <- data_access$getRxnPartnersFromGeneNames(geneNames = list_metabolite)
+    df2 <- db@api$getRxnPartnersFromGeneNames(geneNames = list_metabolite)
 
     print("Building gene to metabolite relations.")
     print(paste0("Number of gene2met relations: ",(nrow(df2))))
@@ -120,14 +119,16 @@ rampFastCata <- function( analytes="none", namesOrIds="ids", db = RaMP() ) {
 
   if(nrow(resultList$Rhea_Analyte_Associations) >0)
   {
-    colnames(resultList$Rhea_Analyte_Associations)[3] <- "input_common_name"
     resultList$Rhea_Analyte_Associations$Source <- "Rhea"
   }
 
   if (nrow(resultList$HMDB_Analyte_Associations) >0 && nrow(resultList$Rhea_Analyte_Associations) >0)
   {
     resultDF <- rbind(resultList$HMDB_Analyte_Associations, resultList$Rhea_Analyte_Associations)
-    resultDF[which(do.call(paste0, resultDF[,3:4]) %in% do.call(paste0, resultDF[duplicated(resultDF[3:4]),3:4])),]$Source <- "Both"
+    subset_idx <- which(do.call(paste0, resultDF[,3:4]) %in% do.call(paste0, resultDF[duplicated(resultDF[3:4]),3:4]))
+    if (length(subset_idx) > 0) {
+      resultDF[subset_idx,]$Source <- "Both"
+    }
     duplicates <- subset(resultDF, resultDF$Source=='Both')
     resultDF <- subset(resultDF, resultDF$Source!='Both')
 
