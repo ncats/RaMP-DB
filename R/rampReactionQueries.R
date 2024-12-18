@@ -159,8 +159,8 @@ getReactionsForAnalytes <- function( analytes, onlyHumanMets=F, humanProtein=T, 
 
     for (i in 1:length(met2rxn_edit))
     {
-      metSourceId <- paste0(c(met2rxn_edit[[i]]$metSourceId), collapse = "|")
-      metName <- paste0(c(met2rxn_edit[[i]]$metName), collapse = "|")
+      metSourceId <- paste0(c(met2rxn_edit[[i]]$metSourceId), collapse = " | ")
+      metName <- paste0(c(met2rxn_edit[[i]]$metName), collapse = " | ")
       line2add <- met2rxn_edit[[i]][1,]
       line2add$metSourceId <- metSourceId
       line2add$metName <- metName
@@ -180,8 +180,8 @@ getReactionsForAnalytes <- function( analytes, onlyHumanMets=F, humanProtein=T, 
 
     for (i in 1:length(prot2rxn_edit))
     {
-      uniprot <- paste0(c(prot2rxn_edit[[i]]$uniprot), collapse = "|")
-      proteinName <- paste0(c(prot2rxn_edit[[i]]$proteinName), collapse = "|")
+      uniprot <- paste0(c(prot2rxn_edit[[i]]$uniprot), collapse = " | ")
+      proteinName <- paste0(c(prot2rxn_edit[[i]]$proteinName), collapse = " | ")
       line2add <- prot2rxn_edit[[i]][1,]
       line2add$uniprot <- uniprot
       line2add$proteinName <- proteinName
