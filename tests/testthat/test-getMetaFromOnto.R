@@ -1,9 +1,11 @@
-test_that("Table Returned Is Not Null,getMetaFromOnto", {
+for (rampDB in test_databases) {
+  test_that("Table Returned Is Not Null,getMetaFromOnto", {
 
-  ontologies <- c("Colon", "Liver", "Lung")
+    ontologies <- c("Colon", "Liver", "Lung")
 
-  Metabolites <- getMetaFromOnto(db = rampDB, ontology = ontologies)
+    Metabolites <- getMetaFromOnto(db = rampDB, ontology = ontologies)
 
-  expect_true(NROW(Metabolites) != 0)
-  expect_true(!is.null(Metabolites))
-})
+    expect_true(NROW(Metabolites) != 0)
+    expect_true(!is.null(Metabolites))
+  })
+}
