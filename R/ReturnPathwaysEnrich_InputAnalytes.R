@@ -580,7 +580,7 @@ runEnrichPathways <- function(
     pathwayid <- x["pathwayRampId"]
     sigpathwaydf <- pathwaydf[which(pathwaydf$pathwayRampId == pathwayid), ]
     analytes <- sigpathwaydf[, "commonName"] %>%
-      paste0(collapse = "|")  # KJK - changed semicolon to pipe, since lipids sometimes have ';' in the name
+      paste0(collapse = " | ")  # KJK - added a space for formatting
     return(analytes)
   })
   if (includeRaMPids) {

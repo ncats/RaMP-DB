@@ -1,42 +1,42 @@
-test_that("Fisher test results does not equal filtered fisher test results, FilterFisherResults",
-          {
+for (rampDB in test_databases) {
+  test_that("Fisher test results does not equal filtered fisher test results, FilterFisherResults",
+  {
 
-            analytes <-
-                c(
-                  "ensembl:ENSG00000135679",
-                  "hmdb:HMDB0000064",
-                  "hmdb:HMDB0000148",
-                  "ensembl:ENSG00000141510"
-                )
+    analytes <-
+      c(
+        "ensembl:ENSG00000135679",
+        "hmdb:HMDB0000064",
+        "hmdb:HMDB0000148",
+        "ensembl:ENSG00000141510"
+      )
 
-            fisher.results <-
-              runEnrichPathways(db = rampDB, analytes = analytes)
+    fisher.results <-
+      runEnrichPathways(db = rampDB, analytes = analytes)
 
-            filtered.fisher.results <-
-              filterEnrichResults(fisher.results, pValType='holm', pValCutoff  = 0.05)
+    filtered.fisher.results <-
+      filterEnrichResults(fisher.results, pValType = 'holm', pValCutoff = 0.05)
 
-             fisher.results <-
-              fisher.results$fishresults[,
-                c("pathwayName",
-                  "Pval_Holm"
-                  )]
-            filtered.fisher.results <-
-              filtered.fisher.results$fishresults[,
-                c("pathwayName",
-                  "Pval_Holm"
-                  )]
+    fisher.results <-
+      fisher.results$fishresults[,
+        c("pathwayName",
+          "Pval_Holm"
+        )]
+    filtered.fisher.results <-
+      filtered.fisher.results$fishresults[,
+        c("pathwayName",
+          "Pval_Holm"
+        )]
 
-            Filt.Test <-
-              max(filtered.fisher.results[, 2]
-                             )
-            Fish.Test <-
-              max(fisher.results[, 2]
-                             )
-            expect_true(
-              Filt.Test != Fish.Test)
-            expect_true(
-              !is.null(filtered.fisher.results))
-          })
+    Filt.Test <-
+      max(filtered.fisher.results[, 2]
+      )
+    Fish.Test <-
+      max(fisher.results[, 2]
+      )
+    expect_true(
+      Filt.Test != Fish.Test)
+    expect_true(
+      !is.null(filtered.fisher.results))
+  })
 
-
-
+}

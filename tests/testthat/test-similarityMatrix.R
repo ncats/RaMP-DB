@@ -1,12 +1,12 @@
 # CREATE TEST DATA
 
 getFullMatrixTestData <- function(cellValue = 0) {
-  nameList <- c('one','two','three','four')
+  nameList <- c('one', 'two', 'three', 'four')
   fullSize <- length(nameList)
-  fullMatrix <- data.frame(row.names = nameList, matrix(data = cellValue, ncol = fullSize, nrow=fullSize))
+  fullMatrix <- data.frame(row.names = nameList, matrix(data = cellValue, ncol = fullSize, nrow = fullSize))
   colnames(fullMatrix) <- nameList
   diag(fullMatrix) <- 1
-  return (fullMatrix)
+  return(fullMatrix)
 }
 
 getSparseArrayTestData <- function() {
@@ -16,11 +16,11 @@ getSparseArrayTestData <- function() {
     c('4,-|6,1000'),                                                 # skip six, similar to 10
     c('10,-|1,1000')                                                 # similar to something outside
   )
-  test_dataFrame <- data.frame(data = matrix(0, ncol=2, nrow=4))
+  test_dataFrame <- data.frame(data = matrix(0, ncol = 2, nrow = 4))
   colnames(test_dataFrame) <- c('pathwayRampId', 'blob')
-  test_dataFrame[,1] <- c('one', 'two', 'three', 'four')
-  test_dataFrame[,2] <- data
-  return (test_dataFrame)
+  test_dataFrame[, 1] <- c('one', 'two', 'three', 'four')
+  test_dataFrame[, 2] <- data
+  return(test_dataFrame)
 }
 
 # TEST CASES START HERE
@@ -47,10 +47,10 @@ test_that("full matrix filtered by requested names", {
   simMat$initializeFromFullDataFrame(testData)
   theMatrix <- simMat$getMatrix()
 
-  expect_equal(theMatrix[1,1], 1)
-  expect_equal(theMatrix[1,2], cellValue)
-  expect_equal(theMatrix[2,1], cellValue)
-  expect_equal(theMatrix[2,2], 1)
+  expect_equal(theMatrix[1, 1], 1)
+  expect_equal(theMatrix[1, 2], cellValue)
+  expect_equal(theMatrix[2, 1], cellValue)
+  expect_equal(theMatrix[2, 2], 1)
   expect_equal(simMat$getNames(), nameSubset)
 })
 
@@ -64,10 +64,10 @@ test_that("full matrix works with real data", {
   expect_equal(simMat$getSize(), c(2, 2))
   expect_equal(simMat$getNames(), pathwayNames)
 
-  expect_equal(theMatrix[1,1], 1)
-  expect_equal(theMatrix[1,2], .3125, tolerance = .0001) # these numbers might change if you change the database version
-  expect_equal(theMatrix[2,1], .3125, tolerance = .0001)
-  expect_equal(theMatrix[2,2], 1)
+  expect_equal(theMatrix[1, 1], 1)
+  expect_equal(theMatrix[1, 2], .3125, tolerance = .0001) # these numbers might change if you change the database version
+  expect_equal(theMatrix[2, 1], .3125, tolerance = .0001)
+  expect_equal(theMatrix[2, 2], 1)
 })
 
 test_that("sparse matrix construction works", {
@@ -77,16 +77,16 @@ test_that("sparse matrix construction works", {
   expect_equal(simMat$getNames(), testData$pathwayRampId)
   theMatrix <- simMat$getMatrix()
 
-  expect_equal(theMatrix[1,1], 1)
-  expect_equal(theMatrix[1,2], .2)
-  expect_equal(theMatrix[1,3], .4)
-  expect_equal(theMatrix[1,4], 1)
-  expect_equal(theMatrix[2,2], 1)
-  expect_equal(theMatrix[2,3], .4)
-  expect_equal(theMatrix[2,4], 0)
-  expect_equal(theMatrix[3,3], 1)
-  expect_equal(theMatrix[3,4], 1)
-  expect_equal(theMatrix[4,4], 1)
+  expect_equal(theMatrix[1, 1], 1)
+  expect_equal(theMatrix[1, 2], .2)
+  expect_equal(theMatrix[1, 3], .4)
+  expect_equal(theMatrix[1, 4], 1)
+  expect_equal(theMatrix[2, 2], 1)
+  expect_equal(theMatrix[2, 3], .4)
+  expect_equal(theMatrix[2, 4], 0)
+  expect_equal(theMatrix[3, 3], 1)
+  expect_equal(theMatrix[3, 4], 1)
+  expect_equal(theMatrix[4, 4], 1)
 })
 
 test_that('sparse matrix works with real data', {
@@ -100,8 +100,8 @@ test_that('sparse matrix works with real data', {
   expect_equal(simMat$getSize(), c(2, 2))
   expect_equal(simMat$getNames(), pathwayNames)
 
-  expect_equal(theMatrix[1,1], 1)
-  expect_equal(theMatrix[1,2], .312, tolerance = .001) # these numbers might change if you change the database version
-  expect_equal(theMatrix[2,1], .312, tolerance = .001)
-  expect_equal(theMatrix[2,2], 1)
+  expect_equal(theMatrix[1, 1], 1)
+  expect_equal(theMatrix[1, 2], .312, tolerance = .001) # these numbers might change if you change the database version
+  expect_equal(theMatrix[2, 1], .312, tolerance = .001)
+  expect_equal(theMatrix[2, 2], 1)
 })

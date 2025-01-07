@@ -424,7 +424,7 @@ runEnrichOntologies <- function(mets,
     ontologyid <- x["rampOntologyId"]
     sigontologydf <- ontologydf[which(ontologydf$rampOntologyId == ontologyid), ]
     analytes <- sigontologydf[, "Metabolites"] %>%
-      paste0(collapse = "|")
+      paste0(collapse = " | ")
     return(analytes)
   })
 
