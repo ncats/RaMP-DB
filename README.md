@@ -1,49 +1,35 @@
 [![Build Status](https://api.travis-ci.com/ncats/RaMP-DB.svg?branch=sqlite)](https://travis-ci.com/github/ncats/RaMP-DB)
 
-# New!  RaMP 3.0!
+# New!  RaMP-DB 3.0!
 
-RaMP 3.0 is now released and includes an updated backend database with 
-expanded annotations for >200,000 metabolites and ~16,000 genes/proteins.  Annotations include biological pathways, chemical classes and structures (for metabolites only), ontologies (metabolites only), and enzyme-metabolite relationships based on chemical reactions. Annotations are drawn from HMDB, KEGG (through HMDB), Lipid-MAPS, WikiPathways, Reactome, CheBI, and Rhea reaction database. 
+RaMP-DB 3.0 is now released and includes an updated backend database with expanded annotations for >250,000 metabolites, ~34,000 genes/proteins, >122,000 pathways, and > 66,000 reactions.  Annotations include biological pathways, chemical classes and structures (for metabolites only), ontologies (metabolites only), and enzyme-metabolite relationships based on chemical reactions. Annotations are drawn from HMDB, KEGG (through HMDB), Lipid-MAPS, WikiPathways, Reactome, CheBI, PFOCR, RefMet, and Rhea reaction database. 
 
-This R package includes functions that allow users to interface with this up-do-date and comprehensive resource.  Functionalities include 1) simple and batch queries for pathways, ontologies, chemical annotations, and reaction-level gene-metabolite relationships; 2) pathway and chemical enrichment analyses.
+This R package allows users to interface with this up-do-date and comprehensive resource.  Functionalities include 1) Queries: simple and batch queries for pathways, ontologies, chemical annotations, and reaction-level gene-metabolite relationships; 2) Enrichment Analysis: pathway and chemical enrichment analyses; 3) Exploration of Results: interactive visualizations of metabolite/gene annotations.
 
-The code used to build the backend RaMP database is freely available at https://github.com/ncats/RaMP-Backend.
+The code used to build the backend RaMP-DB database is freely available at [https://github.com/ncats/RaMP-Backend](https://github.com/ncats/RaMP-Backend).
 
 Please [click here to view our latest manuscript](https://pubmed.ncbi.nlm.nih.gov/36373969/).
 
 # Web Interface
-Our new revamped web interface can be found at https://rampdb.nih.gov/.  The code is publicly available at https://github.com/ncats/RaMP-Client/.
+Our new revamped web interface can be found at [https://rampdb.nih.gov/](https://rampdb.nih.gov/).  The code for the front-end is publicly available at [https://github.com/ncats/ncats-frontend-library/tree/main/apps/ramp-client](https://github.com/ncats/ncats-frontend-library/tree/main/apps/ramp-client).
 
 # APIs
 API access is now available [here](https://rampdb.nih.gov/api).
 
-# Why RaMP (Relational Database of Metabolomic Pathways)
+# Why RaMP-DB (Relational Database of Metabolomic Pathways)
 
-The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene/protein biological, 
-chemical and other from multiple sources. The database structure and data is available as an SQLite database file and it is directly downloaded when using the RaMP package.
+The purpose of RaMP-DB is to provide a publicly available database that integrates metabolite and gene/protein biological, 
+chemical, reaction, and ontology information from multiple sources. The database structure and data is available as an SQLite database file and it is directly downloaded when using the RaMP-DB package.
 Please see the Installation Instructions for further information.
-Please note that this project is in continuous development and we appreciated any feedback. 
+Please note that this project is in continuous development and we appreciate any feedback (through email below or create a GitHub issue)!  Thanks to those that have provided some thus far.
 
 ## Contact Info:
 For any questions or feedback, please send us a note at [NCATSRaMP@mail.nih.gov](NCATSRaMP@mail.nih.gov). 
 
 If you find a bug, please submit an issue through this GitHub repo. 
 
-## Basic Features:
-The R packages and associated app perform  the following queries:
-
-	1. Retrieve analytes (genes, proteins, metabolites) given pathway(s) as input.
-	2. Retrieve pathway annotations given analytes as input.
-	3. Retrieve chemical annotations/structures given metabolites as input.
-	4. Retrieve analytes involved in the same reaction (e.g. enzymes catalyzing reactions involving input metabolites)
-	5. Retrieve ontologies (e.g. biospecimen location, disease, etc.) given input meteabolites.
-	6. Retrieve reactions associated with a list of metabolite and gene/protein input ids.     
-	7. Multi-omic pathway enrichment analysis
-	8. Chemical enrichment analyses
-
 ## Vignette
 Detailed instructions for installing RaMP locally are below.  We've also put together a vignette to get you started on the analyses.  Click here for [vignette](https://ncats.github.io/RaMP-DB/Updated_RaMP_Vignette.html).
-
 
 ## Citation
 If you use RaMP-DB, please cite the following work:
