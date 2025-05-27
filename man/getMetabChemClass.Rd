@@ -4,11 +4,13 @@
 \alias{getMetabChemClass}
 \title{Returns chemical classes for classType}
 \usage{
-getMetabChemClass(db = RaMP(), classType = "ClassyFire_super_class")
+getMetabChemClass(classType = "ClassyFire_super_class", db = RaMP())
 }
 \arguments{
 \item{classType}{one of the metab class types as returned by getMetabClassTypes() function; if null
 will return a list of available classes for each class type}
+
+\item{db}{a RaMP database object, if not specified a new one is created with RaMP::RaMP()}
 }
 \value{
 Returns metabolite classes for classTypes

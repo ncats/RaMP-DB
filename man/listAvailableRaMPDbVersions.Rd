@@ -5,7 +5,12 @@
 \title{Lists local and remotely available RaMP SQLite DB versions and prompts with
 message to download a new version if one exists.}
 \usage{
-listAvailableRaMPDbVersions()
+listAvailableRaMPDbVersions(branch = "main")
+}
+\arguments{
+\item{branch}{`character(1)` specifying the RaMP repository branch to load
+the database from. by default (`version = "main"`) for the released versions
+of the database.}
 }
 \description{
 Lists local and remotely available RaMP SQLite DB versions and prompts with

@@ -4,15 +4,19 @@
 \alias{rampFastCata}
 \title{Retrieves analytes that involved in same reaction as input metabolite}
 \usage{
-rampFastCata(db = RaMP(), analytes = "none", NameOrIds = "ids")
+rampFastCata(analytes = "none", namesOrIds = "ids", db = RaMP(), ...)
 }
 \arguments{
 \item{analytes}{a vector of analytes that need to be searched}
 
-\item{NameOrIds}{whether input is "names" or "ids" (default is "ids")}
+\item{namesOrIds}{whether input is "names" or "ids" (default is "ids")}
+
+\item{db}{a RaMP database object}
+
+\item{...}{Internal Use - for handling deprecated parameter names}
 }
 \value{
-a dataframe containing query results. If the input is a metabolite, the function will output
+a list of two dataframes containing query results from HMDB and Rhea. If the input is a metabolite, the function will output
 gene transcript common names and source IDs that are known to catalyze
 reactions in the same pathway as that metabolite. Conversely, if the input
 is a gene, the function will return the common name and source id of metabolites
@@ -24,7 +28,9 @@ Retrieves analytes that involved in same reaction as input metabolite
 }
 \examples{
 \dontrun{
-pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-rampFastCata(analytes="creatine",NameOrIds="names")
+inputs.of.interest <- c("kegg:C00186" , "hmdb:HMDB0000148", "kegg:C00780",
+ "hmdb:HMDB0000064", "ensembl:ENSG00000115850", "uniprot:Q99259")
+
+new.transcripts <- rampFastCata( analytes = inputs.of.interest, db = rampDB )
 }
 }

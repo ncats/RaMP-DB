@@ -9,14 +9,18 @@
 \usage{
 \S4method{show}{RaMP}(object)
 
-RaMP(version = character())
+RaMP(version = character(), branch = "main")
 
-listRaMPVersions(local = FALSE)
+listRaMPVersions(local = FALSE, branch = "main")
 }
 \arguments{
+\item{object}{a RaMP object}
+
 \item{version}{`character(1)` specifying the RaMP version to load. By
 default (`version = character()`), the most recent release will be
 used.}
+
+\item{branch}{specifies what branch versions should be taken from. Default is 'main'.}
 
 \item{local}{`logical(1)` for `listRaMPVersion`: whether remote
 (`local = FALSE`, default) or locally (`local = TRUE`) available RaMP

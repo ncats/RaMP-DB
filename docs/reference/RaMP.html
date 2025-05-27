@@ -30,7 +30,7 @@ same database version.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RaMP</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
       </span>
     </div>
 
@@ -73,17 +73,25 @@ same database version.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for RaMP</span></span>
 <span><span class="fu">show</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">RaMP</span><span class="op">(</span>version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">RaMP</span><span class="op">(</span>version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>, branch <span class="op">=</span> <span class="st">"main"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">listRaMPVersions</span><span class="op">(</span>local <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">listRaMPVersions</span><span class="op">(</span>local <span class="op">=</span> <span class="cn">FALSE</span>, branch <span class="op">=</span> <span class="st">"main"</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>version</dt>
+    <dl><dt>object</dt>
+<dd><p>a RaMP object</p></dd>
+
+
+<dt>version</dt>
 <dd><p>`character(1)` specifying the RaMP version to load. By
 default (`version = character()`), the most recent release will be
 used.</p></dd>
+
+
+<dt>branch</dt>
+<dd><p>specifies what branch versions should be taken from. Default is 'main'.</p></dd>
 
 
 <dt>local</dt>
@@ -101,7 +109,7 @@ versions should be listed.</p></dd>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by John Braisted, Ewy Mathe, Andrew Patt, Kyle Spencer, Cole Tindall.</p>
+  <p></p><p>Developed by Andrew Patt, Ewy Mathe, Khyati Mehta.</p>
 </div>
 
 <div class="pkgdown">

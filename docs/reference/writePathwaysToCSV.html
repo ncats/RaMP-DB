@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RaMP</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
       </span>
     </div>
 
@@ -44,17 +44,21 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">writePathwaysToCSV</span><span class="op">(</span>mypathways <span class="op">=</span> <span class="st">"none"</span>, outputfile <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">writePathwaysToCSV</span><span class="op">(</span>myPathways <span class="op">=</span> <span class="st">"none"</span>, outputFile <span class="op">=</span> <span class="st">"none"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>mypathways</dt>
+    <dl><dt>myPathways</dt>
 <dd><p>data frame returned by function getPathwayFromAnalyte()</p></dd>
 
 
-<dt>outputfile</dt>
+<dt>outputFile</dt>
 <dd><p>name of output file</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Internal Use - for handling deprecated parameter names</p></dd>
 
 </dl></div>
 
@@ -66,7 +70,7 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by John Braisted, Ewy Mathe, Andrew Patt, Kyle Spencer, Cole Tindall.</p>
+  <p></p><p>Developed by Andrew Patt, Ewy Mathe, Khyati Mehta.</p>
 </div>
 
 <div class="pkgdown">

@@ -6,6 +6,9 @@
 \usage{
 getEntityCountsFromSourceDBs(db = RaMP())
 }
+\arguments{
+\item{db}{a RaMP database object}
+}
 \value{
 database sources and entity counts associated with each data source
 }
@@ -14,7 +17,6 @@ Retrieve counts of entitites (e.g. Metabolites, Pathways, Metabolite-Pathway ass
 }
 \examples{
 \dontrun{
-pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
 getEntityCountsFromSourceDBs()
 }
 }

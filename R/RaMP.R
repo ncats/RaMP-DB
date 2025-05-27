@@ -1,5 +1,5 @@
 #' @importFrom methods setClassUnion
-#'
+#' @importFrom methods callNextMethod
 #' @importClassesFrom DBI DBIDriver
 #'
 #' @noRd
@@ -14,20 +14,14 @@ setClass(
     slots = c(
         driver = "DBIDriverOrNULL",
         dbname = "character",
-        username = "character",
-        conpass = "character",
-        host = "character",
-        port = "integer",
-        dbSummaryObjCache = "list"
+        versionSupport = "environment",
+        api = "ANY"
     ),
     prototype = prototype(
         driver = NULL,
         dbname = character(),
-        username = character(),
-        conpass = character(),
-        host = character(),
-        port = integer(),
-        dbSummaryObjCache = list()
+        versionSupport = new.env(),
+        api = NULL
     ))
 
 #' Helper function to return the connection to the database, defined by the
@@ -39,8 +33,7 @@ setClass(
 #'
 #' @noRd
 .dbcon <- function(x) {
-  con <- dbConnect(drv = x@driver, dbname = .dbname(x), username = .username(x),
-                            password = .conpass(x), host = .host(x), port = .port(x))
+  con <- dbConnect(drv = x@driver, dbname = .dbname(x))
 }
 
 .dbname <- function(x) {
@@ -48,40 +41,12 @@ setClass(
     else NULL
 }
 
-.username <- function(x) {
-    if (length(x@username)) x@username
-    else NULL
-}
-
-.conpass <- function(x) {
-    if (length(x@conpass)) x@conpass
-    else NULL
-}
-
-.host <- function(x) {
-    if (length(x@host)) x@host
-    else NULL
-}
-
-.port <- function(x) {
-    if (length(x@port)) x@port
-    else NULL
-}
-
-#' Helper function to check if the connection is/will be to a
-#' SQLite database
-#'
-#' @noRd
-.is_sqlite <- function(x) {
-    inherits(x@driver, "SQLiteDriver")
-}
-
 #' @importMethodsFrom methods show
 #'
 #' @importFrom DBI dbDisconnect
 #'
 #' @exportMethod show
-#'
+#' @param object a RaMP object
 #' @rdname RaMP
 setMethod("show", "RaMP", function(object) {
     if (is.null(object@driver))
@@ -92,6 +57,17 @@ setMethod("show", "RaMP", function(object) {
     ## Maybe get some additional information from the database with e.g.
     ## number of analytes or versions and list them.
 })
+
+#' @importFrom methods callNextMethod
+setMethod(
+  "initialize",
+  "RaMP",
+  function(.Object, ...) {
+    .Object@versionSupport <- new.env()
+    callNextMethod()
+  }
+)
+
 
 #' @title Connection to a RaMP database
 #'
@@ -120,9 +96,15 @@ setMethod("show", "RaMP", function(object) {
 #'     default (`version = character()`), the most recent release will be
 #'     used.
 #'
+#' @param branch `character(1)` specifying the RaMP repository branch to load
+#' the database from. by default (`version = "main"`) for the released versions
+#' of the database.
+#'
 #' @param local `logical(1)` for `listRaMPVersion`: whether remote
 #'     (`local = FALSE`, default) or locally (`local = TRUE`) available RaMP
 #'     versions should be listed.
+#'
+#' @param branch specifies what branch versions should be taken from. Default is 'main'.
 #'
 #' @name RaMP
 #'
@@ -133,11 +115,11 @@ setMethod("show", "RaMP", function(object) {
 #' @importFrom DBI dbConnect
 #'
 #' @export
-RaMP <- function(version = character()) {
-    db_local <- listRaMPVersions(local = TRUE)
+RaMP <- function(version = character(), branch = "main") {
+    db_local <- listRaMPVersions(local = TRUE, branch = branch)
     if (!length(version)) {
         ## Get most recent remote version
-        db_remote <- listRaMPVersions(local = FALSE)
+        db_remote <- listRaMPVersions(local = FALSE, branch = branch)
         if (!length(db_remote))
             stop("Error getting available remote versions")
 
@@ -146,29 +128,26 @@ RaMP <- function(version = character()) {
     }
     if (!version %in% db_local) {
         ## Only check for remote versions if database not already cached
-        db_remote <- listRaMPVersions(local = FALSE)
+        db_remote <- listRaMPVersions(local = FALSE, branch = branch)
         if (!version %in% db_remote) {
             print(paste0("RaMP version '", version,"' not available. Use ",
                  "'listAvailableRaMPDbVersions()' to list available versions."))
             print(paste0("Checking for version '", version, "' on remote server."))
-              avail <- RaMP:::.is_version_in_remote_lfs(version)
+              avail <- .is_version_in_remote_lfs(version = version, branch = branch)
             if(!avail) {
               print("The spcified RaMP Database version is not available in local file cache OR in remote repository.")
               print("")
               print("Available versions [ running listAvailableRaMPDbVersions() ]:")
-              listAvailableRaMPDbVersions()
+              listAvailableRaMPDbVersions(branch = branch)
               return(NULL)
             } else {
               print(paste0("Retrieving RaMP SQLite DB version '", version, "' from remote server."))
-              .get_ramp_db(version)
+              .get_ramp_db(version = version, branch = branch)
             }
         }
     }
-    db <- .RaMP(SQLite(), dbname = .get_ramp_db(version))
+    db <- .RaMP(SQLite(), dbname = .get_ramp_db(version = version, branch = branch))
     con <- .dbcon(db)
-
-    # add the cache of summary data objects for enrichment
-    db@dbSummaryObjCache <- setupRdataCache(db)
 
     on.exit(dbDisconnect(con))
     .valid_ramp_database(con, error = TRUE)
@@ -180,15 +159,13 @@ RaMP <- function(version = character()) {
 #' @importFrom RSQLite SQLite
 #'
 #' @noRd
-.RaMP <- function(driver = SQLite(), dbname = character(),
-                  username = character(), conpass = character(),
-                  host = character(), port = integer()) {
+.RaMP <- function(driver = SQLite(), dbname = character()) {
 
-    rampObj <- new("RaMP", driver = driver, dbname = dbname, username = username,
-        conpass = conpass, host = host, port = port, dbSummaryObjCache = list())
+    rampObj <- new("RaMP", driver = driver, dbname = dbname)
 
-    # creates the cache of R data objects
-    rampObj@dbSummaryObjCache <- setupRdataCache(db = rampObj)
+    setupVersionSupport(rampObj)
+
+    rampObj@api <- DataAccessObject$new(db = rampObj)
 
     return(rampObj)
 }
@@ -217,14 +194,14 @@ RaMP <- function(version = character()) {
 
 #' @rdname RaMP
 #'
-listRaMPVersions <- function(local = FALSE) {
+listRaMPVersions <- function(local = FALSE, branch = "main") {
     if (local) {
         bfc <- BiocFileCache(cache = getBFCOption("CACHE"), ask = FALSE)
         ci <- bfcinfo(bfc)
         ramps <- ci$rname[grepl("RaMP", ci$rname)]
         sort(unname(vapply(ramps, .version_from_db_file, character(1))))
     } else {
-       .get_remote_db_version_list()
+       get_remote_db_version_list(branch = branch)
     }
 }
 
@@ -236,15 +213,19 @@ listRaMPVersions <- function(local = FALSE) {
 #' otherwise.
 #'
 #' @noRd
-.get_ramp_db <- function(version) {
+.get_ramp_db <- function(version, branch = "main") {
     bfc <- BiocFileCache(cache = getBFCOption("CACHE"), ask = FALSE)
     cacheInfo <- bfcinfo()
     cacheInfo <- cacheInfo[grepl(paste0("RaMP_SQLite_v", version, ".sqlite"),
                                  cacheInfo$rname), ]
     if (!nrow(cacheInfo)) {
-        message("Downloading RaMP-DB version ", version)
+        if (branch == "main") {
+            message("Downloading RaMP-DB version ", version)
+        } else {
+            message("Downloading RaMP-DB version ", version, " from ", branch, " branch")
+        }
         db_url <- paste0(
-            "https://github.com/ncats/RaMP-DB/raw/sqlite/db/RaMP_SQLite_v",
+            "https://github.com/ncats/RaMP-DB/raw/", branch, "/db/RaMP_SQLite_v",
             version, ".sqlite.gz")
         path <- bfcadd(bfc, db_url, fname = "exact", archiveMethod='unzip')
         dbf <- sub(".gz", "", path, fixed = TRUE)
@@ -278,9 +259,9 @@ listRaMPVersions <- function(local = FALSE) {
 #' Tests if a version exists in remote github LFS
 #'
 #' @noRd
-.is_version_in_remote_lfs <- function(version) {
+.is_version_in_remote_lfs <- function(version, branch="main") {
   db_url <- paste0(
-    "https://github.com/ncats/RaMP-DB/raw/sqlite/db/RaMP_SQLite_v",
+    "https://github.com/ncats/RaMP-DB/raw/", branch, "/db/RaMP_SQLite_v",
     version, ".sqlite.gz")
   resp <- httr::HEAD(db_url)
   return(resp$status_code == 200)
@@ -297,7 +278,7 @@ listRaMPVersions <- function(local = FALSE) {
   suppressWarnings( {
     cacheInfo <- cacheInfo[grepl("RaMP_SQLite_v", cacheInfo$rname), ]$rname
     if(length(cacheInfo) > 0) {
-      localVersions <- unlist(lapply(cacheInfo, FUN=RaMP:::.version_from_db_file))
+      localVersions <- unlist(lapply(cacheInfo, FUN=.version_from_db_file))
     }
   })
 
@@ -307,15 +288,18 @@ listRaMPVersions <- function(local = FALSE) {
   return(localVersions)
 }
 
-#' @importFrom httr HEAD GET
+#' List RaMP db versions
 #'
 #' @description returns the list of RaMP db versions available
-#'
-#' @noRd
-.get_remote_db_version_list <- function() {
+#' @param branch Which GitHub branch to pull a list of remote databases from
+#' @export
+# This function was exported at the request of Issue #134.
+# I thought wrapping the existing function for export would be the best solution to avoiding breaking things.
+# - AT 11/12/24
+get_remote_db_version_list <- function(branch = "main") {
 
   # a bit of a hack to parse html... and a regexpr could be cleaner...
-  remoteURL = "https://github.com/ncats/RaMP-DB/raw/sqlite/db/"
+  remoteURL = paste0("https://github.com/ncats/RaMP-DB/raw/", branch, "/db/")
   filenames = httr::GET(remoteURL, ftp.use.epsv = FALSE, dirlistonly = TRUE)
   filenames <- rawToChar(filenames$content)
   filelocs <- unlist(gregexpr(pattern = 'SQLite_v', filenames))
@@ -333,15 +317,20 @@ listRaMPVersions <- function(local = FALSE) {
   return(remoteVersions)
 }
 
-#'
+
 #' Lists local and remotely available RaMP SQLite DB versions and prompts with
 #' message to download a new version if one exists.
+#' @param branch specifies what branch versions should be taken from. Default is 'main'.
+#'
+#' @param branch `character(1)` specifying the RaMP repository branch to load
+#' the database from. by default (`version = "main"`) for the released versions
+#' of the database.
 #'
 #' @export
-listAvailableRaMPDbVersions <- function() {
+listAvailableRaMPDbVersions <- function(branch = "main") {
 
-  localVersions <- RaMP:::.get_local_db_version_list()
-  remoteVersions <- RaMP:::.get_remote_db_version_list()
+  localVersions <- .get_local_db_version_list()
+  remoteVersions <- get_remote_db_version_list(branch = branch)
 
   newVersions <- setdiff(remoteVersions, localVersions)
   haveLocalVersions <- (length(localVersions)>0)
@@ -355,7 +344,11 @@ listAvailableRaMPDbVersions <- function() {
     print("Alternatively you can use the command db <- RaMP(version = <remote_version_number>) using one of the versions listed below.")
   }
 
-  print("Available remote RaMP SQLite DB versions for download:")
+  if (branch == "main") {
+    print("Available remote RaMP SQLite DB versions for download:")
+  } else {
+    print(paste0("Available remote RaMP SQLite DB versions (", branch, " branch) for download:"))
+  }
   print(remoteVersions)
 
   if(length(newVersions) > 0 && haveLocalVersions) {
@@ -380,7 +373,7 @@ removeLocalRampDB <- function(version = 'none') {
     message("Please specify a RaMP database version to remove from local cache, or specify version as 'all' to clear file cache.")
   } else {
 
-    localVersions <- RaMP:::.get_local_db_version_list()
+    localVersions <- .get_local_db_version_list()
     cacheInfo <- BiocFileCache::bfcinfo()
 
     if(version == 'all') {

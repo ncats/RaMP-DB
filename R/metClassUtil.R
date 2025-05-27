@@ -1,16 +1,21 @@
 #' Query to retrieve database ID prefixes for analyte types
 #' @param analyteType value to indicate the desired analyte type. Value one of 'gene' or 'metabolite'
+#' @param db a RaMP database object, if not specified a new one is created with RaMP::RaMP()
 #' @return Returns list of database ID prefixes for selected 'gene' or 'metabolite'
+#' @examples
+#' \dontrun{
+#'   metabprefixes <- getPrefixesFromAnalytes( "metabolite", db = rampDB )
+#' }
+#'
 #' @export  getPrefixesFromAnalytes
-getPrefixesFromAnalytes<-function(db = RaMP(), analyteType="gene") {
+getPrefixesFromAnalytes<-function(analyteType="gene", db = RaMP()) {
+  assertDBparamIsRight(firstParam = analyteType, dbParam = db)
   if (analyteType=="gene"){
-    query1 <- "select distinct(IDtype) from source where geneOrCompound ='gene';"
-    df1<- RaMP::runQuery(query1, db)
+    df1<- db@api$getGeneIDTypes()
     df1 <- data.frame(analyteType="Genes/Proteins", idTypes=paste(df1$IDtype,collapse=", "))
     }
   else if (analyteType=="metabolite"){
-    query2 <- "select distinct(IDtype) from source where geneOrCompound ='compound';"
-    df1 <- RaMP::runQuery(query2, db)
+    df1 <- db@api$getMetaboliteIDTypes()
     df1 <- data.frame(analyteType="Metabolites", idTypes=paste(df1$IDtype,collapse=", "))
     }
   else{
@@ -21,38 +26,37 @@ getPrefixesFromAnalytes<-function(db = RaMP(), analyteType="gene") {
 
 
 #' Returns class data sources for metabolites
+#' @param db a RaMP database object, if not specified a new one is created with RaMP::RaMP()
 #' @return Returns list of data sources for metabolites
+#' @noRd
 getMetabClassDataSources<-function(db = RaMP()){
-  query1<-"select distinct(source) from metabolite_class order by source asc"
-  results<- RaMP::runQuery(query1, db)
-  return(results)
+  return(db@api$getMetaboliteClassSources())
 }
 
 
 #' Returns class categories for metabolites
+#' @param db a RaMP database object, if not specified a new one is created with RaMP::RaMP()
 #' @return Returns metabolite class types
 #' @export getMetabClassTypes
 getMetabClassTypes<-function(db = RaMP()){
-  query1<-"select distinct(class_level_name) from metabolite_class order by class_level_name asc"
-  results<- RaMP::runQuery(query1, db)
-  return(results)
+  return(db@api$getMetaboliteClassTypes())
 }
 
 #' Returns chemical classes for classType
 #' @param classType one of the metab class types as returned by getMetabClassTypes() function; if null
 #' will return a list of available classes for each class type
+#' @param db a RaMP database object, if not specified a new one is created with RaMP::RaMP()
 #' @return Returns metabolite classes for classTypes
 #' @export getMetabChemClass
-getMetabChemClass <- function(db = RaMP(), classType= 'ClassyFire_super_class') {
+getMetabChemClass <- function( classType= 'ClassyFire_super_class', db = RaMP() ) {
+  assertDBparamIsRight(firstParam = classType, dbParam = db)
   if (!is.null(classType)) {
-    query1<- paste0("select class_level_name, class_name from metabolite_class where class_level_name = '",classType,"' group by class_level_name, class_name")
-    res <- RaMP::runQuery(query1, db)
+    res <- db@api$getMetaboliteClassesForType(classType=classType)
     res <- split(res$class_name,res$class_level_name)
   }
 
   else if (is.null(classType)){
-    query1 <- "select class_level_name, class_name from metabolite_class group by class_level_name, class_name"
-    res <- RaMP::runQuery(query1, db)
+    res <- db@api$getAllMetaboliteClasses()
     res <- split(res$class_name,res$class_level_name)
   }
 
@@ -67,13 +71,12 @@ getMetabChemClass <- function(db = RaMP(), classType= 'ClassyFire_super_class') 
 
 
 #' Returns list of available ontologies from database
+#' @param db a RaMP database object, if not specified a new one is created with RaMP::RaMP()
 #' @return Returns ontologies listed in database
 #' @export getOntologies
 
 getOntologies <- function(db = RaMP()) {
-  query1 <- "select * from ontology"
-  OntoRes <- RaMP::runQuery(query1, db)
-  return(OntoRes)
+  return (db@api$getOntologies())
 }
 
 

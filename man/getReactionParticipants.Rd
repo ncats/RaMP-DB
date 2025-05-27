@@ -7,12 +7,12 @@ This utility method can help extend information from previous queries.
 For instance, if a user queries for reactions related to a list of metabolites,
 this method can be used to return proteins on some subset of reaction ids to find related proteins.}
 \usage{
-getReactionParticipants(db = RaMP(), reactionList = c())
+getReactionParticipants(reactionList = c(), db = RaMP())
 }
 \arguments{
-\item{db}{a RaMP databse object}
-
 \item{reactionList}{list of reaction ids}
+
+\item{db}{a RaMP databse object}
 }
 \value{
 returns a dataframe object with reaction to reaction participant mappings.

@@ -42,7 +42,7 @@ The R packages and associated app perform  the following queries:
 	8. Chemical enrichment analyses
 
 ## Vignette
-Detailed instructions for installing RaMP locally are below.  We've also put together a vignette to get you started on the analyses.  Click here for [vignette](https://ncats.github.io/RaMP-DB/RaMP_v3.0_SQLite_Vignette.html).
+Detailed instructions for installing RaMP locally are below.  We've also put together a vignette to get you started on the analyses.  Click here for [vignette](https://ncats.github.io/RaMP-DB/Updated_RaMP_Vignette.html).
 
 
 ## Citation
@@ -58,11 +58,14 @@ To access, [click here](https://www.mdpi.com/2218-1989/8/1/16)
 In order to use this R package locally, you will need to install the R code under this repository.
 
 *Special Note:*
-There is incompatibility (reported here: https://stat.ethz.ch/pipermail/bioc-devel/2023-October/020003.html) between the version of BiocFileCache installed using BiocManager (2.8.0) and the actual latest version (2.10.1).  The latter is needed to be compatible with other dependencies in RaMP-DB.  To install the latest version, you will need to download the source file from Bioconductor (https://bioconductor.org/packages/release/bioc/html/BiocFileCache.html), then install using the install.packages() function.  For a Mac, this looks like this:
-
+There is incompatibility (reported here: https://stat.ethz.ch/pipermail/bioc-devel/2023-October/020003.html) between 
+the version of BiocFileCache installed using BiocManager (2.8.0) and the actual latest version (2.10.1).  The 
+latter is needed to be compatible with other dependencies in RaMP-DB.  To install the latest version, you will 
+need to download the source file from Bioconductor (https://bioconductor.org/packages/release/bioc/html/BiocFileCache.html), 
+then install using the install.packages() function.  For a Mac, this looks like this:
 
 ```
-install.packages("/Users/mathee/Downloads/BiocFileCache_2.10.1.tgz")
+install.packages('https://www.bioconductor.org/packages/3.18/bioc/src/contrib/Archive/BiocFileCache/BiocFileCache_2.10.1.tar.gz', repos=NULL, method='libcurl', dependencies=TRUE)
 ```
 
 ### Install and load the RaMP package 
@@ -109,15 +112,18 @@ RaMP::getPrefixesFromAnalytes(db = rampDB, analyteType = 'gene')
 ```
 
 ## Current Authors and Testers
-* **John Braisted** - john.braisted@nih.gov
-* **Tara Eicher** - tara.eicher@nih.gov
 * **Ewy Mathé** - ewy.mathe@nih.gov
 * **Andrew Patt** - andy.patt@nih.gov
+* **Khyati Mehta** - khyati.meta@nih.gov
+* **Adam Tisch** - adam.tisch@nih.gov
+* **Keith Kelleher** - keith.kelleher@nih.gov
 * **Tim Sheils** - tim.sheils@nih.gov
-* **Kyle Spencer** - kyle.spencer@nih.gov
 
 
 ## Previous Authors/Testers
+* **John Braisted** - 
+* **Tara Eicher** - 
+* **Kyle Spencer** - 
 * **Cole Tindall** - 
 * **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
 * **Shunchao Wang** - 
