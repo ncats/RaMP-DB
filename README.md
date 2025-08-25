@@ -11,7 +11,7 @@ The code used to build the backend RaMP-DB database is freely available at [http
 Please [click here to view our latest manuscript](https://pubmed.ncbi.nlm.nih.gov/36373969/).
 
 # Components of RaMP-DB
-Visit our [linktree here](linktr.ee/ramp_db) to access the many components related to RaMP-DB, incuding links to the front-end, back-end, vignette, publication, API, and the user-friendly website.
+Visit our [linktree here](https://linktr.ee/ramp_db) to access the many components related to RaMP-DB, incuding links to the front-end, back-end, vignette, publication, API, and the user-friendly website.
 
 # Web Interface
 Our new revamped web interface can be found at [https://rampdb.nih.gov/](https://rampdb.nih.gov/).  The code for the front-end is publicly available at [https://github.com/ncats/ncats-frontend-library/tree/main/apps/ramp-client](https://github.com/ncats/ncats-frontend-library/tree/main/apps/ramp-client).
