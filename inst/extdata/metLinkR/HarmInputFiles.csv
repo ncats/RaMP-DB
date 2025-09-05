@@ -1,0 +1,6 @@
+FileNames,ShortFileName,HMDB,Metabolite_Name,PubChem_CID,KEGG,LIPIDMAPS,chebi
+SamplefromCOMETS.csv,inputfile,HMDB_ID,metabolite_name,PUBCHEM,NA,NA,NA
+2019_Metabolon_Metadata.csv,VickyFile,HMDB,BIOCHEMICAL.NAME,PUBCHEM,KEGG,NA,NA
+Metabolon_Annotations_Serum_hmdbformatted.csv,JohnFile,HMDB,CHEMICAL_NAME,PUBCHEM,KEGG,NA,NA
+CSVModifiedBroadfilefromVicky20182019.csv,broadfileVicky,HMDB_ID,Metabolite,COMP_ID,NA,NA,NA
+Broad_2022Aug_annotations.csv,broadfileEwy,hmdbId,Metabolite,pubChemId,NA,NA,NA
