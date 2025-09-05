@@ -1,49 +1,37 @@
 [![Build Status](https://api.travis-ci.com/ncats/RaMP-DB.svg?branch=sqlite)](https://travis-ci.com/github/ncats/RaMP-DB)
 
-# New!  RaMP 3.0!
+# New!  RaMP-DB 3.0!
 
-RaMP 3.0 is now released and includes an updated backend database with 
-expanded annotations for >200,000 metabolites and ~16,000 genes/proteins.  Annotations include biological pathways, chemical classes and structures (for metabolites only), ontologies (metabolites only), and enzyme-metabolite relationships based on chemical reactions. Annotations are drawn from HMDB, KEGG (through HMDB), Lipid-MAPS, WikiPathways, Reactome, CheBI, and Rhea reaction database. 
+RaMP-DB 3.0 is now released and includes an updated backend database with expanded annotations for >250,000 metabolites, ~34,000 genes/proteins, >122,000 pathways, and > 66,000 reactions.  Annotations include biological pathways, chemical classes and structures (for metabolites only), ontologies (metabolites only), and enzyme-metabolite relationships based on chemical reactions. Annotations are drawn from HMDB, KEGG (through HMDB), Lipid-MAPS, WikiPathways, Reactome, CheBI, PFOCR, RefMet, and Rhea reaction database. 
 
-This R package includes functions that allow users to interface with this up-do-date and comprehensive resource.  Functionalities include 1) simple and batch queries for pathways, ontologies, chemical annotations, and reaction-level gene-metabolite relationships; 2) pathway and chemical enrichment analyses.
+This R package allows users to interface with this up-do-date and comprehensive resource.  Functionalities include 1) Queries: simple and batch queries for pathways, ontologies, chemical annotations, and reaction-level gene-metabolite relationships; 2) Enrichment Analysis: pathway and chemical enrichment analyses; 3) Exploration of Results: interactive visualizations of metabolite/gene annotations.
 
-The code used to build the backend RaMP database is freely available at https://github.com/ncats/RaMP-Backend.
+The code used to build the backend RaMP-DB database is freely available at [https://github.com/ncats/RaMP-Backend](https://github.com/ncats/RaMP-Backend).
 
 Please [click here to view our latest manuscript](https://pubmed.ncbi.nlm.nih.gov/36373969/).
 
+# Components of RaMP-DB
+Visit our [linktree here](https://linktr.ee/ramp_db) to access the many components related to RaMP-DB, incuding links to the front-end, back-end, vignette, publication, API, and the user-friendly website.
+
 # Web Interface
-Our new revamped web interface can be found at https://rampdb.nih.gov/.  The code is publicly available at https://github.com/ncats/RaMP-Client/.
+Our new revamped web interface can be found at [https://rampdb.nih.gov/](https://rampdb.nih.gov/).  The code for the front-end is publicly available at [https://github.com/ncats/ncats-frontend-library/tree/main/apps/ramp-client](https://github.com/ncats/ncats-frontend-library/tree/main/apps/ramp-client).
 
 # APIs
 API access is now available [here](https://rampdb.nih.gov/api).
 
-# Why RaMP (Relational Database of Metabolomic Pathways)
+# Why RaMP-DB (Relational Database of Metabolomic Pathways)
 
-The purpose of RaMP is to provide a publicly available database that integrates metabolite and gene/protein biological, 
-chemical and other from multiple sources. The database structure and data is available as an SQLite database file and it is directly downloaded when using the RaMP package.
+The purpose of RaMP-DB is to provide a publicly available database that integrates metabolite and gene/protein biological, chemical, reaction, and ontology information from multiple sources. The database structure and data is available as an SQLite database file and it is directly downloaded when using the RaMP-DB package.
 Please see the Installation Instructions for further information.
-Please note that this project is in continuous development and we appreciated any feedback. 
+Please note that this project is in continuous development and we appreciate any feedback (through email below or create a GitHub issue)!  Thanks to those that have provided some thus far.
 
 ## Contact Info:
 For any questions or feedback, please send us a note at [NCATSRaMP@mail.nih.gov](NCATSRaMP@mail.nih.gov). 
 
 If you find a bug, please submit an issue through this GitHub repo. 
 
-## Basic Features:
-The R packages and associated app perform  the following queries:
-
-	1. Retrieve analytes (genes, proteins, metabolites) given pathway(s) as input.
-	2. Retrieve pathway annotations given analytes as input.
-	3. Retrieve chemical annotations/structures given metabolites as input.
-	4. Retrieve analytes involved in the same reaction (e.g. enzymes catalyzing reactions involving input metabolites)
-	5. Retrieve ontologies (e.g. biospecimen location, disease, etc.) given input meteabolites.
-	6. Retrieve reactions associated with a list of metabolite and gene/protein input ids.     
-	7. Multi-omic pathway enrichment analysis
-	8. Chemical enrichment analyses
-
 ## Vignette
-Detailed instructions for installing RaMP locally are below.  We've also put together a vignette to get you started on the analyses.  Click here for [vignette](https://ncats.github.io/RaMP-DB/RaMP_v3.0_SQLite_Vignette.html).
-
+Detailed instructions for installing RaMP locally are below.  We've also put together a vignette to get you started on the analyses.  Click here for [vignette](https://ncats.github.io/RaMP-DB/Updated_RaMP_Vignette.html).
 
 ## Citation
 If you use RaMP-DB, please cite the following work:
@@ -58,11 +46,12 @@ To access, [click here](https://www.mdpi.com/2218-1989/8/1/16)
 In order to use this R package locally, you will need to install the R code under this repository.
 
 *Special Note:*
-There is incompatibility (reported here: https://stat.ethz.ch/pipermail/bioc-devel/2023-October/020003.html) between the version of BiocFileCache installed using BiocManager (2.8.0) and the actual latest version (2.10.1).  The latter is needed to be compatible with other dependencies in RaMP-DB.  To install the latest version, you will need to download the source file from Bioconductor (https://bioconductor.org/packages/release/bioc/html/BiocFileCache.html), then install using the install.packages() function.  For a Mac, this looks like this:
-
+If you do not have BiocFileCache already installed, you will need this prior to installing RaMP-DB.  To do so, use the following:
 
 ```
-install.packages("/Users/mathee/Downloads/BiocFileCache_2.10.1.tgz")
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("BiocFileCache")
 ```
 
 ### Install and load the RaMP package 
@@ -94,14 +83,14 @@ rampDB <- RaMP(version = "2.5.4")
 
 ### Important Notes
 
-When gene or metabolite ids are input for queries, IDs should be prepended with their database of origin, e.g. kegg:C02712, hmdb:HMDB04824, or CAS:2566-39-4. The list of metabolite or gene/protien IDs may be of mixed source. Remember to include the colon in the prefix. The id prefixes that are currently included in RaMP are: 
+When gene/protein or metabolite ids are input for queries, IDs should be prepended with their database of origin, e.g. kegg:C02712, hmdb:HMDB04824, or CAS:2566-39-4. The list of metabolite or gene/protien IDs may be of mixed source. Remember to include the colon in the prefix. The id prefixes that are currently included in RaMP are: 
 
 | Analyte Type | ID Prefix Types |
 |--------------|-----------------|
-| Metabolites | hmdb, pubchem, chebi, chemspider, kegg, CAS, LIPIDMAPS, swisslipids, lipidbank, wikidata, plantfa, kegg_glycan |
-| Genes/Proteins | ensembl, entrez, gene_symbol, uniprot, hmdb, ncbiprotein, EN, wikidata, chebi
+| Metabolites | hmdb, pubchem, chebi, chemspider, kegg, CAS, LIPIDMAPS, swisslipids, lipidbank, wikidata, plantfa, kegg_glycan, refmet, rhea-comp |
+| Genes/Proteins | ensembl, entrez, gene_symbol, uniprot, hmdb, ncbiprotein, EN, wikidata, chebi, brenda |
 
-The following RaMP functions can be used to list all represented id prefix types.
+The following RaMP-DB functions can be used to list all represented id prefix types.
 ```
 rampDB <- RaMP()
 RaMP::getPrefixesFromAnalytes(db = rampDB, analyteType = 'metabolite')
@@ -109,15 +98,18 @@ RaMP::getPrefixesFromAnalytes(db = rampDB, analyteType = 'gene')
 ```
 
 ## Current Authors and Testers
-* **John Braisted** - john.braisted@nih.gov
-* **Tara Eicher** - tara.eicher@nih.gov
 * **Ewy Mathé** - ewy.mathe@nih.gov
 * **Andrew Patt** - andy.patt@nih.gov
+* **Khyati Mehta** - khyati.meta@nih.gov
+* **Adam Tisch** - adam.tisch@nih.gov
+* **Keith Kelleher** - keith.kelleher@nih.gov
 * **Tim Sheils** - tim.sheils@nih.gov
-* **Kyle Spencer** - kyle.spencer@nih.gov
-
+* **Haley Chatelaine** - haley.chatelaine@nih.gov
 
 ## Previous Authors/Testers
+* **John Braisted** - 
+* **Tara Eicher** - 
+* **Kyle Spencer** - 
 * **Cole Tindall** - 
 * **Bofei Zhang** - [Bofei5675](https://github.com/Bofei5675)
 * **Shunchao Wang** - 

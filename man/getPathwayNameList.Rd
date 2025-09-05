@@ -6,6 +6,9 @@
 \usage{
 getPathwayNameList(db = RaMP())
 }
+\arguments{
+\item{db}{a RaMP database object}
+}
 \value{
 vector of unique pathway names (alphabetically ordered)
 }
@@ -14,7 +17,6 @@ Retrieve list of pathway names
 }
 \examples{
 \dontrun{
-pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-getPathwayNameList()
+getPathwayNameList(db = rampDB)
 }
 }

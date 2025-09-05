@@ -5,18 +5,16 @@
 \title{getReactionClassesForAnalytes returns reactions class and EC numbers for a collection of input compound ids}
 \usage{
 getReactionClassesForAnalytes(
-  db = RaMP(),
   analytes,
   multiRxnParticipantCount = 1,
   humanProtein = TRUE,
   concatResults = F,
   includeReactionIDs = F,
-  useIdMapping = F
+  useIdMapping = F,
+  db = RaMP()
 )
 }
 \arguments{
-\item{db}{a RaMP database object}
-
 \item{analytes}{list of analyte ids}
 
 \item{multiRxnParticipantCount}{minimum number of analytes to report a reaction class, default = 1}
@@ -28,10 +26,22 @@ getReactionClassesForAnalytes(
 \item{includeReactionIDs}{adds the list of reaction ids for each reaction class}
 
 \item{useIdMapping}{allows one to fuzzy match input ids to chebi and uniprot to support reaction queries.}
+
+\item{db}{a RaMP database object}
 }
 \value{
-returns a three dataframes of reaction EC classe information, one for each EC level
+returns a three dataframes of reaction EC class information, one for each EC level
 }
 \description{
 getReactionClassesForAnalytes returns reactions class and EC numbers for a collection of input compound ids
+}
+\examples{
+\dontrun{
+ analytes.of.interest = c('chebi:58115', 'chebi:456215', 'chebi:58245', 'chebi:58450',
+'chebi:17596', 'chebi:16335', 'chebi:16750', 'chebi:172878',
+'chebi:62286', 'chebi:77897', 'uniprot:P30566','uniprot:P30520',
+'uniprot:P00568', 'uniprot:P23109', 'uniprot:P22102', 'uniprot:P15531')
+
+reaction.classes <- getReactionClassesForAnalytes(analytes = analytes.of.interest, db = RaMP())
+}
 }

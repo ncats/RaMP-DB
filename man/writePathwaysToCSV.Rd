@@ -4,12 +4,14 @@
 \alias{writePathwaysToCSV}
 \title{Function that writes output from getPathwayFromAnalyte() to a CSV file}
 \usage{
-writePathwaysToCSV(mypathways = "none", outputfile = "none")
+writePathwaysToCSV(myPathways = "none", outputFile = "none", ...)
 }
 \arguments{
-\item{mypathways}{data frame returned by function getPathwayFromAnalyte()}
+\item{myPathways}{data frame returned by function getPathwayFromAnalyte()}
 
-\item{outputfile}{name of output file}
+\item{outputFile}{name of output file}
+
+\item{...}{Internal Use - for handling deprecated parameter names}
 }
 \description{
 Function that writes output from getPathwayFromAnalyte() to a CSV file

@@ -4,14 +4,22 @@
 \alias{getPrefixesFromAnalytes}
 \title{Query to retrieve database ID prefixes for analyte types}
 \usage{
-getPrefixesFromAnalytes(db = RaMP(), analyteType = "gene")
+getPrefixesFromAnalytes(analyteType = "gene", db = RaMP())
 }
 \arguments{
 \item{analyteType}{value to indicate the desired analyte type. Value one of 'gene' or 'metabolite'}
+
+\item{db}{a RaMP database object, if not specified a new one is created with RaMP::RaMP()}
 }
 \value{
 Returns list of database ID prefixes for selected 'gene' or 'metabolite'
 }
 \description{
 Query to retrieve database ID prefixes for analyte types
+}
+\examples{
+\dontrun{
+  metabprefixes <- getPrefixesFromAnalytes( "metabolite", db = rampDB )
+}
+
 }

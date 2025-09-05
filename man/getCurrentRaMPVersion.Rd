@@ -4,11 +4,13 @@
 \alias{getCurrentRaMPVersion}
 \title{Retrieve RaMP version}
 \usage{
-getCurrentRaMPVersion(db = RaMP(), justVersion = T)
+getCurrentRaMPVersion(justVersion = T, db = RaMP())
 }
 \arguments{
 \item{justVersion}{boolean value indicating if the method should just return the version id (default, justVersion = T),
 or a table that includes db_version_id, load_timestamp (update time/date), version_notes, and the db_sql_url (a url for mysql schema download)}
+
+\item{db}{a RaMP database object}
 }
 \value{
 current ramp databse version
@@ -18,7 +20,7 @@ Retrieve RaMP version
 }
 \examples{
 \dontrun{
-pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-getCurrentRaMPVersion()
+rampDB <- RaMP()
+getCurrentRaMPVersion(db = rampDB)
 }
 }

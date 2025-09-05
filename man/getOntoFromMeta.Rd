@@ -3,26 +3,37 @@
 \name{getOntoFromMeta}
 \alias{getOntoFromMeta}
 \title{Function that query database to find ontology information based on
-the given list of analytes}
+the given list of metabolites}
 \usage{
-getOntoFromMeta(db = RaMP(), analytes, NameOrIds = "ids")
+getOntoFromMeta(
+  mets,
+  namesOrIds = "ids",
+  includeRaMPids = FALSE,
+  db = RaMP(),
+  ...
+)
 }
 \arguments{
-\item{analytes}{a vector of analytes or a analytes delimited by new line character}
+\item{mets}{a vector of metabolites or a metabolites delimited by new line character}
 
-\item{NameOrIds}{specify the type of given data}
+\item{namesOrIds}{specify the type of given data}
+
+\item{includeRaMPids}{whether or not to include RaMP ids in the output (TRUE/FALSE)}
+
+\item{db}{a RaMP database object}
+
+\item{...}{Internal Use - for handling deprecated parameter names}
 }
 \value{
-dataframe that contains searched ontology from given analytes
+dataframe that contains searched ontology from given metabolites
 }
 \description{
 Function that query database to find ontology information based on
-the given list of analytes
+the given list of metabolites
 }
 \examples{
 \dontrun{
-pkg.globals <- setConnectionToRaMP(dbname = "ramp2", username = "root",
-	conpass = "", host = "localhost")
-getOntoFromMeta("hmdb:HMDB0071437")
+rampDB <- RaMP()
+getOntoFromMeta(mets = "hmdb:HMDB0071437", db=rampDB)
 }
 }

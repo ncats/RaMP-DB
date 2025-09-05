@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RaMP</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
       </span>
     </div>
 
@@ -44,28 +44,36 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotCataNetwork</span><span class="op">(</span>catalyzedf <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotCataNetwork</span><span class="op">(</span>catalyzeDf <span class="op">=</span> <span class="st">""</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>catalyzedf</dt>
+    <dl><dt>catalyzeDf</dt>
 <dd><p>a data.frame output by rampFastCata() that contains analytes that are in the same reaction</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Internal Use - for handling deprecated parameter names</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     
 
-<p>An interactive HTML plot that allows the user to pan/zoom into regions of interest. User genes/metabolites are highlighted in blue, whereas analytes found by the function are orange.</p>
+<p>An interactive HTML plot that allows the user to pan/zoom into regions of interest. User genes/
+metabolites are highlighted in blue, whereas analytes found by the function are orange.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="va">pkg.globals</span> <span class="op">&lt;-</span> <span class="fu">setConnectionToRaMP</span><span class="op">(</span>dbname<span class="op">=</span><span class="st">"ramp2"</span>,username<span class="op">=</span><span class="st">"root"</span>,conpass<span class="op">=</span><span class="st">""</span>,host <span class="op">=</span> <span class="st">"localhost"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">catalyzedf</span> <span class="op">&lt;-</span> <span class="fu"><a href="rampFastCata.html">rampFastCata</a></span><span class="op">(</span>analytes<span class="op">=</span><span class="st">"creatine"</span>,NamesOrIds<span class="op">=</span><span class="st">"names"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">plotCataNetwork</span><span class="op">(</span><span class="va">catalyzedf</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">inputs.of.interest</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"kegg:C00186"</span> , <span class="st">"hmdb:HMDB0000148"</span>, <span class="st">"kegg:C00780"</span>, <span class="st">"hmdb:HMDB0000064"</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"ensembl:ENSG00000115850"</span>, <span class="st">"uniprot:Q99259"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">new.transcripts</span> <span class="op">&lt;-</span> <span class="fu"><a href="rampFastCata.html">rampFastCata</a></span><span class="op">(</span>analytes <span class="op">=</span> <span class="va">inputs.of.interest</span>, db <span class="op">=</span> <span class="va">rampDB</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">plotCataNetwork</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">new.transcripts</span>, n<span class="op">=</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
@@ -77,7 +85,7 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by John Braisted, Ewy Mathe, Andrew Patt, Kyle Spencer, Cole Tindall.</p>
+  <p></p><p>Developed by Andrew Patt, Ewy Mathe, Khyati Mehta.</p>
 </div>
 
 <div class="pkgdown">

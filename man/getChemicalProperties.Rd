@@ -4,16 +4,18 @@
 \alias{getChemicalProperties}
 \title{Returns chemical properties given a metabolite list}
 \usage{
-getChemicalProperties(db = RaMP(), mets, propertyList = "all")
+getChemicalProperties(mets, propertyList = "all", db = RaMP())
 }
 \arguments{
-\item{mets}{a list object of source prepended metaboite ids, representing a metabolite set of interest}
+\item{mets}{a list object of source prepended metabolite ids, representing a metabolite set of interest}
 
 \item{propertyList}{an optional list of specific properties to extract.  Options include 'all' (default),  'smiles', 'inchi_key', 'inchi_key_prefix', 'inchi', 'mw', 'monoisotop_mass', 'formula', 'common_name'.
 If a props list is not supplied, all property fields will be returned.}
+
+\item{db}{a RaMP database object}
 }
 \value{
-Returns chemcial property information for the list of input metabolites and a query report reporting on the number of metabolite ids that were matched and the list of un-matched input ids.
+Returns chemical property information for the list of input metabolites and a query report reporting on the number of metabolite ids that were matched and the list of un-matched input ids.
 
 The returned object (return_obj below) contains two results. Use str(return_obj) to see the structure described here.
 
@@ -28,21 +30,15 @@ Returns chemical properties given a metabolite list
 \examples{
 \dontrun{
 # metabolite list of interest
-mets = c('hmdb:HMDB0000056',
-            'hmdb:HMDB0000439',
-            'hmdb:HMDB0000479',
-            'hmdb:HMDB0000532',
-            'hmdb:HMDB0001015',
-            'hmdb:HMDB0001138',
-            'hmdb:HMDB0029159',
-            'hmdb:HMDB0029412',
-            'hmdb:HMDB0034365',
-            'hmdb:HMDB0035227',
-            'hmdb:HMDB0007973',
-            'hmdb:HMDB0008057',
-            'hmdb:HMDB0011211')
-pkg.globals <- setConnectionToRaMP(dbname="ramp2",username="root",conpass="",host = "localhost")
-chemProps <- getChemicalProperties(mets, propertyList = c('iso_smiles', 'inchi_key', 'common_name'))
-head(chemProps$chem_props)
+metabolites.of.interest = c("pubchem:64969",
+                             "chebi:16958",
+                             "chemspider:20549",
+                             "kegg:C05598",
+                             "chemspider:388809",
+                             "pubchem:53861142",
+                             "hmdb:HMDB0001138",
+                             "hmdb:HMDB0029412")
+
+chemical.classes <- getChemicalProperties(mets = metabolites.of.interest, db = rampDB)
 }
 }

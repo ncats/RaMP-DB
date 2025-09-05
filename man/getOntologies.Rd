@@ -6,6 +6,9 @@
 \usage{
 getOntologies(db = RaMP())
 }
+\arguments{
+\item{db}{a RaMP database object, if not specified a new one is created with RaMP::RaMP()}
+}
 \value{
 Returns ontologies listed in database
 }
