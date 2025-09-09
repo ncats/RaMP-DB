@@ -1,0 +1,303 @@
+Compound,BIOCHEMICAL,HMDB_ID,Metabolite,,,,COMP_ID
+MQ1,2-aminoadipate,HMDB00510,2-aminoadipate,,,,6146
+MQ103,2-hydroxyglutaric acid,HMDB59655*,2-hydroxyglutarate,,,,NA
+MQ2,3-hydroxykynurenine,HMDB00732,3-hydroxykynurenate,,,,22110
+MQ97,3-methyladipate,HMDB00555*,3-methyladipate/pimelate,,,,36749
+MQ4,3-phosphoglycerate,HMDB00807,3-phosphoglycerate,,,,1414;40264
+MQ6,Pyridoxate,HMDB00017,4-pyridoxate,,,,31555
+QI8439,5-hydroxytryptophan,HMDB00472,5-hydroxytryptophan,,,,NA
+MQ100,6-phosphogluconate,HMDB01316,6-phosphogluconate,,,,NA
+MQ8,Cis-aconitate,HMDB00072*,aconitate,,,,46173
+MQ9,Adenine,HMDB00034,adenine,,,,554
+MQ11,Adipate,HMDB00448,adipate,,,,21134
+MQ14,Adenosine 5'-diphosphate (ADP),HMDB01341,ADP,,,,3108
+MQ5,Glycerol 3-phosphate or Glycerol 3-phosphate (G3P),HMDB00126,alpha-glycerophosphate,,,,43847
+MQ101,2-hydroxybutyrate (AHB),HMDB00008,alpha-hydroxybutyrate,,,,21044
+MQ13,Adenosine 5'-monophosphate (AMP),HMDB00045,AMP,,,,32342
+MQ116,NA,HMDB00538,ATP,,,,NA
+MQ102,Beta-hydroxybutyrate,HMDB00011,beta-hydroxybutyrate,,,,NA
+QI7469,C14:0 CE,HMDB06725,C14:0 CE,,,,NA
+QI14069,1-myristoylglycerophosphocholine (14:0),HMDB10379,C14:0 LPC,,,,35626;45453
+QI4680,"Myristoyl sphingomyelin* or Sphingomyelin (d18:1/14:0, d16:1/16:0)*",HMDB12097,C14:0 SM,,,,42463
+QI7643,C16:0 CE,HMDB00885,C16:0 CE,,,,NA
+QI12012,N-palmitoyl-sphingosine (d18:1/16:0),HMDB04949,C16:0 Ceramide (d18:1),,,,44877
+QI3511,1-palmitoyl-GPC (16:0) or 1-palmitoylglycerophosphocholine (16:0),HMDB10382,C16:0 LPC,,,,33955
+TF12,1-palmitoyl-GPC (16:0) or 1-palmitoylglycerophosphocholine (16:0),HMDB10382,C16:0 LPC,,,,33955
+QI3528,1-palmitoyl-GPE (16:0) or 1-palmitoylglycerophosphoethanolamine,HMDB11503,C16:0 LPE,,,,35631
+QI12160,C16:0 SM,HMDB10169,C16:0 SM,,,,NA
+TF13,C16:0 SM,HMDB10169,C16:0 SM,,,,NA
+QI9634,C16:1 CE,HMDB00658*,C16:1 CE,,,,NA
+QI3208,C16:1 LPC,HMDB10383*,C16:1 LPC,,,,NA
+QI9305,C18:0 CE,HMDB10368,C18:0 CE,,,,NA
+QI13300,1-stearoyl-GPC (18:0) or 1-stearoylglycerophosphocholine (18:0),HMDB10384,C18:0 LPC,,,,33961
+QI13275,1-stearoyl-GPE (18:0) or 1-stearoylglycerophosphoethanolamine,HMDB11130,C18:0 LPE,,,,42398
+TF14,1-stearoyl-GPE (18:0) or 1-stearoylglycerophosphoethanolamine,HMDB11130*,C18:0 LPE-B,,,,42398
+QI5476,Stearoyl sphingomyelin or Stearoyl sphingomyelin (d18:1/18:0),HMDB01348,C18:0 SM,,,,19503
+QI7682,C18:1 CE,HMDB00918*,C18:1 CE,,,,NA
+QI3628,1-oleoyl-GPC (18:1) or 1-oleoylglycerophosphocholine (18:1),HMDB02815*,C18:1 LPC,,,,48258
+QI13506,1-oleoyl-GPE (18:1) or 1-oleoylglycerophosphoethanolamine,HMDB11506*,C18:1 LPE,,,,35628
+QI11983,"Oleoyl sphingomyelin or Sphingomyelin (d18:1/18:1, d18:2/18:0)",HMDB12101*,C18:1 SM,,,,37529
+QI9592,C18:2 CE,HMDB00610*,C18:2 CE,,,,NA
+QI3332,1-linoleoyl-GPC (18:2) or 1-linoleoylglycerophosphocholine (18:2n6),HMDB10386*,C18:2 LPC,,,,34419
+TF15,1-linoleoyl-GPC (18:2) or 1-linoleoylglycerophosphocholine (18:2n6),HMDB10386*,C18:2 LPC,,,,34419
+QI3352,1-linoleoyl-GPE (18:2)* or 1-linoleoylglycerophosphoethanolamine*,HMDB11507*,C18:2 LPE,,,,36600
+QI7435,C18:3 CE,HMDB10370*,C18:3 CE,,,,NA
+QI3493,NA,HMDB10387*,C18:3 LPC,,,,NA
+TF16,NA,HMDB11478*,C18:3 LPE,,,,NA
+QI3685,Lysope(20:0/0:0),HMDB11511,C20:0 LPE,,,,NA
+QI5976,"Arachidoyl sphingomyelin* or Sphingomyelin (d18:1/20:0, d16:1/22:0)*",HMDB12102,C20:0 SM,,,,48490
+TF17,NA,HMDB10391*,C20:1 LPC,,,,NA
+TF18,NA,HMDB11512*,C20:1 LPE,,,,NA
+QI9560,C20:3 CE,HMDB06736*,C20:3 CE,,,,NA
+TF19,C20:3 LPC,HMDB10393*,C20:3 LPC,,,,NA
+QI9666,C20:4 CE,HMDB06726,C20:4 CE,,,,NA
+QI3358,1-arachidonoyl-GPC (20:4n6) or 1-arachidonoylglycerophosphocholine (20:4n6)*,HMDB10395,C20:4 LPC,,,,33228
+QI3273,1-arachidonoyl-GPE (20:4n6)* or 1-arachidonoylglycerophosphoethanolamine*,HMDB11517,C20:4 LPE,,,,35186
+QI7367,C20:5 CE,HMDB06731,C20:5 CE,,,,NA
+TF2,C20:5 LPC,HMDB10397,C20:5 LPC,,,,NA
+QI10713,C22:0 Ceramide (d18:1),HMDB04952,C22:0 Ceramide (d18:1),,,,NA
+QI4008,NA,HMDB11520,C22:0 LPE,,,,NA
+QI6321,Behenoyl sphingomyelin (d18:1/22:0)*,HMDB12103,C22:0 SM,,,,48492
+TF20,Behenoyl sphingomyelin (d18:1/22:0)*,HMDB12103,C22:0 SM,,,,48492
+QI11086,"Euricoyl sphingomyelin* or Sphingomyelin (d18:1/22:1, d18:2/22:0, d16:1/24:1)*",HMDB12104*,C22:1 SM,,,,48493
+TF21,"Euricoyl sphingomyelin* or Sphingomyelin (d18:1/22:1, d18:2/22:0, d16:1/24:1)*",HMDB12104*,C22:1 SM,,,,48493
+TF22,NA,HMDB10401*,C22:4 LPC,,,,NA
+QI9626,C22:5 CE,HMDB10375*,C22:5 CE,,,,NA
+TF23,NA,HMDB10403*,C22:5 LPC,,,,NA
+QI7414,C22:6 CE,HMDB06733,C22:6 CE,,,,NA
+QI3333,C22:6 LPC,HMDB10404,C22:6 LPC,,,,NA
+QI3355,C22:6 LPE,HMDB11526,C22:6 LPE,,,,NA
+QI6800,C24:0 Ceramide (d18:1),HMDB04956,C24:0 Ceramide (d18:1),,,,NA
+TF24,1-lignoceroyl-GPC (24:0),HMDB10405,C24:0 LPC,,,,49617
+QI10419,C24:0 SM,HMDB11697,C24:0 SM,,,,NA
+QI10548,C24:1 Ceramide (d18:1),HMDB04953*,C24:1 Ceramide (d18:1),,,,NA
+QI6382,"Nervonoyl sphingomyelin* or Sphingomyelin (d18:1/24:1, d18:2/24:0)*",HMDB12107*,C24:1 SM,,,,47153
+QI5500,C30:0 DAG,HMDB07011*,C30:0 DAG,,,,NA
+QI12230,C30:0 PC,HMDB07869*,C30:0 PC,,,,NA
+TF3,C30:1 PC,HMDB07870*,C30:1 PC,,,,NA
+QI5904,"1,2-dipalmitoylglycerol",HMDB07098*,C32:0 DAG,,,,11953;35727
+QI11709,C32:0 PC,HMDB07871*,C32:0 PC,,,,NA
+QI12344,"1,2-dipalmitoyl-GPE (16:0/16:0)*",HMDB08923*,C32:0 PE,,,,57341
+QI11535,C32:1 DAG,HMDB07099*,C32:1 DAG,,,,NA
+QI12030,C32:1 PC,HMDB07873*,C32:1 PC,,,,NA
+TF10,C32:2 DAG,HMDB07128*,C32:2 DAG,,,,NA
+QI4829,C32:2 PC,HMDB07874*,C32:2 PC,,,,NA
+QI6252,C34:0 DAG,HMDB07100*,C34:0 DAG,,,,NA
+QI5846,1-palmitoyl-2-stearoyl-GPC (16:0/18:0),HMDB07970*,C34:0 PC,,,,52616
+QI11940,C34:0 PE,HMDB08925*,C34:0 PE,,,,NA
+QI4978,C34:0 PS,HMDB12356*,C34:0 PS,,,,NA
+QI6006,C34:1 DAG,HMDB07102*,C34:1 DAG,,,,NA
+QI5561,1-palmitoyl-2-oleoyl-GPC (16:0/18:1),HMDB07972*,C34:1 PC,,,,52461
+QI5826,C34:1 PC plasmalogen-A,HMDB11208*,C34:1 PC plasmalogen-A,,,,NA
+QI6123,C34:1 PC plasmalogen-B,HMDB11239*,C34:1 PC plasmalogen-B,,,,NA
+QI11384,1-palmitoyl-3-linoleoyl-glycerol (16:0/18:2)* or Palmitoyl-linoleoyl-glycerol (16:0/18:2) [2]*,HMDB07103*,C34:2 DAG,,,,52634
+QI5277,1-palmitoyl-2-linoleoyl-GPC (16:0/18:2),HMDB07973*,C34:2 PC,,,,42446
+QI11317,C34:2 PC plasmalogen,HMDB11210*,C34:2 PC plasmalogen,,,,NA
+QI11865,C34:2 PE,HMDB08928*,C34:2 PE,,,,NA
+QI5827,C34:2 PE plasmalogen,HMDB08952*,C34:2 PE plasmalogen,,,,NA
+QI5461,Palmitoleoyl-linoleoyl-glycerol (16:1/18:2) [1]*,HMDB07132*,C34:3 DAG,,,,54967
+QI4948,C34:3 PC,HMDB08006*,C34:3 PC,,,,NA
+TF8,1-(1-enyl-palmitoyl)-2-linoleoyl-GPC (P-16:0/18:2)*,HMDB11211*,C34:3 PC plasmalogen,,,,52682
+QI5558,1-(1-enyl-palmitoyl)-2-linoleoyl-GPE (P-16:0/18:2)*,HMDB11343*,C34:3 PE plasmalogen,,,,52677
+TF4,C34:4 PC,HMDB07883*,C34:4 PC,,,,NA
+QI11383,C34:5 PC plasmalogen,HMDB11214*,C34:5 PC plasmalogen,,,,NA
+QI6647,C36:0 DAG,HMDB07158*,C36:0 DAG,,,,NA
+QI11569,C36:0 PE,HMDB08991*,C36:0 PE,,,,NA
+QI10708,C36:1 DAG,HMDB07216*,C36:1 DAG,,,,NA
+QI11168,1-stearoyl-2-oleoyl-GPC (18:0/18:1),HMDB08038*,C36:1 PC,,,,52438
+QI6218,C36:1 PC plasmalogen,HMDB11241*,C36:1 PC plasmalogen,,,,NA
+QI5968,1-stearoyl-2-oleoyl-GPE (18:0/18:1),HMDB08993*,C36:1 PE,,,,42448
+QI6161,C36:2 DAG,HMDB07218*,C36:2 DAG,,,,NA
+QI5706,1-stearoyl-2-linoleoyl-GPC (18:0/18:2)*,HMDB08039*,C36:2 PC,,,,52452
+QI5981,C36:2 PC plasmalogen,HMDB11243*,C36:2 PC plasmalogen,,,,NA
+QI11437,1-stearoyl-2-linoleoyl-GPE(18:0/18:2)*,HMDB08994*,C36:2 PE,,,,52446
+QI10942,C36:2 PE plasmalogen,HMDB09082*,C36:2 PE plasmalogen,,,,NA
+QI11262,C36:3 DAG,HMDB07219*,C36:3 DAG,,,,NA
+QI11717,C36:3 PC,HMDB08105*,C36:3 PC,,,,NA
+QI11178,C36:3 PC plasmalogen,HMDB11244*,C36:3 PC plasmalogen,,,,NA
+QI11727,C36:3 PE,HMDB09060*,C36:3 PE,,,,NA
+QI5967,C36:3 PE plasmalogen,HMDB11441*,C36:3 PE plasmalogen,,,,NA
+QI11543,Linoleoyl-linoleoyl-glycerol (18:2/18:2) [1]*,HMDB07248*,C36:4 DAG,,,,54968
+QI11572,C36:4 PC plasmalogen,HMDB11310*,C36:4 PC plasmalogen,,,,NA
+TF5,C36:4 PC-A,HMDB07983*,C36:4 PC-A,,,,NA
+QI11861,"1,2-dilinoleoyl-GPC (18:2/18:2)",HMDB08138*,C36:4 PC-B,,,,52603
+QI11860,C36:4 PE,HMDB08937*,C36:4 PE,,,,NA
+QI11462,C36:4 PE plasmalogen,HMDB11442*,C36:4 PE plasmalogen,,,,NA
+QI5299,C36:5 PC plasmalogen-A,HMDB11221*,C36:5 PC plasmalogen-A,,,,NA
+TF9,1-(1-enyl-palmitoyl)-2-arachidonoyl-GPC (P-16:0/20:4)*,HMDB11220*,C36:5 PC plasmalogen-B,,,,52689
+QI5563,C36:5 PE plasmalogen,HMDB11410*,C36:5 PE plasmalogen,,,,NA
+TF6,C38:2 PC,HMDB08270*,C38:2 PC,,,,NA
+QI11659,C38:2 PE,HMDB08942*,C38:2 PE,,,,NA
+QI11298,C38:3 PC,HMDB08047*,C38:3 PC,,,,NA
+QI5732,C38:3 PE plasmalogen,HMDB11384*,C38:3 PE plasmalogen,,,,NA
+QI11434,1-stearoyl-2-arachidonoyl-GPC (18:0/20:4),HMDB08048*,C38:4 PC,,,,42450
+QI5986,C38:4 PC plasmalogen,HMDB11252*,C38:4 PC plasmalogen,,,,NA
+QI5710,1-stearoyl-2-arachidonoyl-GPE (18:0/20:4),HMDB09003*,C38:4 PE,,,,52447
+QI5810,C38:5 DAG,HMDB07199*,C38:5 DAG,,,,NA
+QI11167,C38:5 PE plasmalogen,HMDB11386*,C38:5 PE plasmalogen,,,,NA
+QI5239,C38:6 PC,HMDB07991*,C38:6 PC,,,,NA
+QI11625,C38:6 PC plasmalogen,HMDB11319*,C38:6 PC plasmalogen,,,,NA
+QI11904,C38:6 PE,HMDB09102*,C38:6 PE,,,,NA
+QI5680,C38:6 PE plasmalogen,HMDB11387*,C38:6 PE plasmalogen,,,,NA
+QI11561,C38:7 PC plasmalogen,HMDB11229*,C38:7 PC plasmalogen,,,,NA
+QI11646,C38:7 PE plasmalogen,HMDB11420*,C38:7 PE plasmalogen,,,,NA
+QI11482,C40:6 PC,HMDB08057*,C40:6 PC,,,,NA
+QI11245,C40:7 PE plasmalogen,HMDB11394*,C40:7 PE plasmalogen,,,,NA
+TF7,C40:9 PC,HMDB08731*,C40:9 PC,,,,NA
+QI7210,C43:0 TAG,HMDB42062*,C43:0 TAG,,,,NA
+QI7095,C43:1 TAG,HMDB42098*,C43:1 TAG,,,,NA
+QI10151,C43:2 TAG,HMDB43169*,C43:2 TAG,,,,NA
+QI7290,C44:0 TAG,HMDB42063*,C44:0 TAG,,,,NA
+QI9778,C45:0 TAG,HMDB42093*,C45:0 TAG,,,,NA
+QI9887,C45:1 TAG,HMDB42099*,C45:1 TAG,,,,NA
+QI10008,C45:2 TAG,HMDB43170*,C45:2 TAG,,,,NA
+QI9693,C46:0 TAG,HMDB10411*,C46:0 TAG,,,,NA
+QI9924,C46:2 TAG,HMDB10419*,C46:2 TAG,,,,NA
+QI9735,C47:1 TAG,HMDB42100*,C47:1 TAG,,,,NA
+QI7295,C47:2 TAG,HMDB42076*,C47:2 TAG,,,,NA
+QI9559,C48:0 TAG,HMDB05356*,C48:0 TAG,,,,NA
+QI9655,C48:1 TAG,HMDB05359*,C48:1 TAG,,,,NA
+QI9764,C48:2 TAG,HMDB05376*,C48:2 TAG,,,,NA
+QI7260,C48:3 TAG,HMDB05432*,C48:3 TAG,,,,NA
+QI9484,C49:0 TAG,HMDB42095*,C49:0 TAG,,,,NA
+QI7452,C49:2 TAG,HMDB11706*,C49:2 TAG,,,,NA
+QI7347,C49:3 TAG,HMDB42103*,C49:3 TAG,,,,NA
+QI7720,C50:0 TAG,HMDB05357*,C50:0 TAG,,,,NA
+QI7624,C50:1 TAG,HMDB05360*,C50:1 TAG,,,,NA
+QI7527,C50:2 TAG,HMDB05377*,C50:2 TAG,,,,NA
+QI9730,C50:3 TAG,HMDB05433*,C50:3 TAG,,,,NA
+QI7300,C50:4 TAG,HMDB05435*,C50:4 TAG,,,,NA
+QI7188,C50:5 TAG,HMDB10471*,C50:5 TAG,,,,NA
+QI7124,C50:6 TAG,HMDB10497*,C50:6 TAG,,,,NA
+QI9326,NA,HMDB31106*,C51:0 TAG,,,,NA
+QI9455,NA,HMDB42104*,C51:1 TAG,,,,NA
+QI9650,NA,HMDB11701*,C51:3 TAG,,,,NA
+QI9244,C52:0 TAG,HMDB05365*,C52:0 TAG,,,,NA
+QI7775,C52:1 TAG,HMDB05367*,C52:1 TAG,,,,NA
+QI9476,C52:2 TAG,HMDB05369*,C52:2 TAG,,,,NA
+QI9576,C52:3 TAG,HMDB05384*,C52:3 TAG,,,,NA
+QI7460,C52:4 TAG,HMDB05363*,C52:4 TAG,,,,NA
+QI9790,C52:5 TAG,HMDB05380*,C52:5 TAG,,,,NA
+QI9906,C52:6 TAG,HMDB05436*,C52:6 TAG,,,,NA
+QI7172,C52:7 TAG,HMDB10517*,C52:7 TAG,,,,NA
+QI9419,C53:2 TAG,HMDB42196*,C53:2 TAG,,,,NA
+QI7625,NA,HMDB43058*,C53:3 TAG,,,,NA
+QI9205,C54:1 TAG,HMDB05395*,C54:1 TAG,,,,NA
+QI7823,C54:2 TAG,HMDB05403*,C54:2 TAG,,,,NA
+QI7701,C54:3 TAG,HMDB05405*,C54:3 TAG,,,,NA
+QI7603,C54:4 TAG,HMDB05370*,C54:4 TAG,,,,NA
+QI7501,C54:5 TAG,HMDB05385*,C54:5 TAG,,,,NA
+QI7395,C54:6 TAG,HMDB05391*,C54:6 TAG,,,,NA
+TF11,C54:7 TAG,HMDB05447*,C54:7 TAG,,,,NA
+QI7234,C54:8 TAG,HMDB10518*,C54:8 TAG,,,,NA
+QI10095,C54:9 TAG,HMDB10498*,C54:9 TAG,,,,NA
+QI7900,C55:2 TAG,HMDB42226*,C55:2 TAG,,,,NA
+QI9355,C55:3 TAG,HMDB42466*,C55:3 TAG,,,,NA
+QI8079,C56:1 TAG,HMDB05396*,C56:1 TAG,,,,NA
+QI7175,C56:10 TAG,HMDB10513*,C56:10 TAG,,,,NA
+QI7969,C56:2 TAG,HMDB05404*,C56:2 TAG,,,,NA
+QI9280,C56:3 TAG,HMDB05410*,C56:3 TAG,,,,NA
+QI7730,C56:4 TAG,HMDB05398*,C56:4 TAG,,,,NA
+QI9563,C56:6 TAG,HMDB05456*,C56:6 TAG,,,,NA
+QI9641,C56:7 TAG,HMDB05462*,C56:7 TAG,,,,NA
+QI7402,C56:8 TAG,HMDB05392*,C56:8 TAG,,,,NA
+QI9859,C56:9 TAG,HMDB05448*,C56:9 TAG,,,,NA
+QI9816,C58:10 TAG,HMDB05476*,C58:10 TAG,,,,NA
+QI7247,C58:11 TAG,HMDB10531*,C58:11 TAG,,,,NA
+QI7444,C58:9 TAG,HMDB05463*,C58:9 TAG,,,,NA
+QI7316,C60:12 TAG,HMDB05478*,C60:12 TAG,,,,NA
+MQ16,"Adenosine 3',5'-cyclic monophosphate (cAMP)",HMDB00058,cAMP,,,,2831
+QI12603,Campesterol,HMDB02869,campesterol,,,,33997
+MQ17,NA,HMDB01546,CDP,,,,NA
+MQ86,NA,HMDB00626*,chenodeoxycholate/deoxycholate,,,,NA
+MQ81,Cholate,HMDB00619,cholate,,,,22842
+QI12606,Cholesterol (Cholest-5-en-3-ol),HMDB00067,cholesterol,,,,63
+MQ18,Citrate,HMDB00094,citrate,,,,1564
+MQ20,NA,HMDB00095,CMP,,,,NA
+QI9946,NA,HMDB01072,coenzyme Q10,,,,NA
+MQ21,Cystathionine,HMDB00099,cystathionine,,,,15705
+TF25,Cystine,HMDB00192,cystine,,,,56
+MQ22,Cytidine,HMDB00089,cytidine,,,,514
+QI8466,Cytosine,HMDB00630,cytosine,,,,573
+MQ23,NA,HMDB01202,dCMP,,,,NA
+MQ24,Dihydroxyacetone,HMDB01473*,DHAP/glyceraldehyde 3P,,,,NA
+TF26,NA,HMDB0240212,DMGV,,,,NA
+MQ26,NA,HMDB01409,dUMP,,,,NA
+MQ27,NA,HMDB01321,erythrose-4-phosphate,,,,NA
+MQ29,NA,HMDB00121,folate,,,,NA
+MQ30,Glucose (D-glucose),HMDB00122*,fructose/glucose/galactose,,,,48152
+MQ32,Fumarate,HMDB00134*,fumarate/maleate,,,,1643
+TF27,GABA,HMDB00112,GABA,,,,NA
+MQ33,GDP,HMDB01201,GDP,,,,NA
+MQ34,Glucuronate,HMDB00127,glucuronate,,,,15443
+MQ35,Glutathione oxidized,HMDB03337,glutathione oxidized,,,,NA
+MQ82,Glycocholate,HMDB00138,glycocholate,,,,18476
+MQ84,Glycodeoxycholate,HMDB00631*,glycodeoxycholate/glycochenodeoxycholate,,,,18477
+MQ37,GMP,HMDB01397,GMP,,,,NA
+MQ38,Guanine,HMDB00132,guanine,,,,32352
+MQ39,Guanosine,HMDB00133,guanosine,,,,1573
+MQ31,NA,HMDB01058*,hexose diphosphate,,,,NA
+MQ28,Hexose monophosphate,HMDB00124*,hexose monophosphate,,,,NA
+MQ40,Hippurate,HMDB00714,hippurate,,,,15753
+TF28,Homocysteine,HMDB00742,homocysteine,,,,15128;40266
+MQ41,NA,HMDB00676,homocystine,,,,NA
+MQ91,4-hydroxyphenylacetate,HMDB00020,hydroxyphenylacetate,,,,541
+MQ44,Hypoxanthine,HMDB00157,hypoxanthine,,,,3127
+MQ45,IMP,HMDB00175,IMP,,,,NA
+MQ94,Indolepropionate,HMDB02302,indole-3-propionate,,,,32405
+MQ92,Indolelactate,HMDB00671,indolelactate,,,,18349
+MQ93,3-indoxyl sulfate,HMDB00682,indoxylsulfate,,,,27672
+MQ46,Inosine,HMDB00195,inosine,,,,1123
+MQ104,Myo-inositol,HMDB00211,inositol,,,,1124
+MQ19,Isocitrate,HMDB00193,isocitrate,,,,12110
+TF29,Isoleucine (L-isoleucine),HMDB00172,isoleucine,,,,1125
+TF30,NA,HMDB00704,isoxanthopterin,,,,NA
+MQ47,Kynurenine (L-kynurenine),HMDB00684,kynurenine,,,,15140
+MQ48,Lactate,HMDB00190,lactate,,,,527
+MQ49,Lactose,HMDB00186,lactose,,,,567;11454
+TF31,Leucine (L-leucine),HMDB00687,leucine,,,,60
+MQ50,Malic acid,HMDB00744,malate,,,,NA
+MQ106,MDA,HMDB06112,MDA,,,,NA
+QI8489,Metoprolol,HMDB01932,metoprolol,,,,18037
+TF34,N-acetylhistidine,HMDB32055,N-acetylhistidine,,,,33946
+TF35,N-acetylphenylalanine,HMDB00512,N-acetylphenylalanine,,,,33950
+TF36,N-acetylputrescine,HMDB02064,N-acetylputrescine,,,,37496
+QI3719,Oleic ethanolamide or Oleoyl ethanolamide,HMDB02088,N-oleoylethanolamine,,,,38102
+TF32,"N2,N2-dimethylguanosine",HMDB04824,"N2,N2-dimethylguanosine",,,,35137
+MQ57,Oxalate (ethanedioate),HMDB02329,oxalate,,,,20694
+QI13532,Palmitoyl ethanolamide,HMDB02100,palmithoylethanolamide,,,,38165
+MQ58,Pantothenate,HMDB00210,pantothenate,,,,1508
+MQ64,NA,HMDB01548*,pentose monophosphate,,,,NA
+MQ59,PEP,HMDB00263,PEP,,,,NA
+TF37,Phenylalanine (L-phenylalanine),HMDB00159,phenylalanine,,,,64
+TF38,Choline phosphate,HMDB01565,phosphocholine,,,,34396
+MQ96,Phosphocreatine,HMDB01511,phosphocreatine,,,,NA
+MQ60,NA,HMDB06049,phosphotyrosine,,,,NA
+QI15147,Piperine,HMDB29377,piperine,,,,33935
+MQ61,Propionate,HMDB00237,propionate,,,,NA
+TF39,Pterin,HMDB00802,pterin,,,,NA
+TF40,NA,HMDB00239,pyridoxine,,,,NA
+MQ62,Pyruvate,HMDB00243,pyruvate,,,,48990
+MQ63,Oxaloacetate,HMDB00232,quinolinate,,,,47173
+MQ65,2-hydroxyhippurate (salicylurate),HMDB00840,salicylurate,,,,18281
+TF41,Sarcosine or Sarcosine (N-Methylglycine),HMDB00271,sarcosine,,,,1516
+TF42,SDMA,HMDB03334,SDMA,,,,NA
+TF43,Solanidine,HMDB03236,solanidine,,,,39788
+MQ66,Sorbitol,HMDB00247,sorbitol,,,,15053
+MQ67,Succinate,HMDB00254,succinate,,,,1437
+MQ69,Sucrose,HMDB00258,sucrose,,,,1519
+MQ83,Taurocholate,HMDB00036,taurocholate,,,,18497
+MQ85,Taurodeoxycholate,HMDB00896*,taurodeoxycholate/taurochenodeoxycholate,,,,12261
+MQ70,Thymine,HMDB00262,thymine,,,,NA
+TF45,Tryptophan (L-tryptophan),HMDB00929,tryptophan,,,,54
+TF46,Tyrosine,HMDB00158,tyrosine,,,,1299
+MQ72,UDP,HMDB00295,UDP,,,,NA
+MQ73,UDP-galactose/UDP-glucose,HMDB00286*,UDP-galactose/UDP-glucose,,,,NA
+MQ74,UDP-glucuronic acid,HMDB00935,UDP-glucuronate,,,,NA
+MQ71,NA,HMDB00288,UMP,,,,NA
+MQ75,Uracil,HMDB00300,uracil,,,,605
+MQ76,Urate,HMDB00289,urate,,,,1604
+MQ77,Uridine,HMDB00296,uridine,,,,606
+TF47,Valine,HMDB00883,valine,,,,1649
+MQ78,Xanthine,HMDB00292,xanthine,,,,3147
+MQ79,Xanthurenate,HMDB00881,xanthurenate,,,,15679
