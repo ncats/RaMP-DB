@@ -310,9 +310,9 @@ get_remote_db_version_list <- function(branch = "main") {
     versions <- c(versions, substr(filenames, filelocs[i], fileEnds[i]))
   }
   versions <- substr(versions, 1, unlist(gregexpr(".sqlite", versions))-1)
-
-  remoteVersions <- sort(versions, decreasing=T)
-  remoteVersions <- unique(remoteVersions)
+  versions <- unique(versions)
+  remoteVersions <- sort(package_version(versions), decreasing=T)
+  remoteVersions <- as.character(remoteVersions)
 
   return(remoteVersions)
 }
