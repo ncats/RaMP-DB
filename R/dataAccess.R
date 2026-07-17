@@ -264,6 +264,10 @@ DataAccessObject <- R6::R6Class(
     getAllSourceInfoForSourceIDs = function(sourceIds) {
       return (runQuery(sql = getInfoForIDsQuery(table = 'source', matchColumn = 'sourceid', idList = sourceIds), db = self$db))
     },
+    getCommonNamesForSourceIDs = function(sourceIds) {
+      queryFunction <- if (supportsCommonName(db = self$db)) getCommonNamesForSourceIDsQuery else getCommonNamesForSourceIDsQueryOld
+      return (runQuery(sql = queryFunction(sourceIds = sourceIds), db = self$db))
+    },
     getAllPathwaysForRampIDs = function(rampIds) {
       return (runQuery(sql = getInfoForIDsQuery(table = 'analytehaspathway', matchColumn = 'rampId', idList = rampIds), db = self$db))
     },
@@ -433,6 +437,29 @@ getChemicalClassFromSourceIDsQuery <- function(sourceIds) {
 getSourceInfoFromSourceIDsQuery <- function(sourceIds) {
   query_list = formatListAsString(idList = sourceIds)
   return (paste0("select sourceId,IDtype as analytesource, rampId from source where sourceId in (",query_list,");"))
+}
+
+getCommonNamesForSourceIDsQuery <- function(sourceIds) {
+  query_list = formatListAsString(idList = sourceIds)
+  return (paste0("select distinct s.sourceId,
+                         s.commonName as sourceCommonName,
+                         s.rampId,
+                         a.common_name as rampCommonName
+                  from source s
+                  left join analyte a on a.rampId = s.rampId
+                  where s.sourceId in (", query_list, ")
+                  order by s.sourceId, s.rampId;"))
+}
+
+getCommonNamesForSourceIDsQueryOld <- function(sourceIds) {
+  query_list = formatListAsString(idList = sourceIds)
+  return (paste0("select distinct sourceId,
+                         commonName as sourceCommonName,
+                         rampId,
+                         NULL as rampCommonName
+                  from source
+                  where sourceId in (", query_list, ")
+                  order by sourceId, rampId;"))
 }
 
 getSynonymsForSynonymQuery <- function(synonymList) {

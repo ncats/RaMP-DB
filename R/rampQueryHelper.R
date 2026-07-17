@@ -147,6 +147,48 @@ rampFindSourceRampId <- function( sourceId, db = RaMP()){
   return(df)
 }
 
+#' Find RaMP common names from source IDs
+#'
+#' @param sourceIds a vector, data frame, or string separated by comma or new line
+#' @param db a RaMP database object
+#'
+#' @return data.frame with sourceId, sourceCommonName, rampId, and rampCommonName
+#' @noRd
+rampCommonNameFromSourceId <- function(sourceIds, db = RaMP()) {
+  if (is.character(sourceIds)) {
+    if (grepl("\n", sourceIds)[1]) {
+      sourceIds <- unlist(strsplit(sourceIds, "\n"))
+    } else if (grepl(",", sourceIds)[1]) {
+      sourceIds <- unlist(strsplit(sourceIds, ","))
+    }
+  } else if (is.data.frame(sourceIds)) {
+    if ("sourceId" %in% colnames(sourceIds)) {
+      sourceIds <- as.character(sourceIds$sourceId)
+    } else {
+      sourceIds <- as.character(unlist(sourceIds))
+    }
+  } else {
+    message("sourceIds must be a character string, character vector, or data frame")
+    return(NULL)
+  }
+
+  sourceIds <- unique(trimws(sourceIds))
+  sourceIds <- sourceIds[nzchar(sourceIds)]
+
+  if (length(sourceIds) == 0) {
+    return(data.frame(
+      sourceId = character(),
+      sourceCommonName = character(),
+      rampId = character(),
+      rampCommonName = character()
+    ))
+  }
+
+  df <- db@api$getCommonNamesForSourceIDs(sourceIds = sourceIds)
+  df <- df[, c("sourceId", "sourceCommonName", "rampId", "rampCommonName")]
+  return(df)
+}
+
 #' Check for id prefixes
 #' By default, the function checks on whether there are at least 90% of input user analytes with
 #' appropriate RaMP-supported prefixes.

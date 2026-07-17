@@ -40,6 +40,26 @@ for (rampDB in test_databases) {
     testthat::expect_true(length(vList) > 0)
   })
 
+  test_that("rampCommonNameFromSourceId returns source and RaMP common names", {
+    res <- rampCommonNameFromSourceId(
+      sourceIds = c("hmdb:HMDB0000056", "hmdb:HMDB0000439"),
+      db = rampDB
+    )
+
+    expect_s3_class(res, "data.frame")
+    expect_equal(
+      colnames(res),
+      c("sourceId", "sourceCommonName", "rampId", "rampCommonName")
+    )
+    expect_true(all(res$sourceId %in% c("hmdb:HMDB0000056", "hmdb:HMDB0000439")))
+    expect_true(all(!is.na(res$sourceCommonName)))
+    expect_true(all(!is.na(res$rampId)))
+
+    if (supportsCommonName(db = rampDB)) {
+      expect_true(all(!is.na(res$rampCommonName)))
+    }
+  })
+
 
   test_that("get_remote_db_version_list works", {
     vList <- get_remote_db_version_list()
