@@ -227,7 +227,7 @@ listRaMPVersions <- function(local = FALSE, branch = "main") {
         db_url <- paste0(
             "https://github.com/ncats/RaMP-DB/raw/", branch, "/db/RaMP_SQLite_v",
             version, ".sqlite.gz")
-        path <- bfcadd(bfc, db_url, fname = "exact", archiveMethod='unzip')
+        path <- bfcadd(bfc, db_url, fname = "exact")
         dbf <- sub(".gz", "", path, fixed = TRUE)
         if (file.exists(dbf))
             file.remove(dbf)
