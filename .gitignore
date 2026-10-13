@@ -10,3 +10,5 @@ dbprops.txt
 # !.vscode/launch.json
 # !.vscode/extensions.json
 .history/*
+notebooks
+.idea
